@@ -1,2 +1,2 @@
 # Prestige-Tree
-A tree of prestige upgrades (unfinished)
+A tree of prestige upgrades (alpha)
