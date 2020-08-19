@@ -11,8 +11,19 @@
 <body onload="load()">
 	<div id="app">
 		<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
+		<div id="info" v-if="player.tab=='tree'" onclick="showTab('info')"><br>i</div>
 		<div class="vl"></div>
-		<br>You have <h2>{{format(player.points)}}</h2> Points
+		<br><br>
+		<div v-if="player.tab=='info'" class="col right">
+			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
+			<h3>Hotkeys</h3><br><br>
+			P: Prestige reset<br>
+			<span v-if="player.b.unl">B: Booster reset</span><br>
+			<span v-if="player.g.unl">G: Generator reset</span><br>
+			<span v-if="player.t.unl">T: Time reset</span><br>
+			<span v-if="player.e.unl">E: Enhance reset</span><br>
+			<span v-if="player.s.unl">S: Space reset</span><br>
+		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
 			<table>
@@ -30,6 +41,7 @@
 			</table>
 		</div>
 		<div class="col left">
+			You have <h2>{{format(player.points)}}</h2> Points
 			<br><br><br><br><br>
 			<table>
 				<tr>
@@ -80,13 +92,16 @@
 					You have {{format(player.t.energy)}} Time Energy, which multiplies Point gain & Prestige Point gain by {{format(getTimeEnergyEff())}}<br><br>
 					<table><tr><td v-bind:class="{ milestone: player.t.best.lt(2), milestoneDone: player.t.best.gte(2) }">2 time capsules<br>Keep Booster/Generator milestones on reset</td></tr>
 					<tr><td v-bind:class="{ milestone: player.t.best.lt(3), milestoneDone: player.t.best.gte(3) }">3 time capsules<br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-bind:class="{ milestone: player.t.best.lt(4), milestoneDone: player.t.best.gte(4) }">4 time capsules<br>Keep Booster Upgrades on all row 3 resets</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: (player.b.points.gte(getExtCapsuleCost())&&player.t.unl), locked: (player.b.points.lt(getExtCapsuleCost())||!player.t.unl), t: true }" onclick="buyExtCapsule()">Buy an extra Time Capsule<br>Cost: {{formatWhole(getExtCapsuleCost())}} Boosters<br>Amount: {{formatWhole(player.t.extCapsules)}}</button>
 				</div>
 				<div v-if="layer=='s'">
 					You have {{formatWhole(getSpace())}} Space.<br><br>
 					<table><tr><td v-bind:class="{ milestone: player.s.best.lt(2), milestoneDone: player.s.best.gte(2) }">2 space energy<br>Keep Booster/Generator milestones on reset</td></tr>
-					<tr><td v-bind:class="{ milestone: player.s.best.lt(3), milestoneDone: player.s.best.gte(3) }">3 space energy<br>Keep Prestige Upgrades on reset</td></tr></table><br><br>
+					<tr><td v-bind:class="{ milestone: player.s.best.lt(3), milestoneDone: player.s.best.gte(3) }">3 space energy<br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-bind:class="{ milestone: player.s.best.lt(4), milestoneDone: player.s.best.gte(4) }">4 space energy<br>Keep Generator Upgrades on all row 3 resets</td></tr>
+					</table><br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<table><tr>
 						<td v-for="id in 4">

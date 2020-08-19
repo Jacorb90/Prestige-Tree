@@ -8,6 +8,7 @@
 
 *:focus {
 	outline: none;
+	webkit-outline: none;
 }
 
 body {
@@ -170,6 +171,25 @@ h1, h2 {
 
 #optionWheel:hover {
 	transform: rotate(360deg);
+}
+
+#info {
+	font-size: 20px;
+	color: white;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	cursor: pointer;
+	width: 40px;
+	height: 40px;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: #02f2f2;
+}
+
+#info:hover {
+	transform: scale(1.2, 1.2);
+	text-shadow: 5px 0px 10px #02f2f2,
+              -3px 0px 12px #02f2f2;
 }
 
 .opt {
