@@ -10,7 +10,7 @@
 </head>
 <body onload="load()">
 	<div id="app">
-		<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.JPG" onclick="showTab('options')"></img>
+		<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 		<br>You have <h2>{{format(player.points)}}</h2> Points
 		<div v-if="player.tab=='options'">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
