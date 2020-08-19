@@ -10,10 +10,8 @@
 </head>
 <body onload="load()">
 	<div id="app">
-		<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 		<div id="info" v-if="player.tab=='tree'" onclick="showTab('info')"><br>i</div>
 		<div class="vl"></div>
-		<br><br>
 		<div v-if="player.tab=='info'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
 			<h3>Hotkeys</h3><br><br>
@@ -41,7 +39,8 @@
 			</table>
 		</div>
 		<div class="col left">
-			You have <h2>{{format(player.points)}}</h2> Points
+			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
+			<br>You have <h2>{{format(player.points)}}</h2> Points
 			<br><br><br><br><br>
 			<table>
 				<tr>

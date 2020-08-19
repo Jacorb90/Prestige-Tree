@@ -990,10 +990,12 @@ function hardReset() {
 }
 
 var saveInterval = setInterval(function() {
+	if (player===undefined) return;
 	if (player.autosave) save();
 }, 5000)
 
 var interval = setInterval(function() {
+	if (player===undefined) return;
 	let diff = (Date.now()-player.time)/1000
 	player.time = Date.now()
 	if (needCanvasUpdate && player.tab=="tree") resizeCanvas();
@@ -1001,6 +1003,7 @@ var interval = setInterval(function() {
 }, 50)
 
 document.onkeydown = function(e) {
+	if (player===undefined) return;
 	let shiftDown = e.shiftKey
 	let key = e.key
 	if (!LAYERS.includes(key)) return
