@@ -12,7 +12,6 @@ function retrieveCanvasData() {
 }
 
 function resizeCanvas() {
-	if (player.tab!='tree') return
 	if (!retrieveCanvasData()) return
 	canvas.width = 0;
     canvas.height = 0;
@@ -22,7 +21,6 @@ function resizeCanvas() {
 }
 
 function drawTree() {
-	if (player.tab!='tree') return
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	if (layerUnl('b')) drawTreeBranch("p", "b")

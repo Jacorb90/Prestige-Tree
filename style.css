@@ -14,7 +14,12 @@ body {
 	background-color: black;
 	color: white;
 	text-shadow: 0px 0px 7px white;
-	overflow-x: hidden;
+	overflow: hidden;
+}
+
+html, body {
+	min-height: 100%;
+	height: 100%;
 }
 
 h1, h2 {
@@ -157,7 +162,7 @@ h1, h2 {
 #optionWheel {
 	position: absolute;
 	top: 0px;
-	right: 0px;
+	left: 0px;
 	height: 40px;
 	width: 40px;
 	cursor: pointer;
@@ -219,6 +224,38 @@ h1, h2 {
 
 .remove:hover {
 	transform: scale(1.1, 1.1);
+}
+
+.col {
+	min-width: 49.5%;
+	max-width: 49.5%;
+	width: 49.5%;
+	height: 100%;
+	min-height: 100%;
+	column-span: 1;
+	position: absolute;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.col.right {
+	top: 0;
+	right: 0;
+}
+
+#app {
+	column-count: 2;
+	column-width: 50%;
+	min-height: 100%;
+}
+
+.vl {
+	border-left: 6px solid #969696;
+	height: 100%;
+	position: absolute;
+	left: 50%;
+	margin-left: -3px;
+	top: 0;
 }
 
 [tooltip] {

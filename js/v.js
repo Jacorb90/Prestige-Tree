@@ -21,6 +21,7 @@ function loadVue() {
 		  getTimeEnergyEff,
 		  getExtCapsuleCost,
 		  getSpace,
+		  getSpaceBuildingsUnl,
 		  getSpaceBuildingCost,
 		  getSpaceBuildingEffDesc,
 		  buyBuilding,
