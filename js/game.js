@@ -772,7 +772,7 @@ function resetRow(row) {
 
 function getEnhancerCost() {
 	let cost = Decimal.pow(2, player.e.enhancers.pow(1.5))
-	return cost
+	return cost.floor()
 }
 
 function getEnhancerEff() {
