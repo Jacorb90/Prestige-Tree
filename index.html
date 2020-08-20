@@ -27,6 +27,10 @@
 				<li>Added changelog</li>
 				<li>Balanced up to 1e700 with all prestige tree paths</li>
 			</ul><br><br>
+			<h3>Alpha Build 5</h3>
+			<ul>
+				<li>Balanced up to 1e920 with all prestige tree paths (before unlocking third row 3 layer)</li>
+			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
@@ -122,7 +126,7 @@
 					</table><br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<table><tr>
-						<td v-for="id in 4">
+						<td v-for="id in 5">
 							<button v-if="getSpaceBuildingsUnl()>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button>
 						</td>
 					</tr></table>

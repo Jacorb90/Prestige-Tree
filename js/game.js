@@ -55,7 +55,8 @@ function getStartPlayer() {
 				1: new Decimal(0),
 				2: new Decimal(0),
 				3: new Decimal(0),
-				4: new Decimal(0)
+				4: new Decimal(0),
+				5: new Decimal(0)
 			},
 			upgrades: [],
 		},
@@ -297,7 +298,7 @@ const LAYER_UPGS = {
 		},
 	},
 	e: {
-		rows: 1,
+		rows: 2,
 		cols: 5,
 		11: {
 			desc: "Boosters & Generators boost each other.",
@@ -332,9 +333,34 @@ const LAYER_UPGS = {
 			cost: new Decimal(2e10),
 			unl: function() { return player.e.upgrades.includes(14)&&(player.t.unl||player.s.unl)&&player.e.best.gte(1e9) },
 		},
+		21: {
+			desc: "The Generator Power effect is raised to the power of 1.15.",
+			cost: new Decimal(1e15),
+			unl: function() { return player.t.unl&&(player.t.order==1||player.s.unl)&&player.e.upgrades.includes(14) },
+		},
+		22: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		23: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		24: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		25: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
 	},
 	t: {
-		rows: 2,
+		rows: 3,
 		cols: 4,
 		11: {
 			desc: "Non-extra Time Capsules boost the Booster effect.",
@@ -388,9 +414,29 @@ const LAYER_UPGS = {
 			cost: new Decimal(7),
 			unl: function() { return player.t.upgrades.includes(21)&&player.t.best.gte(5) },
 		},
+		31: {
+			desc: "Add 25 to the booster effect base.",
+			cost: new Decimal(8),
+			unl: function() { return (player.t.upgrades.includes(22)&&(player.e.order==1||player.s.unl))||(player.t.upgrades.includes(23)&&(player.s.order==1||player.e.unl)) },
+		},
+		32: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		33: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		34: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
 	},
 	s: {
-		rows: 2,
+		rows: 3,
 		cols: 4,
 		11: {
 			desc: "Add a free level to all Space Buildings.",
@@ -441,6 +487,26 @@ const LAYER_UPGS = {
 			desc: "Space Building costs scale half as fast, and you have 3 more Space.",
 			cost: new Decimal(7),
 			unl: function() { return player.s.upgrades.includes(21)&&(player.t.unl||player.e.unl) },
+		},
+		31: {
+			desc: "Space Building 1 uses a better formula.",
+			cost: new Decimal(7),
+			unl: function() { return (player.s.upgrades.includes(22)&&(player.t.order==0||player.e.unl))||(player.s.upgrades.includes(23)&&(player.e.order==0||player.t.unl)) },
+		},
+		32: {
+			desc: "Unlock a 5th Space Building.",
+			cost: new Decimal(8),
+			unl: function() { return (player.s.upgrades.includes(22)&&(player.t.order==1||player.e.unl))||(player.s.upgrades.includes(23)&&(player.e.order==1||player.t.unl)) },
+		},
+		33: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		34: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 }
@@ -525,6 +591,7 @@ function checkForVars() {
 	if (player.t === undefined) player.t = getStartPlayer().t
 	if (player.s === undefined) player.s = getStartPlayer().s
 	if (player.s.buildings[4] === undefined) player.s.buildings[4] = new Decimal(0);
+	if (player.s.buildings[5] === undefined) player.s.buildings[5] = new Decimal(0);
 }
 
 function convertToDecimal() {
@@ -546,7 +613,7 @@ function convertToDecimal() {
 	player.s.points = new Decimal(player.s.points)
 	player.s.best = new Decimal(player.s.best)
 	player.s.spent = new Decimal(player.s.spent)
-	for (let i=1;i<=4;i++) player.s.buildings[i] = new Decimal(player.s.buildings[i])
+	for (let i=1;i<=5;i++) player.s.buildings[i] = new Decimal(player.s.buildings[i])
 }
 
 function toggleOpt(name) {
@@ -740,7 +807,8 @@ function rowReset(row, layer) {
 					1: new Decimal(0),
 					2: new Decimal(0),
 					3: new Decimal(0),
-					4: new Decimal(0)
+					4: new Decimal(0),
+					5: new Decimal(0)
 				},
 				upgrades: [],
 			}
@@ -797,6 +865,7 @@ function addToBoosterBase() {
 	if (player.b.upgrades.includes(12)) toAdd = toAdd.plus(LAYER_UPGS.b[12].currently())
 	if (player.b.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.b[13].currently())
 	if (player.t.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.t[11].currently())
+	if (player.t.upgrades.includes(31)) toAdd = toAdd.plus(25)
 	if (player.e.unl) toAdd = toAdd.plus(getEnhancerEff2())
 	if (player.e.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
 	if (player.s.unl) toAdd = toAdd.plus(getSpaceBuildingEff(2))
@@ -832,6 +901,7 @@ function getGenPowerEff() {
 	let eff = player.g.power.plus(1).cbrt();
 	if (player.b.upgrades.includes(21)) eff = eff.pow(2);
 	if (player.b.upgrades.includes(22)) eff = eff.pow(1.2);
+	if (player.e.upgrades.includes(21)) eff = eff.pow(1.15);
 	return eff
 }
 
@@ -932,7 +1002,7 @@ function getSpaceBuildingCostMod() {
 }
 
 function getSpaceBuildingCost(x) {
-	let inputVal = new Decimal([1e3,1e10,1e25,1e48][x-1])
+	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
 	let bought = player.s.buildings[x]
 	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0)
 	return cost
@@ -951,6 +1021,7 @@ function getExtraBuildingLevels(x) {
 	let lvl = new Decimal(0)
 	if (player.s.upgrades.includes(11)) lvl = lvl.plus(1);
 	if (player.s.upgrades.includes(14)) lvl = lvl.plus(1);
+	if (x<5) lvl = lvl.plus(getSpaceBuildingEff(5))
 	return lvl
 }
 
@@ -962,7 +1033,7 @@ function getSpaceBuildingEff(x) {
 	bought = bought.times(power)
 	switch(x) {
 		case 1: 
-			return Decimal.pow(Decimal.add(1, bought), player.s.points.sqrt()).times(Decimal.mul(4, bought)).max(1)
+			return Decimal.pow(Decimal.add(1, bought.pow(player.s.upgrades.includes(31)?2.75:1)), player.s.points.sqrt()).times(Decimal.mul(4, bought.pow(player.s.upgrades.includes(31)?2.75:1))).max(1)
 			break;
 		case 2: 
 			return bought.sqrt()
@@ -972,6 +1043,9 @@ function getSpaceBuildingEff(x) {
 			break;
 		case 4: 
 			return bought.plus(1).pow(1.25)
+			break;
+		case 5: 
+			return bought.sqrt().times(2)
 			break;
 	}
 }
@@ -990,6 +1064,10 @@ function getSpaceBuildingEffDesc(x) {
 			break;
 		case 4: 
 			return "Booster Upgrade 6's effect is raised to the power of "+format(eff)
+			break;
+		case 5: 
+			return "Add "+format(eff)+" free levels to all previous Space Buildings."
+			break;
 	}
 }
 
@@ -1007,7 +1085,7 @@ function buyBuilding(x) {
 function respecSpaceBuildings() {
 	if (!player.s.unl) return;
 	if (!confirm("Are you sure you want to reset your Space Buildings? This will force you to do a Space reset as well!")) return
-	for (let i=1;i<=4;i++) player.s.buildings[i] = new Decimal(0)
+	for (let i=1;i<=5;i++) player.s.buildings[i] = new Decimal(0)
 	player.s.spent = new Decimal(0)
 	doReset("s", true)
 }
@@ -1015,6 +1093,7 @@ function respecSpaceBuildings() {
 function getSpaceBuildingsUnl() {
 	let x = 3
 	if (player.s.upgrades.includes(14)) x++;
+	if (player.s.upgrades.includes(32)) x++;
 	return x;
 }
 
