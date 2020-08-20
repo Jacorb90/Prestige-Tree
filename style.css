@@ -100,6 +100,13 @@ h1, h2 {
 	font-size: 10px;
 }
 
+.smallUpg {
+	height: 40px;
+	width: 40px;
+	border-radius: 25%;
+	border-color: black;
+}
+
 .p {
 	background-color: #439ea3;
 	color: black;
@@ -192,6 +199,20 @@ h1, h2 {
               -3px 0px 12px #02f2f2;
 }
 
+#cl {
+	font-size: 20px;
+	color: white;
+	cursor: pointer;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: #02f2f2;
+}
+
+#cl:hover {
+	transform: scale(1.2, 1.2);
+	text-shadow: 5px 0px 10px #02f2f2,
+              -3px 0px 12px #02f2f2;
+}
+
 .opt {
 	height: 100px;
 	width: 100px;
@@ -276,6 +297,10 @@ h1, h2 {
 	left: 50%;
 	margin-left: -3px;
 	top: 0;
+}
+
+ul {
+	list-style-type: none;
 }
 
 [tooltip] {
