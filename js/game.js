@@ -347,21 +347,25 @@ const LAYER_UPGS = {
 			unl: function() { return player.t.upgrades.includes(12)||player.t.upgrades.includes(13) },
 		},
 		21: {
-			desc: "Time Energy boosts its own production & cap, and the Time Energy effect uses a better formula.",
+			desc: "Time Energy boosts its own production & limit, and the Time Energy effect uses a better formula.",
 			cost: new Decimal(4),
 			unl: function() { return player.t.upgrades.includes(14) },
 			currently: function() { return player.t.energy.plus(1).log10().pow(1.1).plus(1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		22: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Time Energy production & limit are boosted by your Enhance Points.",
+			cost: new Decimal(5),
+			unl: function() { return player.t.upgrades.includes(14)&&player.e.unl },
+			currently: function() { return player.e.points.plus(1).pow(0.8) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		23: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Time Energy production & limit are boosted by your Space Energy.",
+			cost: new Decimal(5),
+			unl: function() { return player.t.upgrades.includes(14)&&player.s.unl },
+			currently: function() { return Decimal.pow(3, player.s.points.pow(0.9)) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		24: {
 			desc: "???",
@@ -576,13 +580,13 @@ function getLayerReq(layer) {
 			if (player.b.unl && !player.g.unl) req = req.times(5000)
 			break;
 		case "e": 
-			req = req.times(Decimal.pow("10^^1000", player.e.order))
+			req = req.times(Decimal.pow("1e200", Decimal.pow(player.e.order, 2)))
 			break;
 		case "t": 
-			req = req.times(Decimal.pow("10^^1000", player.t.order))
+			req = req.times(Decimal.pow("1e200", Decimal.pow(player.t.order, 2)))
 			break;
 		case "s": 
-			req = req.times(Decimal.pow("10^^1000", player.s.order))
+			req = req.times(Decimal.pow("1e200", Decimal.pow(player.s.order, 2)))
 			break;
 	}
 	return req
@@ -857,6 +861,8 @@ function getTimeEnergyGainMult() {
 	if (!player.t.unl) return new Decimal(1)
 	let mult = new Decimal(1);
 	if (player.t.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.t[21].currently())
+	if (player.t.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.t[22].currently())
+	if (player.t.upgrades.includes(23)) mult = mult.times(LAYER_UPGS.t[23].currently())
 	return mult;
 }
 
@@ -865,6 +871,8 @@ function getTimeEnergyLimitMult() {
 	let mult = new Decimal(1);
 	if (player.t.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.t[12].currently())
 	if (player.t.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.t[21].currently())
+	if (player.t.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.t[22].currently())
+	if (player.t.upgrades.includes(23)) mult = mult.times(LAYER_UPGS.t[23].currently())
 	return mult;
 }
 
