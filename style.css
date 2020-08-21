@@ -1,7 +1,7 @@
 * {
 	transition-duration: 0.5s;
 	text-align: center;
-	font-family: "Lucida Console";
+	font-family: "Lucida Console", "Courier New", monospace;
 	table-align: center;
 	margin: auto;
 }

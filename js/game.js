@@ -339,14 +339,14 @@ const LAYER_UPGS = {
 			unl: function() { return player.t.unl&&(player.t.order==1||player.s.unl)&&player.e.upgrades.includes(14) },
 		},
 		22: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
+			cost: new Decimal(1e22),
+			unl: function() { return (player.t.unl&&player.s.unl&&player.e.order==2)||player.e.upgrades.includes(22)||player.e.upgrades.includes(23) },
 		},
 		23: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
+			cost: new Decimal(1e40),
+			unl: function() { return (player.t.unl&&player.s.unl&&player.e.order==1)||player.e.upgrades.includes(22)||player.e.upgrades.includes(23) },
 		},
 		24: {
 			desc: "???",
@@ -420,9 +420,9 @@ const LAYER_UPGS = {
 			unl: function() { return (player.t.upgrades.includes(22)&&(player.e.order==1||player.s.unl))||(player.t.upgrades.includes(23)&&(player.s.order==1||player.e.unl)) },
 		},
 		32: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
+			cost: new Decimal(12),
+			unl: function() { return (player.s.unl&&player.e.unl)||player.t.upgrades.includes(32) },
 		},
 		33: {
 			desc: "???",
@@ -499,14 +499,16 @@ const LAYER_UPGS = {
 			unl: function() { return (player.s.upgrades.includes(22)&&(player.t.order==1||player.e.unl))||(player.s.upgrades.includes(23)&&(player.e.order==1||player.t.unl)) },
 		},
 		33: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
+			cost: new Decimal(12),
+			unl: function() { return (player.t.unl&&player.e.unl)||player.s.upgrades.includes(33) },
 		},
 		34: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Space Buildings boost the Generator Power effect (before all other boosts).",
+			cost: new Decimal(15),
+			unl: function() { return player.t.unl&&player.e.unl&&player.t.order==0&&player.e.order==0&&player.s.order==0 },
+			currently: function() { return Decimal.pow(Object.values(player.s.buildings).reduce((a,b) => Decimal.add(a,b)), 0.2).div(17.5) },
+			effDisp: function(x) { return "Add "+format(x)+" to exponent" },
 		},
 	},
 }
@@ -633,7 +635,10 @@ function commaFormat(num, precision) {
 
 function format(decimal, precision=3) {
 	decimal = new Decimal(decimal)
-	if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
+	if (decimal.gte("eee1000")) return exponentialFormat(decimal, precision)
+	else if (decimal.gte("ee1000")) return "ee"+format(decimal.log10().log10())
+	else if (decimal.gte("1e1000")) return decimal.div(Decimal.pow(10, decimal.log10().floor())).toStringWithDecimalPlaces(precision)+"e"+format(decimal.log10().floor())
+	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
 }
@@ -834,6 +839,8 @@ function doReset(layer, force=false) {
 			for (let i in layers) if (!player[layers[i]].unl) player[layers[i]].order++
 		}
 	}
+	
+	if ((layer=="b"&&player.t.best.gte(12))||(layer=="g"&&player.s.best.gte(12))) return;
 	let row = LAYER_ROW[layer]
 	if (row==0) rowReset(0, layer)
 	else for (let x=row;x>=1;x--) rowReset(x, layer)
@@ -846,6 +853,13 @@ function buyUpg(layer, id) {
 	if (player[layer].points.lt(LAYER_UPGS[layer][id].cost)) return
 	player[layer].points = player[layer].points.sub(LAYER_UPGS[layer][id].cost)
 	player[layer].upgrades.push(id);
+	if (layer=="t"&&id==32) player.t.order = 0;
+	if (layer=="e"&&(id==22||id==23)) {
+		player.e.order = 0;
+		if (!player.e.upgrades.includes(22)) player.e.upgrades.push(22)
+		if (!player.e.upgrades.includes(23)) player.e.upgrades.push(23)
+	}
+	if (layer=="s"&&id==33) player.s.order = 0;
 }
 
 function getPointGen() {
@@ -897,11 +911,17 @@ function getGenPowerGainMult() {
 	return mult
 }
 
+function getGenPowerEffExp() {
+	let exp = new Decimal(1/3)
+	if (player.s.upgrades.includes(34)) exp = exp.plus(LAYER_UPGS.s[34].currently())
+	if (player.b.upgrades.includes(21)) exp = exp.times(2)
+	if (player.b.upgrades.includes(22)) exp = exp.times(1.2)
+	if (player.e.upgrades.includes(21)) exp = exp.times(1.15)
+	return exp;
+}
+
 function getGenPowerEff() {
-	let eff = player.g.power.plus(1).cbrt();
-	if (player.b.upgrades.includes(21)) eff = eff.pow(2);
-	if (player.b.upgrades.includes(22)) eff = eff.pow(1.2);
-	if (player.e.upgrades.includes(21)) eff = eff.pow(1.15);
+	let eff = player.g.power.plus(1).pow(getGenPowerEffExp());
 	return eff
 }
 
@@ -914,12 +934,15 @@ function resetRow(row) {
 	doReset(pre_layers[0], true)
 	for (let layer in layers) {
 		player[layers[layer]].unl = false
+		if (player[layers[layer]].order) player[layers[layer]].order = 0
 	}
 	resizeCanvas();
 }
 
 function getEnhancerCost() {
-	let cost = Decimal.pow(2, player.e.enhancers.pow(1.5))
+	let e = player.e.enhancers
+	if (e.gte(25)) e = e.pow(2).div(25)
+	let cost = Decimal.pow(2, e.pow(1.5))
 	return cost.floor()
 }
 
@@ -976,7 +999,9 @@ function getTimeEnergyLimitMult() {
 }
 
 function getExtCapsuleCost() {
-	let cost = player.t.extCapsules.times(0.4).pow(1.2).plus(1).times(10)
+	let amt = player.t.extCapsules
+	if (amt.gte(25)) amt = amt.pow(2).div(25)
+	let cost = amt.times(0.4).pow(1.2).plus(1).times(10)
 	return cost.floor()
 }
 

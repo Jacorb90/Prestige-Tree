@@ -31,6 +31,12 @@
 			<ul>
 				<li>Balanced up to 1e920 with all prestige tree paths (before unlocking third row 3 layer)</li>
 			</ul><br><br>
+			<h3>Alpha Build 6</h3>
+			<ul>
+				<li>Made font work for Mac users</li>
+				<li>Added 1 new Space & Time milestone each</li>
+				<li>Balanced up to 1e3,375 points</li>
+			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
@@ -114,6 +120,7 @@
 					<tr><td v-bind:class="{ milestone: player.t.best.lt(3), milestoneDone: player.t.best.gte(3) }">3 time capsules<br>Keep Prestige Upgrades on reset</td></tr>
 					<tr><td v-bind:class="{ milestone: player.t.best.lt(4), milestoneDone: player.t.best.gte(4) }">4 time capsules<br>Keep Booster Upgrades on all row 3 resets</td></tr>
 					<tr><td v-bind:class="{ milestone: player.t.best.lt(5), milestoneDone: player.t.best.gte(5) }">5 time capsules<br>Automatically purchase Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.t.best.gte(5)" class="smallUpg can b" onclick="toggleAuto('b')">{{player.b.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-bind:class="{ milestone: player.t.best.lt(12), milestoneDone: player.t.best.gte(12) }">12 time capsules<br>Boosters reset nothing</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: (player.b.points.gte(getExtCapsuleCost())&&player.t.unl), locked: (player.b.points.lt(getExtCapsuleCost())||!player.t.unl), t: true }" onclick="buyExtCapsule()">Buy an extra Time Capsule<br>Cost: {{formatWhole(getExtCapsuleCost())}} Boosters<br>Amount: {{formatWhole(player.t.extCapsules)}}</button>
 				</div>
@@ -123,6 +130,7 @@
 					<tr><td v-bind:class="{ milestone: player.s.best.lt(3), milestoneDone: player.s.best.gte(3) }">3 space energy<br>Keep Prestige Upgrades on reset</td></tr>
 					<tr><td v-bind:class="{ milestone: player.s.best.lt(4), milestoneDone: player.s.best.gte(4) }">4 space energy<br>Keep Generator Upgrades on all row 3 resets</td></tr>
 					<tr><td v-bind:class="{ milestone: player.s.best.lt(5), milestoneDone: player.s.best.gte(5) }">5 space energy<br>Automatically purchase Generators&nbsp;&nbsp;&nbsp;<button v-if="player.s.best.gte(5)" class="smallUpg can g" onclick="toggleAuto('g')">{{player.g.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-bind:class="{ milestone: player.s.best.lt(12), milestoneDone: player.s.best.gte(12) }">12 space energy<br>Generators reset nothing</td></tr>
 					</table><br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<table><tr>
