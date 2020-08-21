@@ -4,6 +4,7 @@
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script type="text/javascript" src="js/break_eternity.min.js"></script>
+	<script type="text/javascript" src="js/temp.js"></script>
 	<script type="text/javascript" src="js/game.js"></script>
 	<script type="text/javascript" src="js/v.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
@@ -36,6 +37,12 @@
 				<li>Made font work for Mac users</li>
 				<li>Added 1 new Space & Time milestone each</li>
 				<li>Balanced up to 1e3,375 points</li>
+			</ul><br><br>
+			<h3>Alpha Build 7</h3>
+			<ul>
+				<li>Made the new upgrades from Alpha Build 6 shown at proper times</li>
+				<li>Balanced up to 1e4,175 points</li>
+				<li>Setup a temp variable system (to prevent lag later on)</li>
 			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
@@ -71,7 +78,7 @@
 			<br><br><br><br><br>
 			<table>
 				<tr>
-					<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(getLayerReq('p'))||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(getLayerReq('p'))+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(getLayerReq('p'))&&!player.p.unl), can: (player.points.gte(getLayerReq('p'))||player.p.unl) }">P</button></td>
+					<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(tmp.layerReqs.p)||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(tmp.layerReqs.p)+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(tmp.layerReqs.p)&&!player.p.unl), can: (player.points.gte(tmp.layerReqs.p)||player.p.unl) }">P</button></td>
 				</tr>
 			</table><table>
 				<tr>
@@ -80,8 +87,8 @@
 			</table><table>
 				<tr>
 					<td v-if="player.b.unl||player.g.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
-					<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(getLayerReq('b'))||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(getLayerReq('b'))+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(getLayerReq('b'))&&!player.b.unl), can: (player.points.gte(getLayerReq('b'))||player.b.unl) }">B</button></td>
-					<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(getLayerReq('g'))||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(getLayerReq('g'))+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(getLayerReq('g'))&&!player.g.unl), can: (player.points.gte(getLayerReq('g'))||player.g.unl) }">G</button></td>
+					<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.b)||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(tmp.layerReqs.b)+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(tmp.layerReqs.b)&&!player.b.unl), can: (player.points.gte(tmp.layerReqs.b)||player.b.unl) }">B</button></td>
+					<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.g)||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(tmp.layerReqs.g)+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(tmp.layerReqs.g)&&!player.g.unl), can: (player.points.gte(tmp.layerReqs.g)||player.g.unl) }">G</button></td>
 				</tr>
 			</table><table>
 				<tr>
@@ -90,9 +97,9 @@
 			</table><table>
 				<tr>
 					<td v-if="player.e.unl||player.t.unl||player.s.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
-					<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(getLayerReq('t'))||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(getLayerReq('t'))+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(getLayerReq('t'))&&!player.t.unl), can: (player.points.gte(getLayerReq('t'))||player.t.unl) }">T</button></td>
-					<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(getLayerReq('e'))||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(getLayerReq('e'))+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(getLayerReq('e'))&&!player.e.unl), can: (player.points.gte(getLayerReq('e'))||player.e.unl) }">E</button></td>
-					<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(getLayerReq('s'))||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(getLayerReq('s'))+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(getLayerReq('s'))&&!player.s.unl), can: (player.points.gte(getLayerReq('s'))||player.s.unl) }">S</button></td>
+					<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
+					<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
+					<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
 				</tr>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
@@ -106,16 +113,16 @@
 					<table><tr><td v-bind:class="{ milestone: player.b.best.lt(8), milestoneDone: player.b.best.gte(8) }">8 Boosters<br>Keep Prestige Upgrades on reset</td></tr><tr><td v-bind:class="{ milestone: player.b.best.lt(15), milestoneDone: player.b.best.gte(15) }">15 Boosters<br>You can buy max Boosters</td></tr></table>
 				</div>
 				<div v-if="layer=='g'">
-					You have {{format(player.g.power)}} Generator Power, which multiplies Point gain by {{format(getGenPowerEff())}}<br><br>
+					You have {{format(player.g.power)}} Generator Power, which multiplies Point gain by {{format(tmp.genPowEff)}}<br><br>
 					<table><tr><td v-bind:class="{ milestone: player.g.best.lt(8), milestoneDone: player.g.best.gte(8) }">8 Generators<br>Keep Prestige Upgrades on reset</td></tr><tr><td v-bind:class="{ milestone: player.g.best.lt(10), milestoneDone: player.g.best.gte(10) }">10 Generators<br>Gain 100% of Prestige Point gain every second</td></tr><tr><td v-bind:class="{ milestone: player.g.best.lt(15), milestoneDone: player.g.best.gte(15) }">15 Generators<br>You can buy max Generators</td></tr></table>
 				</div>
 				<div v-if="layer=='e'">
 					<table><tr><td v-bind:class="{ milestone: player.e.best.lt(2), milestoneDone: player.e.best.gte(2) }">2 enhance points<br>Keep Booster/Generator milestones on reset</td></tr>
 					<tr><td v-bind:class="{ milestone: player.e.best.lt(10), milestoneDone: player.e.best.gte(10) }">10 enhance points<br>Keep Prestige Upgrades on reset</td></tr></table><br><br>
-					<button v-bind:class="{ upgBig: true, can: player.e.points.gte(getEnhancerCost()), locked: player.e.points.lt(getEnhancerCost()), e: true }" onclick="buyEnhancer()">Buy an Enhancer<br>Cost: {{formatWhole(getEnhancerCost())}} Enhance Points<br>Amount: {{formatWhole(player.e.enhancers)}}<br>Multiplies Prestige Point gain by {{format(getEnhancerEff())}}<br>Adds to base of Booster/Generator effects by {{format(getEnhancerEff2())}}</button>
+					<button v-bind:class="{ upgBig: true, can: player.e.points.gte(getEnhancerCost()), locked: player.e.points.lt(getEnhancerCost()), e: true }" onclick="buyEnhancer()">Buy an Enhancer<br>Cost: {{formatWhole(getEnhancerCost())}} Enhance Points<br>Amount: {{formatWhole(player.e.enhancers)}}<br>Multiplies Prestige Point gain by {{format(tmp.enhEff)}}<br>Adds to base of Booster/Generator effects by {{format(tmp.enhEff2)}}</button>
 				</div>
 				<div v-if="layer=='t'">
-					You have {{format(player.t.energy)}} Time Energy, which multiplies Point gain & Prestige Point gain by {{format(getTimeEnergyEff())}}<br><br>
+					You have {{format(player.t.energy)}} Time Energy, which multiplies Point gain & Prestige Point gain by {{format(tmp.timeEff)}}<br><br>
 					<table><tr><td v-bind:class="{ milestone: player.t.best.lt(2), milestoneDone: player.t.best.gte(2) }">2 time capsules<br>Keep Booster/Generator milestones on reset</td></tr>
 					<tr><td v-bind:class="{ milestone: player.t.best.lt(3), milestoneDone: player.t.best.gte(3) }">3 time capsules<br>Keep Prestige Upgrades on reset</td></tr>
 					<tr><td v-bind:class="{ milestone: player.t.best.lt(4), milestoneDone: player.t.best.gte(4) }">4 time capsules<br>Keep Booster Upgrades on all row 3 resets</td></tr>
@@ -135,13 +142,13 @@
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<table><tr>
 						<td v-for="id in 5">
-							<button v-if="getSpaceBuildingsUnl()>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button>
+							<button v-if="tmp.sbUnl>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button>
 						</td>
 					</tr></table>
 				</div>
 				<br><br><br>
-				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: player.points.lt(getLayerReq(layer)), can: player.points.gte(getLayerReq(layer)) }" v-on:click="doReset(layer)">+{{formatWhole(getResetGain(layer))}} {{LAYER_RES[layer]}}<br>Next at {{ format(getNextAt(layer)) }} points</button>
-				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: player.points.lt(getNextAt(layer)), can: player.points.gte(getNextAt(layer)) }" v-on:click="doReset(layer)">+{{formatWhole(getResetGain(layer))}} {{LAYER_RES[layer]}}<br>Req: {{format(getNextAt(layer))}} points</button>
+				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: player.points.lt(tmp.layerReqs[layer]), can: player.points.gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ format(tmp.nextAt[layer]) }} points</button>
+				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: player.points.lt(tmp.nextAt[layer]), can: player.points.gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Req: {{format(tmp.nextAt[layer])}} points</button>
 				<br><br><br>
 				<table>
 					<tr v-for="row in LAYER_UPGS[layer].rows">

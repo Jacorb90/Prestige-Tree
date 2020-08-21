@@ -1,4 +1,5 @@
 var player;
+var tmp = {};
 var needCanvasUpdate = true;
 
 function getStartPlayer() {
@@ -126,11 +127,11 @@ const ROW_LAYERS = [
 ]
 
 const LAYER_EFFS = {
-	b: function() { return Decimal.pow(Decimal.add(2, addToBoosterBase()), player.b.points.plus(getFreeBoosters())) },
-	g: function() { return Decimal.pow(Decimal.add(2, addToGenBase()), player.g.points).sub(1).times(getGenPowerGainMult()) },
+	b: function() { return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())) },
+	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points).sub(1).times(getGenPowerGainMult()) },
 	t: function() { return {
-		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(getFreeExtCapsules()))).sub(1).times(getTimeEnergyGainMult()),
-		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(getFreeExtCapsules()))).sub(1).times(100).times(getTimeEnergyLimitMult()),
+		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(getTimeEnergyGainMult()),
+		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 }
 
@@ -223,7 +224,7 @@ const LAYER_UPGS = {
 			desc: "Boosters are cheaper based on your points.",
 			cost: new Decimal(18),
 			unl: function() { return player.b.upgrades.includes(21) || player.b.upgrades.includes(22) },
-			currently: function() { return player.points.plus(1).log10().plus(1).pow(3.2).pow(getSpaceBuildingEff(4)) },
+			currently: function() { return player.points.plus(1).log10().plus(1).pow(3.2).pow(tmp.spaceBuildEff?tmp.spaceBuildEff[4]:1) },
 			effDisp: function(x) { return "/"+format(x) },
 		},
 	},
@@ -346,17 +347,25 @@ const LAYER_UPGS = {
 		23: {
 			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
 			cost: new Decimal(1e40),
-			unl: function() { return (player.t.unl&&player.s.unl&&player.e.order==1)||player.e.upgrades.includes(22)||player.e.upgrades.includes(23) },
+			unl: function() { return (player.t.unl&&player.s.unl)||player.e.upgrades.includes(22)||player.e.upgrades.includes(23) },
 		},
 		24: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Prestige Points boost Enhance Point gain.",
+			cost: new Decimal(1e65),
+			unl: function() { return player.t.unl&&player.s.unl&&player.e.best.gte(1e50) },
+			currently: function() { return player.p.points.plus(1).pow(0.002) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		25: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Enhancers are stronger based on your Space Energy & Time Capsules.",
+			cost: new Decimal(7.777e77),
+			unl: function() { return player.t.unl&&player.s.unl&&player.e.best.gte(1e60) },
+			currently: function() { 
+				let ret = player.s.points.plus(player.t.points).div(32).plus(1);
+				if (ret.gte(2)) ret = ret.log(2).plus(1).min(ret);
+				return ret;
+			},
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 	},
 	t: {
@@ -380,7 +389,7 @@ const LAYER_UPGS = {
 			desc: "Extra Time Capsules are added to the first Time Upgrade's effect formula, but at a reduced amount.",
 			cost: new Decimal(3),
 			unl: function() { return player.t.upgrades.includes(11) },
-			currently: function() { return player.t.extCapsules.plus(getFreeExtCapsules()).pow(0.95) },
+			currently: function() { return player.t.extCapsules.plus(tmp.freeExtCap).pow(0.95) },
 			effDisp: function(x) { return "+"+format(x) },
 		},
 		14: {
@@ -425,9 +434,9 @@ const LAYER_UPGS = {
 			unl: function() { return (player.s.unl&&player.e.unl)||player.t.upgrades.includes(32) },
 		},
 		33: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Add 40 to the booster effect base.",
+			cost: new Decimal(16),
+			unl: function() { return player.s.unl&&player.e.unl&&player.t.upgrades.includes(32) },
 		},
 		34: {
 			desc: "???",
@@ -518,17 +527,17 @@ const TAB_REQS = {
 	options: function() { return true },
 	info: function() { return true },
 	changelog: function() { return true },
-	p: function() { return (player.p.unl||player.points.gte(getLayerReq('p')))&&layerUnl('p') },
-	b: function() { return (player.b.unl||player.points.gte(getLayerReq('b')))&&layerUnl('b') },
-	g: function() { return (player.g.unl||player.points.gte(getLayerReq('g')))&&layerUnl('g') },
-	e: function() { return (player.e.unl||player.points.gte(getLayerReq('e')))&&layerUnl('e') },
-	t: function() { return (player.t.unl||player.points.gte(getLayerReq('t')))&&layerUnl('t') },
-	s: function() { return (player.s.unl||player.points.gte(getLayerReq('s')))&&layerUnl('s') },
+	p: function() { return (player.p.unl||player.points.gte(tmp.layerReqs.p))&&layerUnl('p') },
+	b: function() { return (player.b.unl||player.points.gte(tmp.layerReqs.b))&&layerUnl('b') },
+	g: function() { return (player.g.unl||player.points.gte(tmp.layerReqs.g))&&layerUnl('g') },
+	e: function() { return (player.e.unl||player.points.gte(tmp.layerReqs.e))&&layerUnl('e') },
+	t: function() { return (player.t.unl||player.points.gte(tmp.layerReqs.t))&&layerUnl('t') },
+	s: function() { return (player.s.unl||player.points.gte(tmp.layerReqs.s))&&layerUnl('s') },
 }
 
 function getLayerEffDesc(layer) {
 	if (!Object.keys(LAYER_EFFS).includes(layer)) return "???"
-	let eff = LAYER_EFFS[layer]()
+	let eff = tmp.layerEffs[layer]
 	switch(layer) {
 		case "b":
 			return "translated to a "+format(eff)+"x multiplier to point gain"
@@ -553,6 +562,7 @@ function load() {
 	player.tab = "tree"
 	checkForVars();
 	convertToDecimal();
+	updateTemp();
 	loadVue();
 }
 
@@ -637,7 +647,7 @@ function format(decimal, precision=3) {
 	decimal = new Decimal(decimal)
 	if (decimal.gte("eee1000")) return exponentialFormat(decimal, precision)
 	else if (decimal.gte("ee1000")) return "ee"+format(decimal.log10().log10())
-	else if (decimal.gte("1e1000")) return decimal.div(Decimal.pow(10, decimal.log10().floor())).toStringWithDecimalPlaces(precision)+"e"+format(decimal.log10().floor())
+	else if (decimal.gte("1e1000")) return decimal.div(Decimal.pow(10, decimal.log10().floor())).toStringWithDecimalPlaces(3)+"e"+format(decimal.log10().floor())
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
@@ -695,19 +705,22 @@ function getLayerGainMult(layer) {
 			if (player.p.upgrades.includes(23)) mult = mult.times(LAYER_UPGS.p[23].currently())
 			if (player.b.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.b[11].currently())
 			if (player.g.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.g[11].currently())
-			if (player.e.unl) mult = mult.times(getEnhancerEff())
+			if (player.e.unl) mult = mult.times(tmp.enhEff)
 			if (player.e.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.e[12].currently())
 			if (player.e.upgrades.includes(13)) mult = mult.times(1e10)
-			if (player.t.unl) mult = mult.times(getTimeEnergyEff())
-			if (player.s.unl) mult = mult.times(getSpaceBuildingEff(1))
+			if (player.t.unl) mult = mult.times(tmp.timeEff)
+			if (player.s.unl && tmp.spaceBuildEff) mult = mult.times(tmp.spaceBuildEff[1])
 			break;
 		case "b": 
 			if (player.b.upgrades.includes(23)) mult = mult.div(LAYER_UPGS.b[23].currently())
-			if (player.s.unl) mult = mult.div(getSpaceBuildingEff(3))
+			if (player.s.unl && tmp.spaceBuildEff) mult = mult.div(tmp.spaceBuildEff[3])
 			break;
 		case "g":
 			if (player.g.upgrades.includes(22)) mult = mult.div(LAYER_UPGS.g[22].currently())
-			if (player.s.unl) mult = mult.div(getSpaceBuildingEff(3))
+			if (player.s.unl && tmp.spaceBuildEff) mult = mult.div(tmp.spaceBuildEff[3])
+			break;
+		case "e": 
+			if (player.e.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.e[24].currently())
 			break;
 	}
 	return mult
@@ -715,13 +728,13 @@ function getLayerGainMult(layer) {
 
 function getResetGain(layer) {
 	if (LAYER_TYPE[layer]=="static") {
-		if ((!canBuyMax(layer)) || player.points.lt(getLayerReq(layer))) return new Decimal(1)
-		let gain = player.points.div(getLayerReq(layer)).div(getLayerGainMult(layer)).max(1).log(LAYER_BASE[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
+		if ((!canBuyMax(layer)) || player.points.lt(tmp.layerReqs[layer])) return new Decimal(1)
+		let gain = player.points.div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(LAYER_BASE[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
 		if (gain.gte(12)) gain = gain.times(12).sqrt()
 		return gain.floor().sub(player[layer].points).plus(1).max(1);
 	}
-	if (player.points.lt(getLayerReq(layer))) return new Decimal(0)
-	let gain = player.points.div(getLayerReq(layer)).pow(LAYER_EXP[layer]).times(getLayerGainMult(layer))
+	if (player.points.lt(tmp.layerReqs[layer])) return new Decimal(0)
+	let gain = player.points.div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer])
 	return gain.floor().max(0);
 }
 
@@ -729,9 +742,9 @@ function getNextAt(layer) {
 	if (LAYER_TYPE[layer]=="static") {
 		let amt = player[layer].points
 		if (amt.gte(12)) amt = amt.pow(2).div(12)
-		let extraCost = Decimal.pow(LAYER_BASE[layer], amt.pow(LAYER_EXP[layer])).times(getLayerGainMult(layer))
-		return extraCost.times(getLayerReq(layer)).max(getLayerReq(layer))
-	} else return getResetGain(layer).plus(1).div(getLayerGainMult(layer)).root(LAYER_EXP[layer]).times(getLayerReq(layer)).max(getLayerReq(layer))
+		let extraCost = Decimal.pow(LAYER_BASE[layer], amt.pow(LAYER_EXP[layer])).times(tmp.gainMults[layer])
+		return extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+	} else return tmp.resetGain[layer].plus(1).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
 }
 
 function layerUnl(layer) {
@@ -823,10 +836,10 @@ function rowReset(row, layer) {
 
 function doReset(layer, force=false) {
 	if (!force) {
-		if (player.points.lt(getLayerReq(layer))) return;
-		let gain = getResetGain(layer)
+		if (player.points.lt(tmp.layerReqs[layer])) return;
+		let gain = tmp.resetGain[layer]
 		if (LAYER_TYPE[layer]=="static") {
-			if (player.points.lt(getNextAt(layer))) return;
+			if (player.points.lt(tmp.nextAt[layer])) return;
 			player[layer].points = player[layer].points.plus(canBuyMax(layer)?gain:1)
 		} else player[layer].points = player[layer].points.plus(gain)
 		player[layer].best = player[layer].best.max(player[layer].points)
@@ -867,10 +880,10 @@ function getPointGen() {
 	if (player.p.upgrades.includes(12)) gain = gain.times(LAYER_UPGS.p[12].currently())
 	if (player.p.upgrades.includes(13)) gain = gain.times(LAYER_UPGS.p[13].currently())
 	if (player.p.upgrades.includes(22)) gain = gain.times(LAYER_UPGS.p[22].currently())
-	if (player.b.unl) gain = gain.times(LAYER_EFFS.b())
-	if (player.g.unl) gain = gain.times(getGenPowerEff())
-	if (player.t.unl) gain = gain.times(getTimeEnergyEff())
-	if (player.s.unl) gain = gain.times(getSpaceBuildingEff(1))
+	if (player.b.unl) gain = gain.times(tmp.layerEffs.b)
+	if (player.g.unl) gain = gain.times(tmp.genPowEff)
+	if (player.t.unl) gain = gain.times(tmp.timeEff)
+	if (player.s.unl && tmp.spaceBuildEff) gain = gain.times(tmp.spaceBuildEff[1])
 	return gain
 }
 
@@ -880,9 +893,10 @@ function addToBoosterBase() {
 	if (player.b.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.b[13].currently())
 	if (player.t.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.t[11].currently())
 	if (player.t.upgrades.includes(31)) toAdd = toAdd.plus(25)
-	if (player.e.unl) toAdd = toAdd.plus(getEnhancerEff2())
+	if (player.t.upgrades.includes(33)) toAdd = toAdd.plus(40)
+	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
-	if (player.s.unl) toAdd = toAdd.plus(getSpaceBuildingEff(2))
+	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
 	return toAdd
 }
 
@@ -896,9 +910,9 @@ function addToGenBase() {
 	let toAdd = new Decimal(0)
 	if (player.g.upgrades.includes(12)) toAdd = toAdd.plus(LAYER_UPGS.g[12].currently())
 	if (player.g.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.g[13].currently())
-	if (player.e.unl) toAdd = toAdd.plus(getEnhancerEff2())
+	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
-	if (player.s.unl) toAdd = toAdd.plus(getSpaceBuildingEff(2))
+	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
 	return toAdd
 }
 
@@ -936,6 +950,7 @@ function resetRow(row) {
 		player[layers[layer]].unl = false
 		if (player[layers[layer]].order) player[layers[layer]].order = 0
 	}
+	updateTemp();
 	resizeCanvas();
 }
 
@@ -946,15 +961,21 @@ function getEnhancerCost() {
 	return cost.floor()
 }
 
+function getEnhancerPow() {
+	let pow = new Decimal(1)
+	if (player.e.upgrades.includes(25)) pow = pow.times(LAYER_UPGS.e[25].currently())
+	return pow
+}
+
 function getEnhancerEff() {
 	if (!player.e.unl) return new Decimal(1)
-	let eff = Decimal.pow(25, player.e.enhancers.pow(1.1))
+	let eff = Decimal.pow(25, player.e.enhancers.times(tmp.enhPow).pow(1.1))
 	return eff
 }
 
 function getEnhancerEff2() {
 	if (!player.e.unl) return new Decimal(0)
-	let eff = player.e.enhancers.pow(0.8)
+	let eff = player.e.enhancers.times(tmp.enhPow).pow(0.8)
 	return eff;
 }
 
@@ -1046,14 +1067,14 @@ function getExtraBuildingLevels(x) {
 	let lvl = new Decimal(0)
 	if (player.s.upgrades.includes(11)) lvl = lvl.plus(1);
 	if (player.s.upgrades.includes(14)) lvl = lvl.plus(1);
-	if (x<5) lvl = lvl.plus(getSpaceBuildingEff(5))
+	if (x<5) lvl = lvl.plus(tmp.spaceBuildEff[5])
 	return lvl
 }
 
 function getSpaceBuildingEff(x) {
 	let bought = player.s.buildings[x].plus(getExtraBuildingLevels(x));
 	if (!player.s.unl) bought = new Decimal(0);
-	if (getSpaceBuildingsUnl()<x) bought = new Decimal(0);
+	if (tmp.sbUnl<x) bought = new Decimal(0);
 	let power = getSpaceBuildingPow()
 	bought = bought.times(power)
 	switch(x) {
@@ -1076,7 +1097,7 @@ function getSpaceBuildingEff(x) {
 }
 
 function getSpaceBuildingEffDesc(x) {
-	let eff = getSpaceBuildingEff(x)
+	let eff = tmp.spaceBuildEff[x]
 	switch(x) {
 		case 1: 
 			return "Space Energy boosts Point gain & Prestige Point gain ("+format(eff)+"x)"
@@ -1098,7 +1119,7 @@ function getSpaceBuildingEffDesc(x) {
 
 function buyBuilding(x) {
 	if (!player.s.unl) return
-	if (getSpaceBuildingsUnl()<x) return
+	if (tmp.sbUnl<x) return
 	if (getSpace().lt(1)) return
 	let cost = getSpaceBuildingCost(x)
 	if (player.g.power.lt(cost)) return
@@ -1128,11 +1149,11 @@ function toggleAuto(layer) {
 }
 
 function gameLoop(diff) {
-	if (player.p.upgrades.includes(11)) player.points = player.points.plus(getPointGen().times(diff))
-	if (player.g.unl) player.g.power = player.g.power.plus(LAYER_EFFS.g().times(diff))
-	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(getResetGain("p").times(diff))
+	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff))
+	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff))
+	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff))
 	if (player.t.unl) {
-		let data = LAYER_EFFS.t()
+		let data = tmp.layerEffs.t
 		player.t.energy = player.t.energy.plus(data.gain.times(diff)).min(data.limit)
 	}
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
@@ -1156,6 +1177,7 @@ var interval = setInterval(function() {
 	let diff = (Date.now()-player.time)/1000
 	player.time = Date.now()
 	if (needCanvasUpdate && player.tab=="tree") resizeCanvas();
+	updateTemp();
 	gameLoop(diff)
 }, 50)
 
