@@ -46,8 +46,16 @@
 			</ul><br><br>
 			<h3>Alpha Build 8</h3>
 			<ul>
-				<li>Implemented Super Boosters</li>
+				<li>Implemented Super-Boosters</li>
 				<li>Balanced up to 1e25,600 points</li>
+			</ul><br><br>
+			<h3>Alpha Build 9</h3>
+			<ul>
+				<li>Fixed a visual bug with the Prestige Tree branches</li>
+				<li>Added a hotkey for Super-Boosters</li>
+				<li>Added a new Super-Booster milestone</li>
+				<li>Fixed a bug with hotkeys</li>
+				<li>Balanced up to 1e46,500 points</li>
 			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
@@ -60,6 +68,7 @@
 			<span v-if="player.t.unl">T: Time reset</span><br>
 			<span v-if="player.e.unl">E: Enhance reset</span><br>
 			<span v-if="player.s.unl">S: Space reset</span><br>
+			<span v-if="player.sb.unl">Shift+B: Super-Booster reset</span><br>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
@@ -154,6 +163,7 @@
 				</div>
 				<div v-if="layer=='sb'">
 					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(3), milestoneDone: player.sb.best.gte(3) }">3 Super-Boosters<br>Keep Prestige Upgrades on reset</td></tr></table>
+					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(7), milestoneDone: player.sb.best.gte(7) }">7 Super-Boosters<br>Keep Booster/Generator milestones on reset</td></tr></table>
 				</div>
 				<br><br><br>
 				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ format(tmp.nextAt[layer]) }} {{ LAYER_AMT_NAMES[layer] }}</button>

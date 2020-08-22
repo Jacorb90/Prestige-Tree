@@ -453,9 +453,11 @@ const LAYER_UPGS = {
 			unl: function() { return player.s.unl&&player.e.unl&&player.t.upgrades.includes(32) },
 		},
 		34: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Time Energy caps later and generates faster based on your non-free Time Capsules.",
+			cost: new Decimal(25),
+			unl: function() { return player.t.upgrades.includes(33)&&player.sb.unl&&player.sb.points.gte(7) },
+			currently: function() { return Decimal.pow(10, player.t.points.pow(1.1)) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 	s: {
@@ -536,12 +538,23 @@ const LAYER_UPGS = {
 	},
 	sb: {
 		rows: 1,
-		cols: 1,
+		cols: 2,
 		11: {
 			desc: "Super-Boosters are stronger based on your Prestige Points.",
 			cost: new Decimal(2),
 			unl: function() { return player.sb.unl },
-			currently: function() { return Decimal.pow(10, player.p.points.plus(1).log10().div(1e5).sqrt()) },
+			currently: function() { 
+				let ret = Decimal.pow(10, player.p.points.plus(1).log10().div(1e5).sqrt());
+				if (ret.gte(2.5)) ret = ret.log(2.5).plus(1.5).min(ret);
+				return ret;
+			},
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		12: {
+			desc: "Super-Boosters are stronger based on your Generators.",
+			cost: new Decimal(8),
+			unl: function() { return player.sb.upgrades.includes(11) },
+			currently: function() { return player.g.points.div(10).pow(0.04) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -857,6 +870,9 @@ function rowReset(row, layer) {
 					player.b.best = new Decimal(prev.b.best)
 					player.g.best = new Decimal(prev.g.best)
 				}
+			} else if (player.sb.best.gte(7)&&layer=="sb") {
+				player.b.best = new Decimal(prev.b.best)
+				player.g.best = new Decimal(prev.g.best)
 			}
 			break;
 		case 3: 
@@ -913,6 +929,8 @@ function doReset(layer, force=false) {
 			let layers = ROW_LAYERS[LAYER_ROW[layer]]
 			for (let i in layers) if (!player[layers[i]].unl) player[layers[i]].order++
 		}
+		
+		tmp.layerAmt[layer] = new Decimal(0) // quick fix
 	}
 	
 	if ((layer=="b"&&player.t.best.gte(12))||(layer=="g"&&player.s.best.gte(12))) return;
@@ -1070,6 +1088,7 @@ function getTimeEnergyGainMult() {
 	if (player.t.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.t[21].currently())
 	if (player.t.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.t[22].currently())
 	if (player.t.upgrades.includes(23)) mult = mult.times(LAYER_UPGS.t[23].currently())
+	if (player.t.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.t[34].currently())
 	return mult;
 }
 
@@ -1080,6 +1099,7 @@ function getTimeEnergyLimitMult() {
 	if (player.t.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.t[21].currently())
 	if (player.t.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.t[22].currently())
 	if (player.t.upgrades.includes(23)) mult = mult.times(LAYER_UPGS.t[23].currently())
+	if (player.t.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.t[34].currently())
 	return mult;
 }
 
@@ -1215,6 +1235,7 @@ function toggleAuto(layer) {
 function getSuperBoosterPow() {
 	let pow = new Decimal(1)
 	if (player.sb.upgrades.includes(11)) pow = pow.times(LAYER_UPGS.sb[11].currently())
+	if (player.sb.upgrades.includes(12)) pow = pow.times(LAYER_UPGS.sb[12].currently())
 	return pow;
 }
 
@@ -1246,7 +1267,7 @@ var interval = setInterval(function() {
 	if (player===undefined) return;
 	let diff = (Date.now()-player.time)/1000
 	player.time = Date.now()
-	if (needCanvasUpdate && player.tab=="tree") resizeCanvas();
+	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();
 	gameLoop(diff)
 }, 50)
@@ -1255,6 +1276,11 @@ document.onkeydown = function(e) {
 	if (player===undefined) return;
 	let shiftDown = e.shiftKey
 	let key = e.key
-	if (!LAYERS.includes(key)) return
-	if (player[key].unl) doReset(key)
+	if (!LAYERS.includes(key)) {
+		switch(key) {
+			case "B": 
+				if (player.sb.unl) doReset("sb")
+				break;
+		}
+	} else if (player[key].unl) doReset(key)
 }
