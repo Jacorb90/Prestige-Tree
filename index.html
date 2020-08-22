@@ -44,6 +44,11 @@
 				<li>Balanced up to 1e4,175 points</li>
 				<li>Setup a temp variable system (to prevent lag later on)</li>
 			</ul><br><br>
+			<h3>Alpha Build 8</h3>
+			<ul>
+				<li>Implemented Super Boosters</li>
+				<li>Balanced up to 1e25,600 points</li>
+			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
@@ -96,7 +101,8 @@
 				</tr>
 			</table><table>
 				<tr>
-					<td v-if="player.e.unl||player.t.unl||player.s.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
+					<td v-if="player.e.unl||player.t.unl||player.s.unl||player.sb.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
+					<td id="sb" v-if="layerUnl('sb')"><button onclick="showTab('sb')" v-bind:tooltip="((player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl)&&layerUnl('sb')) ? (formatWhole(player.sb.points)+' super-boosters') : ('Reach '+formatWhole(tmp.layerReqs.sb)+' boosters to unlock')" v-bind:class="{ treeNode: true, sb: true, locked: (player.b.points.lt(tmp.layerReqs.sb)&&!player.sb.unl), can: (player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl) }">SB</button></td>
 					<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
 					<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
 					<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
@@ -146,9 +152,12 @@
 						</td>
 					</tr></table>
 				</div>
+				<div v-if="layer=='sb'">
+					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(3), milestoneDone: player.sb.best.gte(3) }">3 Super-Boosters<br>Keep Prestige Upgrades on reset</td></tr></table>
+				</div>
 				<br><br><br>
-				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: player.points.lt(tmp.layerReqs[layer]), can: player.points.gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ format(tmp.nextAt[layer]) }} points</button>
-				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: player.points.lt(tmp.nextAt[layer]), can: player.points.gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Req: {{format(tmp.nextAt[layer])}} points</button>
+				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ format(tmp.nextAt[layer]) }} {{ LAYER_AMT_NAMES[layer] }}</button>
+				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Req: {{format(tmp.nextAt[layer])}} {{ LAYER_AMT_NAMES[layer] }}</button>
 				<br><br><br>
 				<table>
 					<tr v-for="row in LAYER_UPGS[layer].rows">

@@ -30,6 +30,7 @@ function drawTree() {
 		drawTreeBranch("g", "e")
 	}
 	if (layerUnl('t')) drawTreeBranch("b", "t")
+	if (layerUnl('sb')) drawTreeBranch("b", "sb")
 	if (layerUnl('s')) drawTreeBranch("g", "s")
 	
 	needCanvasUpdate = false;

@@ -8,7 +8,9 @@ function updateTemp() {
 	if (!tmp.gainMults) tmp.gainMults = {}
 	if (!tmp.resetGain) tmp.resetGain = {}
 	if (!tmp.nextAt) tmp.nextAt = {}
+	if (!tmp.layerAmt) tmp.layerAmt = {}
 	for (let i in LAYERS) {
+		tmp.layerAmt[LAYERS[i]] = getLayerAmt(LAYERS[i])
 		tmp.gainMults[LAYERS[i]] = getLayerGainMult(LAYERS[i])
 		tmp.resetGain[LAYERS[i]] = getResetGain(LAYERS[i])
 		tmp.nextAt[LAYERS[i]] = getNextAt(LAYERS[i])

@@ -24,6 +24,7 @@ function loadVue() {
 		  LAYER_TYPE,
 		  LAYER_UPGS,
 		  LAYER_EFFS,
+		  LAYER_AMT_NAMES
 	  },
 	})
 }

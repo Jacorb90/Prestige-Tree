@@ -61,10 +61,17 @@ function getStartPlayer() {
 			},
 			upgrades: [],
 		},
+		sb: {
+			unl: false, 
+			order: 0,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			upgrades: [],
+		},
 	}
 }
 
-const LAYERS = ["p", "b", "g", "e", "t", "s"]
+const LAYERS = ["p", "b", "g", "e", "t", "s", "sb"]
 
 const LAYER_REQS = {
 	p: new Decimal(10),
@@ -73,6 +80,7 @@ const LAYER_REQS = {
 	e: new Decimal(1e120),
 	t: new Decimal(1e120),
 	s: new Decimal(1e120),
+	sb: new Decimal(180),
 }
 
 const LAYER_RES = {
@@ -82,6 +90,7 @@ const LAYER_RES = {
 	e: "enhance points",
 	t: "time capsules",
 	s: "space energy",
+	sb: "super-boosters",
 }
 
 const LAYER_TYPE = {
@@ -91,6 +100,7 @@ const LAYER_TYPE = {
 	e: "normal",
 	t: "static",
 	s: "static",
+	sb: "static",
 }
 
 const LAYER_EXP = {
@@ -100,6 +110,7 @@ const LAYER_EXP = {
 	e: new Decimal(0.02),
 	t: new Decimal(1.85),
 	s: new Decimal(1.85),
+	sb: new Decimal(1.25),
 }
 
 const LAYER_BASE = {
@@ -107,6 +118,7 @@ const LAYER_BASE = {
 	g: new Decimal(5),
 	t: new Decimal(1e15),
 	s: new Decimal(1e15),
+	sb: new Decimal(1.05),
 }
 
 const LAYER_ROW = {
@@ -116,13 +128,14 @@ const LAYER_ROW = {
 	e: 2,
 	t: 2,
 	s: 2,
+	sb: 2,
 	future_layer: 3,
 }
 
 const ROW_LAYERS = [
 	["p"],
 	["b","g"],
-	["e","t","s"],
+	["e","t","s","sb"],
 	["future_layer"],
 ]
 
@@ -133,6 +146,7 @@ const LAYER_EFFS = {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
+	sb: function() { return Decimal.mul(45, player.sb.points.times(getSuperBoosterPow()).pow(1.25)) },
 }
 
 const LAYER_UPGS = {
@@ -520,6 +534,17 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "Add "+format(x)+" to exponent" },
 		},
 	},
+	sb: {
+		rows: 1,
+		cols: 1,
+		11: {
+			desc: "Super-Boosters are stronger based on your Prestige Points.",
+			cost: new Decimal(2),
+			unl: function() { return player.sb.unl },
+			currently: function() { return Decimal.pow(10, player.p.points.plus(1).log10().div(1e5).sqrt()) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+	},
 }
 
 const TAB_REQS = {
@@ -533,6 +558,27 @@ const TAB_REQS = {
 	e: function() { return (player.e.unl||player.points.gte(tmp.layerReqs.e))&&layerUnl('e') },
 	t: function() { return (player.t.unl||player.points.gte(tmp.layerReqs.t))&&layerUnl('t') },
 	s: function() { return (player.s.unl||player.points.gte(tmp.layerReqs.s))&&layerUnl('s') },
+	sb: function() { return (player.sb.unl||player.b.points.gte(tmp.layerReqs.sb))&&layerUnl('sb') },
+}
+
+const LAYER_AMT_NAMES = {
+	p: "points",
+	b: "points",
+	g: "points",
+	t: "points",
+	e: "points",
+	s: "points",
+	sb: "boosters"
+}
+
+function getLayerAmt(layer) {
+	let amt = player.points
+	switch(layer) {
+		case "sb": 
+			return player.b.points;
+			break;
+	}
+	return amt
 }
 
 function getLayerEffDesc(layer) {
@@ -547,6 +593,9 @@ function getLayerEffDesc(layer) {
 			break;
 		case "t":
 			return "which are generating "+format(eff.gain)+" Time Energy/sec, but with a limit of "+format(eff.limit)+" Time Energy"
+			break;
+		case "sb": 
+			return "which are adding "+format(eff)+" to the Booster effect base and providing "+format(eff)+" free Boosters" 
 			break;
 	}
 }
@@ -604,6 +653,7 @@ function checkForVars() {
 	if (player.s === undefined) player.s = getStartPlayer().s
 	if (player.s.buildings[4] === undefined) player.s.buildings[4] = new Decimal(0);
 	if (player.s.buildings[5] === undefined) player.s.buildings[5] = new Decimal(0);
+	if (player.sb === undefined) player.sb = getStartPlayer().sb
 }
 
 function convertToDecimal() {
@@ -626,6 +676,8 @@ function convertToDecimal() {
 	player.s.best = new Decimal(player.s.best)
 	player.s.spent = new Decimal(player.s.spent)
 	for (let i=1;i<=5;i++) player.s.buildings[i] = new Decimal(player.s.buildings[i])
+	player.sb.points = new Decimal(player.sb.points)
+	player.sb.best = new Decimal(player.sb.best)
 }
 
 function toggleOpt(name) {
@@ -728,13 +780,13 @@ function getLayerGainMult(layer) {
 
 function getResetGain(layer) {
 	if (LAYER_TYPE[layer]=="static") {
-		if ((!canBuyMax(layer)) || player.points.lt(tmp.layerReqs[layer])) return new Decimal(1)
-		let gain = player.points.div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(LAYER_BASE[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
+		if ((!canBuyMax(layer)) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
+		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(LAYER_BASE[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
 		if (gain.gte(12)) gain = gain.times(12).sqrt()
 		return gain.floor().sub(player[layer].points).plus(1).max(1);
 	}
-	if (player.points.lt(tmp.layerReqs[layer])) return new Decimal(0)
-	let gain = player.points.div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer])
+	if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
+	let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer])
 	return gain.floor().max(0);
 }
 
@@ -767,6 +819,9 @@ function layerUnl(layer) {
 		case "s":
 			return player.g.unl;
 			break;
+		case "sb":
+			return player.e.unl&&player.t.unl&&player.s.unl;
+			break;
 	}
 }
 
@@ -781,7 +836,7 @@ function rowReset(row, layer) {
 			player.p.points = new Decimal(0);
 			if (layer=="b"||layer=="g") {
 				if (player[layer].best.lt(8)) player.p.upgrades = [];
-			} else if (layer=="t"||layer=="s") {
+			} else if (layer=="t"||layer=="s"||layer=="sb") {
 				if (player[layer].best.lt(3)) player.p.upgrades = [];
 			} else if (layer=="e") {
 				if (player[layer].best.lt(10)) player.p.upgrades = [];
@@ -830,16 +885,23 @@ function rowReset(row, layer) {
 				},
 				upgrades: [],
 			}
+			player.sb = {
+				unl: player.sb.unl,
+				order: 0,
+				points: new Decimal(0),
+				best: new Decimal(0),
+				upgrades: [],
+			}
 			break;
 	}
 }
 
 function doReset(layer, force=false) {
 	if (!force) {
-		if (player.points.lt(tmp.layerReqs[layer])) return;
+		if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return;
 		let gain = tmp.resetGain[layer]
 		if (LAYER_TYPE[layer]=="static") {
-			if (player.points.lt(tmp.nextAt[layer])) return;
+			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
 			player[layer].points = player[layer].points.plus(canBuyMax(layer)?gain:1)
 		} else player[layer].points = player[layer].points.plus(gain)
 		player[layer].best = player[layer].best.max(player[layer].points)
@@ -897,12 +959,14 @@ function addToBoosterBase() {
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
+	if (player.sb.unl) toAdd = toAdd.plus(tmp.layerEffs.sb)
 	return toAdd
 }
 
 function getFreeBoosters() {
 	let free = new Decimal(0)
 	if (player.t.upgrades.includes(24)) free = free.plus(18)
+	if (player.sb.unl) free = free.plus(tmp.layerEffs.sb)
 	return free
 }
 
@@ -1146,6 +1210,12 @@ function getSpaceBuildingsUnl() {
 function toggleAuto(layer) {
 	if (player[layer].auto===undefined) return;
 	player[layer].auto = !player[layer].auto
+}
+
+function getSuperBoosterPow() {
+	let pow = new Decimal(1)
+	if (player.sb.upgrades.includes(11)) pow = pow.times(LAYER_UPGS.sb[11].currently())
+	return pow;
 }
 
 function gameLoop(diff) {
