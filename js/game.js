@@ -7,6 +7,9 @@ function getStartPlayer() {
 		tab: "tree",
 		time: Date.now(),
 		autosave: true,
+		versionType: "alpha",
+		version: 10,
+		timePlayed: 0,
 		points: new Decimal(10),
 		p: {
 			unl: false,
@@ -146,12 +149,12 @@ const LAYER_EFFS = {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
-	sb: function() { return Decimal.mul(45, player.sb.points.times(getSuperBoosterPow()).pow(1.25)) },
+	sb: function() { return Decimal.pow(1.5, player.sb.points.times(getSuperBoosterPow())) },
 }
 
 const LAYER_UPGS = {
 	p: {
-		rows: 2,
+		rows: 3,
 		cols: 3,
 		11: {
 			desc: "Gain 1 Point every second.",
@@ -195,9 +198,29 @@ const LAYER_UPGS = {
 			currently: function() { 
 				let ret = player.points.plus(1).log10().cbrt().plus(1) 
 				if (player.g.upgrades.includes(23)) ret = ret.pow(LAYER_UPGS.g[23].currently())
+				if (player.p.upgrades.includes(33)) ret = ret.pow(1.25)
 				return ret;
 			},
 			effDisp: function(x) { return format(x)+"x" },
+		},
+		31: {
+			desc: "Prestige Point gain is boosted by your Prestige Point amount.",
+			cost: new Decimal("1e4450"),
+			unl: function() { return player.e.upgrades.includes(33) },
+			currently: function() { return player.p.points.plus(1).log10().plus(1).pow(player.p.points.plus(1).log10().div(200).plus(1)).pow(player.p.upgrades.includes(32) ? LAYER_UPGS.p[32].currently() : 1) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		32: {
+			desc: "The upgrade to the left is stronger based on your Points.",
+			cost: new Decimal("1e5140"),
+			unl: function() { return player.e.upgrades.includes(33) },
+			currently: function() { return player.points.plus(1).log10().plus(1).root(16) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		33: {
+			desc: "The above upgrade is 25% stronger.",
+			cost: new Decimal("1e5500"),
+			unl: function() { return player.e.upgrades.includes(33) },
 		},
 	},
 	b: {
@@ -275,7 +298,7 @@ const LAYER_UPGS = {
 			desc: "Prestige Upgrade 3 is stronger based on your Generators.",
 			cost: new Decimal(15),
 			unl: function() { return player.g.upgrades.includes(13) },
-			currently: function() { return player.g.points.sqrt().plus(1) },
+			currently: function() { return player.g.points.sqrt().plus(1).times((player.e.upgrades.includes(32)) ? LAYER_UPGS.e[32].currently() : 1) },
 			effDisp: function(x) { return "^"+format(x) },
 		},
 		21: {
@@ -313,7 +336,7 @@ const LAYER_UPGS = {
 		},
 	},
 	e: {
-		rows: 2,
+		rows: 3,
 		cols: 5,
 		11: {
 			desc: "Boosters & Generators boost each other.",
@@ -376,10 +399,44 @@ const LAYER_UPGS = {
 			unl: function() { return player.t.unl&&player.s.unl&&player.e.best.gte(1e60) },
 			currently: function() { 
 				let ret = player.s.points.plus(player.t.points).div(32).plus(1);
-				if (ret.gte(2)) ret = ret.log(2).plus(1).min(ret);
+				if (ret.gte(2)) ret = ret.log(2).plus(1).times(2).sqrt();
 				return ret;
 			},
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		31: {
+			desc: "Enhancers are stronger based on your Super-Boosters.",
+			cost: new Decimal(1e90),
+			unl: function() { return player.e.upgrades.includes(25)&&player.sb.unl },
+			currently: function() { return player.sb.points.pow(0.75).div(4).plus(1) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		32: {
+			desc: "Generator Upgrade 5 is stronger based on your Enhance Points.",
+			cost: new Decimal(7.5e108),
+			unl: function() { return player.e.upgrades.includes(25)&&player.sb.unl },
+			currently: function() { 
+				let ret = Decimal.pow(10, player.e.points.plus(1).log10().pow(0.085)).div(10).max(1);
+				return ret;
+			},
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		33: {
+			desc: "Unlock 3 new Prestige Upgrades.",
+			cost: new Decimal(2.5e139),
+			unl: function() { return player.e.upgrades.includes(31)||player.e.upgrades.includes(32) },
+		},
+		34: {
+			desc: "You gain 1e40x as many Prestige Points.",
+			cost: new Decimal(1e152),
+			unl: function() { return player.e.upgrades.includes(31)&&player.e.upgrades.includes(32) },
+		},
+		35: {
+			desc: "Points boost Generator Power gain.",
+			cost: new Decimal(2e189),
+			unl: function() { return player.e.upgrades.includes(33)||player.e.upgrades.includes(34) },
+			currently: function() { return player.points.plus(1).pow(0.004) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 	t: {
@@ -454,9 +511,9 @@ const LAYER_UPGS = {
 		},
 		34: {
 			desc: "Time Energy caps later and generates faster based on your non-free Time Capsules.",
-			cost: new Decimal(25),
-			unl: function() { return player.t.upgrades.includes(33)&&player.sb.unl&&player.sb.points.gte(7) },
-			currently: function() { return Decimal.pow(10, player.t.points.pow(1.1)) },
+			cost: new Decimal(18),
+			unl: function() { return player.t.upgrades.includes(33)&&player.sb.unl },
+			currently: function() { return Decimal.pow(10, player.t.points.pow(1.2)) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -546,15 +603,15 @@ const LAYER_UPGS = {
 			currently: function() { 
 				let ret = Decimal.pow(10, player.p.points.plus(1).log10().div(1e5).sqrt());
 				if (ret.gte(2.5)) ret = ret.log(2.5).plus(1.5).min(ret);
-				return ret;
+				return ret.max(1);
 			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		12: {
 			desc: "Super-Boosters are stronger based on your Generators.",
-			cost: new Decimal(8),
+			cost: new Decimal(4),
 			unl: function() { return player.sb.upgrades.includes(11) },
-			currently: function() { return player.g.points.div(10).pow(0.04) },
+			currently: function() { return player.g.points.div(10).pow(0.04).max(1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -608,7 +665,7 @@ function getLayerEffDesc(layer) {
 			return "which are generating "+format(eff.gain)+" Time Energy/sec, but with a limit of "+format(eff.limit)+" Time Energy"
 			break;
 		case "sb": 
-			return "which are adding "+format(eff)+" to the Booster effect base and providing "+format(eff)+" free Boosters" 
+			return "which are multiplying the Booster effect base by "+format(eff)
 			break;
 	}
 }
@@ -624,6 +681,7 @@ function load() {
 	player.tab = "tree"
 	checkForVars();
 	convertToDecimal();
+	versionCheck();
 	updateTemp();
 	loadVue();
 }
@@ -640,14 +698,34 @@ function exportSave() {
 	document.body.removeChild(el);
 }
 
-function importSave() {
-	let imported = prompt("Paste your save here")
+function importSave(imported=undefined) {
+	if (imported===undefined) imported = prompt("Paste your save here")
 	try {
 		player = JSON.parse(atob(imported))
 		save()
 		window.location.reload()
 	} catch(e) {
 		return;
+	}
+}
+
+function versionCheck() {
+	let setVersion = true
+	
+	if (player.versionType===undefined||player.version===undefined) {
+		player.versionType = "alpha"
+		player.version = 0
+	}
+	if (player.versionType=="alpha") {
+		if (player.version<10&&player.sb.unl) {
+			if (confirm("The Super-Booster era has been rebalanced since the last time you were here, so... would you like to import a built-in save for where you should start at?")) importSave(SAVES.PRE_SUPER_BOOSTERS)
+			setVersion = false;
+		}
+	}
+	
+	if (setVersion) {
+		player.versionType = getStartPlayer().versionType
+		player.version = getStartPlayer().version
 	}
 }
 
@@ -667,6 +745,7 @@ function checkForVars() {
 	if (player.s.buildings[4] === undefined) player.s.buildings[4] = new Decimal(0);
 	if (player.s.buildings[5] === undefined) player.s.buildings[5] = new Decimal(0);
 	if (player.sb === undefined) player.sb = getStartPlayer().sb
+	if (player.timePlayed === undefined) player.timePlayed = 0
 }
 
 function convertToDecimal() {
@@ -710,6 +789,7 @@ function commaFormat(num, precision) {
 
 function format(decimal, precision=3) {
 	decimal = new Decimal(decimal)
+	if (decimal.eq(1/0)) return "Infinity"
 	if (decimal.gte("eee1000")) return exponentialFormat(decimal, precision)
 	else if (decimal.gte("ee1000")) return "ee"+format(decimal.log10().log10())
 	else if (decimal.gte("1e1000")) return decimal.div(Decimal.pow(10, decimal.log10().floor())).toStringWithDecimalPlaces(3)+"e"+format(decimal.log10().floor())
@@ -768,11 +848,13 @@ function getLayerGainMult(layer) {
 		case "p":
 			if (player.p.upgrades.includes(21)) mult = mult.times(2)
 			if (player.p.upgrades.includes(23)) mult = mult.times(LAYER_UPGS.p[23].currently())
+			if (player.p.upgrades.includes(31)) mult = mult.times(LAYER_UPGS.p[31].currently())
 			if (player.b.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.b[11].currently())
 			if (player.g.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.g[11].currently())
 			if (player.e.unl) mult = mult.times(tmp.enhEff)
 			if (player.e.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.e[12].currently())
 			if (player.e.upgrades.includes(13)) mult = mult.times(1e10)
+			if (player.e.upgrades.includes(34)) mult = mult.times(1e40)
 			if (player.t.unl) mult = mult.times(tmp.timeEff)
 			if (player.s.unl && tmp.spaceBuildEff) mult = mult.times(tmp.spaceBuildEff[1])
 			break;
@@ -870,7 +952,7 @@ function rowReset(row, layer) {
 					player.b.best = new Decimal(prev.b.best)
 					player.g.best = new Decimal(prev.g.best)
 				}
-			} else if (player.sb.best.gte(7)&&layer=="sb") {
+			} else if (player.sb.best.gte(4)&&layer=="sb") {
 				player.b.best = new Decimal(prev.b.best)
 				player.g.best = new Decimal(prev.g.best)
 			}
@@ -977,14 +1059,13 @@ function addToBoosterBase() {
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
-	if (player.sb.unl) toAdd = toAdd.plus(tmp.layerEffs.sb)
+	if (player.sb.unl) toAdd = toAdd.times(tmp.layerEffs.sb)
 	return toAdd
 }
 
 function getFreeBoosters() {
 	let free = new Decimal(0)
 	if (player.t.upgrades.includes(24)) free = free.plus(18)
-	if (player.sb.unl) free = free.plus(tmp.layerEffs.sb)
 	return free
 }
 
@@ -1002,6 +1083,7 @@ function getGenPowerGainMult() {
 	let mult = new Decimal(1)
 	if (player.g.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.g[21].currently())
 	if (player.g.upgrades.includes(25)) mult = mult.times(LAYER_UPGS.g[25].currently())
+	if (player.e.upgrades.includes(35)) mult = mult.times(LAYER_UPGS.e[35].currently())
 	if (player.s.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.s[12].currently())
 	if (player.s.upgrades.includes(13)) mult = mult.times(LAYER_UPGS.s[13].currently())
 	return mult
@@ -1046,6 +1128,7 @@ function getEnhancerCost() {
 function getEnhancerPow() {
 	let pow = new Decimal(1)
 	if (player.e.upgrades.includes(25)) pow = pow.times(LAYER_UPGS.e[25].currently())
+	if (player.e.upgrades.includes(31)) pow = pow.times(LAYER_UPGS.e[31].currently())
 	return pow
 }
 
@@ -1240,6 +1323,7 @@ function getSuperBoosterPow() {
 }
 
 function gameLoop(diff) {
+	player.timePlayed += diff
 	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff))
 	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff))
 	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff))

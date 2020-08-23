@@ -5,6 +5,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script type="text/javascript" src="js/break_eternity.min.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
+	<script type="text/javascript" src="js/saves.js"></script>
 	<script type="text/javascript" src="js/game.js"></script>
 	<script type="text/javascript" src="js/v.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
@@ -56,6 +57,11 @@
 				<li>Added a new Super-Booster milestone</li>
 				<li>Fixed a bug with hotkeys</li>
 				<li>Balanced up to 1e46,500 points</li>
+			</ul><br><br>
+			<h3>Alpha Build 10</h3>
+			<ul>
+				<li>Rebalanced the Super-Booster era (now up to 1e9,250 points)</li>
+				<li>Implemented a game version variable</li>
 			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
@@ -163,7 +169,7 @@
 				</div>
 				<div v-if="layer=='sb'">
 					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(3), milestoneDone: player.sb.best.gte(3) }">3 Super-Boosters<br>Keep Prestige Upgrades on reset</td></tr></table>
-					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(7), milestoneDone: player.sb.best.gte(7) }">7 Super-Boosters<br>Keep Booster/Generator milestones on reset</td></tr></table>
+					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(4), milestoneDone: player.sb.best.gte(4) }">4 Super-Boosters<br>Keep Booster/Generator milestones on reset</td></tr></table>
 				</div>
 				<br><br><br>
 				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ format(tmp.nextAt[layer]) }} {{ LAYER_AMT_NAMES[layer] }}</button>
