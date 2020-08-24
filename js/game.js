@@ -1,15 +1,17 @@
 var player;
 var tmp = {};
 var needCanvasUpdate = true;
+var NaNalert = false;
 
 function getStartPlayer() {
 	return {
 		tab: "tree",
 		time: Date.now(),
 		autosave: true,
-		versionType: "alpha",
-		version: 10,
+		versionType: "beta",
+		version: 1.0,
 		timePlayed: 0,
+		hasNaN: false,
 		points: new Decimal(10),
 		p: {
 			unl: false,
@@ -718,7 +720,7 @@ function versionCheck() {
 	}
 	if (player.versionType=="alpha") {
 		if (player.version<10&&player.sb.unl) {
-			if (confirm("The Super-Booster era has been rebalanced since the last time you were here, so... would you like to import a built-in save for where you should start at?")) importSave(SAVES.PRE_SUPER_BOOSTERS)
+			if (confirm("Since the last time you played, several changes to Super-Booster effects have been made. Would you like to roll back your save to that point in the progression, in order for you to experience the new features properly?")) importSave(SAVES.PRE_SUPER_BOOSTERS)
 			setVersion = false;
 		}
 	}
@@ -746,6 +748,7 @@ function checkForVars() {
 	if (player.s.buildings[5] === undefined) player.s.buildings[5] = new Decimal(0);
 	if (player.sb === undefined) player.sb = getStartPlayer().sb
 	if (player.timePlayed === undefined) player.timePlayed = 0
+	if (player.hasNaN === undefined) player.hasNaN = false
 }
 
 function convertToDecimal() {
@@ -789,6 +792,10 @@ function commaFormat(num, precision) {
 
 function format(decimal, precision=3) {
 	decimal = new Decimal(decimal)
+	if (isNaN(decimal.sign)||isNaN(decimal.layer)||isNaN(decimal.mag)) {
+		player.hasNaN = true;
+		return "NaN"
+	}
 	if (decimal.eq(1/0)) return "Infinity"
 	if (decimal.gte("eee1000")) return exponentialFormat(decimal, precision)
 	else if (decimal.gte("ee1000")) return "ee"+format(decimal.log10().log10())
@@ -800,6 +807,12 @@ function format(decimal, precision=3) {
 
 function formatWhole(decimal) {
 	return format(decimal, 0)
+}
+
+function formatTime(s) {
+	if (s<60) return format(s)+"s"
+	else if (s<3600) return formatWhole(Math.floor(s/60))+"m "+format(s%60)+"s"
+	else return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
 }
 
 function showTab(name) {
@@ -1323,6 +1336,7 @@ function getSuperBoosterPow() {
 }
 
 function gameLoop(diff) {
+	if (isNaN(diff)) diff = 0;
 	player.timePlayed += diff
 	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff))
 	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff))
@@ -1333,6 +1347,11 @@ function gameLoop(diff) {
 	}
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
+	
+	if (player.hasNaN&&!NaNalert) {
+		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
+		NaNalert = true;
+	}
 }
 
 function hardReset() {

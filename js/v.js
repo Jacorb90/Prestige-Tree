@@ -8,6 +8,7 @@ function loadVue() {
 		  tmp,
 		  format,
 		  formatWhole,
+		  formatTime,
 		  layerUnl,
 		  getLayerEffDesc,
 		  doReset,

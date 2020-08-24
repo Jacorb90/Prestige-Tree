@@ -63,9 +63,17 @@
 				<li>Rebalanced the Super-Booster era (now up to 1e9,250 points)</li>
 				<li>Implemented a game version variable</li>
 			</ul><br><br>
+			<h3>Beta v1.0</h3>
+			<ul>
+				<li>Made sure any built-in saves had Auto-Save turned on</li>
+				<li>Fixed a visual bug for mobile users</li>
+				<li>Added a "time played" display in the info tab</li>
+				<li>Implemented a NaN check system</li>
+			</ul><br><br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
+			Time Played: {{ formatTime(player.timePlayed) }}<br><br><br>
 			<div id="cl" onclick="showTab('changelog')">Changelog</div><br><br><br>
 			<h3>Hotkeys</h3><br><br>
 			P: Prestige reset<br>
@@ -161,25 +169,25 @@
 					<tr><td v-bind:class="{ milestone: player.s.best.lt(12), milestoneDone: player.s.best.gte(12) }">12 space energy<br>Generators reset nothing</td></tr>
 					</table><br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
-					<table><tr>
-						<td v-for="id in 5">
+					<div class="upgRow">
+						<div v-for="id in 5">
 							<button v-if="tmp.sbUnl>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button>
-						</td>
-					</tr></table>
+						</div>
+					</div>
 				</div>
 				<div v-if="layer=='sb'">
-					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(3), milestoneDone: player.sb.best.gte(3) }">3 Super-Boosters<br>Keep Prestige Upgrades on reset</td></tr></table>
-					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(4), milestoneDone: player.sb.best.gte(4) }">4 Super-Boosters<br>Keep Booster/Generator milestones on reset</td></tr></table>
+					<table><tr><td v-bind:class="{ milestone: player.sb.best.lt(3), milestoneDone: player.sb.best.gte(3) }">3 Super-Boosters<br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-bind:class="{ milestone: player.sb.best.lt(4), milestoneDone: player.sb.best.gte(4) }">4 Super-Boosters<br>Keep Booster/Generator milestones on reset</td></tr></table>
 				</div>
 				<br><br><br>
 				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ format(tmp.nextAt[layer]) }} {{ LAYER_AMT_NAMES[layer] }}</button>
 				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Req: {{format(tmp.nextAt[layer])}} {{ LAYER_AMT_NAMES[layer] }}</button>
 				<br><br><br>
-				<table>
-					<tr v-for="row in LAYER_UPGS[layer].rows">
-						<td v-for="col in LAYER_UPGS[layer].cols"><button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span></button></td>
-					</tr>
-				</table>
+				<div class="upgTable">
+					<div v-for="row in LAYER_UPGS[layer].rows" class="upgRow">
+						<div v-for="col in LAYER_UPGS[layer].cols"><button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span></button></div>
+					</div>
+				</div>
 				<br><br><br><br>
 			</div>
 		</div>
