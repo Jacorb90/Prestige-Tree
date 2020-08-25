@@ -1,11 +1,13 @@
 var canvas;
-var ctx
+var ctx;
 
 window.addEventListener("resize", (_=>resizeCanvas()));
 
 function retrieveCanvasData() {
 	let treeCanv = document.getElementById("treeCanvas")
+	let treeTab = document.getElementById("treeTab")
 	if (treeCanv===undefined||treeCanv===null) return false;
+	if (treeTab===undefined||treeTab===null) return false;
 	canvas = treeCanv;
 	ctx = canvas.getContext("2d");
 	return true;
@@ -15,8 +17,8 @@ function resizeCanvas() {
 	if (!retrieveCanvasData()) return
 	canvas.width = 0;
     canvas.height = 0;
-    canvas.width = document.body.scrollWidth;
-    canvas.height = document.body.scrollHeight;
+    canvas.width = document.getElementById("treeTab").scrollWidth;
+    canvas.height = document.getElementById("treeTab").scrollHeight;
     drawTree();
 }
 
@@ -39,10 +41,10 @@ function drawTree() {
 function drawTreeBranch(num1, num2) { // taken from Antimatter Dimensions & adjusted slightly
     let start = document.getElementById(num1).getBoundingClientRect();
     let end = document.getElementById(num2).getBoundingClientRect();
-    let x1 = start.left + (start.width / 2) + (document.documentElement.scrollLeft || document.body.scrollLeft);
-    let y1 = start.top + (start.height / 2) + (document.documentElement.scrollTop || document.body.scrollTop);
-    let x2 = end.left + (end.width / 2) + (document.documentElement.scrollLeft || document.body.scrollLeft);
-    let y2 = end.top + (end.height / 2) + (document.documentElement.scrollTop || document.body.scrollTop);
+    let x1 = start.left + (start.width / 2) + (document.getElementById("treeTab").scrollLeft || document.body.scrollLeft);
+    let y1 = start.top + (start.height / 2) + (document.getElementById("treeTab").scrollTop || document.body.scrollTop);
+    let x2 = end.left + (end.width / 2) + (document.getElementById("treeTab").scrollLeft || document.body.scrollLeft);
+    let y2 = end.top + (end.height / 2) + (document.getElementById("treeTab").scrollTop || document.body.scrollTop);
     ctx.lineWidth = 15;
     ctx.beginPath();
     ctx.strokeStyle = "white"

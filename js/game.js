@@ -9,7 +9,7 @@ function getStartPlayer() {
 		time: Date.now(),
 		autosave: true,
 		versionType: "beta",
-		version: 1.0,
+		version: 1.01,
 		timePlayed: 0,
 		hasNaN: false,
 		points: new Decimal(10),
@@ -97,6 +97,8 @@ const LAYER_RES = {
 	s: "space energy",
 	sb: "super-boosters",
 }
+
+const LAYER_RES_CEIL = ["sb"]
 
 const LAYER_TYPE = {
 	p: "normal",
@@ -624,6 +626,7 @@ const TAB_REQS = {
 	options: function() { return true },
 	info: function() { return true },
 	changelog: function() { return true },
+	credits: function() { return true },
 	p: function() { return (player.p.unl||player.points.gte(tmp.layerReqs.p))&&layerUnl('p') },
 	b: function() { return (player.b.unl||player.points.gte(tmp.layerReqs.b))&&layerUnl('b') },
 	g: function() { return (player.g.unl||player.points.gte(tmp.layerReqs.g))&&layerUnl('g') },
@@ -903,8 +906,14 @@ function getNextAt(layer) {
 		let amt = player[layer].points
 		if (amt.gte(12)) amt = amt.pow(2).div(12)
 		let extraCost = Decimal.pow(LAYER_BASE[layer], amt.pow(LAYER_EXP[layer])).times(tmp.gainMults[layer])
-		return extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
-	} else return tmp.resetGain[layer].plus(1).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		let cost = extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		if (LAYER_RES_CEIL.includes(layer)) cost = cost.ceil()
+		return cost;
+	} else {
+		let next = tmp.resetGain[layer].plus(1).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		if (LAYER_RES_CEIL.includes(layer)) next = next.ceil()
+		return next;
+	}
 }
 
 function layerUnl(layer) {
@@ -1350,6 +1359,7 @@ function gameLoop(diff) {
 	
 	if (player.hasNaN&&!NaNalert) {
 		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
+		clearInterval(interval);
 		NaNalert = true;
 	}
 }
