@@ -92,6 +92,11 @@
 				<li>Implemented some new milestones</li>
 				<li>Balanced up to 15 Hindrance Spirit & 15 Quirks</li>
 			</ul>
+			<h3>Beta v1.1 Alpha 4</h3>
+			<ul>
+				<li>Add the first Hindrance</li>
+				<li>Implemented some new milestones</li>
+			</ul>
 		</div>
 		<div v-if="player.tab=='credits'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
@@ -228,6 +233,7 @@
 					<tr><td v-bind:class="{ milestone: player.h.best.lt(5), milestoneDone: player.h.best.gte(5) }">5 Hindrance Spirit<br>Automatically purchase Extra Time Capsules&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(5)" class="smallUpg can t" onclick="toggleAuto('t', 'Cap')">{{player.t.autoCap?"ON":"OFF"}}</button></td></tr>
 					<tr><td v-bind:class="{ milestone: player.h.best.lt(10), milestoneDone: player.h.best.gte(10) }">10 Hindrance Spirit<br>Keep Prestige & Super-Booster Upgrades on all fourth row resets</td></tr>
 					<tr><td v-bind:class="{ milestone: player.h.best.lt(15), milestoneDone: player.h.best.gte(15) }">15 Hindrance Spirit<br>Automatically purchase Super-Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(15)" class="smallUpg can sb" onclick="toggleAuto('sb')">{{player.sb.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-bind:class="{ milestone: player.h.best.lt(25), milestoneDone: player.h.best.gte(25) }">25 Hindrance Spirit<br>Time resets reset nothing</td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='q'">
@@ -238,6 +244,7 @@
 					<tr><td v-bind:class="{ milestone: player.q.best.lt(5), milestoneDone: player.q.best.gte(5) }">5 Quirks<br>Automatically purchase Enhancers&nbsp;&nbsp;&nbsp;<button v-if="player.q.best.gte(5)" class="smallUpg can e" onclick="toggleAuto('e')">{{player.e.auto?"ON":"OFF"}}</button></td></tr>
 					<tr><td v-bind:class="{ milestone: player.q.best.lt(10), milestoneDone: player.q.best.gte(10) }">10 Quirks<br>Automatically purchase Time Capsules & Space Energy<br><button v-if="player.q.best.gte(10)" class="smallUpg can t" onclick="toggleAuto('t')">{{player.t.auto?"ON":"OFF"}}</button>&nbsp;<button v-if="player.q.best.gte(10)" class="smallUpg can s" onclick="toggleAuto('s')">{{player.s.auto?"ON":"OFF"}}</button></td></tr>
 					<tr><td v-bind:class="{ milestone: player.q.best.lt(15), milestoneDone: player.q.best.gte(15) }">15 Quirks<br>Gain 100% of Enhance Point gain every second</td></tr>
+					<tr><td v-bind:class="{ milestone: player.q.best.lt(25), milestoneDone: player.q.best.gte(25) }">25 Quirks<br>Space resets reset nothing</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: player.q.points.gte(getQuirkLayerCost()), locked: player.q.points.lt(getQuirkLayerCost()), q: true }" onclick="buyQuirkLayer()">Increment your Quirk Layer<br>Cost: {{formatWhole(getQuirkLayerCost())}} Quirks<br>Layers: {{formatWhole(player.q.layers)}}</button>
 				</div>
@@ -250,7 +257,21 @@
 						<div v-for="col in LAYER_UPGS[layer].cols"><button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span></button></div>
 					</div>
 				</div>
-				<br><br><br><br>
+				<br><br>
+				<div v-if="layer=='h'" class="upgTable">
+					<div v-for="row in H_CHALLS.rows" class="upgRow">
+						<div v-for="col in H_CHALLS.cols">
+							<div v-if="H_CHALLS[row*10+col].unl()" v-bind:class="{hChall: true, done: player.h.challs.includes(row*10+col)}">
+								<br><h3>{{H_CHALLS[row*10+col].name}}</h3><br><br>
+								<button class="longUpg can h" v-on:click="startHindrance(row*10+col)">{{HCActive(row*10+col)?(player.points.gte(H_CHALLS[row*10+col].goal)?"Finish":"Exit Early"):(player.h.challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
+								{{H_CHALLS[row*10+col].desc}}<br>
+								Goal: {{format(H_CHALLS[row*10+col].goal)}} Points<br>
+								Reward: {{H_CHALLS[row*10+col].reward}}<br>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br><br>
 			</div>
 		</div>
 	</div>

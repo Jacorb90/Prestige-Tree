@@ -22,13 +22,16 @@ function loadVue() {
 		  buyBuilding,
 		  getQuirkLayerCost,
 		  buyQuirkLayer,
+		  startHindrance,
+		  HCActive,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,
 		  LAYER_UPGS,
 		  LAYER_EFFS,
 		  LAYER_AMT_NAMES,
-		  LAYER_RES_CEIL
+		  LAYER_RES_CEIL,
+		  H_CHALLS
 	  },
 	})
 }

@@ -82,6 +82,7 @@ function getStartPlayer() {
 			unl: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
+			active: 0,
 			challs: [],
 			upgrades: [],
 		},
@@ -179,14 +180,21 @@ const ROW_LAYERS = [
 ]
 
 const LAYER_EFFS = {
-	b: function() { return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())) },
+	b: function() { 
+		if (HCActive(11)) return new Decimal(1);
+		return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())) 
+	},
 	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points).sub(1).times(getGenPowerGainMult()) },
 	t: function() { return {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap))).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 	sb: function() { return Decimal.pow(1.5, player.sb.points.times(getSuperBoosterPow())) },
-	h: function() { return player.h.points.plus(1).times(player.points.times(player.h.points).plus(1).log10().plus(1).log10().plus(1)).log10().times(5).root(player.q.upgrades.includes(12)?1.25:2) },
+	h: function() { 
+		let ret = player.h.points.plus(1).times(player.points.times(player.h.points).plus(1).log10().plus(1).log10().plus(1)).log10().times(5).root(player.q.upgrades.includes(12)?1.25:2);
+		if (ret.gte(100)) ret = ret.log10().times(50).min(ret);
+		return ret;
+	},
 }
 
 const LAYER_UPGS = {
@@ -658,7 +666,7 @@ const LAYER_UPGS = {
 	},
 	q: {
 		rows: 1,
-		cols: 2,
+		cols: 3,
 		11: {
 			desc: "Quirks & Hindrance Spirit boost Point, Prestige Point, and Enhance Point gain.",
 			cost: new Decimal(1),
@@ -670,6 +678,11 @@ const LAYER_UPGS = {
 			desc: "The Quirk Energy and Hindrance Spirit effects use better formulas.",
 			cost: new Decimal(5),
 			unl: function() { return player.q.upgrades.includes(11)&&player.h.best.gte(3) },
+		},
+		13: {
+			desc: "Quirk Layers are twice as fast.",
+			cost: new Decimal(50),
+			unl: function() { return player.q.upgrades.includes(11)&&player.h.challs.includes(11) },
 		},
 	},
 }
@@ -824,6 +837,7 @@ function checkForVars() {
 	if (player.timePlayed === undefined) player.timePlayed = 0
 	if (player.hasNaN === undefined) player.hasNaN = false
 	if (player.h === undefined) player.h = getStartPlayer().h
+	if (player.h.active === undefined) player.h.active = 0
 	if (player.q === undefined) player.q = getStartPlayer().q
 }
 
@@ -1146,6 +1160,7 @@ function doReset(layer, force=false) {
 	}
 	
 	if ((layer=="b"&&player.t.best.gte(12))||(layer=="g"&&player.s.best.gte(12))) return;
+	if ((layer=="t"&&player.h.best.gte(25))||(layer=="s"&&player.q.best.gte(25))) return;
 	let row = LAYER_ROW[layer]
 	if (row==0) rowReset(0, layer)
 	else for (let x=row;x>=1;x--) rowReset(x, layer)
@@ -1228,10 +1243,12 @@ function getGenPowerEffExp() {
 	if (player.b.upgrades.includes(21)) exp = exp.times(2)
 	if (player.b.upgrades.includes(22)) exp = exp.times(1.2)
 	if (player.e.upgrades.includes(21)) exp = exp.times(1.15)
+	if (player.h.challs.includes(11)) exp = exp.times(1.25)
 	return exp;
 }
 
 function getGenPowerEff() {
+	if (HCActive(11)) return new Decimal(1)
 	let eff = player.g.power.plus(1).pow(getGenPowerEffExp());
 	return eff
 }
@@ -1477,13 +1494,26 @@ function getQuirkLayerCost() {
 	return cost.max(1);
 }
 
+function getQuirkLayerMult() {
+	let mult = new Decimal(1)
+	if (player.q.upgrades.includes(13)) mult = mult.times(2)
+	return mult
+}
+
 function getQuirkEnergyGainExp() {
 	return player.q.layers.sub(1)
 }
 
 function getQuirkEnergyEff() {
 	let eff = player.q.energy.plus(1).pow(2)
-	if (player.q.upgrades.includes(12)) eff = eff.pow(player.q.energy.plus(1).log10().plus(1).log10().plus(1))
+	if (player.q.upgrades.includes(12)) {
+		let mod = player.q.energy.plus(1).log10().plus(1).log10().plus(1)
+		if (mod.gte(2)) {
+			eff = eff.times(mod.div(2).pow(10))
+			mod = new Decimal(2)
+		}
+		eff = eff.pow(mod)
+	}
 	return eff;
 }
 
@@ -1493,6 +1523,33 @@ function buyQuirkLayer() {
 	if (player.q.points.lt(cost)) return
 	player.q.points = player.q.points.sub(cost)
 	player.q.layers = player.q.layers.plus(1)
+}
+
+const H_CHALLS = {
+	rows: 1,
+	cols: 1,
+	11: {
+		name: "Skip the Second",
+		desc: "Boosters and Generator Power do nothing",
+		unl: function() { return player.h.best.gt(0) },
+		goal: new Decimal("1e2400"),
+		reward: "The generator power effect is raised to the power of 1.25",
+	},
+}
+
+function HCActive(x) {
+	return player.h.active==x;
+}
+
+function startHindrance(x) {
+	if (!player.h.unl) return
+	if (player.h.active==x) {
+		if (player.points.gte(H_CHALLS[x].goal) && !player.h.challs.includes(x)) player.h.challs.push(x); 
+		player.h.active = 0
+	} else {
+		player.h.active = x
+	}
+	doReset("h", true)
 }
 
 function gameLoop(diff) {
@@ -1506,9 +1563,10 @@ function gameLoop(diff) {
 		player.t.energy = player.t.energy.plus(data.gain.times(diff)).min(data.limit)
 	}
 	if (player.q.unl) {
-		player.q.time = player.q.time.plus(diff)
+		let mult = getQuirkLayerMult()
+		player.q.time = player.q.time.plus(mult.times(diff))
 		let exp = getQuirkEnergyGainExp()
-		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(diff))
+		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(mult).times(diff))
 	}
 	if (player.q.best.gte(15)) player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff))
 
