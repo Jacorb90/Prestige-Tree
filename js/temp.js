@@ -35,4 +35,12 @@ function updateTemp() {
 	tmp.sbUnl = getSpaceBuildingsUnl()
 
 	tmp.quirkEff = getQuirkEnergyEff()
+	
+	if (!tmp.hcActive) tmp.hcActive = {}
+	for (let row=1;row<=H_CHALLS.rows;row++) {
+		for (let col=1;col<=H_CHALLS.cols;col++) {
+			let id = row*10+col
+			tmp.hcActive[id] = HCActive(id)
+		}
+	}
 }

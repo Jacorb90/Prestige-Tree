@@ -96,6 +96,12 @@
 			<ul>
 				<li>Add the first Hindrance</li>
 				<li>Implemented some new milestones</li>
+				<li>Balanced up to 60 Hindrance Spirit & Quirks</li>
+			</ul>
+			<h3>Beta v1.1 Alpha 5</h3>
+			<ul>
+				<li>Add the second Hindrance</li>
+				<li>Balanced up to 200 Hindrance Spirit & Quirks</li>
 			</ul>
 		</div>
 		<div v-if="player.tab=='credits'" class="col right">
@@ -263,10 +269,11 @@
 						<div v-for="col in H_CHALLS.cols">
 							<div v-if="H_CHALLS[row*10+col].unl()" v-bind:class="{hChall: true, done: player.h.challs.includes(row*10+col)}">
 								<br><h3>{{H_CHALLS[row*10+col].name}}</h3><br><br>
-								<button class="longUpg can h" v-on:click="startHindrance(row*10+col)">{{HCActive(row*10+col)?(player.points.gte(H_CHALLS[row*10+col].goal)?"Finish":"Exit Early"):(player.h.challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
+								<button class="longUpg can h" v-on:click="startHindrance(row*10+col)">{{tmp.hcActive[row*10+col]?(player.points.gte(H_CHALLS[row*10+col].goal)?"Finish":"Exit Early"):(player.h.challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
 								{{H_CHALLS[row*10+col].desc}}<br>
 								Goal: {{format(H_CHALLS[row*10+col].goal)}} Points<br>
 								Reward: {{H_CHALLS[row*10+col].reward}}<br>
+								<span v-if="H_CHALLS[row*10+col].effDisp!==undefined">Currently: {{H_CHALLS[row*10+col].effDisp(H_CHALLS[row*10+col].currently())}}</span>
 							</div>
 						</div>
 					</div>
