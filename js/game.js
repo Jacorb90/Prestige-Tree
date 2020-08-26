@@ -692,9 +692,14 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		22: {
-			desc: "Unlock Egg (placeholder).",
-			cost: new Decimal(1/0),
+			desc: "Quirk & Hindrance Spirit gain boost each other.",
+			cost: new Decimal(400),
 			unl: function() { return player.q.upgrades.includes(12)&&player.q.upgrades.includes(13)&&player.h.challs.includes(12) },
+			currently: function() { return {
+				q: player.h.points.div(10).plus(1).sqrt(),
+				h: player.q.points.div(10).plus(1).sqrt(),
+			}},
+			effDisp: function(x) { return format(x.q)+"x to Quirk gain, "+format(x.h)+"x to Hindrance Spirit gain" },
 		},
 		23: {
 			desc: "Unlock a built-in Better TPT (placeholder).",
@@ -1006,11 +1011,31 @@ function getLayerGainMult(layer) {
 			if (player.q.best.gte(1)) mult = mult.times(100)
 			if (player.q.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.q[11].currently())
 			break;
+		case "t":
+			if (player.h.challs.includes(21)) mult = mult.div(H_CHALLS[21].currently())
+			break;
+		case "s":
+			if (player.h.challs.includes(21)) mult = mult.div(H_CHALLS[21].currently())
+			break;
+		case "h": 
+			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
+			break;
 		case "q": 
 			if (player.h.challs.includes(12)) mult = mult.times(H_CHALLS[12].currently())
+			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().q)
 			break;
 	}
 	return mult
+}
+
+function getGainExp(layer) {
+	let exp = new Decimal(1);
+	switch(layer) {
+		case "p": 
+			if (tmp.hcActive ? tmp.hcActive[21] : true) exp = exp.div(100)
+			break;
+	}
+	return exp;
 }
 
 function getResetGain(layer) {
@@ -1021,7 +1046,7 @@ function getResetGain(layer) {
 		return gain.floor().sub(player[layer].points).plus(1).max(1);
 	}
 	if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
-	let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer])
+	let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer]).pow(getGainExp(layer))
 	return gain.floor().max(0);
 }
 
@@ -1034,7 +1059,7 @@ function getNextAt(layer) {
 		if (LAYER_RES_CEIL.includes(layer)) cost = cost.ceil()
 		return cost;
 	} else {
-		let next = tmp.resetGain[layer].plus(1).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		let next = tmp.resetGain[layer].plus(1).root(getGainExp(layer)).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
 		if (LAYER_RES_CEIL.includes(layer)) next = next.ceil()
 		return next;
 	}
@@ -1383,10 +1408,9 @@ function buyExtCapsule() {
 }
 
 function maxExtTimeCapsules() {
-	let target = player.b.points.div(10).sub(1).root(1.2).div(0.4)
+	let target = player.b.points.plus(1).div(10).sub(1).root(1.2).div(0.4)
 	if (target.gte(25)) target = target.times(25).sqrt()
-	target = target.plus(1).floor()
-	if (target.lte(player.t.extCapsules)) return
+	target = target.plus(1).floor().max(0)
 	player.t.extCapsules = player.t.extCapsules.max(target)
 }
 
@@ -1394,7 +1418,7 @@ function getSpace() {
 	let baseSpace = player.s.best.pow(1.1).times(3).floor()
 	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(2);
 	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(3);
-	return baseSpace.sub(player.s.spent)
+	return baseSpace.sub(player.s.spent).max(0)
 }
 
 function getSpaceBuildingCostMod() {
@@ -1549,7 +1573,7 @@ function buyQuirkLayer() {
 }
 
 const H_CHALLS = {
-	rows: 1,
+	rows: 2,
 	cols: 2,
 	11: {
 		name: "Skip the Second",
@@ -1565,6 +1589,24 @@ const H_CHALLS = {
 		goal: new Decimal("1e840"),
 		reward: "Quirk gain is boosted by your Quirk Layers",
 		currently: function() { return Decimal.pow(1.5, player.q.layers) },
+		effDisp: function(x) { return format(x)+"x" },
+	},
+	21: {
+		name: "Prestigeless",
+		desc: "Prestige Point gain is raised to the power of 0.01",
+		unl: function() { return player.h.challs.includes(12) },
+		goal: new Decimal("1e1200"),
+		reward: "Hindrance Spirit & Quirks make Time Capsules & Space Energy cheaper.",
+		currently: function() { return player.h.points.plus(player.q.points).div(2).plus(1).pow(1000) },
+		effDisp: function(x) { return format(x)+"x cheaper" },
+	},
+	22: {
+		name: "Placeholder 420",
+		desc: "Egg does nothing",
+		unl: function() { return player.h.challs.includes(12) },
+		goal: new Decimal(1/0),
+		reward: "Egg Poggers boost Egg generation",
+		currently: function() { return new Decimal(6.969e69) },
 		effDisp: function(x) { return format(x)+"x" },
 	},
 }
