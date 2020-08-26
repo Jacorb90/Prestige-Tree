@@ -195,6 +195,26 @@ h1, h2 {
 	text-shadow: 0px 0px 10px #415a9e;
 }
 
+.h {
+	background-color: #a14040;
+	color: black;
+}
+
+.h_txt {
+	color: #a14040;
+	text-shadow: 0px 0px 10px #a14040;
+}
+
+.q {
+	background-color: #ff2bf2;
+	color: black;
+}
+
+.q_txt {
+	color: #ff2bf2;
+	text-shadow: 0px 0px 10px #ff2bf2;
+}
+
 #optionWheel {
 	position: absolute;
 	top: 0px;

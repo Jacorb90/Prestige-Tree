@@ -20,6 +20,8 @@ function loadVue() {
 		  getSpaceBuildingCost,
 		  getSpaceBuildingEffDesc,
 		  buyBuilding,
+		  getQuirkLayerCost,
+		  buyQuirkLayer,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,

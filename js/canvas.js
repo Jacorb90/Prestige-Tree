@@ -34,6 +34,8 @@ function drawTree() {
 	if (layerUnl('t')) drawTreeBranch("b", "t")
 	if (layerUnl('sb')) drawTreeBranch("b", "sb")
 	if (layerUnl('s')) drawTreeBranch("g", "s")
+	if (layerUnl('h')) drawTreeBranch("t", "h")
+	if (layerUnl('q')) drawTreeBranch("e", "q")
 	
 	needCanvasUpdate = false;
 }
