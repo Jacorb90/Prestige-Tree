@@ -3,7 +3,7 @@
 	<title>The Prestige Tree</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<script type="text/javascript" src="js/break_eternity.min.js"></script>
+	<script type="text/javascript" src="js/break_eternity.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
 	<script type="text/javascript" src="js/saves.js"></script>
 	<script type="text/javascript" src="js/game.js"></script>
@@ -85,6 +85,12 @@
 			<ul>
 				<li>Implemented some new milestones</li>
 				<li>Balanced up to 5 Hindrance Spirit & 5 Quirks</li>
+			</ul>
+			<h3>Beta v1.1 Alpha 3</h3>
+			<ul>
+				<li>Fixed corruption bug</li>
+				<li>Implemented some new milestones</li>
+				<li>Balanced up to 15 Hindrance Spirit & 15 Quirks</li>
 			</ul>
 		</div>
 		<div v-if="player.tab=='credits'" class="col right">
@@ -220,6 +226,8 @@
 					<tr><td v-bind:class="{ milestone: player.h.best.lt(2), milestoneDone: player.h.best.gte(2) }">2 Hindrance Spirit<br>Keep all third row milestones on all fourth row resets, and start with your best-ever Space</td></tr>
 					<tr><td v-bind:class="{ milestone: player.h.best.lt(4), milestoneDone: player.h.best.gte(4) }">4 Hindrance Spirit<br>Keep Time, Enhance, and Space Upgrades on all fourth row resets</td></tr>
 					<tr><td v-bind:class="{ milestone: player.h.best.lt(5), milestoneDone: player.h.best.gte(5) }">5 Hindrance Spirit<br>Automatically purchase Extra Time Capsules&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(5)" class="smallUpg can t" onclick="toggleAuto('t', 'Cap')">{{player.t.autoCap?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-bind:class="{ milestone: player.h.best.lt(10), milestoneDone: player.h.best.gte(10) }">10 Hindrance Spirit<br>Keep Prestige & Super-Booster Upgrades on all fourth row resets</td></tr>
+					<tr><td v-bind:class="{ milestone: player.h.best.lt(15), milestoneDone: player.h.best.gte(15) }">15 Hindrance Spirit<br>Automatically purchase Super-Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(15)" class="smallUpg can sb" onclick="toggleAuto('sb')">{{player.sb.auto?"ON":"OFF"}}</button></td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='q'">
@@ -228,6 +236,8 @@
 					<tr><td v-bind:class="{ milestone: player.q.best.lt(2), milestoneDone: player.q.best.gte(2) }">2 Quirks<br>You can buy max Time Capsules & Space Energy</td></tr>
 					<tr><td v-bind:class="{ milestone: player.q.best.lt(4), milestoneDone: player.q.best.gte(4) }">4 Quirks<br>Keep Space Buildings on all fourth row resets</td></tr>
 					<tr><td v-bind:class="{ milestone: player.q.best.lt(5), milestoneDone: player.q.best.gte(5) }">5 Quirks<br>Automatically purchase Enhancers&nbsp;&nbsp;&nbsp;<button v-if="player.q.best.gte(5)" class="smallUpg can e" onclick="toggleAuto('e')">{{player.e.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-bind:class="{ milestone: player.q.best.lt(10), milestoneDone: player.q.best.gte(10) }">10 Quirks<br>Automatically purchase Time Capsules & Space Energy<br><button v-if="player.q.best.gte(10)" class="smallUpg can t" onclick="toggleAuto('t')">{{player.t.auto?"ON":"OFF"}}</button>&nbsp;<button v-if="player.q.best.gte(10)" class="smallUpg can s" onclick="toggleAuto('s')">{{player.s.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-bind:class="{ milestone: player.q.best.lt(15), milestoneDone: player.q.best.gte(15) }">15 Quirks<br>Gain 100% of Enhance Point gain every second</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: player.q.points.gte(getQuirkLayerCost()), locked: player.q.points.lt(getQuirkLayerCost()), q: true }" onclick="buyQuirkLayer()">Increment your Quirk Layer<br>Cost: {{formatWhole(getQuirkLayerCost())}} Quirks<br>Layers: {{formatWhole(player.q.layers)}}</button>
 				</div>

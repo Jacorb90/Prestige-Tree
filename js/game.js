@@ -73,6 +73,7 @@ function getStartPlayer() {
 		sb: {
 			unl: false, 
 			order: 0,
+			auto: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
 			upgrades: [],
@@ -819,6 +820,7 @@ function checkForVars() {
 	if (player.s.buildings[5] === undefined) player.s.buildings[5] = new Decimal(0);
 	if (player.s.auto === undefined) player.s.auto = false
 	if (player.sb === undefined) player.sb = getStartPlayer().sb
+	if (player.sb.auto === undefined) player.sb.auto = false
 	if (player.timePlayed === undefined) player.timePlayed = 0
 	if (player.hasNaN === undefined) player.hasNaN = false
 	if (player.h === undefined) player.h = getStartPlayer().h
@@ -1046,7 +1048,8 @@ function rowReset(row, layer) {
 		case 1: 
 			player.points = new Decimal(10);
 			player.p.points = new Decimal(0);
-			if ((player.h.best.lt(1)&&player.q.best.lt(1))||LAYER_ROW[layer]>=3) {
+			if (LAYER_ROW[layer]>=3 && player.h.best.gte(10)) player.p.upgrades = prev.p.upgrades;
+			else if ((player.h.best.lt(1)&&player.q.best.lt(1))||LAYER_ROW[layer]>=3) {
 				if (layer=="b"||layer=="g") {
 					if (player[layer].best.lt(8)) player.p.upgrades = [];
 				} else if (layer=="t"||layer=="s"||layer=="sb") {
@@ -1100,14 +1103,16 @@ function rowReset(row, layer) {
 					4: new Decimal(0),
 					5: new Decimal(0)
 				}),
-				upgrades: player.h.best.gte(2) ? player.s.upgrades : [],
+				upgrades: player.h.best.gte(4) ? player.s.upgrades : [],
+				auto: player.s.auto,
 			}
 			player.sb = {
 				unl: player.sb.unl,
+				auto: player.sb.auto,
 				order: 0,
 				points: new Decimal(0),
 				best: player.h.best.gte(2) ? player.sb.best : new Decimal(0),
-				upgrades: [],
+				upgrades: player.h.best.gte(10) ? player.sb.upgrades : [],
 			}
 			player.q.time = new Decimal(0);
 			player.q.energy = new Decimal(0);
@@ -1505,11 +1510,15 @@ function gameLoop(diff) {
 		let exp = getQuirkEnergyGainExp()
 		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(diff))
 	}
+	if (player.q.best.gte(15)) player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff))
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
 	if (player.e.auto&&player.q.best.gte(5)) maxEnhancers()
 	if (player.t.autoCap&&player.h.best.gte(5)) maxExtTimeCapsules()
+	if (player.t.auto&&player.q.best.gte(10)) doReset("t")
+	if (player.s.auto&&player.q.best.gte(10)) doReset("s")
+	if (player.sb.auto&&player.h.best.gte(15)) doReset("sb")
 
 	if (player.hasNaN&&!NaNalert) {
 		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
