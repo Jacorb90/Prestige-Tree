@@ -24,6 +24,7 @@ function loadVue() {
 		  buyQuirkLayer,
 		  startHindrance,
 		  HCActive,
+		  milestoneShown,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,

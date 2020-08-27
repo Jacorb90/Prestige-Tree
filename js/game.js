@@ -8,6 +8,7 @@ function getStartPlayer() {
 		tab: "tree",
 		time: Date.now(),
 		autosave: true,
+		msDisplay: "always",
 		versionType: "beta",
 		version: 1.1,
 		timePlayed: 0,
@@ -186,8 +187,8 @@ const LAYER_EFFS = {
 	},
 	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points).sub(1).times(getGenPowerGainMult()) },
 	t: function() { return {
-		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow()))).sub(1).times(getTimeEnergyGainMult()),
-		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow()))).sub(1).times(100).times(getTimeEnergyLimitMult()),
+		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
+		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 	sb: function() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
 	h: function() { 
@@ -210,7 +211,10 @@ const LAYER_UPGS = {
 			desc: "Point generation is faster based on your unspent Prestige Points.",
 			cost: new Decimal(1),
 			unl: function() { return player.p.upgrades.includes(11) },
-			currently: function() { return player.p.points.plus(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) },
+			currently: function() {
+				if (tmp.hcActive ? tmp.hcActive[32] : true) return new Decimal(1)
+				return player.p.points.plus(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) 
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		13: {
@@ -651,7 +655,7 @@ const LAYER_UPGS = {
 		},
 	},
 	sb: {
-		rows: 1,
+		rows: 2,
 		cols: 2,
 		11: {
 			desc: "Super-Boosters are stronger based on your Prestige Points.",
@@ -670,6 +674,18 @@ const LAYER_UPGS = {
 			unl: function() { return player.sb.upgrades.includes(11) },
 			currently: function() { return player.g.points.div(10).pow(0.04).max(1) },
 			effDisp: function(x) { return format(x)+"x" },
+		},
+		21: {
+			desc: "Super-Boosters add to the Booster base.",
+			cost: new Decimal(8),
+			unl: function() { return player.h.challs.includes(32) },
+			currently: function() { return player.sb.points.pow(2.15) },
+			effDisp: function(x) { return "+"+format(x) },
+		},
+		22: {
+			desc: "Definitely not a placeholder",
+			cost: new Decimal(1/0),
+			unl: function() { return player.h.challs.includes(32) },
 		},
 	},
 	h: {
@@ -729,9 +745,11 @@ const LAYER_UPGS = {
 			unl: function() { return player.q.upgrades.includes(23)||player.q.upgrades.includes(31) },
 		},
 		33: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Time Capsules are stronger based on their amount",
+			cost: new Decimal(2e9),
+			unl: function() { return player.q.upgrades.includes(23)&&player.q.upgrades.includes(31) },
+			currently: function() { return player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap)).plus(1).log10().plus(1) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 	},
 }
@@ -888,6 +906,7 @@ function checkForVars() {
 	if (player.h === undefined) player.h = getStartPlayer().h
 	if (player.h.active === undefined) player.h.active = 0
 	if (player.q === undefined) player.q = getStartPlayer().q
+	if (player.msDisplay === undefined) player.msDisplay = "always"
 }
 
 function convertToDecimal() {
@@ -1282,6 +1301,7 @@ function addToBoosterBase() {
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
+	if (player.sb.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sb[21].currently())
 	if (player.sb.unl) toAdd = toAdd.times(tmp.layerEffs.sb)
 	return toAdd
 }
@@ -1392,6 +1412,12 @@ function getFreeExtCapsules() {
 	if (player.t.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) amt = amt.plus(1)
 	if (player.h.unl) amt = amt.plus(tmp.layerEffs.h)
 	return amt
+}
+
+function getCapPow() {
+	let pow = new Decimal(1)
+	if (player.q.upgrades.includes(33)) pow = pow.times(LAYER_UPGS.q[33].currently())
+	return pow
 }
 
 function getFreeExtPow() {
@@ -1663,11 +1689,11 @@ const H_CHALLS = {
 		reward: "Enhancers are twice as strong.",
 	},
 	32: {
-		name: "???",
-		desc: "???",
-		unl: function() { return false },
-		goal: new Decimal(1/0),
-		reward: "???",
+		name: "Surprise Junction",
+		desc: "Prestige Upgrade 2 does nothing",
+		unl: function() { return player.h.challs.includes(21)&&player.h.challs.includes(22) },
+		goal: new Decimal("1e2580"),
+		reward: "Unlock 2 new Super-Booster Upgrades.",
 	},
 }
 
@@ -1684,6 +1710,29 @@ function startHindrance(x) {
 		player.h.active = x
 	}
 	doReset("h", true)
+}
+
+function adjustMSDisp() {
+	let displays = ["always", "automation", "incomplete", "never"];
+	player.msDisplay = displays[(displays.indexOf(player.msDisplay)+1)%4]
+}
+
+function milestoneShown(complete, auto=false) {
+	switch(player.msDisplay) {
+		case "always": 
+			return true;
+			break;
+		case "automation": 
+			return auto||!complete
+			break;
+		case "incomplete":
+			return !complete
+			break;
+		case "never": 
+			return false;
+			break;
+	}
+	return false;
 }
 
 function gameLoop(diff) {
