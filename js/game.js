@@ -252,7 +252,11 @@ const LAYER_UPGS = {
 			desc: "Prestige Point gain is boosted by your Prestige Point amount.",
 			cost: new Decimal("1e4450"),
 			unl: function() { return player.e.upgrades.includes(33) },
-			currently: function() { return player.p.points.plus(1).log10().plus(1).pow(player.p.points.plus(1).log10().div(200).plus(1)).pow(player.p.upgrades.includes(32) ? LAYER_UPGS.p[32].currently() : 1) },
+			currently: function() { 
+				let ret = player.p.points.plus(1).log10().plus(1).pow(player.p.points.plus(1).log10().div(200).plus(1)).pow(player.p.upgrades.includes(32) ? LAYER_UPGS.p[32].currently() : 1) 
+				if (ret.gte("1e1000")) ret = ret.log10().times("1e997")
+				return ret;
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		32: {
@@ -398,7 +402,11 @@ const LAYER_UPGS = {
 			desc: "Unspent Enhance Points boost Prestige Point gain.",
 			cost: new Decimal(150),
 			unl: function() { return player.e.unl&&player.e.best.gte(40) },
-			currently: function() { return player.e.points.plus(1).pow((player.e.upgrades.includes(15)&&!(tmp.hcActive?tmp.hcActive[12]:true))?3.25:1.5) },
+			currently: function() { 
+				let ret = player.e.points.plus(1).pow((player.e.upgrades.includes(15)&&!(tmp.hcActive?tmp.hcActive[12]:true))?3.25:1.5) 
+				if (ret.gte("1e1500")) ret = ret.sqrt().times("1e750")
+				return ret
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		13: {
@@ -461,7 +469,7 @@ const LAYER_UPGS = {
 			cost: new Decimal(7.5e108),
 			unl: function() { return player.e.upgrades.includes(25)&&player.sb.unl },
 			currently: function() { 
-				let ret = Decimal.pow(10, player.e.points.plus(1).log10().pow(0.085)).div(10).max(1);
+				let ret = Decimal.pow(10, player.e.points.plus(1).log10().pow(0.085)).div(10).max(1).min(10);
 				return ret;
 			},
 			effDisp: function(x) { return format(x)+"x" },
@@ -524,7 +532,11 @@ const LAYER_UPGS = {
 			desc: "Time Energy production & limit are boosted by your Enhance Points.",
 			cost: new Decimal(5),
 			unl: function() { return player.t.upgrades.includes(14)&&player.e.unl },
-			currently: function() { return player.e.points.plus(1).pow(0.8/(1+player.t.order)) },
+			currently: function() { 
+				let ret = player.e.points.plus(1).pow(0.8/(1+player.t.order))
+				if (ret.gte("1e400")) ret = ret.log10().times(Decimal.div("1e400", 400)).min(ret)
+				return ret;
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		23: {
@@ -665,7 +677,7 @@ const LAYER_UPGS = {
 		cols: 0,
 	},
 	q: {
-		rows: 2,
+		rows: 3,
 		cols: 3,
 		11: {
 			desc: "Quirks & Hindrance Spirit boost Point, Prestige Point, and Enhance Point gain.",
@@ -705,6 +717,21 @@ const LAYER_UPGS = {
 			desc: "The Time Energy limit is 1e10x higher.",
 			cost: new Decimal(5000),
 			unl: function() { return player.q.upgrades.includes(21)||player.q.upgrades.includes(22) },
+		},
+		31: {
+			desc: "Get 1 of each Space Building for free.",
+			cost: new Decimal(150000),
+			unl: function() { return player.q.upgrades.includes(21)&&player.q.upgrades.includes(22) },
+		},
+		32: {
+			desc: "The Quirk Energy effect is squared.",
+			cost: new Decimal(500000),
+			unl: function() { return player.q.upgrades.includes(23)||player.q.upgrades.includes(31) },
+		},
+		33: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 }
@@ -1240,6 +1267,8 @@ function getPointGen() {
 	if (player.s.unl && tmp.spaceBuildEff) gain = gain.times(tmp.spaceBuildEff[1])
 	if (player.q.unl && tmp.quirkEff) gain = gain.times(tmp.quirkEff)
 	if (player.q.upgrades.includes(11)) gain = gain.times(LAYER_UPGS.q[11].currently())
+		
+	if (tmp.hcActive ? tmp.hcActive[31] : true) gain = gain.tetrate(0.1)
 	return gain
 }
 
@@ -1320,6 +1349,7 @@ function getEnhancerPow() {
 	let pow = new Decimal(1)
 	if (player.e.upgrades.includes(25)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[25].currently())
 	if (player.e.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[31].currently())
+	if (player.h.challs.includes(31)) pow = pow.times(2)
 	return pow
 }
 
@@ -1438,6 +1468,7 @@ function getSpaceBuildingCostMod() {
 function getSpaceBuildingCost(x) {
 	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
 	let bought = player.s.buildings[x]
+	if (bought.gte(100)) bought = bought.pow(2).div(100)
 	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0)
 	return cost
 }
@@ -1456,6 +1487,7 @@ function getExtraBuildingLevels(x) {
 	let lvl = new Decimal(0)
 	if (player.s.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
 	if (player.s.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
+	if (player.q.upgrades.includes(31)) lvl = lvl.plus(1);
 	if (x<5) lvl = lvl.plus(tmp.spaceBuildEff[5])
 	return lvl
 }
@@ -1576,6 +1608,7 @@ function getQuirkEnergyEff() {
 		}
 		eff = eff.pow(mod)
 	}
+	if (player.q.upgrades.includes(32)) eff = eff.pow(2)
 	return eff;
 }
 
@@ -1588,7 +1621,7 @@ function buyQuirkLayer() {
 }
 
 const H_CHALLS = {
-	rows: 2,
+	rows: 3,
 	cols: 2,
 	11: {
 		name: "Skip the Second",
@@ -1622,6 +1655,20 @@ const H_CHALLS = {
 		goal: new Decimal("1e4600"),
 		reward: "Add 0.25 to the Super-Booster base.",
 	},
+	31: {
+		name: "Flattened Curve",
+		desc: "Point generation is tetrated by 0.1",
+		unl: function() { return player.h.challs.includes(21)||player.h.challs.includes(22) },
+		goal: new Decimal(1e208),
+		reward: "Enhancers are twice as strong.",
+	},
+	32: {
+		name: "???",
+		desc: "???",
+		unl: function() { return false },
+		goal: new Decimal(1/0),
+		reward: "???",
+	},
 }
 
 function HCActive(x) {
@@ -1642,20 +1689,20 @@ function startHindrance(x) {
 function gameLoop(diff) {
 	if (isNaN(diff)) diff = 0;
 	player.timePlayed += diff
-	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff))
-	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff))
-	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff))
+	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff)).max(0)
+	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff)).max(0)
+	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff)).max(0)
 	if (player.t.unl) {
 		let data = tmp.layerEffs.t
-		player.t.energy = player.t.energy.plus(data.gain.times(diff)).min(data.limit)
+		player.t.energy = player.t.energy.plus(data.gain.times(diff)).min(data.limit).max(0)
 	}
 	if (player.q.unl) {
 		let mult = getQuirkLayerMult()
-		player.q.time = player.q.time.plus(mult.times(diff))
+		player.q.time = player.q.time.plus(mult.times(diff)).max(0)
 		let exp = getQuirkEnergyGainExp()
-		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(mult).times(diff))
+		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(mult).times(diff)).max(0)
 	}
-	if (player.q.best.gte(15)) player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff))
+	if (player.q.best.gte(15)) player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff)).max(0)
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
