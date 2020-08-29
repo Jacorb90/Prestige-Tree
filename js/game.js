@@ -81,6 +81,7 @@ function getStartPlayer() {
 		},
 		h: {
 			unl: false,
+			time: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
 			active: 0,
@@ -510,7 +511,7 @@ const LAYER_UPGS = {
 			desc: "The Time Energy cap starts later based on your Boosters, and you get a free Extra Time Capsule.",
 			cost: new Decimal(3),
 			unl: function() { return player.t.best.gte(2)&&player.t.unl },
-			currently: function() { return player.b.points.pow(0.95).plus(1) },
+			currently: function() { return player.b.points.pow(0.95).plus(1).pow(player.q.upgrades.includes(43)?16:1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		13: {
@@ -683,9 +684,11 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "+"+format(x) },
 		},
 		22: {
-			desc: "Definitely not a placeholder",
-			cost: new Decimal(1/0),
+			desc: "Super-Boosters add to the Super-Booster base.",
+			cost: new Decimal(12),
 			unl: function() { return player.h.challs.includes(32) },
+			currently: function() { return player.sb.points.plus(1).log10().div(3) },
+			effDisp: function(x) { return "+"+format(x) },
 		},
 	},
 	h: {
@@ -781,14 +784,16 @@ const LAYER_UPGS = {
 			unl: function() { return player.h.challs.includes(32) },
 		},
 		43: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Time Upgrade 2 is 1,500% stronger.",
+			cost: new Decimal(1e16),
 			unl: function() { return player.h.challs.includes(32) },
 		},
 		44: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "You gain more Hindrance Spirit based on your Quirk Energy.",
+			cost: new Decimal(4e16),
 			unl: function() { return player.h.challs.includes(32) },
+			currently: function() { return player.q.energy.plus(1).log10().plus(1) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 }
@@ -944,6 +949,7 @@ function checkForVars() {
 	if (player.hasNaN === undefined) player.hasNaN = false
 	if (player.h === undefined) player.h = getStartPlayer().h
 	if (player.h.active === undefined) player.h.active = 0
+	if (player.h.time === undefined) player.h.time = 0
 	if (player.q === undefined) player.q = getStartPlayer().q
 	if (player.msDisplay === undefined) player.msDisplay = "always"
 }
@@ -1105,6 +1111,7 @@ function getLayerGainMult(layer) {
 		case "h": 
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
 			if (player.q.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.q[34].currently())
+			if (player.q.upgrades.includes(44)) mult = mult.times(LAYER_UPGS.q[44].currently())
 			break;
 		case "q": 
 			if (player.h.challs.includes(12)) mult = mult.times(H_CHALLS[12].currently())
@@ -1260,6 +1267,7 @@ function rowReset(row, layer) {
 				best: player.h.best.gte(2) ? player.sb.best : new Decimal(0),
 				upgrades: player.h.best.gte(10) ? player.sb.upgrades : [],
 			}
+			player.h.time = 0
 			player.q.time = new Decimal(0);
 			player.q.energy = new Decimal(0);
 			break;
@@ -1381,6 +1389,7 @@ function getGenPowerEffExp() {
 	if (player.b.upgrades.includes(22)) exp = exp.times(1.2)
 	if (player.e.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) exp = exp.times(1.15)
 	if (player.h.challs.includes(11)) exp = exp.times(1.25)
+	if (player.h.challs.includes(42)) exp = exp.times(3)
 	return exp;
 }
 
@@ -1663,6 +1672,7 @@ function addToSBBase() {
 	let toAdd = new Decimal(0)
 	if (player.h.challs.includes(22)) toAdd = toAdd.plus(0.25)
 	if (player.h.challs.includes(41)) toAdd = toAdd.plus(0.25)
+	if (player.sb.upgrades.includes(22)) toAdd = toAdd.plus(LAYER_UPGS.sb[22].currently())
 	return toAdd
 }
 
@@ -1762,11 +1772,11 @@ const H_CHALLS = {
 		reward: "Add 0.25 to the Super-Booster base.",
 	},
 	42: {
-		name: "???",
-		desc: "???",
-		unl: function() { return false },
-		goal: new Decimal(1/0),
-		reward: "???",
+		name: "Slowed to a Halt",
+		desc: "Time slows down over time, halting to a stop after 10 seconds.",
+		unl: function() { return player.h.challs.includes(31)&&player.h.challs.includes(32) },
+		goal: new Decimal("1e16500"),
+		reward: "Cube the Generator Power effect.",
 	},
 }
 
@@ -1809,8 +1819,13 @@ function milestoneShown(complete, auto=false) {
 }
 
 function gameLoop(diff) {
-	if (isNaN(diff)) diff = 0;
-	player.timePlayed += diff
+	if (isNaN(diff.toNumber())) diff = new Decimal(0);
+	player.h.time += diff.toNumber()
+	if (tmp.hcActive ? tmp.hcActive[42] : true) {
+		if (player.h.time>=10) diff = new Decimal(0)
+		else diff = diff.div(Decimal.div(10, Decimal.sub(10, player.h.time+1)).pow(1000))
+	}
+	player.timePlayed += diff.toNumber()
 	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff)).max(0)
 	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff)).max(0)
 	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff)).max(0)
@@ -1860,7 +1875,7 @@ var interval = setInterval(function() {
 	player.time = Date.now()
 	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();
-	gameLoop(diff)
+	gameLoop(new Decimal(diff))
 }, 50)
 
 document.onkeydown = function(e) {
