@@ -694,7 +694,7 @@ const LAYER_UPGS = {
 	},
 	q: {
 		rows: 3,
-		cols: 3,
+		cols: 4,
 		11: {
 			desc: "Quirks & Hindrance Spirit boost Point, Prestige Point, and Enhance Point gain.",
 			cost: new Decimal(1),
@@ -711,6 +711,11 @@ const LAYER_UPGS = {
 			desc: "Quirk Layers are twice as fast.",
 			cost: new Decimal(50),
 			unl: function() { return player.q.upgrades.includes(11)&&player.h.challs.includes(11) },
+		},
+		14: {
+			desc: "Quirk Layers are thrice as fast.",
+			cost: new Decimal(2e10),
+			unl: function() { return player.h.challs.includes(32)&&player.q.upgrades.includes(13) },
 		},
 		21: {
 			desc: "Quirk Layers are faster based on your Quirks.",
@@ -734,6 +739,13 @@ const LAYER_UPGS = {
 			cost: new Decimal(5000),
 			unl: function() { return player.q.upgrades.includes(21)||player.q.upgrades.includes(22) },
 		},
+		24: {
+			desc: "The Time Energy limit is higher based on your Quirk Energy.",
+			cost: new Decimal(5e10),
+			unl: function() { return player.h.challs.includes(32)&&player.q.upgrades.includes(23) },
+			currently: function() { return player.q.energy.div(1e6).plus(1).pow(0.9) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
 		31: {
 			desc: "Get 1 of each Space Building for free.",
 			cost: new Decimal(150000),
@@ -745,11 +757,18 @@ const LAYER_UPGS = {
 			unl: function() { return player.q.upgrades.includes(23)||player.q.upgrades.includes(31) },
 		},
 		33: {
-			desc: "Time Capsules are stronger based on their amount",
+			desc: "Time Capsules are stronger based on their amount.",
 			cost: new Decimal(2e9),
 			unl: function() { return player.q.upgrades.includes(23)&&player.q.upgrades.includes(31) },
 			currently: function() { return player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap)).plus(1).log10().plus(1) },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		34: {
+			desc: "Enhance Points boost Hindrance Spirit & Quirk gain.",
+			cost: new Decimal(1e11),
+			unl: function() { return player.h.challs.includes(32)&&player.q.upgrades.includes(33) },
+			currently: function() { return player.e.points.plus(1).log10().cbrt().plus(1) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 }
@@ -1065,10 +1084,12 @@ function getLayerGainMult(layer) {
 			break;
 		case "h": 
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
+			if (player.q.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.q[34].currently())
 			break;
 		case "q": 
 			if (player.h.challs.includes(12)) mult = mult.times(H_CHALLS[12].currently())
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().q)
+			if (player.q.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.q[34].currently())
 			break;
 	}
 	return mult
@@ -1366,6 +1387,7 @@ function resetRow(row) {
 
 function getEnhancerPow() {
 	if (tmp.hcActive ? tmp.hcActive[22] : true) return new Decimal(0);
+	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0);
 	let pow = new Decimal(1)
 	if (player.e.upgrades.includes(25)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[25].currently())
 	if (player.e.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[31].currently())
@@ -1415,6 +1437,7 @@ function getFreeExtCapsules() {
 }
 
 function getCapPow() {
+	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	if (player.q.upgrades.includes(33)) pow = pow.times(LAYER_UPGS.q[33].currently())
 	return pow
@@ -1453,6 +1476,7 @@ function getTimeEnergyLimitMult() {
 	if (player.t.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[23].currently())
 	if (player.t.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[34].currently())
 	if (player.q.upgrades.includes(23)) mult = mult.times(1e10)
+	if (player.q.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.q[24].currently())
 	return mult;
 }
 
@@ -1502,6 +1526,7 @@ function getSpaceBuildingCost(x) {
 function getSpaceBuildingPow() {
 	if (!player.s.unl) return new Decimal(0)
 	if (tmp.hcActive ? tmp.hcActive[22] : true) return new Decimal(0)
+	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	if (player.s.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[21].currently())
 	if (player.s.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
@@ -1596,6 +1621,7 @@ function toggleAuto(layer, end="") {
 }
 
 function getSuperBoosterPow() {
+	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	if (player.sb.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.sb[11].currently())
 	if (player.sb.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.sb[12].currently())
@@ -1605,6 +1631,7 @@ function getSuperBoosterPow() {
 function addToSBBase() {
 	let toAdd = new Decimal(0)
 	if (player.h.challs.includes(22)) toAdd = toAdd.plus(0.25)
+	if (player.h.challs.includes(41)) toAdd = toAdd.plus(0.25)
 	return toAdd
 }
 
@@ -1616,6 +1643,7 @@ function getQuirkLayerCost() {
 function getQuirkLayerMult() {
 	let mult = new Decimal(1)
 	if (player.q.upgrades.includes(13)) mult = mult.times(2)
+	if (player.q.upgrades.includes(14)) mult = mult.times(3)
 	if (player.q.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.q[21].currently())
 	return mult
 }
@@ -1647,7 +1675,7 @@ function buyQuirkLayer() {
 }
 
 const H_CHALLS = {
-	rows: 3,
+	rows: 4,
 	cols: 2,
 	11: {
 		name: "Skip the Second",
@@ -1694,6 +1722,20 @@ const H_CHALLS = {
 		unl: function() { return player.h.challs.includes(21)&&player.h.challs.includes(22) },
 		goal: new Decimal("1e2580"),
 		reward: "Unlock 2 new Super-Booster Upgrades.",
+	},
+	41: {
+		name: "Skip the Third",
+		desc: "Enhancers, Time Capsules, Space Buildings, and Super-Boosters do nothing.",
+		unl: function() { return player.h.challs.includes(31)||player.h.challs.includes(32) },
+		goal: new Decimal("4.444e4444"),
+		reward: "Add 0.25 to the Super-Booster base.",
+	},
+	42: {
+		name: "???",
+		desc: "???",
+		unl: function() { return false },
+		goal: new Decimal(1/0),
+		reward: "???",
 	},
 }
 
