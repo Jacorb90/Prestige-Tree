@@ -43,4 +43,8 @@ function updateTemp() {
 			tmp.hcActive[id] = HCActive(id)
 		}
 	}
+	
+	tmp.ssEff1 = getSubspaceEff1()
+	tmp.ssEff2 = getSubspaceEff2()
+	tmp.ssEff3 = getSubspaceEff3()
 }

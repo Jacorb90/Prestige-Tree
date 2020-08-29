@@ -97,10 +97,25 @@ function getStartPlayer() {
 			time: new Decimal(0),
 			upgrades: [],
 		},
+		hb: {
+			unl: false,
+			order: 0,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			upgrades: [],
+		},
+		ss: {
+			unl: false,
+			order: 0,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			subspace: new Decimal(0),
+			upgrades: [],
+		},
 	}
 }
 
-const LAYERS = ["p", "b", "g", "e", "t", "s", "sb", "h", "q"]
+const LAYERS = ["p", "b", "g", "e", "t", "s", "sb", "h", "q", "hb", "ss"]
 
 const LAYER_REQS = {
 	p: new Decimal(10),
@@ -112,6 +127,8 @@ const LAYER_REQS = {
 	sb: new Decimal(180),
 	h: new Decimal(1e220),
 	q: new Decimal("1e512"),
+	hb: new Decimal(12),
+	ss: new Decimal(36),
 }
 
 const LAYER_RES = {
@@ -124,9 +141,11 @@ const LAYER_RES = {
 	sb: "super-boosters",
 	h: "hindrance spirit",
 	q: "quirks",
+	hb: "hyper-boosters",
+	ss: "subspace energy",
 }
 
-const LAYER_RES_CEIL = ["sb"]
+const LAYER_RES_CEIL = ["sb", "hb", "ss"]
 
 const LAYER_TYPE = {
 	p: "normal",
@@ -138,6 +157,8 @@ const LAYER_TYPE = {
 	sb: "static",
 	h: "normal",
 	q: "normal",
+	hb: "static", 
+	ss: "static",
 }
 
 const LAYER_EXP = {
@@ -150,6 +171,8 @@ const LAYER_EXP = {
 	sb: new Decimal(1.25),
 	h: new Decimal(0.015),
 	q: new Decimal(0.0075),
+	hb: new Decimal(1.1),
+	ss: new Decimal(1.1),
 }
 
 const LAYER_BASE = {
@@ -158,6 +181,8 @@ const LAYER_BASE = {
 	t: new Decimal(1e15),
 	s: new Decimal(1e15),
 	sb: new Decimal(1.05),
+	hb: new Decimal(1.05),
+	ss: new Decimal(1.15),
 }
 
 const LAYER_ROW = {
@@ -170,6 +195,8 @@ const LAYER_ROW = {
 	sb: 2,
 	h: 3,
 	q: 3,
+	hb: 3,
+	ss: 3,
 	future_layer: 4,
 }
 
@@ -177,7 +204,7 @@ const ROW_LAYERS = [
 	["p"],
 	["b","g"],
 	["e","t","s","sb"],
-	["h","q"],
+	["h","q","hb","ss"],
 	["future_layer"],
 ]
 
@@ -197,6 +224,8 @@ const LAYER_EFFS = {
 		if (ret.gte(100)) ret = ret.log10().times(50).min(ret);
 		return ret;
 	},
+	hb: function() { return Decimal.pow(1.6, player.hb.points) },
+	ss: function() { return player.ss.points.pow(2.5) },
 }
 
 const LAYER_UPGS = {
@@ -796,6 +825,14 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
+	hb: {
+		rows: 0,
+		cols: 0,
+	},
+	ss: {
+		rows: 0,
+		cols: 0,
+	},
 }
 
 const TAB_REQS = {
@@ -813,6 +850,8 @@ const TAB_REQS = {
 	sb: function() { return (player.sb.unl||player.b.points.gte(tmp.layerReqs.sb))&&layerUnl('sb') },
 	h: function() { return (player.h.unl||player.t.energy.gte(tmp.layerReqs.h))&&layerUnl('h') },
 	q: function() { return (player.q.unl||player.g.power.gte(tmp.layerReqs.q))&&layerUnl('q') },
+	hb: function() { return (player.hb.unl||player.sb.points.gte(tmp.layerReqs.hb))&&layerUnl('hb') },
+	ss: function() { return (player.ss.unl||player.s.points.gte(tmp.layerReqs.ss))&&layerUnl('ss') },
 }
 
 const LAYER_AMT_NAMES = {
@@ -825,6 +864,8 @@ const LAYER_AMT_NAMES = {
 	sb: "boosters",
 	h: "time energy",
 	q: "generator power",
+	hb: "super-boosters",
+	ss: "space energy",
 }
 
 function getLayerAmt(layer) {
@@ -838,6 +879,12 @@ function getLayerAmt(layer) {
 			break;
 		case "q": 
 			return player.g.power;
+			break;
+		case "hb": 
+			return player.sb.points;
+			break;
+		case "ss":
+			return player.s.points;
 			break;
 	}
 	return amt
@@ -862,6 +909,12 @@ function getLayerEffDesc(layer) {
 		case "h": 
 			return "which are providing "+format(eff)+" free extra Time Capsules (boosted by your points)"
 			break; 
+		case "hb": 
+			return "which are multiplying the Super-Booster effect base by "+format(eff)
+			break;
+		case "ss": 
+			return "which are generating "+format(eff)+" Subspace/sec"
+			break;
 	}
 }
 
@@ -952,6 +1005,8 @@ function checkForVars() {
 	if (player.h.time === undefined) player.h.time = 0
 	if (player.q === undefined) player.q = getStartPlayer().q
 	if (player.msDisplay === undefined) player.msDisplay = "always"
+	if (player.hb === undefined) player.hb = getStartPlayer().hb
+	if (player.ss === undefined) player.ss = getStartPlayer().ss
 }
 
 function convertToDecimal() {
@@ -983,6 +1038,11 @@ function convertToDecimal() {
 	player.q.layers = new Decimal(player.q.layers)
 	player.q.energy = new Decimal(player.q.energy)
 	player.q.time = new Decimal(player.q.time)
+	player.hb.points = new Decimal(player.hb.points)
+	player.hb.best = new Decimal(player.hb.best)
+	player.ss.points = new Decimal(player.ss.points)
+	player.ss.best = new Decimal(player.ss.best)
+	player.ss.subspace = new Decimal(player.ss.subspace)
 }
 
 function toggleOpt(name) {
@@ -1066,6 +1126,12 @@ function getLayerReq(layer) {
 			break;
 		case "s": 
 			req = req.times(Decimal.pow("1e200", Decimal.pow(player.s.order, 2)))
+			break;
+		case "hb":
+			if (player.hb.order>0) req = new Decimal(1/0)
+			break;
+		case "ss":
+			if (player.ss.order>0) req = new Decimal(1/0)
 			break;
 	}
 	return req
@@ -1188,6 +1254,12 @@ function layerUnl(layer) {
 		case "q": 
 			return player.e.unl&&player.sb.unl
 			break;
+		case "hb": 
+			return player.sb.unl&&player.h.unl&&player.q.unl
+			break;
+		case "ss": 
+			return player.s.unl&&player.h.unl&&player.q.unl
+			break;
 	}
 }
 
@@ -1274,6 +1346,8 @@ function rowReset(row, layer) {
 		case 4: 
 			player.h = start.h
 			player.q = start.q
+			player.hb = start.hb
+			player.ss = start.ss
 			break;
 	}
 }
@@ -1536,6 +1610,7 @@ function getSpace() {
 	let baseSpace = player.s.best.pow(1.1).times(3).floor()
 	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(2);
 	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(3);
+	if (player.ss.unl) baseSpace = baseSpace.plus(tmp.ssEff1)
 	return baseSpace.sub(player.s.spent).max(0)
 }
 
@@ -1545,11 +1620,17 @@ function getSpaceBuildingCostMod() {
 	return mod;
 }
 
+function getSpaceBuildingCostMult() {
+	let mult = new Decimal(1)
+	if (player.ss.unl) mult = mult.div(tmp.ssEff2)
+	return mult
+}
+
 function getSpaceBuildingCost(x) {
 	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
 	let bought = player.s.buildings[x]
 	if (bought.gte(100)) bought = bought.pow(2).div(100)
-	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0)
+	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0).times(getSpaceBuildingCostMult())
 	return cost
 }
 
@@ -1562,6 +1643,7 @@ function getSpaceBuildingPow() {
 	if (player.s.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
 	if (player.s.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[23].currently())
 	if (player.q.upgrades.includes(41)) pow = pow.times(1.4)
+	if (player.ss.unl) pow = pow.times(tmp.ssEff3)
 	return pow
 }
 
@@ -1673,6 +1755,7 @@ function addToSBBase() {
 	if (player.h.challs.includes(22)) toAdd = toAdd.plus(0.25)
 	if (player.h.challs.includes(41)) toAdd = toAdd.plus(0.25)
 	if (player.sb.upgrades.includes(22)) toAdd = toAdd.plus(LAYER_UPGS.sb[22].currently())
+	if (player.hb.unl) toAdd = toAdd.times(tmp.layerEffs.hb)
 	return toAdd
 }
 
@@ -1818,6 +1901,24 @@ function milestoneShown(complete, auto=false) {
 	return false;
 }
 
+function getSubspaceEff1() {
+	if (!player.ss.unl) return new Decimal(0)
+	let eff = player.ss.subspace.times(player.ss.points).plus(1).log10().times(100)
+	return eff.floor();
+}
+
+function getSubspaceEff2() {
+	if (!player.ss.unl) return new Decimal(1)
+	let eff = player.ss.subspace.plus(1).pow(750)
+	return eff;
+}
+
+function getSubspaceEff3() {
+	if (!player.ss.unl) return new Decimal(1)
+	let eff = player.ss.subspace.plus(1).log10().plus(1).log10().div(2.5).plus(1)
+	return eff;
+}
+
 function gameLoop(diff) {
 	if (isNaN(diff.toNumber())) diff = new Decimal(0);
 	player.h.time += diff.toNumber()
@@ -1840,6 +1941,7 @@ function gameLoop(diff) {
 		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(mult).times(diff)).max(0)
 	}
 	if (player.q.best.gte(15)) player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff)).max(0)
+	if (player.ss.unl) player.ss.subspace = player.ss.subspace.plus(tmp.layerEffs.ss.times(diff)).max(0)
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
@@ -1881,11 +1983,18 @@ var interval = setInterval(function() {
 document.onkeydown = function(e) {
 	if (player===undefined) return;
 	let shiftDown = e.shiftKey
+	let ctrlDown = e.ctrlKey
 	let key = e.key
-	if (!LAYERS.includes(key)) {
+	if ((!LAYERS.includes(key))||ctrlDown||shiftDown) {
 		switch(key) {
+			case "b": 
+				if (ctrlDown && player.hb.unl) doReset("hb")
+				break;
 			case "B": 
 				if (player.sb.unl) doReset("sb")
+				break;
+			case "S": 
+				if (player.ss.unl) doReset("ss")
 				break;
 		}
 	} else if (player[key].unl) doReset(key)

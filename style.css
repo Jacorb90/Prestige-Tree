@@ -215,6 +215,26 @@ h1, h2 {
 	text-shadow: 0px 0px 10px #ff2bf2;
 }
 
+.hb {
+	background-color: #513d94;
+	color: black;
+}
+
+.hb_txt {
+	color: #513d94;
+	text-shadow: 0px 0px 10px #513d94;
+}
+
+.ss {
+	background-color: white;
+	color: black;
+}
+
+.ss_txt {
+	color: white;
+	text-shadow: 0px 0px 10px white;
+}
+
 #optionWheel {
 	position: absolute;
 	top: 0px;
