@@ -25,6 +25,7 @@ function loadVue() {
 		  startHindrance,
 		  HCActive,
 		  milestoneShown,
+		  destroyBuilding,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,

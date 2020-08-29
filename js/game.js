@@ -693,7 +693,7 @@ const LAYER_UPGS = {
 		cols: 0,
 	},
 	q: {
-		rows: 3,
+		rows: 4,
 		cols: 4,
 		11: {
 			desc: "Quirks & Hindrance Spirit boost Point, Prestige Point, and Enhance Point gain.",
@@ -715,7 +715,7 @@ const LAYER_UPGS = {
 		14: {
 			desc: "Quirk Layers are thrice as fast.",
 			cost: new Decimal(2e10),
-			unl: function() { return player.h.challs.includes(32)&&player.q.upgrades.includes(13) },
+			unl: function() { return player.h.challs.includes(32) },
 		},
 		21: {
 			desc: "Quirk Layers are faster based on your Quirks.",
@@ -742,7 +742,7 @@ const LAYER_UPGS = {
 		24: {
 			desc: "The Time Energy limit is higher based on your Quirk Energy.",
 			cost: new Decimal(5e10),
-			unl: function() { return player.h.challs.includes(32)&&player.q.upgrades.includes(23) },
+			unl: function() { return player.h.challs.includes(32) },
 			currently: function() { return player.q.energy.div(1e6).plus(1).pow(0.9) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
@@ -766,9 +766,29 @@ const LAYER_UPGS = {
 		34: {
 			desc: "Enhance Points boost Hindrance Spirit & Quirk gain.",
 			cost: new Decimal(1e11),
-			unl: function() { return player.h.challs.includes(32)&&player.q.upgrades.includes(33) },
+			unl: function() { return player.h.challs.includes(32) },
 			currently: function() { return player.e.points.plus(1).log10().cbrt().plus(1) },
 			effDisp: function(x) { return format(x)+"x" },
+		},
+		41: {
+			desc: "Space Buildings are 40% stronger.",
+			cost: new Decimal(2.5e13),
+			unl: function() { return player.h.challs.includes(32) },
+		},
+		42: {
+			desc: "Enhancers are 40% stronger.",
+			cost: new Decimal(2e14),
+			unl: function() { return player.h.challs.includes(32) },
+		},
+		43: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.h.challs.includes(32) },
+		},
+		44: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.h.challs.includes(32) },
 		},
 	},
 }
@@ -1392,6 +1412,7 @@ function getEnhancerPow() {
 	if (player.e.upgrades.includes(25)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[25].currently())
 	if (player.e.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[31].currently())
 	if (player.h.challs.includes(31)) pow = pow.times(2)
+	if (player.q.upgrades.includes(42)) pow = pow.times(1.4)
 	return pow
 }
 
@@ -1531,6 +1552,7 @@ function getSpaceBuildingPow() {
 	if (player.s.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[21].currently())
 	if (player.s.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
 	if (player.s.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[23].currently())
+	if (player.q.upgrades.includes(41)) pow = pow.times(1.4)
 	return pow
 }
 
@@ -1598,6 +1620,15 @@ function buyBuilding(x) {
 	player.g.power = player.g.power.sub(cost)
 	player.s.spent = player.s.spent.plus(1)
 	player.s.buildings[x] = player.s.buildings[x].plus(1)
+}
+
+function destroyBuilding(x, all=false) {
+	if (!player.s.unl) return
+	if (tmp.sbUnl<x) return
+	if (player.s.buildings[x].lt(1)) return
+	if (player.q.best.lt(2500)) return
+	player.s.spent = player.s.spent.sub(all?player.s.buildings[x]:1)
+	player.s.buildings[x] = all?new Decimal(0):player.s.buildings[x].sub(1)
 }
 
 function respecSpaceBuildings() {
@@ -1721,7 +1752,7 @@ const H_CHALLS = {
 		desc: "Prestige Upgrade 2 does nothing",
 		unl: function() { return player.h.challs.includes(21)&&player.h.challs.includes(22) },
 		goal: new Decimal("1e2580"),
-		reward: "Unlock 2 new Super-Booster Upgrades.",
+		reward: "Unlock 2 new Super-Booster Upgrades and 7 new Quirk Upgrades.",
 	},
 	41: {
 		name: "Skip the Third",

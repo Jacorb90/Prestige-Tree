@@ -16,6 +16,11 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.1 Alpha 11</h3>
+			<ul>
+				<li>Added a new Quirk Milestone</li>
+				<li>Balanced up to 1e15 Hindrance Spirit, 1e16 Quirks, and 1e42,500 Points</li>
+			</ul><br>
 			<h3>Beta v1.1 Alpha 10</h3>
 			<ul>
 				<li>Balanced up to 2e13 Hindrance Spirit & Quirks, and 1e31,000 Points</li>
@@ -255,7 +260,9 @@
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<div class="upgRow">
 						<div v-for="id in 5">
-							<button v-if="tmp.sbUnl>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button>
+							<button v-if="tmp.sbUnl>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button><br><br>
+							<button v-if="tmp.sbUnl>=id&&player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: player.s.buildings[id].gte(1), locked: player.s.buildings[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
+							<button v-if="tmp.sbUnl>=id&&player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: player.s.buildings[id].gte(1), locked: player.s.buildings[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
 						</div>
 					</div>
 				</div>
@@ -283,6 +290,7 @@
 					<tr><td v-if="milestoneShown(player.q.best.gte(10), true)" v-bind:class="{ milestone: player.q.best.lt(10), milestoneDone: player.q.best.gte(10) }">10 Quirks<br>Automatically purchase Time Capsules & Space Energy<br><button v-if="player.q.best.gte(10)" class="smallUpg can t" onclick="toggleAuto('t')">{{player.t.auto?"ON":"OFF"}}</button>&nbsp;<button v-if="player.q.best.gte(10)" class="smallUpg can s" onclick="toggleAuto('s')">{{player.s.auto?"ON":"OFF"}}</button></td></tr>
 					<tr><td v-if="milestoneShown(player.q.best.gte(15))" v-bind:class="{ milestone: player.q.best.lt(15), milestoneDone: player.q.best.gte(15) }">15 Quirks<br>Gain 100% of Enhance Point gain every second</td></tr>
 					<tr><td v-if="milestoneShown(player.q.best.gte(25))" v-bind:class="{ milestone: player.q.best.lt(25), milestoneDone: player.q.best.gte(25) }">25 Quirks<br>Space resets reset nothing</td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(2500))" v-bind:class="{ milestone: player.q.best.lt(2500), milestoneDone: player.q.best.gte(2500) }">2,500 Quirks<br>You can destroy individual Space Buildings</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: player.q.points.gte(getQuirkLayerCost()), locked: player.q.points.lt(getQuirkLayerCost()), q: true }" onclick="buyQuirkLayer()">Increment your Quirk Layer<br>Cost: {{formatWhole(getQuirkLayerCost())}} Quirks<br>Layers: {{formatWhole(player.q.layers)}}</button>
 				</div>
