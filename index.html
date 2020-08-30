@@ -16,6 +16,11 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.1 Alpha 14</h3>
+			<ul>
+				<li>Implemented the fourth row 4 layer unlock</li>
+				<li>Balanced up to 1e240,000-1e250,000 Points</li>
+			</ul><br>
 			<h3>Beta v1.1 Alpha 13</h3>
 			<ul>
 				<li>Implemented Subspace & Hyper-Booster resets</li>
@@ -309,6 +314,9 @@
 				</div>
 				<div v-if="layer=='ss'">
 					You have {{format(player.ss.subspace)}} Subspace, which provides you with {{formatWhole(tmp.ssEff1)}} extra Space, makes all Space Buildings {{format(tmp.ssEff2)}}x cheaper, and makes all Space Buildings {{format(tmp.ssEff3.sub(1).times(100))}}% stronger<br><br>
+					<table>
+						<tr><td v-if="milestoneShown(player.ss.best.gte(1), true)" v-bind:class="{ milestone: player.ss.best.lt(1), milestoneDone: player.ss.best.gte(1) }">1 Subspace Energy<br>Automatically purchase Space Buildings&nbsp;&nbsp;&nbsp;<button v-if="player.ss.best.gte(1)" class="smallUpg can s" onclick="toggleAuto('s', 'Build')">{{player.s.autoBuild?"ON":"OFF"}}</button></td></tr>
+					</table>
 				</div>
 				<br><br><br>
 				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">+{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</button>

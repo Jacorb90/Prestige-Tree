@@ -58,6 +58,7 @@ function getStartPlayer() {
 		s: {
 			unl: false,
 			auto: false,
+			autoBuild: false,
 			order: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
@@ -171,7 +172,7 @@ const LAYER_EXP = {
 	sb: new Decimal(1.25),
 	h: new Decimal(0.015),
 	q: new Decimal(0.0075),
-	hb: new Decimal(1.1),
+	hb: new Decimal(2.5),
 	ss: new Decimal(1.1),
 }
 
@@ -224,8 +225,8 @@ const LAYER_EFFS = {
 		if (ret.gte(100)) ret = ret.log10().times(50).min(ret);
 		return ret;
 	},
-	hb: function() { return Decimal.pow(1.6, player.hb.points) },
-	ss: function() { return player.ss.points.pow(2.5) },
+	hb: function() { return Decimal.pow(1.6, player.hb.points.pow(getHyperBoosterExp()).times(getHyperBoosterPow())) },
+	ss: function() { return player.ss.points.pow(2.5).times(getSubspaceGainMult()) },
 }
 
 const LAYER_UPGS = {
@@ -826,12 +827,50 @@ const LAYER_UPGS = {
 		},
 	},
 	hb: {
-		rows: 0,
-		cols: 0,
+		rows: 1,
+		cols: 2,
+		11: {
+			desc: "Super-Boosters are stronger based on your Hyper-Boosters.",
+			cost: new Decimal(2),
+			unl: function() { return player.hb.unl },
+			currently: function() { return player.hb.points.sqrt().div((player.hb.order>0)?25:4).plus(1) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		12: {
+			desc: "Hyper-Boosters are stronger based on your Super-Boosters.",
+			cost: new Decimal(2),
+			unl: function() { return player.hb.unl },
+			currently: function() { return player.sb.points.div(10).plus(1).log10().div((player.hb.order>0)?5:1).plus(1) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
 	},
 	ss: {
-		rows: 0,
-		cols: 0,
+		rows: 1,
+		cols: 4,
+		11: {
+			desc: "You get more Space based on your Subspace Energy.",
+			cost: new Decimal(1),
+			unl: function() { return player.ss.unl },
+			currently: function() { return player.ss.points.sqrt().times(150).floor() },
+			effDisp: function(x) { return formatWhole(x)+" more Space" },
+		},
+		12: {
+			desc: "You generate Subspace faster based on your Points.",
+			cost: new Decimal(2),
+			unl: function() { return player.ss.unl },
+			currently: function() { return player.points.plus(1).log10().div(1e4).plus(1) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		13: {
+			desc: "Subspace's third effect is 50% stronger.",
+			cost: new Decimal(2),
+			unl: function() { return player.ss.unl },
+		},
+		14: {
+			desc: "Super-Boosters are 5.5% cheaper.",
+			cost: new Decimal(2),
+			unl: function() { return player.hb.unl },
+		},
 	},
 }
 
@@ -996,6 +1035,7 @@ function checkForVars() {
 	if (player.s.buildings[4] === undefined) player.s.buildings[4] = new Decimal(0);
 	if (player.s.buildings[5] === undefined) player.s.buildings[5] = new Decimal(0);
 	if (player.s.auto === undefined) player.s.auto = false
+	if (player.s.autoBuild === undefined) player.s.autoBuild = false
 	if (player.sb === undefined) player.sb = getStartPlayer().sb
 	if (player.sb.auto === undefined) player.sb.auto = false
 	if (player.timePlayed === undefined) player.timePlayed = 0
@@ -1128,10 +1168,10 @@ function getLayerReq(layer) {
 			req = req.times(Decimal.pow("1e200", Decimal.pow(player.s.order, 2)))
 			break;
 		case "hb":
-			if (player.hb.order>0) req = new Decimal(1/0)
+			if (player.hb.order>0) req = new Decimal(15)
 			break;
 		case "ss":
-			if (player.ss.order>0) req = new Decimal(1/0)
+			if (player.ss.order>0) req = new Decimal(45)
 			break;
 	}
 	return req
@@ -1173,6 +1213,9 @@ function getLayerGainMult(layer) {
 			break;
 		case "s":
 			if (player.h.challs.includes(21)) mult = mult.div(H_CHALLS[21].currently())
+			break;
+		case "sb":
+			if (player.ss.upgrades.includes(14)) mult = mult.div(1.055)
 			break;
 		case "h": 
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
@@ -1330,6 +1373,7 @@ function rowReset(row, layer) {
 				}),
 				upgrades: player.h.best.gte(4) ? player.s.upgrades : [],
 				auto: player.s.auto,
+				autoBuild: player.s.autoBuild,
 			}
 			player.sb = {
 				unl: player.sb.unl,
@@ -1611,6 +1655,7 @@ function getSpace() {
 	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(2);
 	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(3);
 	if (player.ss.unl) baseSpace = baseSpace.plus(tmp.ssEff1)
+	if (player.ss.upgrades.includes(11)) baseSpace = baseSpace.plus(LAYER_UPGS.ss[11].currently())
 	return baseSpace.sub(player.s.spent).max(0)
 }
 
@@ -1632,6 +1677,13 @@ function getSpaceBuildingCost(x) {
 	if (bought.gte(100)) bought = bought.pow(2).div(100)
 	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0).times(getSpaceBuildingCostMult())
 	return cost
+}
+
+function getSpaceBuildingTarg(x) {
+	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
+	let target = player.g.power.div(getSpaceBuildingCostMult()).div(inputVal).max(1).log(inputVal).pow(1/1.35).div(getSpaceBuildingCostMod())
+	if (target.gte(100)) target = target.times(100).sqrt()
+	return target.plus(1).floor()
 }
 
 function getSpaceBuildingPow() {
@@ -1713,6 +1765,18 @@ function buyBuilding(x) {
 	player.s.buildings[x] = player.s.buildings[x].plus(1)
 }
 
+function maxSpaceBuilding(x) {
+	if (!player.s.unl) return
+	if (tmp.sbUnl<x) return
+	let space = getSpace()
+	if (space.lt(1)) return
+	let target = getSpaceBuildingTarg(x)
+	let bulk = target.sub(player.s.buildings[x]).min(space)
+	if (bulk.lt(1)) return
+	player.s.spent = player.s.spent.plus(bulk)
+	player.s.buildings[x] = player.s.buildings[x].plus(bulk)
+}
+
 function destroyBuilding(x, all=false) {
 	if (!player.s.unl) return
 	if (tmp.sbUnl<x) return
@@ -1747,6 +1811,7 @@ function getSuperBoosterPow() {
 	let pow = new Decimal(1)
 	if (player.sb.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.sb[11].currently())
 	if (player.sb.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.sb[12].currently())
+	if (player.hb.upgrades.includes(11)) pow = pow.times(LAYER_UPGS.hb[11].currently())
 	return pow;
 }
 
@@ -1916,10 +1981,31 @@ function getSubspaceEff2() {
 function getSubspaceEff3() {
 	if (!player.ss.unl) return new Decimal(1)
 	let eff = player.ss.subspace.plus(1).log10().plus(1).log10().div(2.5).plus(1)
+	if (player.ss.upgrades.includes(13)) eff = eff.times(1.5)
+	if (eff.gte(2)) eff = eff.log2().plus(1)
 	return eff;
 }
 
+function getSubspaceGainMult() {
+	let mult = new Decimal(1)
+	if (player.ss.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ss[12].currently())
+	return mult
+}
+
+function getHyperBoosterExp() {
+	let exp = new Decimal(1)
+	if (player.hb.order>0) exp = new Decimal(0.5)
+	return exp
+}
+
+function getHyperBoosterPow() {
+	let pow = new Decimal(1)
+	if (player.hb.upgrades.includes(12)) pow = pow.times(LAYER_UPGS.hb[12].currently())
+	return pow;
+}
+
 function gameLoop(diff) {
+	diff = new Decimal(diff)
 	if (isNaN(diff.toNumber())) diff = new Decimal(0);
 	player.h.time += diff.toNumber()
 	if (tmp.hcActive ? tmp.hcActive[42] : true) {
@@ -1949,6 +2035,7 @@ function gameLoop(diff) {
 	if (player.t.autoCap&&player.h.best.gte(5)) maxExtTimeCapsules()
 	if (player.t.auto&&player.q.best.gte(10)) doReset("t")
 	if (player.s.auto&&player.q.best.gte(10)) doReset("s")
+	if (player.s.autoBuild&&player.ss.best.gte(1)) for (let i=1;i<=tmp.sbUnl;i++) maxSpaceBuilding(i)
 	if (player.sb.auto&&player.h.best.gte(15)) doReset("sb")
 
 	if (player.hasNaN&&!NaNalert) {
