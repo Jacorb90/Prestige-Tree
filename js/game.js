@@ -828,25 +828,30 @@ const LAYER_UPGS = {
 	},
 	hb: {
 		rows: 1,
-		cols: 2,
+		cols: 3,
 		11: {
 			desc: "Super-Boosters are stronger based on your Hyper-Boosters.",
 			cost: new Decimal(2),
 			unl: function() { return player.hb.unl },
-			currently: function() { return player.hb.points.sqrt().div((player.hb.order>0)?25:4).plus(1) },
+			currently: function() { return player.hb.points.sqrt().div(4).plus(1) },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		12: {
 			desc: "Hyper-Boosters are stronger based on your Super-Boosters.",
 			cost: new Decimal(2),
 			unl: function() { return player.hb.unl },
-			currently: function() { return player.sb.points.div(10).plus(1).log10().div((player.hb.order>0)?5:1).plus(1) },
+			currently: function() { return player.sb.points.div(10).plus(1).log10().plus(1) },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		13: {
+			desc: "This layer behaves as if you chose it first.",
+			cost: new Decimal(2),
+			unl: function() { return player.hb.order>0||(player.ss.upgrades.includes(15))||player.hb.upgrades.includes(13) },
 		},
 	},
 	ss: {
 		rows: 1,
-		cols: 4,
+		cols: 5,
 		11: {
 			desc: "You get more Space based on your Subspace Energy.",
 			cost: new Decimal(1),
@@ -867,9 +872,14 @@ const LAYER_UPGS = {
 			unl: function() { return player.ss.unl },
 		},
 		14: {
-			desc: "Super-Boosters are 5.5% cheaper.",
+			desc: "Super-Boosters are 8.25% cheaper.",
 			cost: new Decimal(2),
 			unl: function() { return player.hb.unl },
+		},
+		15: {
+			desc: "This layer behaves as if you chose it first.",
+			cost: new Decimal(3),
+			unl: function() { return player.ss.order>0||(player.hb.upgrades.includes(13))||player.ss.upgrades.includes(15) },
 		},
 	},
 }
@@ -1215,7 +1225,7 @@ function getLayerGainMult(layer) {
 			if (player.h.challs.includes(21)) mult = mult.div(H_CHALLS[21].currently())
 			break;
 		case "sb":
-			if (player.ss.upgrades.includes(14)) mult = mult.div(1.055)
+			if (player.ss.upgrades.includes(14)) mult = mult.div(1.0825)
 			break;
 		case "h": 
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
@@ -1246,6 +1256,7 @@ function getResetGain(layer) {
 		if ((!canBuyMax(layer)) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(LAYER_BASE[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
 		if (gain.gte(12)) gain = gain.times(12).sqrt()
+		if (gain.gte(1225)) gain = gain.times(Decimal.pow(1225, 9)).pow(0.1)
 		return gain.floor().sub(player[layer].points).plus(1).max(1);
 	}
 	if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
@@ -1256,6 +1267,7 @@ function getResetGain(layer) {
 function getNextAt(layer) {
 	if (LAYER_TYPE[layer]=="static") {
 		let amt = player[layer].points
+		if (amt.gte(1225)) amt = amt.pow(10).div(Decimal.pow(1225, 9))
 		if (amt.gte(12)) amt = amt.pow(2).div(12)
 		let extraCost = Decimal.pow(LAYER_BASE[layer], amt.pow(LAYER_EXP[layer])).times(tmp.gainMults[layer])
 		let cost = extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
@@ -1440,6 +1452,8 @@ function buyUpg(layer, id) {
 		if (!player.e.upgrades.includes(23)) player.e.upgrades.push(23)
 	}
 	if (layer=="s"&&id==33) player.s.order = 0;
+	if (layer=="hb"&&id==13) player.hb.order = 0;
+	if (layer=="ss"&&id==15) player.ss.order = 0;
 }
 
 function getPointGen() {
