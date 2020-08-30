@@ -16,6 +16,13 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.1 Alpha 16</h3>
+			<ul>
+				<li>Added a new Hindrance (h9)</li>
+				<li>Added a new Hyper-Booster milestone</li>
+				<li>Made the Space Building automation prioritize the rightmost buildings first</li>
+				<li>Balanced up to 1e690,000 Points</li>
+			</ul><br>
 			<h3>Beta v1.1 Alpha 15</h3>
 			<ul>
 				<li>Balanced up to 1e635,000 Points (don't worry, the crazy inflation stops here)</li>
@@ -316,6 +323,11 @@
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: player.q.points.gte(getQuirkLayerCost()), locked: player.q.points.lt(getQuirkLayerCost()), q: true }" onclick="buyQuirkLayer()">Increment your Quirk Layer<br>Cost: {{formatWhole(getQuirkLayerCost())}} Quirks<br>Layers: {{formatWhole(player.q.layers)}}</button>
 				</div>
+				<div v-if="layer=='hb'">
+					<table>
+						<tr><td v-if="milestoneShown(player.hb.best.gte(1))" v-bind:class="{ milestone: player.hb.best.lt(1), milestoneDone: player.hb.best.gte(1) }">1 Hyper-Booster<br>You can buy max Super-Boosters</td></tr>
+					</table>
+				</div>
 				<div v-if="layer=='ss'">
 					You have {{format(player.ss.subspace)}} Subspace, which provides you with {{formatWhole(tmp.ssEff1)}} extra Space, makes all Space Buildings {{format(tmp.ssEff2)}}x cheaper, and makes all Space Buildings {{format(tmp.ssEff3.sub(1).times(100))}}% stronger<br><br>
 					<table>
@@ -337,7 +349,7 @@
 						<div v-for="col in H_CHALLS.cols">
 							<div v-if="H_CHALLS[row*10+col].unl()" v-bind:class="{hChall: true, done: player.h.challs.includes(row*10+col), canComplete: (player.points.gte(H_CHALLS[row*10+col].goal)&&tmp.hcActive[row*10+col]&&!player.h.challs.includes(row*10+col))}">
 								<br><h3>{{H_CHALLS[row*10+col].name}}</h3><br><br>
-								<button class="longUpg can h" v-on:click="startHindrance(row*10+col)">{{tmp.hcActive[row*10+col]?(player.points.gte(H_CHALLS[row*10+col].goal)?"Finish":"Exit Early"):(player.h.challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
+								<button class="longUpg can h" v-on:click="startHindrance(row*10+col)">{{player.h.active==(row*10+col)?(player.points.gte(H_CHALLS[row*10+col].goal)?"Finish":"Exit Early"):(player.h.challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
 								{{H_CHALLS[row*10+col].desc}}<br>
 								Goal: {{format(H_CHALLS[row*10+col].goal)}} Points<br>
 								Reward: {{H_CHALLS[row*10+col].reward}}<br>

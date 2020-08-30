@@ -308,7 +308,7 @@ const LAYER_UPGS = {
 		},
 	},
 	b: {
-		rows: 2,
+		rows: 3,
 		cols: 3,
 		11: {
 			desc: "Boosters boost Prestige Point gain.",
@@ -348,9 +348,26 @@ const LAYER_UPGS = {
 			currently: function() { return player.points.plus(1).log10().plus(1).pow(3.2).pow(tmp.spaceBuildEff?tmp.spaceBuildEff[4]:1) },
 			effDisp: function(x) { return "/"+format(x) },
 		},
+		31: {
+			desc: "Hyper-Boosters multiply the Booster base.",
+			cost: new Decimal(1250),
+			unl: function() { return player.hb.upgrades.includes(14) },
+			currently: function() { return Decimal.pow(4, player.hb.points.pow(2)) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		32: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.hb.upgrades.includes(14) },
+		},
+		33: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.hb.upgrades.includes(14) },
+		},
 	},
 	g: {
-		rows: 2,
+		rows: 3,
 		cols: 5,
 		11: {
 			desc: "Generators boost Prestige Point gain.",
@@ -415,8 +432,35 @@ const LAYER_UPGS = {
 			desc: "Prestige Points boost Generator Power gain.",
 			cost: new Decimal(28),
 			unl: function() { return player.g.upgrades.includes(23) && player.g.upgrades.includes(24) },
-			currently: function() { return player.p.points.plus(1).log10().sqrt().plus(1).pow((player.t.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1) },
+			currently: function() { return player.p.points.plus(1).log10().sqrt().plus(1).pow((player.t.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1).pow(player.g.upgrades.includes(31) ? LAYER_UPGS.g[31].currently() : 1) },
 			effDisp: function(x) { return format(x)+"x" },
+		},
+		31: {
+			desc: "Generators Upgrade 10 is stronger based on your Generators.",
+			cost: new Decimal(950),
+			unl: function() { return player.ss.upgrades.includes(21) },
+			currently: function() { return player.g.points.plus(1).log10().pow(3.6).plus(1) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		32: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ss.upgrades.includes(21) },
+		},
+		33: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ss.upgrades.includes(21) },
+		},
+		34: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ss.upgrades.includes(21) },
+		},
+		35: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ss.upgrades.includes(21) },
 		},
 	},
 	e: {
@@ -828,7 +872,7 @@ const LAYER_UPGS = {
 	},
 	hb: {
 		rows: 1,
-		cols: 3,
+		cols: 4,
 		11: {
 			desc: "Super-Boosters are stronger based on your Hyper-Boosters.",
 			cost: new Decimal(2),
@@ -848,9 +892,14 @@ const LAYER_UPGS = {
 			cost: new Decimal(2),
 			unl: function() { return player.hb.order>0||(player.ss.upgrades.includes(15))||player.hb.upgrades.includes(13) },
 		},
+		14: {
+			desc: "Unlock 3 new Booster Upgrades.",
+			cost: new Decimal(3),
+			unl: function() { return player.hb.upgrades.includes(13)&&player.ss.upgrades.includes(15) },
+		},
 	},
 	ss: {
-		rows: 1,
+		rows: 2,
 		cols: 5,
 		11: {
 			desc: "You get more Space based on your Subspace Energy.",
@@ -880,6 +929,31 @@ const LAYER_UPGS = {
 			desc: "This layer behaves as if you chose it first.",
 			cost: new Decimal(3),
 			unl: function() { return player.ss.order>0||(player.hb.upgrades.includes(13))||player.ss.upgrades.includes(15) },
+		},
+		21: {
+			desc: "Unlock 5 new Generator Upgrades.",
+			cost: new Decimal(4),
+			unl: function() { return player.hb.upgrades.includes(13)&&player.ss.upgrades.includes(15) },
+		},
+		22: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		23: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		24: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		25: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 }
@@ -1154,6 +1228,9 @@ function canBuyMax(layer) {
 			break;
 		case "s": 
 			return player.q.best.gte(2)
+			break;
+		case "sb":
+			return player.hb.best.gte(1)
 			break;
 	}
 	return false;
@@ -1483,6 +1560,8 @@ function addToBoosterBase() {
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
 	if (player.sb.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sb[21].currently())
+	
+	if (player.b.upgrades.includes(31)) toAdd = toAdd.times(LAYER_UPGS.b[31].currently())
 	if (player.sb.unl) toAdd = toAdd.times(tmp.layerEffs.sb)
 	return toAdd
 }
@@ -1500,6 +1579,7 @@ function addToGenBase() {
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
+	if (player.h.challs.includes(51)) toAdd = toAdd.times(H_CHALLS[51].currently())
 	return toAdd
 }
 
@@ -1878,7 +1958,7 @@ function buyQuirkLayer() {
 }
 
 const H_CHALLS = {
-	rows: 4,
+	rows: 5,
 	cols: 2,
 	11: {
 		name: "Skip the Second",
@@ -1940,9 +2020,26 @@ const H_CHALLS = {
 		goal: new Decimal("1e16500"),
 		reward: "Cube the Generator Power effect.",
 	},
+	51: {
+		name: "It's all Gone",
+		desc: '"Skip the Second" and "Skip the Third" are both applied at once.',
+		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42) },
+		goal: new Decimal("1e2840"),
+		reward: "Super-Boosters multiply the Generator base.",
+		currently: function() { return player.sb.points.plus(1).sqrt() },
+		effDisp: function(x) { return format(x)+"x" },
+	},
+	52: {
+		name: "???",
+		desc: "???",
+		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42) },
+		goal: new Decimal(1/0),
+		reward: "???",
+	},
 }
 
 function HCActive(x) {
+	if (x==11||x==41) if (HCActive(51)) return true
 	return player.h.active==x;
 }
 
@@ -2049,7 +2146,7 @@ function gameLoop(diff) {
 	if (player.t.autoCap&&player.h.best.gte(5)) maxExtTimeCapsules()
 	if (player.t.auto&&player.q.best.gte(10)) doReset("t")
 	if (player.s.auto&&player.q.best.gte(10)) doReset("s")
-	if (player.s.autoBuild&&player.ss.best.gte(1)) for (let i=1;i<=tmp.sbUnl;i++) maxSpaceBuilding(i)
+	if (player.s.autoBuild&&player.ss.best.gte(1)) for (let i=tmp.sbUnl;i>=1;i--) maxSpaceBuilding(i)
 	if (player.sb.auto&&player.h.best.gte(15)) doReset("sb")
 
 	if (player.hasNaN&&!NaNalert) {
