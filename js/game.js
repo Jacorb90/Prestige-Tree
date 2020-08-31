@@ -220,9 +220,9 @@ const ORDER_UP = [
 const LAYER_EFFS = {
 	b: function() { 
 		if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1);
-		return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())) 
+		return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())).max(0)
 	},
-	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points).sub(1).times(getGenPowerGainMult()) },
+	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points).sub(1).times(getGenPowerGainMult()).max(0) },
 	t: function() { return {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
@@ -364,9 +364,11 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		32: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Add free Boosters based on your Generator Power.",
+			cost: new Decimal(1265),
 			unl: function() { return player.hb.upgrades.includes(14) },
+			currently: function() { return player.g.power.plus(1).log10().sqrt().floor() },
+			effDisp: function(x) { return "+"+formatWhole(x) },
 		},
 		33: {
 			desc: "???",
@@ -1585,6 +1587,7 @@ function addToBoosterBase() {
 function getFreeBoosters() {
 	let free = new Decimal(0)
 	if (player.t.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) free = free.plus(18)
+	if (player.b.upgrades.includes(32)) free = free.plus(LAYER_UPGS.b[32].currently())
 	return free
 }
 
@@ -1656,13 +1659,19 @@ function getEnhancerPow() {
 
 function getEnhancerEff() {
 	if (!player.e.unl) return new Decimal(1)
-	let eff = Decimal.pow(25, player.e.enhancers.times(tmp.enhPow).pow(1.1))
+	let e = player.e.enhancers.sub(tmp.subbedEnh).times(tmp.enhPow)
+	let eff;
+	if (e.gte(0)) eff = Decimal.pow(25, e.pow(1.1))
+	else eff = Decimal.pow(1/25, e.times(-1).pow(1.1))
 	return eff
 }
 
 function getEnhancerEff2() {
 	if (!player.e.unl) return new Decimal(0)
-	let eff = player.e.enhancers.times(tmp.enhPow).pow(0.8)
+	let e = player.e.enhancers.sub(tmp.subbedEnh).times(tmp.enhPow)
+	let eff;
+	if (e.gte(0)) eff = e.pow(0.8)
+	else eff = e.times(-1).pow(0.8).times(-1)
 	return eff;
 }
 
@@ -1945,6 +1954,7 @@ function getQuirkLayerMult() {
 	if (player.q.upgrades.includes(13)) mult = mult.times(2)
 	if (player.q.upgrades.includes(14)) mult = mult.times(3)
 	if (player.q.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.q[21].currently())
+	if (player.h.challs.includes(52)) mult = mult.times(H_CHALLS[52].currently())
 	return mult
 }
 
@@ -2047,11 +2057,19 @@ const H_CHALLS = {
 		effDisp: function(x) { return format(x)+"x" },
 	},
 	52: {
-		name: "???",
-		desc: "???",
+		name: "Anti-Enhancers",
+		desc: "You lose Enhancers over time. This can make your Enhancer amount get below 0.",
 		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42) },
-		goal: new Decimal(1/0),
-		reward: "???",
+		goal: new Decimal("1e475000"),
+		reward: "Quirk Layers are faster based on your Hindrance Spirit & Quirks.",
+		currently: function() { 
+			let h = player.h.points.times(player.q.points).sqrt();
+			if (h.gte(1e150)) h = h.log10().pow(50).times(1e150/Math.pow(150, 50)).min(h)
+			if (h.gte(1e100)) h = h.times(1e100).sqrt()
+			let ret = h.plus(1).pow(0.04);
+			return ret;
+		},
+		effDisp: function(x) { return format(x)+"x" },
 	},
 }
 
@@ -2187,7 +2205,7 @@ var saveInterval = setInterval(function() {
 }, 5000)
 
 var interval = setInterval(function() {
-	if (player===undefined) return;
+	if (player===undefined||tmp===undefined) return;
 	let diff = (Date.now()-player.time)/1000
 	player.time = Date.now()
 	if (needCanvasUpdate) resizeCanvas();
