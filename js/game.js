@@ -209,6 +209,14 @@ const ROW_LAYERS = [
 	["future_layer"],
 ]
 
+const ORDER_UP = [
+	[],
+	[],
+	["e","t","s","sb"],
+	["hb","ss"],
+	[],
+]
+
 const LAYER_EFFS = {
 	b: function() { 
 		if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1);
@@ -413,7 +421,7 @@ const LAYER_UPGS = {
 			desc: "Generators are cheaper based on your Prestige Points.",
 			cost: new Decimal(19),
 			unl: function() { return player.g.upgrades.includes(15) },
-			currently: function() { return player.p.points.plus(1).pow(0.25) },
+			currently: function() { return player.p.points.plus(1).pow(0.25).pow(player.g.upgrades.includes(32)?2.5:1) },
 			effDisp: function(x) { return "/"+format(x) },
 		},
 		23: {
@@ -436,21 +444,23 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		31: {
-			desc: "Generators Upgrade 10 is stronger based on your Generators.",
+			desc: "Generator Upgrade 10 is stronger based on your Generators.",
 			cost: new Decimal(950),
 			unl: function() { return player.ss.upgrades.includes(21) },
 			currently: function() { return player.g.points.plus(1).log10().pow(3.6).plus(1) },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		32: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Generator Upgrade 7 is 150% stronger.",
+			cost: new Decimal(960),
 			unl: function() { return player.ss.upgrades.includes(21) },
 		},
 		33: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Generator Power adds to the Generator base.",
+			cost: new Decimal(1025),
 			unl: function() { return player.ss.upgrades.includes(21) },
+			currently: function() { return player.g.power.plus(1).log10().div(15).plus(1) },
+			effDisp: function(x) { return "+"+format(x) },
 		},
 		34: {
 			desc: "???",
@@ -1093,6 +1103,12 @@ function versionCheck() {
 			setVersion = false;
 		}
 	}
+	if (player.versionType=="beta") {
+		if (player.version<=1.1) if (!(player.hb.unl||player.ss.unl)) {
+			player.hb.order = 0
+			player.ss.order = 0
+		}
+	}
 	
 	if (setVersion) {
 		player.versionType = getStartPlayer().versionType
@@ -1500,7 +1516,7 @@ function doReset(layer, force=false) {
 			needCanvasUpdate = true;
 			
 			let layers = ROW_LAYERS[LAYER_ROW[layer]]
-			for (let i in layers) if (!player[layers[i]].unl && player[layers[i]]!==undefined) player[layers[i]].order++
+			for (let i in layers) if (!player[layers[i]].unl && player[layers[i]]!==undefined) player[layers[i]].order += ORDER_UP[LAYER_ROW[layer]].includes(layer)?1:0
 		}
 		
 		tmp.layerAmt[layer] = new Decimal(0) // quick fix
@@ -1576,6 +1592,7 @@ function addToGenBase() {
 	let toAdd = new Decimal(0)
 	if (player.g.upgrades.includes(12)) toAdd = toAdd.plus(LAYER_UPGS.g[12].currently())
 	if (player.g.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.g[13].currently())
+	if (player.g.upgrades.includes(33)) toAdd = toAdd.plus(LAYER_UPGS.g[33].currently())
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
