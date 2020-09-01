@@ -6,6 +6,7 @@ function loadVue() {
 	  data: {
 		  player,
 		  tmp,
+		  offTime,
 		  format,
 		  formatWhole,
 		  formatTime,

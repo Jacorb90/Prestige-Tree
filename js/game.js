@@ -1,5 +1,9 @@
 var player;
 var tmp = {};
+var offTime = {
+	remain: 0,
+	speed: 1,
+};
 var needCanvasUpdate = true;
 var NaNalert = false;
 
@@ -222,7 +226,7 @@ const LAYER_EFFS = {
 		if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1);
 		return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())).max(0)
 	},
-	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points).sub(1).times(getGenPowerGainMult()).max(0) },
+	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
 	t: function() { return {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
@@ -371,8 +375,8 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "+"+formatWhole(x) },
 		},
 		33: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Add 100 free Boosters.",
+			cost: new Decimal(1270),
 			unl: function() { return player.hb.upgrades.includes(14) },
 		},
 	},
@@ -465,14 +469,18 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "+"+format(x) },
 		},
 		34: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Generators are stronger based on their amount.",
+			cost: new Decimal(1075),
 			unl: function() { return player.ss.upgrades.includes(21) },
+			currently: function() { return player.g.points.plus(1).log10().plus(1).log10().plus(1).sqrt() },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		35: {
-			desc: "???",
-			cost: new Decimal(1/0),
+			desc: "Subspace boosts Generator Power gain.",
+			cost: new Decimal(1132),
 			unl: function() { return player.ss.upgrades.includes(21) },
+			currently: function() { return player.ss.subspace.plus(1).pow(25) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 	e: {
@@ -948,9 +956,11 @@ const LAYER_UPGS = {
 			unl: function() { return player.hb.upgrades.includes(13)&&player.ss.upgrades.includes(15) },
 		},
 		22: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "You generate Subspace faster based on its amount.",
+			cost: new Decimal(5),
+			unl: function() { return player.ss.upgrades.includes(21)&&(player.h.challs.includes(51)||player.h.challs.includes(52)) },
+			currently: function() { return player.ss.subspace.plus(1).root(2.5) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		23: {
 			desc: "???",
@@ -1062,9 +1072,12 @@ function load() {
 	if (get===null||get===undefined) player = getStartPlayer()
 	else player = JSON.parse(atob(get))
 	player.tab = "tree"
+	offTime.remain = (Date.now()-player.time)/1000
+	player.time = Date.now()
 	checkForVars();
 	convertToDecimal();
 	versionCheck();
+	updateTemp();
 	updateTemp();
 	loadVue();
 }
@@ -1588,6 +1601,7 @@ function getFreeBoosters() {
 	let free = new Decimal(0)
 	if (player.t.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) free = free.plus(18)
 	if (player.b.upgrades.includes(32)) free = free.plus(LAYER_UPGS.b[32].currently())
+	if (player.b.upgrades.includes(33)) free = free.plus(100)
 	return free
 }
 
@@ -1603,6 +1617,12 @@ function addToGenBase() {
 	return toAdd
 }
 
+function getGenPow() {
+	let pow = new Decimal(1)
+	if (player.g.upgrades.includes(34)) pow = pow.times(LAYER_UPGS.g[34].currently())
+	return pow
+}
+
 function getGenPowerGainMult() {
 	let mult = new Decimal(1)
 	if (player.g.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.g[21].currently())
@@ -1611,6 +1631,7 @@ function getGenPowerGainMult() {
 	if (player.s.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.s[12].currently())
 	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.s[13].currently())
 	if (player.q.unl && tmp.quirkEff) mult = mult.times(tmp.quirkEff)
+	if (player.g.upgrades.includes(35)) mult = mult.times(LAYER_UPGS.g[35].currently())
 	return mult
 }
 
@@ -2135,6 +2156,7 @@ function getSubspaceEff3() {
 function getSubspaceGainMult() {
 	let mult = new Decimal(1)
 	if (player.ss.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ss[12].currently())
+	if (player.ss.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.ss[22].currently())
 	return mult
 }
 
@@ -2207,6 +2229,11 @@ var saveInterval = setInterval(function() {
 var interval = setInterval(function() {
 	if (player===undefined||tmp===undefined) return;
 	let diff = (Date.now()-player.time)/1000
+	if (offTime.remain>0) {
+		offTime.speed = offTime.remain/5+1
+		diff += offTime.speed/50
+		offTime.remain = Math.max(offTime.remain-offTime.speed/50, 0)
+	}
 	player.time = Date.now()
 	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();

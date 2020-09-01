@@ -1,4 +1,12 @@
 function updateTemp() {
+	if (!tmp.hcActive) tmp.hcActive = {}
+	for (let row=1;row<=H_CHALLS.rows;row++) {
+		for (let col=1;col<=H_CHALLS.cols;col++) {
+			let id = row*10+col
+			tmp.hcActive[id] = HCActive(id)
+		}
+	}
+	
 	if (!tmp.layerEffs) tmp.layerEffs = {}
 	for (let name in LAYER_EFFS) tmp.layerEffs[name] = LAYER_EFFS[name]()
 	
@@ -37,14 +45,6 @@ function updateTemp() {
 	tmp.sbUnl = getSpaceBuildingsUnl()
 
 	tmp.quirkEff = getQuirkEnergyEff()
-	
-	if (!tmp.hcActive) tmp.hcActive = {}
-	for (let row=1;row<=H_CHALLS.rows;row++) {
-		for (let col=1;col<=H_CHALLS.cols;col++) {
-			let id = row*10+col
-			tmp.hcActive[id] = HCActive(id)
-		}
-	}
 	
 	tmp.ssEff1 = getSubspaceEff1()
 	tmp.ssEff2 = getSubspaceEff2()

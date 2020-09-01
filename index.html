@@ -16,6 +16,11 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.1 Alpha 19</h3>
+			<ul>
+				<li>Remade the offline progression system</li>
+				<li>Balanced up to 1e925,000 Points</li>
+			</ul><br>
 			<h3>Beta v1.1 Alpha 18</h3>
 			<ul>
 				<li>Added a new Hindrance (h10)</li>
@@ -214,6 +219,9 @@
 		</div>
 		<div id="treeTab" onscroll="resizeCanvas()" class="col left">
 			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
+			<span v-if="offTime.remain>0">
+				<br>Offline Time: {{formatTime(offTime.remain)}} ({{format(offTime.speed)}}x speed)<br>
+			</span>
 			<br>You have <h2>{{format(player.points)}}</h2> Points
 			<br><br><br><br><br>
 			<table>
