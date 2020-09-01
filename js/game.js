@@ -369,7 +369,7 @@ const LAYER_UPGS = {
 		},
 		32: {
 			desc: "Add free Boosters based on your Generator Power.",
-			cost: new Decimal(1265),
+			cost: new Decimal(1263),
 			unl: function() { return player.hb.upgrades.includes(14) },
 			currently: function() { return player.g.power.plus(1).log10().sqrt().floor() },
 			effDisp: function(x) { return "+"+formatWhole(x) },
@@ -470,14 +470,14 @@ const LAYER_UPGS = {
 		},
 		34: {
 			desc: "Generators are stronger based on their amount.",
-			cost: new Decimal(1075),
+			cost: new Decimal(1070),
 			unl: function() { return player.ss.upgrades.includes(21) },
 			currently: function() { return player.g.points.plus(1).log10().plus(1).log10().plus(1).sqrt() },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		35: {
 			desc: "Subspace boosts Generator Power gain.",
-			cost: new Decimal(1132),
+			cost: new Decimal(1130),
 			unl: function() { return player.ss.upgrades.includes(21) },
 			currently: function() { return player.ss.subspace.plus(1).pow(25) },
 			effDisp: function(x) { return format(x)+"x" },
