@@ -35,7 +35,9 @@ function updateTemp() {
 	tmp.enhEff = getEnhancerEff()
 	tmp.enhEff2 = getEnhancerEff2()
 	tmp.subbedEnh = new Decimal(0)
-	if (tmp.hcActive ? tmp.hcActive[52] : true) tmp.subbedEnh = tmp.subbedEnh.plus(new Decimal(player.h.time).times(40).plus(1).log10().pow(10).max(0)).round()
+	if (tmp.hcActive ? tmp.hcActive[52] : true) {
+		tmp.subbedEnh = tmp.subbedEnh.plus(new Decimal(player.h.time).times(40).plus(1).log10().pow(10).max(10)).round()
+	}
 	
 	tmp.freeExtCap = getFreeExtCapsules()
 	tmp.timeEff = getTimeEnergyEff()

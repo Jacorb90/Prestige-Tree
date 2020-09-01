@@ -224,9 +224,9 @@ const ORDER_UP = [
 const LAYER_EFFS = {
 	b: function() { 
 		if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1);
-		return Decimal.pow(Decimal.add(2, tmp.atbb), player.b.points.plus(getFreeBoosters())).max(0)
+		return Decimal.pow(Decimal.add(2, tmp.atbb).max(0), player.b.points.plus(getFreeBoosters())).max(0)
 	},
-	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
+	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
 	t: function() { return {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
@@ -2079,9 +2079,9 @@ const H_CHALLS = {
 	},
 	52: {
 		name: "Anti-Enhancers",
-		desc: "You lose Enhancers over time. This can make your Enhancer amount get below 0.",
-		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42) },
-		goal: new Decimal("1e475000"),
+		desc: "You lose Enhancers over time, which can make your Enhancer amount get below 0.",
+		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42)&&player.h.challs.includes(51) },
+		goal: new Decimal("1e440000"),
 		reward: "Quirk Layers are faster based on your Hindrance Spirit & Quirks.",
 		currently: function() { 
 			let h = player.h.points.times(player.q.points).sqrt();
