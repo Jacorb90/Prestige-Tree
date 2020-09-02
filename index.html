@@ -12,10 +12,13 @@
 </head>
 <body onload="load()">
 	<div id="app">
-		<div id="info" v-if="player.tab=='tree'" onclick="showTab('info')"><br>i</div>
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.1</h3>
+			<ul>
+				<li>Cleaned up a few things</li>
+			</ul><br>
 			<h3>Beta v1.1 Alpha 21</h3>
 			<ul>
 				<li>Rebalanced from h10 to endgame (now ends at 1e920,000 Points unless you wanna grind)</li>
@@ -228,6 +231,7 @@
 		</div>
 		<div id="treeTab" onscroll="resizeCanvas()" class="col left">
 			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
+			<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
 			<span v-if="offTime.remain>0">
 				<br>Offline Time: {{formatTime(offTime.remain)}} ({{format(offTime.speed)}}x speed)<br>
 			</span>

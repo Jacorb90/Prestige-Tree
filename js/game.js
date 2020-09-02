@@ -479,7 +479,7 @@ const LAYER_UPGS = {
 			desc: "Subspace boosts Generator Power gain.",
 			cost: new Decimal(1130),
 			unl: function() { return player.ss.upgrades.includes(21) },
-			currently: function() { return player.ss.subspace.plus(1).pow(25) },
+			currently: function() { return player.ss.subspace.plus(1).pow(40) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -959,7 +959,7 @@ const LAYER_UPGS = {
 			desc: "You generate Subspace faster based on its amount.",
 			cost: new Decimal(5),
 			unl: function() { return player.ss.upgrades.includes(21)&&(player.h.challs.includes(51)||player.h.challs.includes(52)) },
-			currently: function() { return player.ss.subspace.plus(1).root(2.5) },
+			currently: function() { return player.ss.subspace.plus(1).root(2.25) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		23: {
