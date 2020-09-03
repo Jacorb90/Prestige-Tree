@@ -7,6 +7,7 @@ function loadVue() {
 		  player,
 		  tmp,
 		  offTime,
+		  Decimal,
 		  format,
 		  formatWhole,
 		  formatTime,
@@ -27,6 +28,9 @@ function loadVue() {
 		  HCActive,
 		  milestoneShown,
 		  destroyBuilding,
+		  getSpellDesc,
+		  activateSpell,
+		  spellActive,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,
@@ -34,7 +38,8 @@ function loadVue() {
 		  LAYER_EFFS,
 		  LAYER_AMT_NAMES,
 		  LAYER_RES_CEIL,
-		  H_CHALLS
+		  H_CHALLS,
+		  SPELL_NAMES
 	  },
 	})
 }

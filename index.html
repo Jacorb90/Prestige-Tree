@@ -15,6 +15,13 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.2 Alpha 1</h3>
+			<ul>
+				<li>Implemented the two Row 5 layers</li>
+				<li>Added a new option</li>
+				<li>Rebalanced a few things at the end of row 4</li>
+				<li>Balanced up to 1 of each Row 5 reset</li>
+			</ul><br>
 			<h3>Beta v1.1</h3>
 			<ul>
 				<li>Cleaned up a few things</li>
@@ -211,6 +218,8 @@
 			<span v-if="player.q.unl">Q: Quirk reset</span><br>
 			<span v-if="player.hb.unl">Ctrl+B: Hyper-Booster reset</span><br>
 			<span v-if="player.ss.unl">Shift+S: Subspace reset</span><br>
+			<span v-if="player.m.unl">M: Magic reset</span><br>
+			<span v-if="player.ba.unl">A: Balance reset</span><br>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
@@ -220,12 +229,13 @@
 					<td><button class="opt" onclick="hardReset()">HARD RESET</button></td>
 				</tr>
 				<tr>
-					<td><button class="opt" onclick="exportSave()">Export</button></td>
+					<td><button class="opt" onclick="exportSave()">Export to clipboard</button></td>
 					<td><button class="opt" onclick="importSave()">Import</button></td>
 				</tr>
 				<tr>
 					<td><button class="opt" onclick="toggleOpt('autosave')">Autosave: {{ player.autosave?"ON":"OFF" }}</button></td>
 					<td><button class="opt" onclick="adjustMSDisp()">Show Milestones: {{ player.msDisplay.toUpperCase() }}</button></td>
+					<td><button class="opt" onclick="toggleOpt('offlineProd')">Offline Prod: {{ player.offlineProd?"ON":"OFF" }}</button></td>
 				</tr>
 			</table>
 		</div>
@@ -275,6 +285,13 @@
 					<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
 					<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
 				</tr>
+			</table><table>
+				<tr>
+					<td><button class="treeNode hidden"></button></td>
+				</tr>
+			</table><table>
+				<td id="m" v-if="layerUnl('m')"><button onclick="showTab('m')" v-bind:tooltip="((player.h.points.gte(tmp.layerReqs.m)||player.m.unl)&&layerUnl('m')) ? (formatWhole(player.m.points)+' magic') : ('Reach '+format(tmp.layerReqs.m)+' hindrance spirit to unlock')" v-bind:class="{ treeNode: true, m: true, locked: (player.h.points.lt(tmp.layerReqs.m)&&!player.m.unl), can: (player.h.points.gte(tmp.layerReqs.m)||player.m.unl) }">M</button></td>
+				<td id="ba" v-if="layerUnl('ba')"><button onclick="showTab('ba')" v-bind:tooltip="((player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl)&&layerUnl('ba')) ? (formatWhole(player.ba.points)+' balance energy') : ('Reach '+format(tmp.layerReqs.ba)+' quirks to unlock')" v-bind:class="{ treeNode: true, ba: true, locked: (player.q.points.lt(tmp.layerReqs.ba)&&!player.ba.unl), can: (player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl) }">BA</button></td>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
@@ -363,6 +380,27 @@
 					You have {{format(player.ss.subspace)}} Subspace, which provides you with {{formatWhole(tmp.ssEff1)}} extra Space, makes all Space Buildings {{format(tmp.ssEff2)}}x cheaper, and makes all Space Buildings {{format(tmp.ssEff3.sub(1).times(100))}}% stronger<br><br>
 					<table>
 						<tr><td v-if="milestoneShown(player.ss.best.gte(1), true)" v-bind:class="{ milestone: player.ss.best.lt(1), milestoneDone: player.ss.best.gte(1) }">1 Subspace Energy<br>Automatically purchase Space Buildings&nbsp;&nbsp;&nbsp;<button v-if="player.ss.best.gte(1)" class="smallUpg can s" onclick="toggleAuto('s', 'Build')">{{player.s.autoBuild?"ON":"OFF"}}</button></td></tr>
+					</table>
+				</div>
+				<div v-if="layer=='m'">
+					<br>
+					<div class="upgRow">
+						<div v-for="id in 3">
+							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(1))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(1)||spellActive(id))), m: true }" v-on:click="activateSpell(id)">{{SPELL_NAMES[id]}}<br>Time Left: {{format(player.m.spellTimes[id])}}<br>Effect: {{getSpellDesc(id)}}</button>
+						</div>
+					</div><br><br>
+					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}<br><br>
+					<table>
+						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }">1 Magic<br>Keep row 4 milestones on reset</td></tr>
+					</table>
+				</div>
+				<div v-if="layer=='ba'">
+					<br>You have {{format(player.ba.power)}} Balance Power, which is multiplying Hindrance Spirit & Quirk gain by {{format(tmp.balEff)}}<br><br>
+					You have {{format(player.ba.positivity)}} Positivity<br>
+					You have {{format(player.ba.negativity)}} Negativity<br>
+					Your Positivity & Negativity are multiplying Balance Power gain by {{format(tmp.balEff2)}}<br><br>
+					<table>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(1))" v-bind:class="{ milestone: player.ba.best.lt(1), milestoneDone: player.ba.best.gte(1) }">1 Balance Energy<br>Keep row 4 milestones on reset</td></tr>
 					</table>
 				</div>
 				<br><br><br>

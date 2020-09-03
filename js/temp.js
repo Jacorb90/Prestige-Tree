@@ -51,4 +51,10 @@ function updateTemp() {
 	tmp.ssEff1 = getSubspaceEff1()
 	tmp.ssEff2 = getSubspaceEff2()
 	tmp.ssEff3 = getSubspaceEff3()
+	
+	tmp.balEff = getBalancePowerEff()
+	tmp.balEff2 = getBalanceTypesEff()
+	tmp.hexEff = getHexEff()
+	if (!tmp.spellEffs) tmp.spellEffs = {}
+	for (let i=1;i<=3;i++) tmp.spellEffs[i] = getSpellEff(i)
 }

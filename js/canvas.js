@@ -44,6 +44,14 @@ function drawTree() {
 		drawTreeBranch("e", "ss")
 		drawTreeBranch("s", "ss")
 	}
+	if (layerUnl('m')) {
+		drawTreeBranch("hb", "m")
+		drawTreeBranch("h", "m")
+	}
+	if (layerUnl('ba')) {
+		drawTreeBranch("q", "ba")
+		drawTreeBranch("ss", "ba")
+	}
 	
 	needCanvasUpdate = false;
 }
