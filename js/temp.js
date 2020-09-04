@@ -58,4 +58,6 @@ function updateTemp() {
 	tmp.hexEff = getHexEff()
 	if (!tmp.spellEffs) tmp.spellEffs = {}
 	for (let i=1;i<=3;i++) tmp.spellEffs[i] = getSpellEff(i)
+	
+	tmp.sGenPowEff = getSGenPowEff()
 }

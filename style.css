@@ -255,6 +255,16 @@ h1, h2 {
 	text-shadow: 0px 0px 10px #ebc88f;
 }
 
+.sg {
+	background-color: #409c6e;
+	color: black;
+}
+
+.sg_txt {
+	color: #409c6e;
+	text-shadow: 0px 0px 10px #409c6e;
+}
+
 #optionWheel {
 	position: absolute;
 	top: 0px;
