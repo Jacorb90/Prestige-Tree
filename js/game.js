@@ -276,13 +276,13 @@ const LAYER_EFFS = {
 		if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1);
 		return Decimal.pow(Decimal.add(2, tmp.atbb).max(0), player.b.points.plus(getFreeBoosters()).times(getBoosterPower())).max(0)
 	},
-	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb).times(tmp.sGenPowEff).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
+	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb).times(tmp.sGenPowEff).times((player.ss.upgrades.includes(23) ? LAYER_UPGS.ss[23].currently() : 1)).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
 	t: function() { return {
 		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 	sb: function() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
-	sg: function() { return Decimal.pow(2, player.sg.points).times(getSuperGenPowerGainMult()).max(0) },
+	sg: function() { return Decimal.pow(Decimal.add(2, addToSGBase()), player.sg.points).times(getSuperGenPowerGainMult()).max(0) },
 	h: function() { 
 		let ret = player.h.points.plus(1).times(player.points.times(player.h.points).plus(1).log10().plus(1).log10().plus(1)).log10().times(5).root(player.q.upgrades.includes(12)?1.25:2);
 		if (player.h.challs.includes(61)) ret = ret.times(1.2);
@@ -1024,19 +1024,23 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		23: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Subspace beyond 1e20 multiplies the Generator Power base.",
+			cost: new Decimal(6),
+			unl: function() { return player.ba.upgrades.includes(24) },
+			currently: function() { return player.ss.subspace.sub(1e20).max(0).div(1e20).plus(1).sqrt() },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		24: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Subspace Energy boosts Subspace gain.",
+			cost: new Decimal(7),
+			unl: function() { return player.ba.upgrades.includes(24) },
+			currently: function() { return Decimal.pow(2, player.ss.points) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		25: {
-			desc: "???",
+			desc: "Placeholder",
 			cost: new Decimal(1/0),
-			unl: function() { return false },
+			unl: function() { return player.ba.upgrades.includes(24) },
 		},
 	},
 	m: {
@@ -1076,14 +1080,14 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		22: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Spell 2 is 900% stronger.",
+			cost: new Decimal(2500),
+			unl: function() { return player.m.upgrades.includes(14) },
 		},
 		23: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "The Time Energy cap starts 1e500x later.",
+			cost: new Decimal(6500),
+			unl: function() { return player.m.upgrades.includes(21) },
 		},
 		24: {
 			desc: "???",
@@ -1133,14 +1137,16 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		23: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Super-Generators add to their base.",
+			cost: new Decimal(7500),
+			unl: function() { return player.ba.upgrades.includes(21) },
+			currently: function() { return player.sg.points.pow(2).div(2) },
+			effDisp: function(x) { return "+"+format(x) },
 		},
 		24: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Unlock 3 new Subspace Upgrades.",
+			cost: new Decimal(2e4),
+			unl: function() { return player.ba.upgrades.includes(22) },
 		},
 	},
 }
@@ -2047,6 +2053,7 @@ function getTimeEnergyLimitMult() {
 	if (player.t.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[34].currently())
 	if (player.q.upgrades.includes(23)) mult = mult.times(1e10)
 	if (player.q.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.q[24].currently())
+	if (player.m.upgrades.includes(23)) mult = mult.times("1e500")
 	return mult;
 }
 
@@ -2476,6 +2483,7 @@ function getSubspaceGainMult() {
 	let mult = new Decimal(1)
 	if (player.ss.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ss[12].currently())
 	if (player.ss.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.ss[22].currently())
+	if (player.ss.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.ss[24].currently())
 	if (player.ba.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ba[12].currently())
 	return mult
 }
@@ -2552,6 +2560,7 @@ function getSpellPower(x) {
 	let power = new Decimal(1);
 	if (player.m.upgrades.includes(11)) power = power.times(LAYER_UPGS.m[11].currently())
 	if (player.m.upgrades.includes(21) && (x==2||x==3)) power = power.times(LAYER_UPGS.m[21].currently())
+	if (player.m.upgrades.includes(22) && (x==2)) power = power.times(10)
 	return power;
 }
 
@@ -2610,6 +2619,12 @@ function getSuperGenPowerGainMult() {
 	let mult = new Decimal(1)
 	if (player.ba.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.ba[21].currently())
 	return mult
+}
+
+function addToSGBase() {
+	let toAdd = new Decimal(0)
+	if (player.ba.upgrades.includes(23)) toAdd = toAdd.plus(LAYER_UPGS.ba[23].currently())
+	return toAdd
 }
 
 function gameLoop(diff) {
@@ -2698,10 +2713,10 @@ var interval = setInterval(function() {
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
-	e.preventDefault()
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key
+	if (ctrlDown&&key=="b") e.preventDefault()
 	if ((!LAYERS.includes(key))||ctrlDown||shiftDown) {
 		switch(key) {
 			case "a": 
