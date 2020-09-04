@@ -96,6 +96,7 @@ function getStartPlayer() {
 		},
 		q: {
 			unl: false,
+			auto: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
 			layers: new Decimal(0),
@@ -105,6 +106,7 @@ function getStartPlayer() {
 		},
 		hb: {
 			unl: false,
+			auto: false,
 			order: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
@@ -112,6 +114,7 @@ function getStartPlayer() {
 		},
 		ss: {
 			unl: false,
+			auto: false,
 			order: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
@@ -273,9 +276,9 @@ const LAYER_EFFS = {
 	hb: function() { return Decimal.pow(1.6, player.hb.points.pow(getHyperBoosterExp()).times(getHyperBoosterPow())) },
 	ss: function() { return player.ss.points.pow(2.5).times(getSubspaceGainMult()) },
 	ba: function() { return {
-		power: player.ba.points.pow(0.2),
-		pos: player.ba.points.pow(0.7),
-		neg: player.ba.points.pow(0.65).times(0.4),
+		power: player.ba.points.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1),
+		pos: player.ba.points.pow(0.7).pow(tmp.baExp ? tmp.baExp : 1),
+		neg: player.ba.points.pow(0.65).times(0.4).pow(tmp.baExp ? tmp.baExp : 1),
 	}},
 }
 
@@ -1017,12 +1020,24 @@ const LAYER_UPGS = {
 		},
 	},
 	m: {
-		rows: 0,
-		cols: 0,
+		rows: 1,
+		cols: 1,
+		11: {
+			desc: "Hexes boost Spells 2 & 3.",
+			cost: new Decimal(10),
+			unl: function() { return player.m.unl },
+			currently: function() { return player.m.hexes.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
 	},
 	ba: {
-		rows: 0,
-		cols: 0,
+		rows: 1,
+		cols: 1,
+		11: {
+			desc: "All Balance Energy effects use better formulas.",
+			cost: new Decimal(25),
+			unl: function() { return player.ba.unl },
+		},
 	},
 }
 
@@ -1220,9 +1235,12 @@ function checkForVars() {
 	if (player.h.active === undefined) player.h.active = 0
 	if (player.h.time === undefined) player.h.time = 0
 	if (player.q === undefined) player.q = start.q
+	if (player.q.auto === undefined) player.q.auto = false
 	if (player.msDisplay === undefined) player.msDisplay = "always"
 	if (player.hb === undefined) player.hb = start.hb
+	if (player.hb.auto === undefined) player.hb.auto = false
 	if (player.ss === undefined) player.ss = start.ss
+	if (player.ss.auto === undefined) player.ss.auto = false
 	if (player.m === undefined) player.m = start.m
 	if (player.ba === undefined) player.ba = start.ba
 	if (player.offlineProd === undefined) player.offlineProd = true
@@ -1334,6 +1352,12 @@ function canBuyMax(layer) {
 			break;
 		case "sb":
 			return player.hb.best.gte(1)
+			break;
+		case "hb":
+			return player.ba.best.gte(8)
+			break;
+		case "ss": 
+			return player.ba.best.gte(8)
 			break;
 	}
 	return false;
@@ -1596,32 +1620,35 @@ function rowReset(row, layer) {
 				points: new Decimal(0),
 				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.h.best:new Decimal(0),
 				active: 0,
-				challs: [],
+				challs: player.m.best.gte(2)?player.h.challs:[],
 				upgrades: [],
 			}
 			player.q = {
 				unl: player.q.unl,
+				auto: player.q.auto,
 				points: new Decimal(0),
 				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.q.best:new Decimal(0),
 				layers: new Decimal(0),
 				energy: new Decimal(0),
 				time: new Decimal(0),
-				upgrades: [],
+				upgrades: player.ba.best.gte(2)?player.q.upgrades:[],
 			}
 			player.hb = {
 				unl: player.hb.unl,
+				auto: player.hb.auto,
 				order: player.hb.order,
 				points: new Decimal(0),
 				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.hb.best:new Decimal(0),
-				upgrades: [],
+				upgrades: player.ba.best.gte(5)?player.hb.upgrades:[],
 			}
 			player.ss = {
 				unl: player.ss.unl,
+				auto: player.ss.auto,
 				order: player.ss.order,
 				points: new Decimal(0),
 				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.ss.best:new Decimal(0),
 				subspace: new Decimal(0),
-				upgrades: [],
+				upgrades: player.ba.best.gte(5)?player.ss.upgrades:[],
 			}
 			break;
 		case 5: 
@@ -1654,6 +1681,7 @@ function doReset(layer, force=false) {
 	
 	if ((layer=="b"&&player.t.best.gte(12))||(layer=="g"&&player.s.best.gte(12))) return;
 	if ((layer=="t"&&player.h.best.gte(25))||(layer=="s"&&player.q.best.gte(25))||(layer=="sb"&&player.h.best.gte(2500))) return;
+	if ((layer=="hb"&&player.ba.best.gte(8))||(layer=="ss"&&player.ba.best.gte(8))) return;
 	let row = LAYER_ROW[layer]
 	if (row==0) rowReset(0, layer)
 	else for (let x=row;x>=1;x--) rowReset(x, layer)
@@ -2092,6 +2120,11 @@ function getQuirkLayerCost() {
 	return cost.max(1);
 }
 
+function getQuirkLayerTarg() {
+	let targ = player.q.points.plus(1).log2().plus(1).log2().plus(1).floor()
+	return targ
+}
+
 function getQuirkLayerMult() {
 	let mult = new Decimal(1)
 	if (player.q.upgrades.includes(13)) mult = mult.times(2)
@@ -2127,6 +2160,16 @@ function buyQuirkLayer() {
 	if (player.q.points.lt(cost)) return
 	player.q.points = player.q.points.sub(cost)
 	player.q.layers = player.q.layers.plus(1)
+}
+
+function maxQuirkLayers() {
+	if (!player.q.unl) return
+	let cost = getQuirkLayerCost()
+	if (player.q.points.lt(cost)) return
+	let target = getQuirkLayerTarg()
+	if (target.lte(player.q.layers)) return
+	player.q.points = player.q.points.sub(cost)
+	player.q.layers = player.q.layers.max(target)
 }
 
 const H_CHALLS = {
@@ -2309,6 +2352,12 @@ function getBalanceTypesEff() {
 	return eff;
 }
 
+function getBalanceEnergyExp() {
+	let exp = new Decimal(1)
+	if (player.ba.unl) exp = exp.times(1.5)
+	return exp;
+}
+
 const SPELL_NAMES = {
 	1: "Spell 1",
 	2: "Spell 2",
@@ -2329,6 +2378,7 @@ const SPELL_BASE = {
 
 function getSpellPower(x) {
 	let power = new Decimal(1);
+	if (player.m.upgrades.includes(11)) power = power.times(LAYER_UPGS.m[11].currently())
 	return power;
 }
 
@@ -2352,6 +2402,7 @@ function getSpellTime() {
 
 function spellActive(x) {
 	if (!player.m.unl) return false
+	if (!tmp.spellEffs) return false
 	return player.m.spellTimes[x]>0
 }
 
@@ -2399,6 +2450,10 @@ function gameLoop(diff) {
 		player.ba.negativity = player.ba.negativity.plus(tmp.layerEffs.ba.neg.times(diff)).max(0)
 	}
 	if (player.m.unl) for (let i=1;i<=3;i++) player.m.spellTimes[i] = Decimal.sub(player.m.spellTimes[i], diff).max(0).toNumber()
+	if (player.m.best.gte(3)) {
+		player.h.points = player.h.points.plus(tmp.resetGain.h.times(diff)).max(0)
+		player.q.points = player.q.points.plus(tmp.resetGain.q.times(diff)).max(0)
+	}
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
@@ -2408,6 +2463,9 @@ function gameLoop(diff) {
 	if (player.s.auto&&player.q.best.gte(10)) doReset("s")
 	if (player.s.autoBuild&&player.ss.best.gte(1)) for (let i=tmp.sbUnl;i>=1;i--) maxSpaceBuilding(i)
 	if (player.sb.auto&&player.h.best.gte(15)) doReset("sb")
+	if (player.q.auto&&player.ba.best.gte(3)) maxQuirkLayers()
+	if (player.hb.auto&&player.m.best.gte(4)) doReset("hb")
+	if (player.ss.auto&&player.m.best.gte(4)) doReset("ss")
 
 	if (player.hasNaN&&!NaNalert) {
 		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
@@ -2446,6 +2504,7 @@ var interval = setInterval(function() {
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
+	e.preventDefault()
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key

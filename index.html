@@ -15,6 +15,11 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.2 Alpha 2</h3>
+			<ul>
+				<li>Added 2 new upgrades and a few new milestones</li>
+				<li>Balanced up to 25 Magic and 25 Balance Energy</li>
+			</ul><br>
 			<h3>Beta v1.2 Alpha 1</h3>
 			<ul>
 				<li>Implemented the two Row 5 layers</li>
@@ -391,7 +396,10 @@
 					</div><br><br>
 					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}<br><br>
 					<table>
-						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }">1 Magic<br>Keep row 4 milestones on reset</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }">1 Magic<br>Keep row 4 milestones on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(2))" v-bind:class="{ milestone: player.m.best.lt(2), milestoneDone: player.m.best.gte(2) }">2 Magic<br>Keep Hindrance completions on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(3))" v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }">3 Magic<br>Gain 1% of Hindrance Energy & Quirk gain every second</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(4), true)" v-bind:class="{ milestone: player.m.best.lt(4), milestoneDone: player.m.best.gte(4) }">4 Magic<br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='ba'">
@@ -400,7 +408,11 @@
 					You have {{format(player.ba.negativity)}} Negativity<br>
 					Your Positivity & Negativity are multiplying Balance Power gain by {{format(tmp.balEff2)}}<br><br>
 					<table>
-						<tr><td v-if="milestoneShown(player.ba.best.gte(1))" v-bind:class="{ milestone: player.ba.best.lt(1), milestoneDone: player.ba.best.gte(1) }">1 Balance Energy<br>Keep row 4 milestones on reset</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(1))" v-bind:class="{ milestone: player.ba.best.lt(1), milestoneDone: player.ba.best.gte(1) }">1 Balance Energy<br>Keep row 4 milestones on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(2))" v-bind:class="{ milestone: player.ba.best.lt(2), milestoneDone: player.ba.best.gte(2) }">2 Balance Energy<br>Keep Quirk Upgrades on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(3), true)" v-bind:class="{ milestone: player.ba.best.lt(3), milestoneDone: player.ba.best.gte(3) }">3 Balance Energy<br>Automatically purchase Quirk Layers&nbsp;&nbsp;&nbsp;<button v-if="player.ba.best.gte(3)" class="smallUpg can q" onclick="toggleAuto('q')">{{player.q.auto?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(5))" v-bind:class="{ milestone: player.ba.best.lt(5), milestoneDone: player.ba.best.gte(5) }">5 Balance Energy<br>Keep Hyper-Booster & Subspace Upgrades on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(8))" v-bind:class="{ milestone: player.ba.best.lt(8), milestoneDone: player.ba.best.gte(8) }">8 Balance Energy<br>You can buy max Hyper-Boosters & Subspace Energy, and Hyper-Boosters/Subspace Energy reset nothing</td></tr>
 					</table>
 				</div>
 				<br><br><br>

@@ -54,6 +54,7 @@ function updateTemp() {
 	
 	tmp.balEff = getBalancePowerEff()
 	tmp.balEff2 = getBalanceTypesEff()
+	tmp.baExp = getBalanceEnergyExp()
 	tmp.hexEff = getHexEff()
 	if (!tmp.spellEffs) tmp.spellEffs = {}
 	for (let i=1;i<=3;i++) tmp.spellEffs[i] = getSpellEff(i)
