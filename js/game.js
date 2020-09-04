@@ -282,7 +282,7 @@ const LAYER_EFFS = {
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 	sb: function() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
-	sg: function() { return Decimal.pow(2, player.sg.points).max(0) },
+	sg: function() { return Decimal.pow(2, player.sg.points).times(getSuperGenPowerGainMult()).max(0) },
 	h: function() { 
 		let ret = player.h.points.plus(1).times(player.points.times(player.h.points).plus(1).log10().plus(1).log10().plus(1)).log10().times(5).root(player.q.upgrades.includes(12)?1.25:2);
 		if (player.h.challs.includes(61)) ret = ret.times(1.2);
@@ -1040,10 +1040,10 @@ const LAYER_UPGS = {
 		},
 	},
 	m: {
-		rows: 1,
+		rows: 2,
 		cols: 4,
 		11: {
-			desc: "Hexes boost Spells 2 & 3.",
+			desc: "Hexes boost all Spells.",
 			cost: new Decimal(10),
 			unl: function() { return player.m.unl },
 			currently: function() { return player.m.hexes.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
@@ -1068,9 +1068,31 @@ const LAYER_UPGS = {
 			currently: function() { return player.m.best.div(3).plus(1).pow(0.8) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
+		21: {
+			desc: "Spells 2 & 3 are stronger based on your Hindrance Spirit.",
+			cost: new Decimal(1000),
+			unl: function() { return player.m.upgrades.includes(13) },
+			currently: function() { return player.h.points.plus(1).log10().plus(1).log10().plus(1).log10().plus(1).sqrt() },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		22: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		23: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		24: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
 	},
 	ba: {
-		rows: 1,
+		rows: 2,
 		cols: 4,
 		11: {
 			desc: "All Balance Energy effects use better formulas.",
@@ -1095,6 +1117,30 @@ const LAYER_UPGS = {
 			desc: "The Balance Power effect uses a better formula.",
 			cost: new Decimal(120),
 			unl: function() { return player.ba.upgrades.includes(12) },
+		},
+		21: {
+			desc: "Negativity boosts Super-Generator Power gain.",
+			cost: new Decimal(300),
+			unl: function() { return player.ba.upgrades.includes(13)&&player.sg.unl },
+			currently: function() { return player.ba.negativity.plus(1).sqrt() },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		22: {
+			desc: "Balance Power boosts Positivity & Negativity gain.",
+			cost: new Decimal(2000),
+			unl: function() { return player.ba.upgrades.includes(14) },
+			currently: function() { return player.ba.power.plus(1).pow(0.15) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		23: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		24: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 }
@@ -2472,6 +2518,18 @@ function getBalanceEnergyExp() {
 	return exp;
 }
 
+function getPosGainMult() {
+	let mult = new Decimal(1)
+	if (player.ba.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.ba[22].currently())
+	return mult;
+}
+
+function getNegGainMult() {
+	let mult = new Decimal(1)
+	if (player.ba.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.ba[22].currently())
+	return mult;
+}
+
 const SPELL_NAMES = {
 	1: "Spell 1",
 	2: "Spell 2",
@@ -2493,6 +2551,7 @@ const SPELL_BASE = {
 function getSpellPower(x) {
 	let power = new Decimal(1);
 	if (player.m.upgrades.includes(11)) power = power.times(LAYER_UPGS.m[11].currently())
+	if (player.m.upgrades.includes(21) && (x==2||x==3)) power = power.times(LAYER_UPGS.m[21].currently())
 	return power;
 }
 
@@ -2547,6 +2606,12 @@ function getSGenPowEff() {
 	return eff
 }
 
+function getSuperGenPowerGainMult() {
+	let mult = new Decimal(1)
+	if (player.ba.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.ba[21].currently())
+	return mult
+}
+
 function gameLoop(diff) {
 	diff = new Decimal(diff)
 	if (isNaN(diff.toNumber())) diff = new Decimal(0);
@@ -2574,8 +2639,8 @@ function gameLoop(diff) {
 	if (player.ss.unl) player.ss.subspace = player.ss.subspace.plus(tmp.layerEffs.ss.times(diff)).max(0)
 	if (player.ba.unl) {
 		player.ba.power = player.ba.power.plus(tmp.layerEffs.ba.power.times(tmp.balEff2).times(diff)).max(0)
-		player.ba.positivity = player.ba.positivity.plus(tmp.layerEffs.ba.pos.times(diff)).max(0)
-		player.ba.negativity = player.ba.negativity.plus(tmp.layerEffs.ba.neg.times(diff)).max(0)
+		player.ba.positivity = player.ba.positivity.plus(tmp.layerEffs.ba.pos.times(getPosGainMult()).times(diff)).max(0)
+		player.ba.negativity = player.ba.negativity.plus(tmp.layerEffs.ba.neg.times(getNegGainMult()).times(diff)).max(0)
 	}
 	if (player.m.unl) for (let i=1;i<=3;i++) player.m.spellTimes[i] = Decimal.sub(player.m.spellTimes[i], diff).max(0).toNumber()
 	if (player.m.best.gte(3)) {
