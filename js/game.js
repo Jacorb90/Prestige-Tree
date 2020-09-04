@@ -270,6 +270,7 @@ const LAYER_EFFS = {
 	sb: function() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
 	h: function() { 
 		let ret = player.h.points.plus(1).times(player.points.times(player.h.points).plus(1).log10().plus(1).log10().plus(1)).log10().times(5).root(player.q.upgrades.includes(12)?1.25:2);
+		if (player.h.challs.includes(61)) ret = ret.times(1.2);
 		if (ret.gte(100)) ret = ret.log10().times(50).min(ret);
 		return ret;
 	},
@@ -1021,7 +1022,7 @@ const LAYER_UPGS = {
 	},
 	m: {
 		rows: 1,
-		cols: 1,
+		cols: 2,
 		11: {
 			desc: "Hexes boost Spells 2 & 3.",
 			cost: new Decimal(10),
@@ -1029,14 +1030,26 @@ const LAYER_UPGS = {
 			currently: function() { return player.m.hexes.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
+		12: {
+			desc: "Unlock 2 new Hindrances.",
+			cost: new Decimal(25),
+			unl: function() { return player.m.upgrades.includes(11) },
+		},
 	},
 	ba: {
 		rows: 1,
-		cols: 1,
+		cols: 2,
 		11: {
 			desc: "All Balance Energy effects use better formulas.",
 			cost: new Decimal(25),
 			unl: function() { return player.ba.unl },
+		},
+		12: {
+			desc: "Subspace is generated faster based on your Positivity & Negativity.",
+			cost: new Decimal(40),
+			unl: function() { return player.ba.upgrades.includes(11) },
+			currently: function() { return (tmp.balEff2?tmp.balEff2:new Decimal(1)).max(1).pow(4) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 }
@@ -2151,6 +2164,7 @@ function getQuirkEnergyEff() {
 		eff = eff.pow(mod)
 	}
 	if (player.q.upgrades.includes(32)) eff = eff.pow(2)
+	if (player.h.challs.includes(61)) eff = eff.pow(1.2)
 	return eff;
 }
 
@@ -2173,7 +2187,7 @@ function maxQuirkLayers() {
 }
 
 const H_CHALLS = {
-	rows: 5,
+	rows: 6,
 	cols: 2,
 	11: {
 		name: "Skip the Second",
@@ -2259,10 +2273,25 @@ const H_CHALLS = {
 		},
 		effDisp: function(x) { return format(x)+"x" },
 	},
+	61: {
+		name: "Microanalysis",
+		desc: '"Flattened Curve" and "Surprised Junction" are both applied at once.',
+		unl: function() { return player.m.upgrades.includes(12) },
+		goal: new Decimal("1e12300"),
+		reward: "Hindrance Spirit & Quirk Energy are 20% stronger.",
+	},
+	62: {
+		name: "???",
+		desc: "???",
+		unl: function() { return player.m.upgrades.includes(12) },
+		goal: new Decimal(1/0),
+		reward: "???",
+	},
 }
 
 function HCActive(x) {
 	if (x==11||x==41) if (HCActive(51)) return true
+	if (x==31||x==32) if (HCActive(61)) return true
 	return player.h.active==x;
 }
 
@@ -2324,6 +2353,7 @@ function getSubspaceGainMult() {
 	let mult = new Decimal(1)
 	if (player.ss.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ss[12].currently())
 	if (player.ss.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.ss[22].currently())
+	if (player.ba.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ba[12].currently())
 	return mult
 }
 
