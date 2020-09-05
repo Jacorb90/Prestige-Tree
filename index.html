@@ -15,6 +15,10 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.2 Alpha 7</h3>
+			<ul>
+				<li>Balanced up to 1e3,950,000 Points, 1,500,000 Magic, and 5,000,000 Balance Energy</li>
+			</ul><br>
 			<h3>Beta v1.2 Alpha 6</h3>
 			<ul>
 				<li>Fixed a bug with hotkeys</li>
@@ -243,7 +247,12 @@
 			<span v-if="player.q.unl">Q: Quirk reset</span><br>
 			<span v-if="player.hb.unl">Ctrl+B: Hyper-Booster reset</span><br>
 			<span v-if="player.ss.unl">Shift+S: Subspace reset</span><br>
-			<span v-if="player.m.unl">M: Magic reset</span><br>
+			<span v-if="player.m.unl">
+				M: Magic reset<br>
+				1: Cast spell 1<br>
+				2: Cast spell 2<br>
+				3: Cast spell 3
+			</span><br>
 			<span v-if="player.ba.unl">A: Balance reset</span><br>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
@@ -419,14 +428,14 @@
 					<br>
 					<div class="upgRow">
 						<div v-for="id in 3">
-							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(1))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(1)||spellActive(id))), m: true }" v-on:click="activateSpell(id)">{{SPELL_NAMES[id]}}<br>Time Left: {{format(player.m.spellTimes[id])}}<br>Effect: {{getSpellDesc(id)}}</button>
+							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(1))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(1)||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>Time Left: {{format(player.m.spellTimes[id])}}<br>Effect: {{getSpellDesc(id)}}</button>
 						</div>
 					</div><br><br>
 					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}<br><br>
 					<table>
 						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }">1 Magic<br>Keep row 4 milestones on all resets</td></tr>
 						<tr><td v-if="milestoneShown(player.m.best.gte(2))" v-bind:class="{ milestone: player.m.best.lt(2), milestoneDone: player.m.best.gte(2) }">2 Magic<br>Keep Hindrance completions on all resets</td></tr>
-						<tr><td v-if="milestoneShown(player.m.best.gte(3))" v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }">3 Magic<br>Gain 1% of Hindrance Energy & Quirk gain every second</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(3))" v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }">3 Magic<br>Gain 1% of Hindrance Spirit & Quirk gain every second</td></tr>
 						<tr><td v-if="milestoneShown(player.m.best.gte(4), true)" v-bind:class="{ milestone: player.m.best.lt(4), milestoneDone: player.m.best.gte(4) }">4 Magic<br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
 					</table>
 				</div>

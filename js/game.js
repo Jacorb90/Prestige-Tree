@@ -1090,13 +1090,15 @@ const LAYER_UPGS = {
 			unl: function() { return player.m.upgrades.includes(21) },
 		},
 		24: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Add free Quirk Layers based on your Boosters.",
+			cost: new Decimal(80000),
+			unl: function() { return player.m.upgrades.includes(22) },
+			currently: function() { return player.b.points.plus(1).log10().times(0.9) },
+			effDisp: function(x) { return "+"+format(x) },
 		},
 	},
 	ba: {
-		rows: 2,
+		rows: 3,
 		cols: 4,
 		11: {
 			desc: "All Balance Energy effects use better formulas.",
@@ -1147,6 +1149,30 @@ const LAYER_UPGS = {
 			desc: "Unlock 3 new Subspace Upgrades.",
 			cost: new Decimal(2e4),
 			unl: function() { return player.ba.upgrades.includes(22) },
+		},
+		31: {
+			desc: "The Quirk Layer cost is adjusted based on your Balance Upgrades bought.",
+			cost: new Decimal(4e5),
+			unl: function() { return player.ba.upgrades.includes(23) },
+			currently: function() { return Decimal.div(0.8, Math.pow(player.ba.upgrades.length+1, 0.1)).plus(1.2) },
+			effDisp: function(x) { return "2 -> "+format(x) },
+		},
+		32: {
+			desc: "Enhancers are stronger based on your Positivity.",
+			cost: new Decimal(5e5),
+			unl: function() { return player.ba.upgrades.includes(24) },
+			currently: function() { return player.ba.positivity.plus(1).log10().plus(1).log10().plus(1).pow(2) },
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		33: {
+			desc: "The Balance Power effect is squared.",
+			cost: new Decimal(1e6),
+			unl: function() { return player.ba.upgrades.includes(31) },
+		},
+		34: {
+			desc: "The Positivity & Negativity effect uses a better formula.",
+			cost: new Decimal(2e6),
+			unl: function() { return player.ba.upgrades.includes(32) },
 		},
 	},
 }
@@ -1961,6 +1987,7 @@ function getEnhancerPow() {
 	if (player.e.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[31].currently())
 	if (player.h.challs.includes(31)) pow = pow.times(2)
 	if (player.q.upgrades.includes(42)) pow = pow.times(1.4)
+	if (player.ba.upgrades.includes(32)) pow = pow.times(LAYER_UPGS.ba[32].currently())
 	return pow
 }
 
@@ -2253,13 +2280,19 @@ function addToSBBase() {
 	return toAdd
 }
 
+function getQuirkLayerCostBase() {
+	let base = new Decimal(2)
+	if (player.ba.upgrades.includes(31)) base = LAYER_UPGS.ba[31].currently()
+	return base
+}
+
 function getQuirkLayerCost() {
-	let cost = Decimal.pow(2, Decimal.pow(2, player.q.layers)).sub(1)
+	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, player.q.layers)).sub(1)
 	return cost.max(1);
 }
 
 function getQuirkLayerTarg() {
-	let targ = player.q.points.plus(1).log2().plus(1).log2().plus(1).floor()
+	let targ = player.q.points.plus(1).log(tmp.qCB).plus(1).log(tmp.qCB).plus(1).floor()
 	return targ
 }
 
@@ -2273,10 +2306,16 @@ function getQuirkLayerMult() {
 	return mult
 }
 
+function getExtraQuirkLayers() {
+	let layers = new Decimal(0);
+	if (player.m.upgrades.includes(24)) layers = layers.plus(LAYER_UPGS.m[24].currently())
+	return layers;
+}
+
 function getQuirkEnergyGainExp() {
 	let mult = new Decimal(1)
 	if (spellActive(3)) mult = mult.times(tmp.spellEffs[3])
-	return player.q.layers.sub(1).times(mult)
+	return player.q.layers.plus(getExtraQuirkLayers()).sub(1).times(mult)
 }
 
 function getQuirkEnergyEff() {
@@ -2509,6 +2548,7 @@ function getHyperBoosterPow() {
 function getBalancePowerEff() {
 	let eff = player.ba.power.plus(1).sqrt()
 	if (player.ba.upgrades.includes(14)) eff = eff.pow(5)
+	if (player.ba.upgrades.includes(33)) eff = eff.pow(2)
 	return eff;
 }
 
@@ -2516,6 +2556,7 @@ function getBalanceTypesEff() {
 	let mod = player.ba.positivity.plus(1).log10().plus(1).div(player.ba.negativity.plus(1).log10().plus(1)).log10().abs().plus(1).pow(-1)
 	let pos = player.ba.positivity.plus(1).log10().plus(1)
 	let neg = player.ba.negativity.plus(1).log10().plus(1)
+	if (player.ba.upgrades.includes(34)) mod = mod.times(1.5)
 	let eff = pos.times(neg).pow(mod)
 	return eff;
 }
@@ -2539,9 +2580,9 @@ function getNegGainMult() {
 }
 
 const SPELL_NAMES = {
-	1: "Spell 1",
-	2: "Spell 2",
-	3: "Spell 3",
+	1: "Booster Launch",
+	2: "Time Warp",
+	3: "Quirk Amplification",
 }
 
 const SPELL_DESCS = {
@@ -2733,6 +2774,15 @@ document.onkeydown = function(e) {
 				break;
 			case "S": 
 				if (player.ss.unl) doReset("ss")
+				break;
+			case "1": 
+				if (player.ba.unl) activateSpell(1)
+				break;
+			case "2": 
+				if (player.ba.unl) activateSpell(2)
+				break;
+			case "3": 
+				if (player.ba.unl) activateSpell(3)
 				break;
 		}
 	} else if (player[key].unl) doReset(key)
