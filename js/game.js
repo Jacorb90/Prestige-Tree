@@ -282,7 +282,7 @@ const LAYER_EFFS = {
 		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 	sb: function() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
-	sg: function() { return Decimal.pow(Decimal.add(2, addToSGBase()), player.sg.points).times(getSuperGenPowerGainMult()).max(0) },
+	sg: function() { return Decimal.pow(Decimal.add(2, addToSGBase()), player.sg.points).sub(1).times(getSuperGenPowerGainMult()).max(0) },
 	h: function() { 
 		let ret = player.h.points.plus(1).times(player.points.times(player.h.points).plus(1).log10().plus(1).log10().plus(1)).log10().times(5).root(player.q.upgrades.includes(12)?1.25:2);
 		if (player.h.challs.includes(61)) ret = ret.times(1.2);
@@ -1044,7 +1044,7 @@ const LAYER_UPGS = {
 		},
 	},
 	m: {
-		rows: 2,
+		rows: 3,
 		cols: 4,
 		11: {
 			desc: "Hexes boost all Spells.",
@@ -1095,6 +1095,30 @@ const LAYER_UPGS = {
 			unl: function() { return player.m.upgrades.includes(22) },
 			currently: function() { return player.b.points.plus(1).log10().times(0.9) },
 			effDisp: function(x) { return "+"+format(x) },
+		},
+		31: {
+			desc: "Unlock a new Hindrance.",
+			cost: new Decimal(2.5e6),
+			unl: function() { return player.m.upgrades.includes(23)&&player.sg.unl },
+		},
+		32: {
+			desc: "Hyper-Boosters add free Space Buildings.",
+			cost: new Decimal(5e9),
+			unl: function() { return player.m.upgrades.includes(24) },
+			currently: function() { return player.hb.points.plus(1).pow(3) },
+			effDisp: function(x) { return "+"+formatWhole(x) },
+		},
+		33: {
+			desc: "Hindrance Spirit adds to the Hyper-Booster base.",
+			cost: new Decimal(2e10),
+			unl: function() { return player.m.upgrades.includes(31) },
+			currently: function() { return player.h.points.plus(1).log10().plus(1).log10().plus(1).log10().div(2) },
+			effDisp: function(x) { return "+"+format(x) },
+		},
+		34: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 	ba: {
@@ -1584,6 +1608,7 @@ function getLayerGainMult(layer) {
 			if (player.ss.upgrades.includes(14)) mult = mult.div(1.0825)
 			break;
 		case "h": 
+			if (player.h.challs.includes(71)) mult = mult.times(H_CHALLS[71].currently())
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
 			if (player.q.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.q[34].currently())
 			if (player.q.upgrades.includes(44)) mult = mult.times(LAYER_UPGS.q[44].currently())
@@ -2161,6 +2186,7 @@ function getExtraBuildingLevels(x) {
 	if (player.s.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
 	if (player.q.upgrades.includes(31)) lvl = lvl.plus(1);
 	if (x<5) lvl = lvl.plus(tmp.spaceBuildEff[5])
+	if (player.m.upgrades.includes(32)) lvl = lvl.plus(LAYER_UPGS.m[32].currently())
 	return lvl
 }
 
@@ -2353,7 +2379,7 @@ function maxQuirkLayers() {
 }
 
 const H_CHALLS = {
-	rows: 6,
+	rows: 7,
 	cols: 2,
 	11: {
 		name: "Skip the Second",
@@ -2453,9 +2479,26 @@ const H_CHALLS = {
 		goal: new Decimal("1e134000"),
 		reward: "Unlock Super-Generators.",
 	},
+	71: {
+		name: "The Final Stockade",
+		desc: 'All previous Hindrances (except "Slowed to a Halt" and "Anti-Enhancers") are applied at once.',
+		unl: function() { return player.m.upgrades.includes(31) },
+		goal: new Decimal("1e1150"),
+		reward: "Gain more Hindrance Spirit based on your Quirk Energy.",
+		currently: function() { return player.q.energy.plus(1).sqrt() },
+		effDisp: function(x) { return format(x)+"x" },
+	},
+	72: {
+		name: "You shouldn't be seeing this",
+		desc: "Never gonna give you up, never gonna let you down, never gonna run around and dessert you",
+		unl: function() { return false },
+		goal: new Decimal(1/0),
+		reward: "???",
+	},
 }
 
 function HCActive(x) {
+	if (x<71&&x!=42&&x!=52) if (HCActive(71)) return true
 	if (x==11||x==41) if (HCActive(51)) return true
 	if (x==31||x==32) if (HCActive(61)) return true
 	return player.h.active==x;
@@ -2530,6 +2573,7 @@ function getSubspaceGainMult() {
 function addToHBBase() {
 	let toAdd = new Decimal(0)
 	if (player.m.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.m[13].currently())
+	if (player.m.upgrades.includes(33)) toAdd = toAdd.plus(LAYER_UPGS.m[33].currently())
 	return toAdd
 }
 
@@ -2620,6 +2664,7 @@ function getSpellDesc(x) {
 
 function getSpellTime() {
 	let time = 20
+	if (player.m.best.gte(2.5e9)) time *= 10
 	return time
 }
 
@@ -2703,6 +2748,7 @@ function gameLoop(diff) {
 		player.h.points = player.h.points.plus(tmp.resetGain.h.times(diff)).max(0)
 		player.q.points = player.q.points.plus(tmp.resetGain.q.times(diff)).max(0)
 	}
+	if (player.m.best.gte(2.5e9)) player.m.hexes = player.m.hexes.plus(getHexGain().times(diff)).max(0)
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
