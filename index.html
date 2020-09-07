@@ -23,6 +23,12 @@
 		</div>
 		<div v-if="player.tab=='changelog_beta'" class="col right">
 			<button class="back" onclick="showTab('changelog')">←</button><br>
+			<h3>Beta v1.2 Alpha 10</h3>
+			<ul>
+				<li>Made a few visual fixes</li>
+				<li>Adjusted the 1,070 Generator upgrade to cost 1,068 Generators instead</li>
+				<li>Balanced up to 1e6,800,000 Points, 1e14 Magic, and 1.5e12 Balance Energy</li>
+			</ul><br>
 			<h3>Beta v1.2 Alpha 9</h3>
 			<ul>
 				<li>Added hints for h8 & h10</li>
@@ -448,6 +454,7 @@
 				</div>
 				<div v-if="layer=='m'">
 					<br>
+					Note: Activating a Spell uses 1 Magic.<br><br>
 					<div class="upgRow">
 						<div v-for="id in 3">
 							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(1))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(1)||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>Time Left: {{formatTime(player.m.spellTimes[id])}}<br>Effect: {{getSpellDesc(id)}}</button>

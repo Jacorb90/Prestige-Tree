@@ -292,11 +292,15 @@ const LAYER_EFFS = {
 	},
 	hb: function() { return Decimal.pow(Decimal.add(1.6, addToHBBase()), player.hb.points.pow(getHyperBoosterExp()).times(getHyperBoosterPow())) },
 	ss: function() { return player.ss.points.pow(2.5).times(getSubspaceGainMult()) },
-	ba: function() { return {
-		power: player.ba.points.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1).pow(player.ba.upgrades.includes(41)?2:1),
-		pos: player.ba.points.pow(0.7).pow(tmp.baExp ? tmp.baExp : 1),
-		neg: player.ba.points.pow(0.65).times(0.4).pow(tmp.baExp ? tmp.baExp : 1),
-	}},
+	ba: function() { 
+		let points1 = player.ba.points
+		if (points1.gte(1e12)) points1 = points1.log10().pow(2).times(1e12/144).min(points1)
+		return {
+			power: points1.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1).pow(player.ba.upgrades.includes(41)?2:1),
+			pos: player.ba.points.pow(0.7).pow(tmp.baExp ? tmp.baExp : 1),
+			neg: player.ba.points.pow(0.65).times(0.4).pow(tmp.baExp ? tmp.baExp : 1),
+		}
+	},
 }
 
 const LAYER_UPGS = {
@@ -528,7 +532,7 @@ const LAYER_UPGS = {
 		},
 		34: {
 			desc: "Generators are stronger based on their amount.",
-			cost: new Decimal(1070),
+			cost: new Decimal(1068),
 			unl: function() { return player.ss.upgrades.includes(21) },
 			currently: function() { return player.g.points.plus(1).log10().plus(1).log10().plus(1).sqrt() },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
@@ -1207,14 +1211,16 @@ const LAYER_UPGS = {
 			unl: function() { return player.ba.upgrades.includes(33)&&player.ba.upgrades.includes(34) },
 		},
 		42: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "The Space Building 1 effect is stronger based on your Space Building 1 amount.",
+			cost: new Decimal(3e11),
+			unl: function() { return player.ba.upgrades.includes(33)&&player.ba.upgrades.includes(34) },
+			currently: function() { return player.s.buildings[1].plus(1).pow(0.8) },
+			effDisp: function(x) { return "^"+format(x) },
 		},
 		43: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "The post-25 Extra Time Capsule cost scaling is disabled.",
+			cost: new Decimal(1e12),
+			unl: function() { return player.ba.upgrades.includes(41)||player.ba.upgrades.includes(42) },
 		},
 		44: {
 			desc: "???",
@@ -1494,8 +1500,10 @@ function toggleOpt(name) {
 
 function changeTreeQuality() {
 	var on = player.hqTree
-	document.body.style.setProperty('--hqProperty1', on ? "0px 0px 20px black" : "")
-	document.body.style.setProperty('--hqProperty2', on ? "2px 2px 4px rgba(0, 0, 0, 0.25)" : "none")
+	document.body.style.setProperty('--hqProperty1', on ? "2px solid" : "4px solid")
+	document.body.style.setProperty('--hqProperty2a', on ? "-4px -4px 4px rgba(0, 0, 0, 0.25) inset" : "-4px -4px 4px rgba(0, 0, 0, 0) inset")
+	document.body.style.setProperty('--hqProperty2b', on ? "0px 0px 20px black" : "")
+	document.body.style.setProperty('--hqProperty3', on ? "2px 2px 4px rgba(0, 0, 0, 0.25)" : "none")
 }
 
 function exponentialFormat(num, precision) {
@@ -1678,6 +1686,7 @@ function getResetGain(layer) {
 	}
 	if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
 	let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer]).pow(getGainExp(layer))
+	if (gain.gte("e1e7")) gain = gain.sqrt().times("e5e6")
 	return gain.floor().max(0);
 }
 
@@ -1691,7 +1700,9 @@ function getNextAt(layer) {
 		if (LAYER_RES_CEIL.includes(layer)) cost = cost.ceil()
 		return cost;
 	} else {
-		let next = tmp.resetGain[layer].plus(1).root(getGainExp(layer)).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		let next = tmp.resetGain[layer].plus(1)
+		if (next.gte("e1e7")) next = next.div("e5e6").pow(2)
+		next = next.root(getGainExp(layer)).div(tmp.gainMults[layer]).root(LAYER_EXP[layer]).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
 		if (LAYER_RES_CEIL.includes(layer)) next = next.ceil()
 		return next;
 	}
@@ -2158,7 +2169,7 @@ function getTimeEnergyLimitMult() {
 
 function getExtCapsuleCost() {
 	let amt = player.t.extCapsules
-	if (amt.gte(25)) amt = amt.pow(2).div(25)
+	if (amt.gte(25) && !player.ba.upgrades.includes(43)) amt = amt.pow(2).div(25)
 	let cost = amt.times(0.4).pow(1.2).plus(1).times(10)
 	return cost.floor()
 }
@@ -2173,7 +2184,7 @@ function buyExtCapsule() {
 
 function maxExtTimeCapsules() {
 	let target = player.b.points.plus(1).div(10).sub(1).root(1.2).div(0.4)
-	if (target.gte(25)) target = target.times(25).sqrt()
+	if (target.gte(25)&&!player.ba.upgrades.includes(43)) target = target.times(25).sqrt()
 	target = target.plus(1).floor().max(0)
 	player.t.extCapsules = player.t.extCapsules.max(target)
 }
@@ -2243,9 +2254,12 @@ function getSpaceBuildingEff(x) {
 	if (tmp.sbUnl<x) bought = new Decimal(0);
 	let power = getSpaceBuildingPow()
 	bought = bought.times(power)
+	let ret;
 	switch(x) {
 		case 1: 
-			return Decimal.pow(Decimal.add(1, bought.pow((player.s.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1)), player.s.points.sqrt()).times(Decimal.mul(4, bought.pow((player.s.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1))).max(1)
+			ret = Decimal.pow(Decimal.add(1, bought.pow((player.s.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1)), player.s.points.sqrt()).times(Decimal.mul(4, bought.pow((player.s.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1))).max(1)
+			if (player.ba.upgrades.includes(42)) ret = ret.pow(LAYER_UPGS.ba[42].currently())
+			return ret;
 			break;
 		case 2: 
 			return bought.sqrt()
@@ -2254,7 +2268,9 @@ function getSpaceBuildingEff(x) {
 			return Decimal.pow(1e18, bought.pow(0.9))
 			break;
 		case 4: 
-			return bought.plus(1).pow(1.25)
+			ret = bought.plus(1).pow(1.25)
+			if (ret.gte(1e6)) ret = ret.log10().times(1e6/6)
+			return ret;
 			break;
 		case 5: 
 			return bought.sqrt().times(2)
@@ -2533,7 +2549,11 @@ const H_CHALLS = {
 		unl: function() { return player.m.upgrades.includes(31) },
 		goal: new Decimal("1e1150"),
 		reward: "Gain more Hindrance Spirit based on your Quirk Energy.",
-		currently: function() { return player.q.energy.plus(1).sqrt() },
+		currently: function() { 
+			let ret = player.q.energy.plus(1).sqrt() 
+			if (ret.gte("1.8e308")) ret = ret.sqrt().times(Decimal.sqrt("1.8e308"))
+			return ret;
+		},
 		effDisp: function(x) { return format(x)+"x" },
 	},
 	72: {
