@@ -14,7 +14,15 @@
 	<div id="app">
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<button class="back" onclick="showTab('info')">←</button><br>
+			<h3>Version 1.1: The Life Update</h3>
+			<ul>
+				<li>???</li>
+			</ul><br>
+			<div class="link" onclick="showTab('changelog_beta')">Alpha / Beta</div><br>
+		</div>
+		<div v-if="player.tab=='changelog_beta'" class="col right">
+			<button class="back" onclick="showTab('changelog')">←</button><br>
 			<h3>Beta v1.2 Alpha 6</h3>
 			<ul>
 				<li>Fixed a bug with hotkeys</li>
@@ -217,20 +225,24 @@
 				<li>Balanced the row 3 prestige layers up to 1e560 points</li>
 			</ul><br><br>
 		</div>
-		<div v-if="player.tab=='credits'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
-			This game uses <a href="https://github.com/Patashu/break_eternity.js/tree/master" target="_blank">break_eternity.js</a> by Patashu.<br>
-			Made by Jacorb<br>
-			Idea by papyrus (on discord)<br>
-			Note: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
-		</div>
 		<div v-if="player.tab=='info'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
-			Time Played: {{ formatTime(player.timePlayed) }}<br><br><br>
-			<div id="cl" onclick="showTab('credits')">Credits</div><br>
-			<div id="cl" onclick="showTab('changelog')">Changelog</div><br>
-			<a id="cl" href="https://plaza.dsolver.ca/m/Jacorb90" target="_blank">Plaza dSolver</a><br><br><br>
-			<h3>Hotkeys</h3><br><br>
+			<button class="back" onclick="showTab('tree')">←</button><br>
+			<h2>Prestige Tree</h2>
+			<br>
+			<h3>Version 1.1: The Life Update</h3>
+			<br>
+			Made by Jacorb and Aarex
+			<br>
+			Idea by papyrus (on discord)
+			<br><br>
+			<div class="link" onclick="showTab('changelog')">Changelog</div><br>
+			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Jacorb's Discord</a><br>
+			<a class="link" href="http://aarextiaokhiao.github.io/" target="_blank">Aarex's Home</a>
+			<br>
+			Note by Jacorb: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
+			<br><br>
+			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
+			<h3>Hotkeys</h3><br>
 			P: Prestige reset<br>
 			<span v-if="player.b.unl">B: Booster reset</span><br>
 			<span v-if="player.g.unl">G: Generator reset</span><br>
@@ -247,7 +259,7 @@
 			<span v-if="player.ba.unl">A: Balance reset</span><br>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br><br><br><br><br>
+			<button class="back" onclick="showTab('tree')">←</button><br>
 			<table>
 				<tr>
 					<td><button class="opt" onclick="save()">Save</button></td>
@@ -273,51 +285,47 @@
 			<br>You have <h2>{{format(player.points)}}</h2> Points
 			<br><br><br><br><br>
 			<table>
-				<tr>
-					<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(tmp.layerReqs.p)||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(tmp.layerReqs.p)+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(tmp.layerReqs.p)&&!player.p.unl), can: (player.points.gte(tmp.layerReqs.p)||player.p.unl) }">P</button></td>
-				</tr>
+				<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(tmp.layerReqs.p)||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(tmp.layerReqs.p)+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(tmp.layerReqs.p)&&!player.p.unl), can: (player.points.gte(tmp.layerReqs.p)||player.p.unl) }">P</button></td>
 			</table><table>
-				<tr>
-					<td><button class="treeNode hidden"></button></td>
-				</tr>
+				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<tr>
-					<td v-if="player.b.unl||player.g.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
-					<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.b)||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(tmp.layerReqs.b)+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(tmp.layerReqs.b)&&!player.b.unl), can: (player.points.gte(tmp.layerReqs.b)||player.b.unl) }">B</button></td>
-					<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.g)||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(tmp.layerReqs.g)+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(tmp.layerReqs.g)&&!player.g.unl), can: (player.points.gte(tmp.layerReqs.g)||player.g.unl) }">G</button></td>
-				</tr>
+				<td v-if="player.b.unl||player.g.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
+				<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.b)||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(tmp.layerReqs.b)+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(tmp.layerReqs.b)&&!player.b.unl), can: (player.points.gte(tmp.layerReqs.b)||player.b.unl) }">B</button></td>
+				<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.g)||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(tmp.layerReqs.g)+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(tmp.layerReqs.g)&&!player.g.unl), can: (player.points.gte(tmp.layerReqs.g)||player.g.unl) }">G</button></td>
 			</table><table>
-				<tr>
-					<td><button class="treeNode hidden"></button></td>
-				</tr>
+				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<tr>
-					<td v-if="player.e.unl||player.t.unl||player.s.unl||player.sb.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
-					<td id="sb" v-if="layerUnl('sb')"><button onclick="showTab('sb')" v-bind:tooltip="((player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl)&&layerUnl('sb')) ? (formatWhole(player.sb.points)+' super-boosters') : ('Reach '+formatWhole(tmp.layerReqs.sb)+' boosters to unlock')" v-bind:class="{ treeNode: true, sb: true, locked: (player.b.points.lt(tmp.layerReqs.sb)&&!player.sb.unl), can: (player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl) }">SB</button></td>
-					<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
-					<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
-					<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
-					<td id="sg" v-if="layerUnl('sg')"><button onclick="showTab('sg')" v-bind:tooltip="((player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl)&&layerUnl('sg')) ? (formatWhole(player.sg.points)+' super-generators') : ('Reach '+formatWhole(tmp.layerReqs.sg)+' generators to unlock')" v-bind:class="{ treeNode: true, sg: true, locked: (player.g.points.lt(tmp.layerReqs.sg)&&!player.sg.unl), can: (player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl) }">SG</button></td>
-				</tr>
+				<td v-if="player.e.unl||player.t.unl||player.s.unl||player.sb.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
+				<td id="sb" v-if="layerUnl('sb')"><button onclick="showTab('sb')" v-bind:tooltip="((player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl)&&layerUnl('sb')) ? (formatWhole(player.sb.points)+' super-boosters') : ('Reach '+formatWhole(tmp.layerReqs.sb)+' boosters to unlock')" v-bind:class="{ treeNode: true, sb: true, locked: (player.b.points.lt(tmp.layerReqs.sb)&&!player.sb.unl), can: (player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl) }">SB</button></td>
+				<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
+				<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
+				<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
+				<td id="sg" v-if="layerUnl('sg')"><button onclick="showTab('sg')" v-bind:tooltip="((player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl)&&layerUnl('sg')) ? (formatWhole(player.sg.points)+' super-generators') : ('Reach '+formatWhole(tmp.layerReqs.sg)+' generators to unlock')" v-bind:class="{ treeNode: true, sg: true, locked: (player.g.points.lt(tmp.layerReqs.sg)&&!player.sg.unl), can: (player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl) }">SG</button></td>
 			</table><table>
-				<tr>
-					<td><button class="treeNode hidden"></button></td>
-				</tr>
+				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<tr>
-					<td v-if="player.h.unl||player.q.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(3)"></img></td>
-					<td id="hb" v-if="layerUnl('hb')"><button onclick="showTab('hb')" v-bind:tooltip="((player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl)&&layerUnl('hb')) ? (formatWhole(player.hb.points)+' hyper-boosters') : ('Reach '+formatWhole(tmp.layerReqs.hb)+' super-boosters to unlock')" v-bind:class="{ treeNode: true, hb: true, locked: (player.sb.points.lt(tmp.layerReqs.hb)&&!player.hb.unl), can: (player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl) }">HB</button></td>
-					<td id="h" v-if="layerUnl('h')"><button onclick="showTab('h')" v-bind:tooltip="((player.t.energy.gte(tmp.layerReqs.h)||player.h.unl)&&layerUnl('h')) ? (formatWhole(player.h.points)+' hindrance spirit') : ('Reach '+format(tmp.layerReqs.h)+' time energy to unlock')" v-bind:class="{ treeNode: true, h: true, locked: (player.t.energy.lt(tmp.layerReqs.h)&&!player.h.unl), can: (player.t.energy.gte(tmp.layerReqs.h)||player.h.unl) }">H</button></td>
-					<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
-					<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
-				</tr>
+				<td v-if="player.h.unl||player.q.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(3)"></img></td>
+				<td id="hb" v-if="layerUnl('hb')"><button onclick="showTab('hb')" v-bind:tooltip="((player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl)&&layerUnl('hb')) ? (formatWhole(player.hb.points)+' hyper-boosters') : ('Reach '+formatWhole(tmp.layerReqs.hb)+' super-boosters to unlock')" v-bind:class="{ treeNode: true, hb: true, locked: (player.sb.points.lt(tmp.layerReqs.hb)&&!player.hb.unl), can: (player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl) }">HB</button></td>
+				<td id="h" v-if="layerUnl('h')"><button onclick="showTab('h')" v-bind:tooltip="((player.t.energy.gte(tmp.layerReqs.h)||player.h.unl)&&layerUnl('h')) ? (formatWhole(player.h.points)+' hindrance spirit') : ('Reach '+format(tmp.layerReqs.h)+' time energy to unlock')" v-bind:class="{ treeNode: true, h: true, locked: (player.t.energy.lt(tmp.layerReqs.h)&&!player.h.unl), can: (player.t.energy.gte(tmp.layerReqs.h)||player.h.unl) }">H</button></td>
+				<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
+				<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
 			</table><table>
-				<tr>
-					<td><button class="treeNode hidden"></button></td>
-				</tr>
+				<td><button class="treeNode hidden"></button></td>
 			</table><table>
+				<td v-if="player.m.unl||player.ba.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(4)"></img></td>
 				<td id="m" v-if="layerUnl('m')"><button onclick="showTab('m')" v-bind:tooltip="((player.h.points.gte(tmp.layerReqs.m)||player.m.unl)&&layerUnl('m')) ? (formatWhole(player.m.points)+' magic') : ('Reach '+format(tmp.layerReqs.m)+' hindrance spirit to unlock')" v-bind:class="{ treeNode: true, m: true, locked: (player.h.points.lt(tmp.layerReqs.m)&&!player.m.unl), can: (player.h.points.gte(tmp.layerReqs.m)||player.m.unl) }">M</button></td>
+				<td id="ps" v-if="layerUnl('ps')"><button class="treeNode ps can">PS</button></td>
 				<td id="ba" v-if="layerUnl('ba')"><button onclick="showTab('ba')" v-bind:tooltip="((player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl)&&layerUnl('ba')) ? (formatWhole(player.ba.points)+' balance energy') : ('Reach '+format(tmp.layerReqs.ba)+' quirks to unlock')" v-bind:class="{ treeNode: true, ba: true, locked: (player.q.points.lt(tmp.layerReqs.ba)&&!player.ba.unl), can: (player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl) }">BA</button></td>
+			</table><table>
+				<td><button class="treeNode hidden"></button></td>
+			</table><table>
+				<td class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
+				<td id="l" v-if="layerUnl('l')"><button class="treeNode l can">L</button></td>
+				<td><button class="treeNode hidden"></button></td>
+				<td id="sp" v-if="layerUnl('sp')"><button class="treeNode sp can">SP</button></td>
+				<td><button class="treeNode hidden"></button></td>
+				<td id="hs" v-if="layerUnl('hs')"><button class="treeNode hs can">HS</button></td>
+				<td id="i" v-if="layerUnl('i')"><button class="treeNode i can">I</button></td>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>

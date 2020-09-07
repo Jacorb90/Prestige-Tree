@@ -14,8 +14,8 @@ function getStartPlayer() {
 		autosave: true,
 		msDisplay: "always",
 		offlineProd: true,
-		versionType: "beta",
-		version: 1.2,
+		versionType: "release",
+		version: 1.1,
 		timePlayed: 0,
 		hasNaN: false,
 		points: new Decimal(10),
@@ -1156,7 +1156,7 @@ const TAB_REQS = {
 	options: function() { return true },
 	info: function() { return true },
 	changelog: function() { return true },
-	credits: function() { return true },
+	changelog_beta: function() { return true },
 	p: function() { return (player.p.unl||player.points.gte(tmp.layerReqs.p))&&layerUnl('p') },
 	b: function() { return (player.b.unl||player.points.gte(tmp.layerReqs.b))&&layerUnl('b') },
 	g: function() { return (player.g.unl||player.points.gte(tmp.layerReqs.g))&&layerUnl('g') },
@@ -1657,6 +1657,21 @@ function layerUnl(layer) {
 			break;
 		case "ba":
 			return player.q.unl&&player.ss.unl
+			break;
+		case "sp":
+			return false //player.m.unl&&player.ba.unl
+			break;
+		case "l":
+			return false //player.m.unl&&player.ba.unl
+			break;
+		case "ps":
+			return false //player.m.unl&&player.ba.unl
+			break;
+		case "hs":
+			return false //player.m.unl&&player.ba.unl
+			break;
+		case "i":
+			return false //player.m.unl&&player.ba.unl
 			break;
 	}
 }

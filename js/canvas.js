@@ -53,7 +53,24 @@ function drawTree() {
 		drawTreeBranch("q", "ba")
 		drawTreeBranch("ss", "ba")
 	}
-	
+	if (layerUnl('sp')) {
+		drawTreeBranch("m", "sp")
+		drawTreeBranch("ba", "sp")
+	}
+	if (layerUnl('l')) {
+		drawTreeBranch("hb", "l")
+		drawTreeBranch("m", "l")
+	}
+	if (layerUnl('ps')) {
+		drawTreeBranch("h", "ps")
+	}
+	if (layerUnl('hs')) {
+		drawTreeBranch("ss", "hs")
+		drawTreeBranch("ba", "hs")
+	}
+	if (layerUnl('i')) {
+		drawTreeBranch("ss", "i")
+	}
 	needCanvasUpdate = false;
 }
 

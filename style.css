@@ -265,6 +265,31 @@ h1, h2 {
 	text-shadow: 0px 0px 10px #409c6e;
 }
 
+.sp {
+	background-color: #007fff;
+	color: black;
+}
+
+.l {
+	background-color: #7fbf7f;
+	color: black;
+}
+
+.ps {
+	background-color: #b38fbf;
+	color: black;
+}
+
+.hs {
+	background-color: #dfdfff;
+	color: black;
+}
+
+.i {
+	background-color: #e5dab7;
+	color: black;
+}
+
 #optionWheel {
 	position: absolute;
 	top: 0px;
@@ -297,15 +322,23 @@ h1, h2 {
               -3px 0px 12px #02f2f2;
 }
 
-#cl {
+a {
+	color: #007fff;
+	text-decoration-line: none;
+	cursor: pointer
+}
+
+.link {
+	display: block;
 	font-size: 20px;
-	color: white;
+	color: #41f5f5;
+	text-decoration-line: none;
 	cursor: pointer;
 	-webkit-text-stroke-width: 1px;
 	-webkit-text-stroke-color: #02f2f2;
 }
 
-#cl:hover {
+.link:hover {
 	transform: scale(1.2, 1.2);
 	text-shadow: 5px 0px 10px #02f2f2,
               -3px 0px 12px #02f2f2;
