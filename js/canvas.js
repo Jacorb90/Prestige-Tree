@@ -22,6 +22,12 @@ function resizeCanvas() {
     drawTree();
 }
 
+var colors = {
+	1: "#ffffff",
+	2: "#bfbfbf",
+	3: "#7f7f7f"
+}
+
 function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -51,6 +57,7 @@ function drawTree() {
 		drawTreeBranch("q", "m")
 	}
 	if (layerUnl('ba')) {
+		drawTreeBranch("h", "ba", 2)
 		drawTreeBranch("q", "ba")
 		drawTreeBranch("ss", "ba")
 	}
@@ -63,7 +70,8 @@ function drawTree() {
 		drawTreeBranch("m", "l")
 	}
 	if (layerUnl('ps')) {
-		drawTreeBranch("h", "ps")
+		drawTreeBranch("h", "ps", 3)
+		drawTreeBranch("q", "ps", 3)
 	}
 	if (layerUnl('hs')) {
 		drawTreeBranch("ss", "hs")
@@ -75,7 +83,7 @@ function drawTree() {
 	needCanvasUpdate = false;
 }
 
-function drawTreeBranch(num1, num2) { // taken from Antimatter Dimensions & adjusted slightly
+function drawTreeBranch(num1, num2, color_id = 1) { // taken from Antimatter Dimensions & adjusted slightly
     let start = document.getElementById(num1).getBoundingClientRect();
     let end = document.getElementById(num2).getBoundingClientRect();
     let x1 = start.left + (start.width / 2) + (document.getElementById("treeTab").scrollLeft || document.body.scrollLeft);
@@ -84,7 +92,7 @@ function drawTreeBranch(num1, num2) { // taken from Antimatter Dimensions & adju
     let y2 = end.top + (end.height / 2) + (document.getElementById("treeTab").scrollTop || document.body.scrollTop);
     ctx.lineWidth = 15;
     ctx.beginPath();
-    ctx.strokeStyle = "white"
+    ctx.strokeStyle = colors[color_id]
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();

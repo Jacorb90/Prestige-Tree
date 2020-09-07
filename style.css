@@ -41,6 +41,11 @@ html, body {
 	margin: 0 auto;
 }
 
+.upgAlign {
+	height: 120px;
+	vertical-align: 0
+}
+
 h1, h2 {
 	display: inline;
 }
@@ -49,8 +54,10 @@ h1, h2 {
 	height: 100px;
 	width: 100px;
 	border-radius: 50%;
-	border-color: black;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
+	box-shadow: var(--hqProperty1);
 	font-size: 40px;
+	text-shadow: var(--hqProperty2);
 }
 
 .locked {
@@ -63,8 +70,9 @@ h1, h2 {
 }
 
 .can:hover {
-	transform: scale(1.1, 1.1);
-	text-shadow: 0px 0px 7px white;
+	transform: scale(1.15, 1.15);
+	box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
+	z-index: 3
 }
 
 .bought {
@@ -89,17 +97,17 @@ h1, h2 {
 }
 
 .reset {
-	height: 100px;
+	height: 125px;
 	width: 150px;
-	border-radius: 50%;
-	border-color: black;
+	border-radius: 40%;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
 }
 
 .upg {
 	height: 120px;
 	width: 120px;
 	border-radius: 25%;
-	border-color: black;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
 	font-size: 10px;
 }
 
@@ -107,14 +115,14 @@ h1, h2 {
 	height: 200px;
 	width: 200px;
 	border-radius: 25%;
-	border-color: black;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
 }
 
 .longUpg {
 	height: 50px;
 	width: 120px;
 	border-radius: 50%;
-	border-color: black;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
 	font-size: 10px;
 }
 
@@ -122,7 +130,7 @@ h1, h2 {
 	height: 40px;
 	width: 40px;
 	border-radius: 25%;
-	border-color: black;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
 }
 
 .p {
@@ -186,13 +194,13 @@ h1, h2 {
 }
 
 .sb {
-	background-color: #415a9e;
+	background-color: #494b99;
 	color: black;
 }
 
 .sb_txt {
-	color: #415a9e;
-	text-shadow: 0px 0px 10px #415a9e;
+	color: #494b99;
+	text-shadow: 0px 0px 10px #494b99;
 }
 
 .h {
@@ -256,13 +264,13 @@ h1, h2 {
 }
 
 .sg {
-	background-color: #409c6e;
+	background-color: #3d997a;
 	color: black;
 }
 
 .sg_txt {
-	color: #409c6e;
-	text-shadow: 0px 0px 10px #409c6e;
+	color: #3d997a;
+	text-shadow: 0px 0px 10px #3d997a;
 }
 
 .sp {
@@ -353,7 +361,7 @@ a {
 	border-radius: 25%;
 	border-color: black;
 	background-color: #a1a1a1;
-	color: black;
+	border-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.25);
 	cursor: pointer;
 }
 

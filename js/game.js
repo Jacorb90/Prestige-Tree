@@ -1343,6 +1343,7 @@ function load() {
 	checkForVars();
 	convertToDecimal();
 	versionCheck();
+	changeTreeQuality();
 	updateTemp();
 	updateTemp();
 	loadVue();
@@ -1488,6 +1489,13 @@ function convertToDecimal() {
 
 function toggleOpt(name) {
 	player[name] = !player[name]
+	if (name == "hqTree") changeTreeQuality()
+}
+
+function changeTreeQuality() {
+	var on = player.hqTree
+	document.body.style.setProperty('--hqProperty1', on ? "0px 0px 20px black" : "")
+	document.body.style.setProperty('--hqProperty2', on ? "2px 2px 4px rgba(0, 0, 0, 0.25)" : "none")
 }
 
 function exponentialFormat(num, precision) {
@@ -1734,19 +1742,19 @@ function layerUnl(layer) {
 			return player.q.unl&&player.ss.unl
 			break;
 		case "sp":
-			return false //player.m.unl&&player.ba.unl
+			return false //player.m.unl && player.ba.unl
 			break;
 		case "l":
-			return false //player.m.unl&&player.ba.unl
+			return false //player.sp.unl
 			break;
 		case "ps":
-			return false //player.m.unl&&player.ba.unl
+			return false //player.l.unl
 			break;
 		case "hs":
-			return false //player.m.unl&&player.ba.unl
+			return false //player.sp.unl
 			break;
 		case "i":
-			return false //player.m.unl&&player.ba.unl
+			return false //player.ps.unl && player.hs.unl
 			break;
 	}
 }
