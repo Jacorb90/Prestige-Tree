@@ -15,6 +15,13 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.2 Alpha 9</h3>
+			<ul>
+				<li>Added hints for h8 & h10</li>
+				<li>Added a new Magic milestone</li>
+				<li>Reduced offline time to 10% of its original amount</li>
+				<li>Balanced up to 1e6,000,000 Points, 3e12 Magic, and 1e11 Balance Energy</li>
+			</ul><br>
 			<h3>Beta v1.2 Alpha 8</h3>
 			<ul>
 				<li>Added a new milestone</li>
@@ -239,8 +246,7 @@
 			Time Played: {{ formatTime(player.timePlayed) }}<br><br><br>
 			<div id="cl" onclick="showTab('credits')">Credits</div><br>
 			<div id="cl" onclick="showTab('changelog')">Changelog</div><br>
-			<div id="cl" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" target="_blank">My Discord</div><br>
-			<div id="cl" onclick="window.open('https://plaza.dsolver.ca/m/Jacorb90','mywindow')" target="_blank">Plaza dSolver</div><br><br>
+			<div id="cl" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" target="_blank">My Discord</div><br><br>
 			<h3>Hotkeys</h3><br><br>
 			P: Prestige reset<br>
 			<span v-if="player.b.unl">B: Booster reset</span><br>
@@ -444,6 +450,7 @@
 						<tr><td v-if="milestoneShown(player.m.best.gte(2))" v-bind:class="{ milestone: player.m.best.lt(2), milestoneDone: player.m.best.gte(2) }">2 Magic<br>Keep Hindrance completions on all resets</td></tr>
 						<tr><td v-if="milestoneShown(player.m.best.gte(3))" v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }">3 Magic<br>Gain 100% of Hindrance Spirit & Quirk gain every second</td></tr>
 						<tr><td v-if="milestoneShown(player.m.best.gte(4), true)" v-bind:class="{ milestone: player.m.best.lt(4), milestoneDone: player.m.best.gte(4) }">4 Magic<br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(1000), true)" v-bind:class="{ milestone: player.m.best.lt(1000), milestoneDone: player.m.best.gte(1000) }">1,000 Magic<br>Automatically cast Spells&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(1000)" class="smallUpg can m" onclick="toggleAuto('m')">{{player.m.auto?"ON":"OFF"}}</button></td></tr>
 						<tr><td v-if="milestoneShown(player.m.best.gte(2.5e9))" v-bind:class="{ milestone: player.m.best.lt(2.5e9), milestoneDone: player.m.best.gte(2.5e9) }">2.5e9 Magic<br>Gain 100% of Hex gain every second, and Spells last 10x longer</td></tr>
 					</table>
 				</div>

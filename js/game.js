@@ -131,6 +131,7 @@ function getStartPlayer() {
 		},
 		m: {
 			unl: false,
+			auto: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
 			spellTimes: {
@@ -292,7 +293,7 @@ const LAYER_EFFS = {
 	hb: function() { return Decimal.pow(Decimal.add(1.6, addToHBBase()), player.hb.points.pow(getHyperBoosterExp()).times(getHyperBoosterPow())) },
 	ss: function() { return player.ss.points.pow(2.5).times(getSubspaceGainMult()) },
 	ba: function() { return {
-		power: player.ba.points.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1),
+		power: player.ba.points.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1).pow(player.ba.upgrades.includes(41)?2:1),
 		pos: player.ba.points.pow(0.7).pow(tmp.baExp ? tmp.baExp : 1),
 		neg: player.ba.points.pow(0.65).times(0.4).pow(tmp.baExp ? tmp.baExp : 1),
 	}},
@@ -1038,9 +1039,11 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		25: {
-			desc: "Placeholder",
-			cost: new Decimal(1/0),
+			desc: "Subspace is generated faster based on your Quirk Layers.",
+			cost: new Decimal(8),
 			unl: function() { return player.ba.upgrades.includes(24) },
+			currently: function() { return Decimal.pow(10, player.q.layers.sqrt()) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 	m: {
@@ -1116,13 +1119,13 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "+"+format(x) },
 		},
 		34: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Add 1 free Quirk Layer.",
+			cost: new Decimal(4e10),
+			unl: function() { return player.m.upgrades.includes(32) },
 		},
 	},
 	ba: {
-		rows: 3,
+		rows: 4,
 		cols: 4,
 		11: {
 			desc: "All Balance Energy effects use better formulas.",
@@ -1197,6 +1200,26 @@ const LAYER_UPGS = {
 			desc: "The Positivity & Negativity effect uses a better formula.",
 			cost: new Decimal(2e6),
 			unl: function() { return player.ba.upgrades.includes(32) },
+		},
+		41: {
+			desc: "The first Balance Energy effect is squared.",
+			cost: new Decimal(2e10),
+			unl: function() { return player.ba.upgrades.includes(33)&&player.ba.upgrades.includes(34) },
+		},
+		42: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		43: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		44: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 }
@@ -1314,7 +1337,7 @@ function load() {
 	if (get===null||get===undefined) player = getStartPlayer()
 	else player = JSON.parse(atob(get))
 	player.tab = "tree"
-	offTime.remain = (Date.now()-player.time)/1000
+	offTime.remain = (Date.now()-player.time)/10000
 	if (!player.offlineProd) offTime.remain = 0
 	player.time = Date.now()
 	checkForVars();
@@ -1411,6 +1434,7 @@ function checkForVars() {
 	if (player.ss === undefined) player.ss = start.ss
 	if (player.ss.auto === undefined) player.ss.auto = false
 	if (player.m === undefined) player.m = start.m
+	if (player.m.auto === undefined) player.m.auto = false
 	if (player.ba === undefined) player.ba = start.ba
 	if (player.offlineProd === undefined) player.offlineProd = true
 }
@@ -2335,6 +2359,7 @@ function getQuirkLayerMult() {
 function getExtraQuirkLayers() {
 	let layers = new Decimal(0);
 	if (player.m.upgrades.includes(24)) layers = layers.plus(LAYER_UPGS.m[24].currently())
+	if (player.m.upgrades.includes(34)) layers = layers.plus(1)
 	return layers;
 }
 
@@ -2436,7 +2461,7 @@ const H_CHALLS = {
 	},
 	42: {
 		name: "Slowed to a Halt",
-		desc: "Time slows down over time, halting to a stop after 10 seconds.",
+		desc: "Time slows down over time, halting to a stop after 10 seconds. Hint: This also impacts auto Enhance Point generation, so make sure to manually press E!",
 		unl: function() { return player.h.challs.includes(31)&&player.h.challs.includes(32) },
 		goal: new Decimal("1e16500"),
 		reward: "Cube the Generator Power effect.",
@@ -2452,7 +2477,7 @@ const H_CHALLS = {
 	},
 	52: {
 		name: "Anti-Enhancers",
-		desc: "You lose Enhancers over time, which can make your Enhancer amount get below 0.",
+		desc: "You lose Enhancers over time, which can make your Enhancer amount get below 0. Hint: Maybe it's best to not have any Time Capsules or Space Energy?",
 		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42)&&player.h.challs.includes(51) },
 		goal: new Decimal("1e440000"),
 		reward: "Quirk Layers are faster based on your Hindrance Spirit & Quirks.",
@@ -2566,6 +2591,7 @@ function getSubspaceGainMult() {
 	if (player.ss.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ss[12].currently())
 	if (player.ss.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.ss[22].currently())
 	if (player.ss.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.ss[24].currently())
+	if (player.ss.upgrades.includes(25)) mult = mult.times(LAYER_UPGS.ss[25].currently())
 	if (player.ba.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.ba[12].currently())
 	return mult
 }
@@ -2762,6 +2788,7 @@ function gameLoop(diff) {
 	if (player.q.auto&&player.ba.best.gte(3)) maxQuirkLayers()
 	if (player.hb.auto&&player.m.best.gte(4)) doReset("hb")
 	if (player.ss.auto&&player.m.best.gte(4)) doReset("ss")
+	if (player.m.auto&&player.m.best.gte(1000)) for (let i=1;i<=3;i++) activateSpell(i)
 
 	if (player.hasNaN&&!NaNalert) {
 		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
