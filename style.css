@@ -370,7 +370,7 @@ a {
 	height: 100px;
 	width: 100px;
 	border-radius: 25%;
-	border: 1px solid black;
+	border: 4px solid;
 	background-color: #a1a1a1;
 	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
 	cursor: pointer;
