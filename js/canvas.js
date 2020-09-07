@@ -48,6 +48,7 @@ function drawTree() {
 	if (layerUnl('m')) {
 		drawTreeBranch("hb", "m")
 		drawTreeBranch("h", "m")
+		drawTreeBranch("q", "m")
 	}
 	if (layerUnl('ba')) {
 		drawTreeBranch("q", "ba")
