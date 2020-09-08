@@ -2,6 +2,7 @@
 <head>
 	<title>The Prestige Tree</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script type="text/javascript" src="js/break_eternity.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
@@ -12,7 +13,7 @@
 </head>
 <body onload="load()">
 	<div id="app">
-		<div class="vl"></div>
+		<div id="vl" class="vl none"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('info')">←</button><br>
 			<h3>Version 1.1: The Life Update</h3>
@@ -322,7 +323,7 @@
 				</tr>
 			</table>
 		</div>
-		<div id="treeTab" onscroll="resizeCanvas()" class="col left">
+		<div id="treeTab" onscroll="resizeCanvas()" class="col full">
 			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
 			<span v-if="offTime.remain>0">
@@ -331,37 +332,37 @@
 			<br>You have <h2>{{format(player.points)}}</h2> Points
 			<br><br><br><br><br>
 			<table>
-				<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(tmp.layerReqs.p)||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(tmp.layerReqs.p)+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(tmp.layerReqs.p)&&!player.p.unl), can: (player.points.gte(tmp.layerReqs.p)||player.p.unl) }">P</button></td>
+				<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(tmp.layerReqs.p)||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(tmp.layerReqs.p)+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(tmp.layerReqs.p)&&!player.p.unl), notify: player.notify.p, can: (player.points.gte(tmp.layerReqs.p)||player.p.unl) }">P</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.b.unl||player.g.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
-				<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.b)||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(tmp.layerReqs.b)+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(tmp.layerReqs.b)&&!player.b.unl), can: (player.points.gte(tmp.layerReqs.b)||player.b.unl) }">B</button></td>
-				<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.g)||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(tmp.layerReqs.g)+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(tmp.layerReqs.g)&&!player.g.unl), can: (player.points.gte(tmp.layerReqs.g)||player.g.unl) }">G</button></td>
+				<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.b)||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(tmp.layerReqs.b)+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(tmp.layerReqs.b)&&!player.b.unl), notify: player.notify.b, can: (player.points.gte(tmp.layerReqs.b)||player.b.unl) }">B</button></td>
+				<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.g)||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(tmp.layerReqs.g)+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(tmp.layerReqs.g)&&!player.g.unl), notify: player.notify.g, can: (player.points.gte(tmp.layerReqs.g)||player.g.unl) }">G</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.e.unl||player.t.unl||player.s.unl||player.sb.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
-				<td id="sb" v-if="layerUnl('sb')"><button onclick="showTab('sb')" v-bind:tooltip="((player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl)&&layerUnl('sb')) ? (formatWhole(player.sb.points)+' super-boosters') : ('Reach '+formatWhole(tmp.layerReqs.sb)+' boosters to unlock')" v-bind:class="{ treeNode: true, sb: true, locked: (player.b.points.lt(tmp.layerReqs.sb)&&!player.sb.unl), can: (player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl) }">SB</button></td>
-				<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
-				<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
-				<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
-				<td id="sg" v-if="layerUnl('sg')"><button onclick="showTab('sg')" v-bind:tooltip="((player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl)&&layerUnl('sg')) ? (formatWhole(player.sg.points)+' super-generators') : ('Reach '+formatWhole(tmp.layerReqs.sg)+' generators to unlock')" v-bind:class="{ treeNode: true, sg: true, locked: (player.g.points.lt(tmp.layerReqs.sg)&&!player.sg.unl), can: (player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl) }">SG</button></td>
+				<td id="sb" v-if="layerUnl('sb')"><button onclick="showTab('sb')" v-bind:tooltip="((player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl)&&layerUnl('sb')) ? (formatWhole(player.sb.points)+' super-boosters') : ('Reach '+formatWhole(tmp.layerReqs.sb)+' boosters to unlock')" v-bind:class="{ treeNode: true, sb: true, locked: (player.b.points.lt(tmp.layerReqs.sb)&&!player.sb.unl), notify: player.notify.sb, can: (player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl) }">SB</button></td>
+				<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), notify: player.notify.t, can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
+				<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), notify: player.notify.e, can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
+				<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), notify: player.notify.s, can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
+				<td id="sg" v-if="layerUnl('sg')"><button onclick="showTab('sg')" v-bind:tooltip="((player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl)&&layerUnl('sg')) ? (formatWhole(player.sg.points)+' super-generators') : ('Reach '+formatWhole(tmp.layerReqs.sg)+' generators to unlock')" v-bind:class="{ treeNode: true, sg: true, locked: (player.g.points.lt(tmp.layerReqs.sg)&&!player.sg.unl), notify: player.notify.sg, can: (player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl) }">SG</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.h.unl||player.q.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(3)"></img></td>
-				<td id="hb" v-if="layerUnl('hb')"><button onclick="showTab('hb')" v-bind:tooltip="((player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl)&&layerUnl('hb')) ? (formatWhole(player.hb.points)+' hyper-boosters') : ('Reach '+formatWhole(tmp.layerReqs.hb)+' super-boosters to unlock')" v-bind:class="{ treeNode: true, hb: true, locked: (player.sb.points.lt(tmp.layerReqs.hb)&&!player.hb.unl), can: (player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl) }">HB</button></td>
-				<td id="h" v-if="layerUnl('h')"><button onclick="showTab('h')" v-bind:tooltip="((player.t.energy.gte(tmp.layerReqs.h)||player.h.unl)&&layerUnl('h')) ? (formatWhole(player.h.points)+' hindrance spirit') : ('Reach '+format(tmp.layerReqs.h)+' time energy to unlock')" v-bind:class="{ treeNode: true, h: true, locked: (player.t.energy.lt(tmp.layerReqs.h)&&!player.h.unl), can: (player.t.energy.gte(tmp.layerReqs.h)||player.h.unl) }">H</button></td>
-				<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
-				<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
+				<td id="hb" v-if="layerUnl('hb')"><button onclick="showTab('hb')" v-bind:tooltip="((player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl)&&layerUnl('hb')) ? (formatWhole(player.hb.points)+' hyper-boosters') : ('Reach '+formatWhole(tmp.layerReqs.hb)+' super-boosters to unlock')" v-bind:class="{ treeNode: true, hb: true, locked: (player.sb.points.lt(tmp.layerReqs.hb)&&!player.hb.unl), notify: player.notify.hb, can: (player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl) }">HB</button></td>
+				<td id="h" v-if="layerUnl('h')"><button onclick="showTab('h')" v-bind:tooltip="((player.t.energy.gte(tmp.layerReqs.h)||player.h.unl)&&layerUnl('h')) ? (formatWhole(player.h.points)+' hindrance spirit') : ('Reach '+format(tmp.layerReqs.h)+' time energy to unlock')" v-bind:class="{ treeNode: true, h: true, locked: (player.t.energy.lt(tmp.layerReqs.h)&&!player.h.unl), notify: player.notify.h, can: (player.t.energy.gte(tmp.layerReqs.h)||player.h.unl) }">H</button></td>
+				<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), notify: player.notify.q, can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
+				<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), notify: player.notify.ss, can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.m.unl||player.ba.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(4)"></img></td>
-				<td id="m" v-if="layerUnl('m')"><button onclick="showTab('m')" v-bind:tooltip="((player.h.points.gte(tmp.layerReqs.m)||player.m.unl)&&layerUnl('m')) ? (formatWhole(player.m.points)+' magic') : ('Reach '+format(tmp.layerReqs.m)+' hindrance spirit to unlock')" v-bind:class="{ treeNode: true, m: true, locked: (player.h.points.lt(tmp.layerReqs.m)&&!player.m.unl), can: (player.h.points.gte(tmp.layerReqs.m)||player.m.unl) }">M</button></td>
+				<td id="m" v-if="layerUnl('m')"><button onclick="showTab('m')" v-bind:tooltip="((player.h.points.gte(tmp.layerReqs.m)||player.m.unl)&&layerUnl('m')) ? (formatWhole(player.m.points)+' magic') : ('Reach '+format(tmp.layerReqs.m)+' hindrance spirit to unlock')" v-bind:class="{ treeNode: true, m: true, locked: (player.h.points.lt(tmp.layerReqs.m)&&!player.m.unl), notify: player.notify.m, can: (player.h.points.gte(tmp.layerReqs.m)||player.m.unl) }">M</button></td>
 				<td id="ps" v-if="layerUnl('ps')"><button class="treeNode ps can">PS</button></td>
-				<td id="ba" v-if="layerUnl('ba')"><button onclick="showTab('ba')" v-bind:tooltip="((player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl)&&layerUnl('ba')) ? (formatWhole(player.ba.points)+' balance energy') : ('Reach '+format(tmp.layerReqs.ba)+' quirks to unlock')" v-bind:class="{ treeNode: true, ba: true, locked: (player.q.points.lt(tmp.layerReqs.ba)&&!player.ba.unl), can: (player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl) }">BA</button></td>
+				<td id="ba" v-if="layerUnl('ba')"><button onclick="showTab('ba')" v-bind:tooltip="((player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl)&&layerUnl('ba')) ? (formatWhole(player.ba.points)+' balance energy') : ('Reach '+format(tmp.layerReqs.ba)+' quirks to unlock')" v-bind:class="{ treeNode: true, ba: true, locked: (player.q.points.lt(tmp.layerReqs.ba)&&!player.ba.unl), notify: player.notify.ba, can: (player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl) }">BA</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
@@ -381,92 +382,92 @@
 				You have <h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_RES[layer]}}<span v-if="Object.keys(LAYER_EFFS).includes(layer)">, {{getLayerEffDesc(layer)}}</span>
 				<br><br>
 				<div v-if="layer=='b'">
-					<table><tr><td v-if="milestoneShown(player.b.best.gte(8))" v-bind:class="{ milestone: player.b.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.b.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }">8 Boosters<br>Keep Prestige Upgrades on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.b.best.gte(15))" v-bind:class="{ milestone: player.b.best.lt(15), milestoneDone: player.b.best.gte(15) }">15 Boosters<br>You can buy max Boosters</td></tr></table>
+					<table><tr><td v-if="milestoneShown(player.b.best.gte(8))" v-bind:class="{ milestone: player.b.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.b.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }"><b>8 Boosters</b><br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.b.best.gte(15))" v-bind:class="{ milestone: player.b.best.lt(15), milestoneDone: player.b.best.gte(15) }"><b>15 Boosters</b><br>You can buy max Boosters</td></tr></table>
 				</div>
 				<div v-if="layer=='g'">
 					You have {{format(player.g.power)}} Generator Power, which multiplies Point gain by {{format(tmp.genPowEff)}}<br><br>
-					<table><tr><td v-if="milestoneShown(player.g.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.g.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.g.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }">8 Generators<br>Keep Prestige Upgrades on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.g.best.gte(10))" v-bind:class="{ milestone: player.g.best.lt(10), milestoneDone: player.g.best.gte(10) }">10 Generators<br>Gain 100% of Prestige Point gain every second</td></tr>
-					<tr><td v-if="milestoneShown(player.g.best.gte(15))" v-bind:class="{ milestone: player.g.best.lt(15), milestoneDone: player.g.best.gte(15) }">15 Generators<br>You can buy max Generators</td></tr></table>
+					<table><tr><td v-if="milestoneShown(player.g.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.g.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.g.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }"><b>8 Generators</b><br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.g.best.gte(10))" v-bind:class="{ milestone: player.g.best.lt(10), milestoneDone: player.g.best.gte(10) }"><b>10 Generators</b><br>Gain 100% of Prestige Point gain every second</td></tr>
+					<tr><td v-if="milestoneShown(player.g.best.gte(15))" v-bind:class="{ milestone: player.g.best.lt(15), milestoneDone: player.g.best.gte(15) }"><b>15 Generators</b><br>You can buy max Generators</td></tr></table>
 				</div>
 				<div v-if="layer=='e'">
-					<table><tr><td v-if="milestoneShown(player.e.best.gte(2))" v-bind:class="{ milestone: player.e.best.lt(2), milestoneDone: player.e.best.gte(2) }">2 enhance points<br>Keep Booster/Generator milestones on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.e.best.lt(10)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1) }">10 enhance points<br>Keep Prestige Upgrades on reset</td></tr></table><br><br>
+					<table><tr><td v-if="milestoneShown(player.e.best.gte(2))" v-bind:class="{ milestone: player.e.best.lt(2), milestoneDone: player.e.best.gte(2) }"><b>2 enhance points</b><br>Keep Booster/Generator milestones on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.e.best.lt(10)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1) }"><b>10 enhance points</b><br>Keep Prestige Upgrades on reset</td></tr></table><br><br>
 					<button v-bind:class="{ upgBig: true, can: player.e.points.gte(getEnhancerCost()), locked: player.e.points.lt(getEnhancerCost()), e: true }" onclick="buyEnhancer()">Buy an Enhancer<br>Cost: {{formatWhole(getEnhancerCost())}} Enhance Points<br>Amount: {{formatWhole(player.e.enhancers.sub(tmp.subbedEnh))}}<br>Multiplies Prestige Point gain by {{format(tmp.enhEff)}}<br>Adds<span v-if="player.q.upgrades.includes(53)"> and multiplies</span> to base of Booster/Generator effects by {{format(tmp.enhEff2)}}</button>
 				</div>
 				<div v-if="layer=='t'">
 					You have {{format(player.t.energy)}} Time Energy, which multiplies Point gain & Prestige Point gain by {{format(tmp.timeEff)}}<br><br>
-					<table><tr><td v-if="milestoneShown(player.t.best.gte(2))" v-bind:class="{ milestone: player.t.best.lt(2), milestoneDone: player.t.best.gte(2) }">2 time capsules<br>Keep Booster/Generator milestones on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.t.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.t.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.t.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }">3 time capsules<br>Keep Prestige Upgrades on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.t.best.gte(4))" v-bind:class="{ milestone: player.t.best.lt(4), milestoneDone: player.t.best.gte(4) }">4 time capsules<br>Keep Booster Upgrades on all row 3 resets</td></tr>
-					<tr><td v-if="milestoneShown(player.t.best.gte(5), true)" v-bind:class="{ milestone: player.t.best.lt(5), milestoneDone: player.t.best.gte(5) }">5 time capsules<br>Automatically purchase Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.t.best.gte(5)" class="smallUpg can b" onclick="toggleAuto('b')">{{player.b.auto?"ON":"OFF"}}</button></td></tr>
-					<tr><td v-if="milestoneShown(player.t.best.gte(12))" v-bind:class="{ milestone: player.t.best.lt(12), milestoneDone: player.t.best.gte(12) }">12 time capsules<br>Boosters reset nothing</td></tr>
+					<table><tr><td v-if="milestoneShown(player.t.best.gte(2))" v-bind:class="{ milestone: player.t.best.lt(2), milestoneDone: player.t.best.gte(2) }"><b>2 time capsules</b><br>Keep Booster/Generator milestones on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.t.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.t.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.t.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }"><b>3 time capsules</b><br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.t.best.gte(4))" v-bind:class="{ milestone: player.t.best.lt(4), milestoneDone: player.t.best.gte(4) }"><b>4 time capsules</b><br>Keep Booster Upgrades on all row 3 resets</td></tr>
+					<tr><td v-if="milestoneShown(player.t.best.gte(5), true)" v-bind:class="{ milestone: player.t.best.lt(5), milestoneDone: player.t.best.gte(5) }"><b>5 time capsules</b><br>Automatically purchase Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.t.best.gte(5)" class="smallUpg can b" onclick="toggleAuto('b')">{{player.b.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-if="milestoneShown(player.t.best.gte(12))" v-bind:class="{ milestone: player.t.best.lt(12), milestoneDone: player.t.best.gte(12) }"><b>12 time capsules</b><br>Boosters reset nothing</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: (player.b.points.gte(getExtCapsuleCost())&&player.t.unl), locked: (player.b.points.lt(getExtCapsuleCost())||!player.t.unl), t: true }" onclick="buyExtCapsule()">Buy an extra Time Capsule<br>Cost: {{formatWhole(getExtCapsuleCost())}} Boosters<br>Amount: {{formatWhole(player.t.extCapsules)}}</button>
 				</div>
 				<div v-if="layer=='s'">
 					You have {{formatWhole(getSpace())}} Space remaining for Space Buildings.<br><br>
-					<table><tr><td v-if="milestoneShown(player.s.best.gte(2))" v-bind:class="{ milestone: player.s.best.lt(2), milestoneDone: player.s.best.gte(2) }">2 space energy<br>Keep Booster/Generator milestones on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.s.best.gte(3)||player.h.best.gte(1)||player.h.best.gte(1))" v-bind:class="{ milestone: player.s.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.s.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }">3 space energy<br>Keep Prestige Upgrades on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.s.best.gte(4))" v-bind:class="{ milestone: player.s.best.lt(4), milestoneDone: player.s.best.gte(4) }">4 space energy<br>Keep Generator Upgrades on all row 3 resets</td></tr>
-					<tr><td v-if="milestoneShown(player.s.best.gte(5), true)" v-bind:class="{ milestone: player.s.best.lt(5), milestoneDone: player.s.best.gte(5) }">5 space energy<br>Automatically purchase Generators&nbsp;&nbsp;&nbsp;<button v-if="player.s.best.gte(5)" class="smallUpg can g" onclick="toggleAuto('g')">{{player.g.auto?"ON":"OFF"}}</button></td></tr>
-					<tr><td v-if="milestoneShown(player.s.best.gte(12))" v-bind:class="{ milestone: player.s.best.lt(12), milestoneDone: player.s.best.gte(12) }">12 space energy<br>Generators reset nothing</td></tr>
+					<table><tr><td v-if="milestoneShown(player.s.best.gte(2))" v-bind:class="{ milestone: player.s.best.lt(2), milestoneDone: player.s.best.gte(2) }"><b>2 space energy</b><br>Keep Booster/Generator milestones on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.s.best.gte(3)||player.h.best.gte(1)||player.h.best.gte(1))" v-bind:class="{ milestone: player.s.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.s.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }"><b>3 space energy</b><br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.s.best.gte(4))" v-bind:class="{ milestone: player.s.best.lt(4), milestoneDone: player.s.best.gte(4) }"><b>4 space energy</b><br>Keep Generator Upgrades on all row 3 resets</td></tr>
+					<tr><td v-if="milestoneShown(player.s.best.gte(5), true)" v-bind:class="{ milestone: player.s.best.lt(5), milestoneDone: player.s.best.gte(5) }"><b>5 space energy</b><br>Automatically purchase Generators&nbsp;&nbsp;&nbsp;<button v-if="player.s.best.gte(5)" class="smallUpg can g" onclick="toggleAuto('g')">{{player.g.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-if="milestoneShown(player.s.best.gte(12))" v-bind:class="{ milestone: player.s.best.lt(12), milestoneDone: player.s.best.gte(12) }"><b>12 space energy</b><br>Generators reset nothing</td></tr>
 					</table><br><br>
 					You have {{ format(player.g.power) }} Generator Power<br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<div class="upgRow">
 						<div v-for="id in 5">
-							<button v-if="tmp.sbUnl>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)">Building {{id}}<br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power<br>Effect: {{getSpaceBuildingEffDesc(id)}}</button><br><br>
+							<button v-if="tmp.sbUnl>=id" v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)"><h3>Building {{id}}</h3><br>Level: {{formatWhole(player.s.buildings[id])}}<br>Effect: {{getSpaceBuildingEffDesc(id)}}<br><br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power</button><br><br>
 							<button v-if="tmp.sbUnl>=id&&player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: player.s.buildings[id].gte(1), locked: player.s.buildings[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
 							<button v-if="tmp.sbUnl>=id&&player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: player.s.buildings[id].gte(1), locked: player.s.buildings[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
 						</div>
 					</div>
 				</div>
 				<div v-if="layer=='sb'">
-					<table><tr><td v-if="milestoneShown(player.sb.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.sb.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.sb.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }">3 Super-Boosters<br>Keep Prestige Upgrades on reset</td></tr>
-					<tr><td v-if="milestoneShown(player.sb.best.gte(4))" v-bind:class="{ milestone: player.sb.best.lt(4), milestoneDone: player.sb.best.gte(4) }">4 Super-Boosters<br>Keep Booster/Generator milestones on reset</td></tr></table>
+					<table><tr><td v-if="milestoneShown(player.sb.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.sb.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.sb.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }"><b>3 Super-Boosters</b><br>Keep Prestige Upgrades on reset</td></tr>
+					<tr><td v-if="milestoneShown(player.sb.best.gte(4))" v-bind:class="{ milestone: player.sb.best.lt(4), milestoneDone: player.sb.best.gte(4) }"><b>4 Super-Boosters</b><br>Keep Booster/Generator milestones on reset</td></tr></table>
 				</div>
 				<div v-if="layer=='sg'">
 					You have {{format(player.sg.power)}} Super-Generator Power, which multiplies the Generator base by {{format(tmp.sGenPowEff)}}<br><br>
 					<table>
-						<tr><td v-if="milestoneShown(player.sg.best.gte(1))" v-bind:class="{ milestone: player.sg.best.lt(1), milestoneDone: player.sg.best.gte(1) }">1 Super-Generator<br>You can buy max Super-Generators, and Super-Generators reset nothing</td></tr>
-						<tr><td v-if="milestoneShown(player.sg.best.gte(2), true)" v-bind:class="{ milestone: player.sg.best.lt(2), milestoneDone: player.sg.best.gte(2) }">2 Super-Generators<br>Automatically purchase Super-Generators&nbsp;&nbsp;&nbsp;<button v-if="player.sg.best.gte(2)" class="smallUpg can sg" onclick="toggleAuto('sg')">{{player.sg.auto?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.sg.best.gte(1))" v-bind:class="{ milestone: player.sg.best.lt(1), milestoneDone: player.sg.best.gte(1) }"><b>1 Super-Generator</b><br>You can buy max Super-Generators, and Super-Generators reset nothing</td></tr>
+						<tr><td v-if="milestoneShown(player.sg.best.gte(2), true)" v-bind:class="{ milestone: player.sg.best.lt(2), milestoneDone: player.sg.best.gte(2) }"><b>2 Super-Generators</b><br>Automatically purchase Super-Generators&nbsp;&nbsp;&nbsp;<button v-if="player.sg.best.gte(2)" class="smallUpg can sg" onclick="toggleAuto('sg')">{{player.sg.auto?"ON":"OFF"}}</button></td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='h'">
-					<table><tr><td v-if="milestoneShown(player.h.best.gte(1))" v-bind:class="{ milestone: player.h.best.lt(1), milestoneDone: player.h.best.gte(1) }">1 Hindrance Spirit<br>Keep Prestige Upgrades on all previous resets, and gain 100x more Enhance Points</td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(2))" v-bind:class="{ milestone: player.h.best.lt(2), milestoneDone: player.h.best.gte(2) }">2 Hindrance Spirit<br>Keep all third row milestones on all fourth row resets, and start with your best-ever Space</td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(4))" v-bind:class="{ milestone: player.h.best.lt(4), milestoneDone: player.h.best.gte(4) }">4 Hindrance Spirit<br>Keep Time, Enhance, and Space Upgrades on all fourth row resets</td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(5), true)" v-bind:class="{ milestone: player.h.best.lt(5), milestoneDone: player.h.best.gte(5) }">5 Hindrance Spirit<br>Automatically purchase Extra Time Capsules&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(5)" class="smallUpg can t" onclick="toggleAuto('t', 'Cap')">{{player.t.autoCap?"ON":"OFF"}}</button></td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(10))" v-bind:class="{ milestone: player.h.best.lt(10), milestoneDone: player.h.best.gte(10) }">10 Hindrance Spirit<br>Keep Prestige & Super-Booster Upgrades on all fourth row resets</td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(15), true)" v-bind:class="{ milestone: player.h.best.lt(15), milestoneDone: player.h.best.gte(15) }">15 Hindrance Spirit<br>Automatically purchase Super-Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(15)" class="smallUpg can sb" onclick="toggleAuto('sb')">{{player.sb.auto?"ON":"OFF"}}</button></td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(25))" v-bind:class="{ milestone: player.h.best.lt(25), milestoneDone: player.h.best.gte(25) }">25 Hindrance Spirit<br>Time resets reset nothing</td></tr>
-					<tr><td v-if="milestoneShown(player.h.best.gte(2500))" v-bind:class="{ milestone: player.h.best.lt(2500), milestoneDone: player.h.best.gte(2500) }">2,500 Hindrance Spirit<br>Super-Boosters reset nothing</td></tr>
+					<table><tr><td v-if="milestoneShown(player.h.best.gte(1))" v-bind:class="{ milestone: player.h.best.lt(1), milestoneDone: player.h.best.gte(1) }"><b>1 Hindrance Spirit</b><br>Keep Prestige Upgrades on all previous resets, and gain 100x more Enhance Points</td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(2))" v-bind:class="{ milestone: player.h.best.lt(2), milestoneDone: player.h.best.gte(2) }"><b>2 Hindrance Spirit</b><br>Keep all third row milestones on all fourth row resets, and start with your best-ever Space</td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(4))" v-bind:class="{ milestone: player.h.best.lt(4), milestoneDone: player.h.best.gte(4) }"><b>4 Hindrance Spirit</b><br>Keep Time, Enhance, and Space Upgrades on all fourth row resets</td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(5), true)" v-bind:class="{ milestone: player.h.best.lt(5), milestoneDone: player.h.best.gte(5) }"><b>5 Hindrance Spirit</b><br>Automatically purchase Extra Time Capsules&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(5)" class="smallUpg can t" onclick="toggleAuto('t', 'Cap')">{{player.t.autoCap?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(10))" v-bind:class="{ milestone: player.h.best.lt(10), milestoneDone: player.h.best.gte(10) }"><b>10 Hindrance Spirit</b><br>Keep Prestige & Super-Booster Upgrades on all fourth row resets</td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(15), true)" v-bind:class="{ milestone: player.h.best.lt(15), milestoneDone: player.h.best.gte(15) }"><b>15 Hindrance Spirit</b><br>Automatically purchase Super-Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(15)" class="smallUpg can sb" onclick="toggleAuto('sb')">{{player.sb.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(25))" v-bind:class="{ milestone: player.h.best.lt(25), milestoneDone: player.h.best.gte(25) }"><b>25 Hindrance Spirit</b><br>Time resets reset nothing</td></tr>
+					<tr><td v-if="milestoneShown(player.h.best.gte(2500))" v-bind:class="{ milestone: player.h.best.lt(2500), milestoneDone: player.h.best.gte(2500) }"><b>2,500 Hindrance Spirit</b><br>Super-Boosters reset nothing</td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='q'">
 					You have {{format(player.q.energy)}} Quirk Energy (generated by Quirk Layers), which multiplies Point & Generator Power gain by {{format(tmp.quirkEff)}}<br><br>
-					<table><tr><td v-if="milestoneShown(player.q.best.gte(1))" v-bind:class="{ milestone: player.q.best.lt(1), milestoneDone: player.q.best.gte(1) }">1 Quirk<br>Keep Prestige Upgrades on all previous resets, and gain 100x more Enhance Points</td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(2))" v-bind:class="{ milestone: player.q.best.lt(2), milestoneDone: player.q.best.gte(2) }">2 Quirks<br>You can buy max Time Capsules & Space Energy</td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(4))" v-bind:class="{ milestone: player.q.best.lt(4), milestoneDone: player.q.best.gte(4) }">4 Quirks<br>Keep Space Buildings on all fourth row resets</td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(5), true)" v-bind:class="{ milestone: player.q.best.lt(5), milestoneDone: player.q.best.gte(5) }">5 Quirks<br>Automatically purchase Enhancers&nbsp;&nbsp;&nbsp;<button v-if="player.q.best.gte(5)" class="smallUpg can e" onclick="toggleAuto('e')">{{player.e.auto?"ON":"OFF"}}</button></td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(10), true)" v-bind:class="{ milestone: player.q.best.lt(10), milestoneDone: player.q.best.gte(10) }">10 Quirks<br>Automatically purchase Time Capsules & Space Energy<br><button v-if="player.q.best.gte(10)" class="smallUpg can t" onclick="toggleAuto('t')">{{player.t.auto?"ON":"OFF"}}</button>&nbsp;<button v-if="player.q.best.gte(10)" class="smallUpg can s" onclick="toggleAuto('s')">{{player.s.auto?"ON":"OFF"}}</button></td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(15))" v-bind:class="{ milestone: player.q.best.lt(15), milestoneDone: player.q.best.gte(15) }">15 Quirks<br>Gain 100% of Enhance Point gain every second</td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(25))" v-bind:class="{ milestone: player.q.best.lt(25), milestoneDone: player.q.best.gte(25) }">25 Quirks<br>Space resets reset nothing</td></tr>
-					<tr><td v-if="milestoneShown(player.q.best.gte(2500))" v-bind:class="{ milestone: player.q.best.lt(2500), milestoneDone: player.q.best.gte(2500) }">2,500 Quirks<br>You can destroy individual Space Buildings</td></tr>
+					<table><tr><td v-if="milestoneShown(player.q.best.gte(1))" v-bind:class="{ milestone: player.q.best.lt(1), milestoneDone: player.q.best.gte(1) }"><b>1 Quirk</b><br>Keep Prestige Upgrades on all previous resets, and gain 100x more Enhance Points</td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(2))" v-bind:class="{ milestone: player.q.best.lt(2), milestoneDone: player.q.best.gte(2) }"><b>2 Quirks</b><br>You can buy max Time Capsules & Space Energy</td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(4))" v-bind:class="{ milestone: player.q.best.lt(4), milestoneDone: player.q.best.gte(4) }"><b>4 Quirks</b><br>Keep Space Buildings on all fourth row resets</td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(5), true)" v-bind:class="{ milestone: player.q.best.lt(5), milestoneDone: player.q.best.gte(5) }"><b>5 Quirks</b><br>Automatically purchase Enhancers&nbsp;&nbsp;&nbsp;<button v-if="player.q.best.gte(5)" class="smallUpg can e" onclick="toggleAuto('e')">{{player.e.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(10), true)" v-bind:class="{ milestone: player.q.best.lt(10), milestoneDone: player.q.best.gte(10) }"><b>10 Quirks</b><br>Automatically purchase Time Capsules & Space Energy<br><button v-if="player.q.best.gte(10)" class="smallUpg can t" onclick="toggleAuto('t')">{{player.t.auto?"ON":"OFF"}}</button>&nbsp;<button v-if="player.q.best.gte(10)" class="smallUpg can s" onclick="toggleAuto('s')">{{player.s.auto?"ON":"OFF"}}</button></td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(15))" v-bind:class="{ milestone: player.q.best.lt(15), milestoneDone: player.q.best.gte(15) }"><b>15 Quirks</b><br>Gain 100% of Enhance Point gain every second</td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(25))" v-bind:class="{ milestone: player.q.best.lt(25), milestoneDone: player.q.best.gte(25) }"><b>25 Quirks</b><br>Space resets reset nothing</td></tr>
+					<tr><td v-if="milestoneShown(player.q.best.gte(2500))" v-bind:class="{ milestone: player.q.best.lt(2500), milestoneDone: player.q.best.gte(2500) }"><b>2,500 Quirks</b><br>You can destroy individual Space Buildings</td></tr>
 					</table><br><br>
 					<button v-bind:class="{ upgBig: true, can: player.q.points.gte(getQuirkLayerCost()), locked: player.q.points.lt(getQuirkLayerCost()), q: true }" onclick="buyQuirkLayer()">Increment your Quirk Layer<br>Cost: {{formatWhole(getQuirkLayerCost())}} Quirks<br>Layers: {{formatWhole(player.q.layers)}}</button>
 				</div>
 				<div v-if="layer=='hb'">
 					<table>
-						<tr><td v-if="milestoneShown(player.hb.best.gte(1))" v-bind:class="{ milestone: player.hb.best.lt(1), milestoneDone: player.hb.best.gte(1) }">1 Hyper-Booster<br>You can buy max Super-Boosters</td></tr>
+						<tr><td v-if="milestoneShown(player.hb.best.gte(1))" v-bind:class="{ milestone: player.hb.best.lt(1), milestoneDone: player.hb.best.gte(1) }"><b>1 Hyper-Booster</b><br>You can buy max Super-Boosters</td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='ss'">
 					You have {{format(player.ss.subspace)}} Subspace, which provides you with {{formatWhole(tmp.ssEff1)}} extra Space, makes all Space Buildings {{format(tmp.ssEff2)}}x cheaper, and makes all Space Buildings {{format(tmp.ssEff3.sub(1).times(100))}}% stronger<br><br>
 					<table>
-						<tr><td v-if="milestoneShown(player.ss.best.gte(1), true)" v-bind:class="{ milestone: player.ss.best.lt(1), milestoneDone: player.ss.best.gte(1) }">1 Subspace Energy<br>Automatically purchase Space Buildings&nbsp;&nbsp;&nbsp;<button v-if="player.ss.best.gte(1)" class="smallUpg can s" onclick="toggleAuto('s', 'Build')">{{player.s.autoBuild?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.ss.best.gte(1), true)" v-bind:class="{ milestone: player.ss.best.lt(1), milestoneDone: player.ss.best.gte(1) }"><b>1 Subspace Energy</b><br>Automatically purchase Space Buildings&nbsp;&nbsp;&nbsp;<button v-if="player.ss.best.gte(1)" class="smallUpg can s" onclick="toggleAuto('s', 'Build')">{{player.s.autoBuild?"ON":"OFF"}}</button></td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='m'">
@@ -482,12 +483,12 @@
 					</div>
 					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}<br><br>
 					<table>
-						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }">1 Magic<br>Keep row 4 milestones on all resets</td></tr>
-						<tr><td v-if="milestoneShown(player.m.best.gte(2))" v-bind:class="{ milestone: player.m.best.lt(2), milestoneDone: player.m.best.gte(2) }">2 Magic<br>Keep Hindrance completions on all resets</td></tr>
-						<tr><td v-if="milestoneShown(player.m.best.gte(3))" v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }">3 Magic<br>Gain 100% of Hindrance Spirit & Quirk gain every second</td></tr>
-						<tr><td v-if="milestoneShown(player.m.best.gte(4), true)" v-bind:class="{ milestone: player.m.best.lt(4), milestoneDone: player.m.best.gte(4) }">4 Magic<br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
-						<tr><td v-if="milestoneShown(player.m.best.gte(1000), true)" v-bind:class="{ milestone: player.m.best.lt(1000), milestoneDone: player.m.best.gte(1000) }">1,000 Magic<br>Automatically cast Spells&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(1000)" class="smallUpg can m" onclick="toggleAuto('m')">{{player.m.auto?"ON":"OFF"}}</button></td></tr>
-						<tr><td v-if="milestoneShown(player.m.best.gte(2.5e9))" v-bind:class="{ milestone: player.m.best.lt(2.5e9), milestoneDone: player.m.best.gte(2.5e9) }">2.5e9 Magic<br>Gain 100% of Hex gain every second, and Spells last 10x longer</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }"><b>1 Magic</b><br>Keep row 4 milestones on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(2))" v-bind:class="{ milestone: player.m.best.lt(2), milestoneDone: player.m.best.gte(2) }"><b>2 Magic</b><br>Keep Hindrance completions on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(3))" v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }"><b>3 Magic</b><br>Gain 100% of Hindrance Spirit & Quirk gain every second</td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(4), true)" v-bind:class="{ milestone: player.m.best.lt(4), milestoneDone: player.m.best.gte(4) }"><b>4 Magic</b><br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(1000), true)" v-bind:class="{ milestone: player.m.best.lt(1000), milestoneDone: player.m.best.gte(1000) }"><b>1,000 Magic</b><br>Automatically cast Spells&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(1000)" class="smallUpg can m" onclick="toggleAuto('m')">{{player.m.auto?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.m.best.gte(2.5e9))" v-bind:class="{ milestone: player.m.best.lt(2.5e9), milestoneDone: player.m.best.gte(2.5e9) }"><b>2.5e9 Magic</b><br>Gain 100% of Hex gain every second, and Spells last 10x longer</td></tr>
 					</table>
 				</div>
 				<div v-if="layer=='ba'">
@@ -496,21 +497,21 @@
 					You have {{format(player.ba.negativity)}} Negativity<br>
 					Your Positivity & Negativity are multiplying Balance Power gain by {{format(tmp.balEff2)}}<br><br>
 					<table>
-						<tr><td v-if="milestoneShown(player.ba.best.gte(1))" v-bind:class="{ milestone: player.ba.best.lt(1), milestoneDone: player.ba.best.gte(1) }">1 Balance Energy<br>Keep row 4 milestones on all resets</td></tr>
-						<tr><td v-if="milestoneShown(player.ba.best.gte(2))" v-bind:class="{ milestone: player.ba.best.lt(2), milestoneDone: player.ba.best.gte(2) }">2 Balance Energy<br>Keep Quirk Upgrades on all resets</td></tr>
-						<tr><td v-if="milestoneShown(player.ba.best.gte(3), true)" v-bind:class="{ milestone: player.ba.best.lt(3), milestoneDone: player.ba.best.gte(3) }">3 Balance Energy<br>Automatically purchase Quirk Layers&nbsp;&nbsp;&nbsp;<button v-if="player.ba.best.gte(3)" class="smallUpg can q" onclick="toggleAuto('q')">{{player.q.auto?"ON":"OFF"}}</button></td></tr>
-						<tr><td v-if="milestoneShown(player.ba.best.gte(5))" v-bind:class="{ milestone: player.ba.best.lt(5), milestoneDone: player.ba.best.gte(5) }">5 Balance Energy<br>Keep Hyper-Booster & Subspace Upgrades on all resets</td></tr>
-						<tr><td v-if="milestoneShown(player.ba.best.gte(8))" v-bind:class="{ milestone: player.ba.best.lt(8), milestoneDone: player.ba.best.gte(8) }">8 Balance Energy<br>You can buy max Hyper-Boosters & Subspace Energy, and Hyper-Boosters/Subspace Energy reset nothing</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(1))" v-bind:class="{ milestone: player.ba.best.lt(1), milestoneDone: player.ba.best.gte(1) }"><b>1 Balance Energy</b><br>Keep row 4 milestones on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(2))" v-bind:class="{ milestone: player.ba.best.lt(2), milestoneDone: player.ba.best.gte(2) }"><b>2 Balance Energy</b><br>Keep Quirk Upgrades on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(3), true)" v-bind:class="{ milestone: player.ba.best.lt(3), milestoneDone: player.ba.best.gte(3) }"><b>3 Balance Energy</b><br>Automatically purchase Quirk Layers&nbsp;&nbsp;&nbsp;<button v-if="player.ba.best.gte(3)" class="smallUpg can q" onclick="toggleAuto('q')">{{player.q.auto?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(5))" v-bind:class="{ milestone: player.ba.best.lt(5), milestoneDone: player.ba.best.gte(5) }"><b>5 Balance Energy</b><br>Keep Hyper-Booster & Subspace Upgrades on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.ba.best.gte(8))" v-bind:class="{ milestone: player.ba.best.lt(8), milestoneDone: player.ba.best.gte(8) }"><b>8 Balance Energy</b><br>You can buy max Hyper-Boosters & Subspace Energy, and Hyper-Boosters/Subspace Energy reset nothing</td></tr>
 					</table>
 				</div>
 				<br><br><br>
-				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">Reset for +{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</button>
-				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">Reset for +{{formatWhole(tmp.resetGain[layer])}} {{LAYER_RES[layer]}}<br>Req: {{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
+				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">Reset for +<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</button>
+				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">Reset for +<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br>Req: {{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
 				<br><br><br>
 				<div class="upgTable">
 					<div v-for="row in LAYER_UPGS[layer].rows" class="upgRow">
 						<div v-for="col in LAYER_UPGS[layer].cols" class="upgAlign">
-							<button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span></button>
+							<button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span><br><br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}</button>
 						</div>
 					</div>
 				</div>

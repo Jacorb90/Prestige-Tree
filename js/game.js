@@ -12,6 +12,7 @@ function getStartPlayer() {
 		tab: "tree",
 		time: Date.now(),
 		autosave: true,
+		notify: {},
 		msDisplay: "always",
 		offlineProd: true,
 		versionType: "release",
@@ -1550,6 +1551,7 @@ function checkForVars() {
 	if (player.m.casted === undefined) player.m.casted = start.m.casted
 	if (player.ba === undefined) player.ba = start.ba
 	if (player.offlineProd === undefined) player.offlineProd = true
+	if (player.notify === undefined) player.notify = {}
 }
 
 function convertToDecimal() {
@@ -1649,10 +1651,25 @@ function formatTime(s) {
 	else return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
 }
 
+var onTreeTab = true
 function showTab(name) {
 	if (!TAB_REQS[name]()) return
+	var toTreeTab = name == "tree"
 	player.tab = name
-	if (name=="tree") needCanvasUpdate = true;
+	
+	if (toTreeTab != onTreeTab) {
+		document.getElementById("treeTab").className = "col " + (toTreeTab ? "full" : "left")
+		document.getElementById("vl").className = "vl " + (toTreeTab ? "none" : "")
+		onTreeTab = toTreeTab
+		resizeCanvas()
+	}
+	delete player.notify[name]
+}
+
+function notifyLayer(name) {
+	if (!TAB_REQS[name]()) return
+	if (player.tab == name) return
+	player.notify[name] = 1
 }
 
 function canBuyMax(layer) {
