@@ -23,6 +23,14 @@
 		</div>
 		<div v-if="player.tab=='changelog_beta'" class="col right">
 			<button class="back" onclick="showTab('changelog')">←</button><br>
+			<h3>Beta v1.2 Alpha 12</h3>
+			<ul>
+				<li>Balanced up to 1e9,200,000 Points, 5e18 Magic, and 1e16 Balance Energy</li>
+			</ul><br>
+			<h3>Beta v1.2 Alpha 11</h3>
+			<ul>
+				<li>Balanced up to 1e7,650,000 Points, 1e16 Magic, and 4e13 Balance Energy</li>
+			</ul><br>
 			<h3>Beta v1.2 Alpha 10</h3>
 			<ul>
 				<li>Made a few visual fixes</li>
@@ -454,12 +462,15 @@
 				</div>
 				<div v-if="layer=='m'">
 					<br>
-					Note: Activating a Spell uses 1 Magic.<br><br>
+					Note: Activating a Spell costs Magic.<br><br>
 					<div class="upgRow">
 						<div v-for="id in 3">
-							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(1))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(1)||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>Time Left: {{formatTime(player.m.spellTimes[id])}}<br>Effect: {{getSpellDesc(id)}}</button>
+							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(player.m.toCast[id]))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(player.m.toCast[id])||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>Time Left: {{formatTime(player.m.spellTimes[id])}}<br>Effect: {{getSpellDesc(id)}}</button><br><br>
+							<div v-if="player.m.upgrades.includes(41)">
+								<input v-model="player.m.toCast[id]" v-on:change="updateToCast(id)"></input><br><br>
+							</div>
 						</div>
-					</div><br><br>
+					</div>
 					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}<br><br>
 					<table>
 						<tr><td v-if="milestoneShown(player.m.best.gte(1))" v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }">1 Magic<br>Keep row 4 milestones on all resets</td></tr>
