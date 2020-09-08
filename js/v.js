@@ -31,6 +31,7 @@ function loadVue() {
 		  getSpellDesc,
 		  activateSpell,
 		  spellActive,
+		  updateToCast,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,

@@ -140,6 +140,16 @@ function getStartPlayer() {
 				3: 0,
 			},
 			hexes: new Decimal(0),
+			toCast: {
+				1: "1",
+				2: "1",
+				3: "1",
+			},
+			casted: {
+				1: new Decimal(1),
+				2: new Decimal(1),
+				3: new Decimal(1),
+			},
 			upgrades: [],
 		},
 		ba: {
@@ -279,8 +289,8 @@ const LAYER_EFFS = {
 	},
 	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb).times(tmp.sGenPowEff).times((player.ss.upgrades.includes(23) ? LAYER_UPGS.ss[23].currently() : 1)).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
 	t: function() { return {
-		gain: Decimal.pow(3, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
-		limit: Decimal.pow(2, player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
+		gain: Decimal.pow(Decimal.add(3, tmp.attb), player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
+		limit: Decimal.pow(Decimal.add(2, tmp.attb), player.t.points.plus(player.t.extCapsules.plus(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
 	}},
 	sb: function() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
 	sg: function() { return Decimal.pow(Decimal.add(2, addToSGBase()), player.sg.points).sub(1).times(getSuperGenPowerGainMult()).max(0) },
@@ -884,7 +894,7 @@ const LAYER_UPGS = {
 			desc: "Quirk Layers are faster based on your Quirks.",
 			cost: new Decimal(160),
 			unl: function() { return (player.q.upgrades.includes(12)||player.q.upgrades.includes(13))&&player.h.challs.includes(12) },
-			currently: function() { return player.q.points.plus(1).log10().plus(1) },
+			currently: function() { return player.q.points.plus(1).log10().plus(1).pow(player.m.upgrades.includes(42)?1.5:1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		22: {
@@ -1051,7 +1061,7 @@ const LAYER_UPGS = {
 		},
 	},
 	m: {
-		rows: 3,
+		rows: 4,
 		cols: 4,
 		11: {
 			desc: "Hexes boost all Spells.",
@@ -1073,7 +1083,7 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "+"+format(x)+" to base" },
 		},
 		14: {
-			desc: "You get more Hexes when casting Spells based on your best Magic.",
+			desc: "You get more Hexes based on your best Magic.",
 			cost: new Decimal(100),
 			unl: function() { return player.m.upgrades.includes(12) },
 			currently: function() { return player.m.best.div(3).plus(1).pow(0.8) },
@@ -1126,6 +1136,30 @@ const LAYER_UPGS = {
 			desc: "Add 1 free Quirk Layer.",
 			cost: new Decimal(4e10),
 			unl: function() { return player.m.upgrades.includes(32) },
+		},
+		41: {
+			desc: "You can insert more Magic into Spells, making them stronger.",
+			cost: new Decimal(2.5e14),
+			unl: function() { return player.m.upgrades.includes(34) },
+		},
+		42: {
+			desc: "Quirk Upgrade 5 is 50% stronger.",
+			cost: new Decimal(1e15),
+			unl: function() { return player.m.upgrades.includes(34) },
+		},
+		43: {
+			desc: "Spells last longer based on your Hexes.",
+			cost: new Decimal(2e15),
+			unl: function() { return player.m.upgrades.includes(41) },
+			currently: function() { return player.m.hexes.plus(1).log10().plus(1).sqrt().min(86400) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		44: {
+			desc: "Magic adds to the Time Capsule base.",
+			cost: new Decimal(4e15),
+			unl: function() { return player.m.upgrades.includes(41) },
+			currently: function() { return player.m.points.plus(1).log10().div(10) },
+			effDisp: function(x) { return "+"+format(x) },
 		},
 	},
 	ba: {
@@ -1223,9 +1257,9 @@ const LAYER_UPGS = {
 			unl: function() { return player.ba.upgrades.includes(41)||player.ba.upgrades.includes(42) },
 		},
 		44: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Space Buildings are 50% stronger.",
+			cost: new Decimal(2e12),
+			unl: function() { return player.ba.upgrades.includes(42)||player.ba.upgrades.includes(43) },
 		},
 	},
 }
@@ -1441,6 +1475,8 @@ function checkForVars() {
 	if (player.ss.auto === undefined) player.ss.auto = false
 	if (player.m === undefined) player.m = start.m
 	if (player.m.auto === undefined) player.m.auto = false
+	if (player.m.toCast === undefined) player.m.toCast = start.m.toCast
+	if (player.m.casted === undefined) player.m.casted = start.m.casted
 	if (player.ba === undefined) player.ba = start.ba
 	if (player.offlineProd === undefined) player.offlineProd = true
 }
@@ -1485,6 +1521,7 @@ function convertToDecimal() {
 	player.m.points = new Decimal(player.m.points)
 	player.m.best = new Decimal(player.m.best)
 	player.m.hexes = new Decimal(player.m.hexes)
+	for (let i=1;i<=3;i++) player.m.casted[i] = new Decimal(player.m.casted[i])
 	player.ba.points = new Decimal(player.ba.points)
 	player.ba.best = new Decimal(player.ba.best)
 	player.ba.power = new Decimal(player.ba.power)
@@ -1926,6 +1963,7 @@ function buyUpg(layer, id) {
 	if (layer=="s"&&id==33) player.s.order = 0;
 	if (layer=="hb"&&id==13) player.hb.order = 0;
 	if (layer=="ss"&&id==15) player.ss.order = 0;
+	if (layer=="m"&&id==43) for (let i=1;i<=3;i++) player.m.spellTimes[i] *= LAYER_UPGS.m[43].currently().toNumber()
 }
 
 function getPointGen() {
@@ -2164,6 +2202,12 @@ function maxExtTimeCapsules() {
 	player.t.extCapsules = player.t.extCapsules.max(target)
 }
 
+function addToTimeBase() {
+	let toAdd = new Decimal(0)
+	if (player.m.upgrades.includes(44)) toAdd = toAdd.plus(LAYER_UPGS.m[44].currently())
+	return toAdd
+}
+
 function getSpace() {
 	let baseSpace = player.s.best.pow(1.1).times(3).floor()
 	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(2);
@@ -2210,6 +2254,7 @@ function getSpaceBuildingPow() {
 	if (player.s.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[23].currently())
 	if (player.q.upgrades.includes(41)) pow = pow.times(1.4)
 	if (player.ss.unl) pow = pow.times(tmp.ssEff3)
+	if (player.ba.upgrades.includes(44)) pow = pow.times(1.5)
 	return pow
 }
 
@@ -2690,6 +2735,7 @@ function getSpellPower(x) {
 	if (player.m.upgrades.includes(11)) power = power.times(LAYER_UPGS.m[11].currently())
 	if (player.m.upgrades.includes(21) && (x==2||x==3)) power = power.times(LAYER_UPGS.m[21].currently())
 	if (player.m.upgrades.includes(22) && (x==2)) power = power.times(10)
+	if (player.m.upgrades.includes(41)) power = power.times(player.m.casted[x].max(1).log10().plus(1).log10().div(5).plus(1))
 	return power;
 }
 
@@ -2709,6 +2755,7 @@ function getSpellDesc(x) {
 function getSpellTime() {
 	let time = 20
 	if (player.m.best.gte(2.5e9)) time *= 10
+	if (player.m.upgrades.includes(43)) time *= LAYER_UPGS.m[43].currently().toNumber()
 	return time
 }
 
@@ -2718,13 +2765,17 @@ function spellActive(x) {
 	return player.m.spellTimes[x]>0
 }
 
-function activateSpell(x) {
-	if (!player.m.unl) return
-	if (spellActive(x)) return
-	if (player.m.points.lt(1)) return
-	player.m.points = player.m.points.sub(1)
+function activateSpell(x, force=false) {
+	let toCast = setToCast(player.m.toCast[x])
+	if (!force) {
+		if (!player.m.unl) return
+		if (spellActive(x)) return
+		if (player.m.points.lt(toCast)) return
+	}
+	player.m.points = player.m.points.sub(toCast)
+	player.m.casted[x] = toCast
 	player.m.spellTimes[x] = getSpellTime()
-	player.m.hexes = player.m.hexes.plus(getHexGain())
+	if (!force) player.m.hexes = player.m.hexes.plus(getHexGain())
 }
 
 function getHexGain() {
@@ -2736,6 +2787,29 @@ function getHexGain() {
 function getHexEff() {
 	let eff = player.m.hexes.plus(1).pow(5)
 	return eff;
+}
+
+function isToCastValid(val) {
+	try {
+		val = new Decimal(val).floor()
+		if (val.eq(undefined) || val.eq(null)) return false
+		if (val.lt(1)) return false
+		if (val.gt(player.m.points)) return false
+		return val;
+	} catch(e) {
+		return false;
+	}
+}
+
+function setToCast(val) {
+	if (!player.m.upgrades.includes(41)) return new Decimal(1)
+	let validVal = isToCastValid(val)
+	if (!validVal) return new Decimal(1)
+	else return validVal
+}
+
+function updateToCast(id) {
+	activateSpell(id, true)
 }
 
 function getSGenPowEff() {

@@ -41,6 +41,7 @@ function updateTemp() {
 	
 	tmp.freeExtCap = getFreeExtCapsules()
 	tmp.timeEff = getTimeEnergyEff()
+	tmp.attb = addToTimeBase()
 	
 	if (!tmp.spaceBuildEff) tmp.spaceBuildEff = {}
 	for (let i=1;i<=5;i++) tmp.spaceBuildEff[i] = getSpaceBuildingEff(i)
