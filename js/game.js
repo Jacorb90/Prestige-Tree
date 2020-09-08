@@ -306,7 +306,7 @@ const LAYER_EFFS = {
 		let points1 = player.ba.points
 		if (points1.gte(1e12)) points1 = points1.log10().pow(2).times(1e12/144).min(points1)
 		return {
-			power: points1.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1).pow(player.ba.upgrades.includes(41)?2:1),
+			power: points1.pow(0.2).pow(tmp.baExp ? tmp.baExp : 1).pow(player.ba.upgrades.includes(41)?2:1).times(player.ba.upgrades.includes(54) ?  LAYER_UPGS.ba[54].currently() : 1),
 			pos: player.ba.points.pow(0.7).pow(tmp.baExp ? tmp.baExp : 1),
 			neg: player.ba.points.pow(0.65).times(0.4).pow(tmp.baExp ? tmp.baExp : 1),
 		}
@@ -551,7 +551,7 @@ const LAYER_UPGS = {
 			desc: "Subspace boosts Generator Power gain.",
 			cost: new Decimal(1130),
 			unl: function() { return player.ss.upgrades.includes(21) },
-			currently: function() { return player.ss.subspace.plus(1).pow(40) },
+			currently: function() { return player.ss.subspace.plus(1).pow(40).pow(player.q.upgrades.includes(54)?20:1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -1007,8 +1007,8 @@ const LAYER_UPGS = {
 			unl: function() { return player.ba.upgrades.includes(52) },
 		},
 		54: {
-			desc: "Placeholder",
-			cost: new Decimal(1/0),
+			desc: "Generator Upgrade 15's effect is raised to the power of 20.",
+			cost: new Decimal("1e3125"),
 			unl: function() { return player.ba.upgrades.includes(52) },
 		},
 	},
@@ -1318,16 +1318,18 @@ const LAYER_UPGS = {
 			unl: function() { return player.ba.upgrades.includes(51) },
 		},
 		53: {
-			desc: "The Positivity & Negativity boost to Balance Energy gain is stronger based on your Super-Generator Power.",
+			desc: "The Positivity & Negativity boost to Balance Power gain is stronger based on your Super-Generator Power.",
 			cost: new Decimal(2e19),
 			unl: function() { return player.ba.upgrades.includes(51)&&player.sg.unl },
 			currently: function() { return player.sg.power.plus(1).log10().div(25).plus(1).sqrt() },
 			effDisp: function(x) { return "^"+format(x) },
 		},
 		54: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Balance Power boosts the first Balance Energy effect (even stronger based on your Best Balance Power).",
+			cost: new Decimal(5e25),
+			unl: function() { return player.ba.upgrades.includes(53) },
+			currently: function() { return player.ba.power.plus(1).times(player.ba.best.plus(1).sqrt()).cbrt() },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 }
