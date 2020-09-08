@@ -746,7 +746,7 @@ const LAYER_UPGS = {
 		},
 	},
 	s: {
-		rows: 3,
+		rows: 4,
 		cols: 4,
 		11: {
 			desc: "Add a free level to all Space Buildings.",
@@ -820,6 +820,28 @@ const LAYER_UPGS = {
 			currently: function() { return Decimal.pow(Object.values(player.s.buildings).reduce((a,b) => Decimal.add(a,b)), 0.2).div(17.5) },
 			effDisp: function(x) { return "Add "+format(x)+" to exponent" },
 		},
+		41: {
+			desc: "Total Space cheapens Space Buildings.",
+			cost: new Decimal(128),
+			unl: function() { return player.ba.upgrades.includes(51) },
+			currently: function() { return Decimal.pow("1e4000", getSpace().plus(player.s.spent).sqrt()) },
+			effDisp: function(x) { return "/"+format(x) },
+		},
+		42: {
+			desc: "The Space Building cost formula is 40% weaker.",
+			cost: new Decimal(131),
+			unl: function() { return player.ba.upgrades.includes(51) },
+		},
+		43: {
+			desc: "Space Building 2 uses a better formula.",
+			cost: new Decimal(133),
+			unl: function() { return player.ba.upgrades.includes(51) },
+		},
+		44: {
+			desc: "Placeholder",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ba.upgrades.includes(51) },
+		},
 	},
 	sb: {
 		rows: 2,
@@ -866,7 +888,7 @@ const LAYER_UPGS = {
 		cols: 0,
 	},
 	q: {
-		rows: 4,
+		rows: 5,
 		cols: 4,
 		11: {
 			desc: "Quirks & Hindrance Spirit boost Point, Prestige Point, and Enhance Point gain.",
@@ -964,6 +986,28 @@ const LAYER_UPGS = {
 			unl: function() { return player.h.challs.includes(32) },
 			currently: function() { return player.q.energy.plus(1).log10().plus(1) },
 			effDisp: function(x) { return format(x)+"x" },
+		},
+		51: {
+			desc: "Get free Quirk Layers based on your Quirk Energy.",
+			cost: new Decimal("1e2100"),
+			unl: function() { return player.ba.upgrades.includes(52) },
+			currently: function() { return player.q.energy.plus(1).log10().plus(1).log10() },
+			effDisp: function(x) { return "+"+format(x) },
+		},
+		52: {
+			desc: "Placeholder",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ba.upgrades.includes(52) },
+		},
+		53: {
+			desc: "Placeholder",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ba.upgrades.includes(52) },
+		},
+		54: {
+			desc: "Placeholder",
+			cost: new Decimal(1/0),
+			unl: function() { return player.ba.upgrades.includes(52) },
 		},
 	},
 	hb: {
@@ -1163,7 +1207,7 @@ const LAYER_UPGS = {
 		},
 	},
 	ba: {
-		rows: 4,
+		rows: 5,
 		cols: 4,
 		11: {
 			desc: "All Balance Energy effects use better formulas.",
@@ -1260,6 +1304,26 @@ const LAYER_UPGS = {
 			desc: "Space Buildings are 50% stronger.",
 			cost: new Decimal(2e12),
 			unl: function() { return player.ba.upgrades.includes(42)||player.ba.upgrades.includes(43) },
+		},
+		51: {
+			desc: "Unlock 4 new Space Upgrades.",
+			cost: new Decimal(4e13),
+			unl: function() { return player.ba.upgrades.includes(43) },
+		},
+		52: {
+			desc: "Unlock 4 new Quirk Upgrades.",
+			cost: new Decimal(2e14),
+			unl: function() { return player.ba.upgrades.includes(51) },
+		},
+		53: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
+		},
+		54: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl: function() { return false },
 		},
 	},
 }
@@ -2219,13 +2283,15 @@ function getSpace() {
 
 function getSpaceBuildingCostMod() {
 	let mod = new Decimal(1)
-	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mod = new Decimal(0.5)
+	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mod = mod.times(0.5)
+	if (player.s.upgrades.includes(42)) mod = mod.times(0.6)
 	return mod;
 }
 
 function getSpaceBuildingCostMult() {
 	let mult = new Decimal(1)
 	if (player.ss.unl) mult = mult.div(tmp.ssEff2)
+	if (player.s.upgrades.includes(41)) mult = mult.div(LAYER_UPGS.s[41].currently())
 	return mult
 }
 
@@ -2281,8 +2347,9 @@ function getSpaceBuildingEff(x) {
 			if (player.ba.upgrades.includes(42)) ret = ret.pow(LAYER_UPGS.ba[42].currently())
 			return ret;
 			break;
-		case 2: 
-			return bought.sqrt()
+		case 2: 	
+			if (player.s.upgrades.includes(43)) return Decimal.pow(1.0001, bought).times(bought.sqrt())
+			else return bought.sqrt()
 			break;
 		case 3: 
 			return Decimal.pow(1e18, bought.pow(0.9))
@@ -2417,6 +2484,7 @@ function getQuirkLayerMult() {
 
 function getExtraQuirkLayers() {
 	let layers = new Decimal(0);
+	if (player.q.upgrades.includes(51)) layers = layers.plus(LAYER_UPGS.q[51].currently())
 	if (player.m.upgrades.includes(24)) layers = layers.plus(LAYER_UPGS.m[24].currently())
 	if (player.m.upgrades.includes(34)) layers = layers.plus(1)
 	return layers;
