@@ -15,6 +15,11 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>Beta v1.2 Alpha 13</h3>
+			<ul>
+				<li>Reduced a few upgrade costs</li>
+				<li>Balanced up to 1e11,000,000 Points, 5e23 Magic, and 3e20 Balance Energy</li>
+			</ul><br>
 			<h3>Beta v1.2 Alpha 12</h3>
 			<ul>
 				<li>Balanced up to 1e9,200,000 Points, 5e18 Magic, and 1e16 Balance Energy</li>
@@ -375,7 +380,7 @@
 				<div v-if="layer=='e'">
 					<table><tr><td v-if="milestoneShown(player.e.best.gte(2))" v-bind:class="{ milestone: player.e.best.lt(2), milestoneDone: player.e.best.gte(2) }">2 enhance points<br>Keep Booster/Generator milestones on reset</td></tr>
 					<tr><td v-if="milestoneShown(player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1))" v-bind:class="{ milestone: player.e.best.lt(10)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1) }">10 enhance points<br>Keep Prestige Upgrades on reset</td></tr></table><br><br>
-					<button v-bind:class="{ upgBig: true, can: player.e.points.gte(getEnhancerCost()), locked: player.e.points.lt(getEnhancerCost()), e: true }" onclick="buyEnhancer()">Buy an Enhancer<br>Cost: {{formatWhole(getEnhancerCost())}} Enhance Points<br>Amount: {{formatWhole(player.e.enhancers.sub(tmp.subbedEnh))}}<br>Multiplies Prestige Point gain by {{format(tmp.enhEff)}}<br>Adds to base of Booster/Generator effects by {{format(tmp.enhEff2)}}</button>
+					<button v-bind:class="{ upgBig: true, can: player.e.points.gte(getEnhancerCost()), locked: player.e.points.lt(getEnhancerCost()), e: true }" onclick="buyEnhancer()">Buy an Enhancer<br>Cost: {{formatWhole(getEnhancerCost())}} Enhance Points<br>Amount: {{formatWhole(player.e.enhancers.sub(tmp.subbedEnh))}}<br>Multiplies Prestige Point gain by {{format(tmp.enhEff)}}<br>Adds<span v-if="player.q.upgrades.includes(53)"> and multiplies</span> to base of Booster/Generator effects by {{format(tmp.enhEff2)}}</button>
 				</div>
 				<div v-if="layer=='t'">
 					You have {{format(player.t.energy)}} Time Energy, which multiplies Point gain & Prestige Point gain by {{format(tmp.timeEff)}}<br><br>

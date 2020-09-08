@@ -838,8 +838,8 @@ const LAYER_UPGS = {
 			unl: function() { return player.ba.upgrades.includes(51) },
 		},
 		44: {
-			desc: "Placeholder",
-			cost: new Decimal(1/0),
+			desc: "All Space Buildings are 25% stronger.",
+			cost: new Decimal(140),
 			unl: function() { return player.ba.upgrades.includes(51) },
 		},
 	},
@@ -995,13 +995,15 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return "+"+format(x) },
 		},
 		52: {
-			desc: "Placeholder",
-			cost: new Decimal(1/0),
+			desc: "Quirk Layers are faster based on your Quirk Layers.",
+			cost: new Decimal("1e2400"),
 			unl: function() { return player.ba.upgrades.includes(52) },
+			currently: function() { return Decimal.pow(10, player.q.layers) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		53: {
-			desc: "Placeholder",
-			cost: new Decimal(1/0),
+			desc: "The second Enhancer effect also multiplies the Booster/Generator base.",
+			cost: new Decimal("1e2750"),
 			unl: function() { return player.ba.upgrades.includes(52) },
 		},
 		54: {
@@ -1188,19 +1190,19 @@ const LAYER_UPGS = {
 		},
 		42: {
 			desc: "Quirk Upgrade 5 is 50% stronger.",
-			cost: new Decimal(1e15),
+			cost: new Decimal(6e14),
 			unl: function() { return player.m.upgrades.includes(34) },
 		},
 		43: {
 			desc: "Spells last longer based on your Hexes.",
-			cost: new Decimal(2e15),
+			cost: new Decimal(1e15),
 			unl: function() { return player.m.upgrades.includes(41) },
 			currently: function() { return player.m.hexes.plus(1).log10().plus(1).sqrt().min(86400) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		44: {
 			desc: "Magic adds to the Time Capsule base.",
-			cost: new Decimal(4e15),
+			cost: new Decimal(1.5e15),
 			unl: function() { return player.m.upgrades.includes(41) },
 			currently: function() { return player.m.points.plus(1).log10().div(10) },
 			effDisp: function(x) { return "+"+format(x) },
@@ -1307,18 +1309,20 @@ const LAYER_UPGS = {
 		},
 		51: {
 			desc: "Unlock 4 new Space Upgrades.",
-			cost: new Decimal(4e13),
+			cost: new Decimal(2e13),
 			unl: function() { return player.ba.upgrades.includes(43) },
 		},
 		52: {
 			desc: "Unlock 4 new Quirk Upgrades.",
-			cost: new Decimal(2e14),
+			cost: new Decimal(1e14),
 			unl: function() { return player.ba.upgrades.includes(51) },
 		},
 		53: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "The Positivity & Negativity boost to Balance Energy gain is stronger based on your Super-Generator Power.",
+			cost: new Decimal(2e19),
+			unl: function() { return player.ba.upgrades.includes(51)&&player.sg.unl },
+			currently: function() { return player.sg.power.plus(1).log10().div(25).plus(1).sqrt() },
+			effDisp: function(x) { return "^"+format(x) },
 		},
 		54: {
 			desc: "???",
@@ -2059,6 +2063,7 @@ function addToBoosterBase() {
 	if (player.sb.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sb[21].currently())
 	
 	if (player.b.upgrades.includes(31)) toAdd = toAdd.times(LAYER_UPGS.b[31].currently())
+	if (player.q.upgrades.includes(53)) toAdd = toAdd.times(tmp.enhEff2)
 	if (player.sb.unl) toAdd = toAdd.times(tmp.layerEffs.sb)
 	return toAdd
 }
@@ -2085,7 +2090,9 @@ function addToGenBase() {
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
 	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
+		
 	if (player.h.challs.includes(51)) toAdd = toAdd.times(H_CHALLS[51].currently())
+	if (player.q.upgrades.includes(53)) toAdd = toAdd.times(tmp.enhEff2)
 	return toAdd
 }
 
@@ -2318,6 +2325,7 @@ function getSpaceBuildingPow() {
 	if (player.s.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[21].currently())
 	if (player.s.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
 	if (player.s.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[23].currently())
+	if (player.s.upgrades.includes(44)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(1.25)
 	if (player.q.upgrades.includes(41)) pow = pow.times(1.4)
 	if (player.ss.unl) pow = pow.times(tmp.ssEff3)
 	if (player.ba.upgrades.includes(44)) pow = pow.times(1.5)
@@ -2477,6 +2485,7 @@ function getQuirkLayerMult() {
 	if (player.q.upgrades.includes(13)) mult = mult.times(2)
 	if (player.q.upgrades.includes(14)) mult = mult.times(3)
 	if (player.q.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.q[21].currently())
+	if (player.q.upgrades.includes(52)) mult = mult.times(LAYER_UPGS.q[52].currently())
 	if (player.h.challs.includes(52)) mult = mult.times(H_CHALLS[52].currently())
 	if (player.ba.upgrades.includes(13)) mult = mult.times(LAYER_UPGS.ba[13].currently())
 	return mult
@@ -2758,6 +2767,7 @@ function getBalanceTypesEff() {
 	let pos = player.ba.positivity.plus(1).log10().plus(1)
 	let neg = player.ba.negativity.plus(1).log10().plus(1)
 	if (player.ba.upgrades.includes(34)) mod = mod.times(1.5)
+	if (player.ba.upgrades.includes(53)) mod = mod.times(LAYER_UPGS.ba[53].currently())
 	let eff = pos.times(neg).pow(mod)
 	return eff;
 }
