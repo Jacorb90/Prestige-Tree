@@ -146,7 +146,7 @@ h1, h2 {
 
 .p {
 	background-color: #439ea3;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .p_txt {
@@ -156,7 +156,7 @@ h1, h2 {
 
 .b {
 	background-color: #415a9e;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .b_txt {
@@ -166,7 +166,7 @@ h1, h2 {
 
 .g {
 	background-color: #409c6e;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .g_txt {
@@ -176,7 +176,7 @@ h1, h2 {
 
 .e {
 	background-color: #9643a3;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .e_txt {
@@ -186,7 +186,7 @@ h1, h2 {
 
 .t {
 	background-color: #3f993d;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .t_txt {
@@ -196,7 +196,7 @@ h1, h2 {
 
 .s {
 	background-color: white;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .s_txt {
@@ -206,7 +206,7 @@ h1, h2 {
 
 .sb {
 	background-color: #494b99;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .sb_txt {
@@ -216,7 +216,7 @@ h1, h2 {
 
 .h {
 	background-color: #a14040;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .h_txt {
@@ -226,7 +226,7 @@ h1, h2 {
 
 .q {
 	background-color: #ff2bf2;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .q_txt {
@@ -236,7 +236,7 @@ h1, h2 {
 
 .hb {
 	background-color: #513d94;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .hb_txt {
@@ -245,18 +245,18 @@ h1, h2 {
 }
 
 .ss {
-	background-color: white;
-	color: black;
+	background-color: #eff7ff;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .ss_txt {
-	color: white;
-	text-shadow: 0px 0px 10px white;
+	color: #eff7ff;
+	text-shadow: 0px 0px 10px #eff7ff;
 }
 
 .m {
 	background-color: #eb34c0;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .m_txt {
@@ -266,7 +266,7 @@ h1, h2 {
 
 .ba {
 	background-color: #ebc88f;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .ba_txt {
@@ -276,7 +276,7 @@ h1, h2 {
 
 .sg {
 	background-color: #3d997a;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .sg_txt {
@@ -286,27 +286,27 @@ h1, h2 {
 
 .sp {
 	background-color: #007fff;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .l {
 	background-color: #7fbf7f;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .ps {
 	background-color: #b38fbf;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .hs {
 	background-color: #dfdfff;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 .i {
 	background-color: #e5dab7;
-	color: black;
+	color: rgba(0, 0, 0, 0.75);
 }
 
 #optionWheel {
