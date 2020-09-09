@@ -2133,19 +2133,24 @@ function rowReset(row, layer) {
 	}
 }
 
+function addPoints(layer, gain) {
+	player[layer].points = player[layer].points.plus(gain).max(0)
+	player[layer].best = player[layer].best.max(player[layer].points)
+	if (player[layer].total) player[layer].total = player[layer].total.plus(gain)
+}
+
+function generatePoints(layer, diff) {
+	addPoints(layer, tmp.resetGain[layer].times(diff))
+}
+
 function doReset(layer, force=false) {
 	if (!force) {
 		if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return;
 		let gain = tmp.resetGain[layer]
 		if (LAYER_TYPE[layer]=="static") {
 			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
-			player[layer].points = player[layer].points.plus(canBuyMax(layer)?gain:1)
-			if (player[layer].total) player[layer].total = player[layer].total.plus(canBuyMax(layer)?gain:1)
-		} else {
-			player[layer].points = player[layer].points.plus(gain)
-			if (player[layer].total) player[layer].total = player[layer].total.plus(gain)
-		}
-		player[layer].best = player[layer].best.max(player[layer].points)
+			addPoints(layer, canBuyMax(layer)?gain:1)
+		} else addPoints(layer, gain)
 	
 		if (!player[layer].unl) {
 			player[layer].unl = true;
@@ -2157,11 +2162,12 @@ function doReset(layer, force=false) {
 		
 		tmp.layerAmt[layer] = new Decimal(0) // quick fix
 	}
-	
+
 	if ((layer=="b"&&player.t.best.gte(12))||(layer=="g"&&player.s.best.gte(12))) return;
 	if ((layer=="t"&&player.h.best.gte(25))||(layer=="s"&&player.q.best.gte(25))||(layer=="sb"&&player.h.best.gte(2500))||(layer=="sg"&&player.sg.best.gte(1))) return;
 	if ((layer=="hb"&&player.ba.best.gte(8))||(layer=="ss"&&player.ba.best.gte(8))) return;
 	let row = LAYER_ROW[layer]
+	if (!force && row>=3) completeHindrance()
 	if (row==0) rowReset(0, layer)
 	else for (let x=row;x>=1;x--) rowReset(x, layer)
 	
@@ -2827,15 +2833,23 @@ function HCActive(x) {
 function startHindrance(x) {
 	if (!player.h.unl) return
 	if (player.h.active==x) {
-		if (player.points.gte(H_CHALLS[x].goal) && !player.h.challs.includes(x)) {
-			if (x==62) needCanvasUpdate = true;
-			player.h.challs.push(x); 
-		}
+		completeHindrance(x)
 		player.h.active = 0
 	} else {
 		player.h.active = x
 	}
 	doReset("h", true)
+}
+
+function completeHindrance() {
+	var x = player.h.active
+	if (x == 0) return
+	if (!player.points.gte(H_CHALLS[x].goal)) return
+	if (!player.h.challs.includes(x)) {
+		if (x==62) needCanvasUpdate = true
+		player.h.challs.push(x);
+	}
+	player.h.active = 0
 }
 
 function adjustMSDisp() {
@@ -3078,20 +3092,16 @@ function addToSGBase() {
 }
 
 function gameLoop(diff) {
-	diff = new Decimal(diff)
-	if (isNaN(diff.toNumber())) diff = new Decimal(0);
-	player.h.time += diff.toNumber()
+	if (isNaN(diff)) diff = 0
+	player.timePlayed += diff
+	player.h.time += diff
 	if (tmp.hcActive ? tmp.hcActive[42] : true) {
-		if (player.h.time>=10) diff = new Decimal(0)
-		else diff = diff.div(Decimal.div(10, Decimal.sub(10, player.h.time+1)).pow(1000))
+		if (player.h.time>=10) diff = 0
+		else diff = Decimal.div(diff, Decimal.div(10, Decimal.sub(10, player.h.time + 1)).pow(1000))
 	}
-	player.timePlayed += diff.toNumber()
 	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff)).max(0)
 	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff)).max(0)
-	if (player.g.best.gte(10)) {
-		player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff)).max(0)
-		player.p.best = player.p.best.max(player.p.points)
-	}
+	if (player.g.best.gte(10)) generatePoints("p", diff)
 	if (player.t.unl) {
 		let data = tmp.layerEffs.t
 		player.t.energy = player.t.energy.plus(data.gain.times(diff)).min(data.limit).max(0)
@@ -3103,10 +3113,7 @@ function gameLoop(diff) {
 		let exp = getQuirkEnergyGainExp()
 		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(mult).times(diff)).max(0)
 	}
-	if (player.q.best.gte(15)) {
-		player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff)).max(0)
-		player.e.best = player.e.best.max(player.e.points)
-	}
+	if (player.q.best.gte(15)) generatePoints("e", diff)
 	if (player.ss.unl) player.ss.subspace = player.ss.subspace.plus(tmp.layerEffs.ss.times(diff)).max(0)
 	if (player.ba.unl) {
 		player.ba.power = player.ba.power.plus(tmp.layerEffs.ba.power.times(tmp.balEff2).times(getBalPowGainMult()).times(diff)).max(0)
@@ -3115,17 +3122,13 @@ function gameLoop(diff) {
 	}
 	if (player.m.unl) for (let i=1;i<=3;i++) player.m.spellTimes[i] = Decimal.sub(player.m.spellTimes[i], diff).max(0).toNumber()
 	if (player.m.best.gte(3)) {
-		player.h.points = player.h.points.plus(tmp.resetGain.h.times(diff)).max(0)
-		player.q.points = player.q.points.plus(tmp.resetGain.q.times(diff)).max(0)
-		player.h.best = player.h.best.max(player.h.points)
-		player.q.best = player.q.best.max(player.q.points)
+		generatePoints("h", diff)
+		generatePoints("q", diff)
 	}
 	if (player.m.best.gte(2.5e9)) player.m.hexes = player.m.hexes.plus(getHexGain().times(diff)).max(0)
 	if (player.sp.total.gte(10)) {
-		player.m.points = player.m.points.plus(tmp.resetGain.m.times(diff)).max(0)
-		player.ba.points = player.ba.points.plus(tmp.resetGain.ba.times(diff)).max(0)
-		player.m.best = player.m.best.max(player.m.points)
-		player.ba.best = player.ba.best.max(player.ba.points)
+		generatePoints("m", diff)
+		generatePoints("ba", diff)
 	}
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
@@ -3178,7 +3181,7 @@ var interval = setInterval(function() {
 	player.time = Date.now()
 	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();
-	gameLoop(new Decimal(diff))
+	gameLoop(diff)
 }, 50)
 
 document.onkeydown = function(e) {
