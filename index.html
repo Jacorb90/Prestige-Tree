@@ -375,7 +375,7 @@
 				</tr>
 			</table><table>
 				<tr>
-					<td id="sp"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
+					<td id="sp" v-if="layerUnl('sp')"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
 				</tr>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
