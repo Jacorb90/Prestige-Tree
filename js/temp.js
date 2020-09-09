@@ -57,9 +57,11 @@ function updateTemp() {
 	tmp.balEff = getBalancePowerEff()
 	tmp.balEff2 = getBalanceTypesEff()
 	tmp.baExp = getBalanceEnergyExp()
+	
 	tmp.hexEff = getHexEff()
+	tmp.spellsUnl = player.sp.upgrades.includes(13)?4:3
 	if (!tmp.spellEffs) tmp.spellEffs = {}
-	for (let i=1;i<=3;i++) tmp.spellEffs[i] = getSpellEff(i)
+	for (let i=1;i<=4;i++) tmp.spellEffs[i] = getSpellEff(i)
 	
 	tmp.sGenPowEff = getSGenPowEff()
 }

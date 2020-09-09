@@ -54,6 +54,10 @@ function drawTree() {
 		drawTreeBranch("q", "ba")
 		drawTreeBranch("ss", "ba")
 	}
+	if (layerUnl('sp')) {
+		drawTreeBranch("m", "sp")
+		drawTreeBranch("ba", "sp")
+	}
 	
 	needCanvasUpdate = false;
 }
