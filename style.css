@@ -2,6 +2,7 @@
 	transition-duration: 0.5s;
 	text-align: center;
 	font-family: "Inconsolata", monospace;
+	font-weight: bold;
 	table-align: center;
 	margin: auto;
 }
@@ -13,8 +14,7 @@
 
 body {
 	background-color: black;
-	color: white;
-	text-shadow: 0px 0px 7px white;
+	color: #dfdfdf;
 	overflow: hidden;
 }
 
@@ -46,7 +46,7 @@ html, body {
 	vertical-align: 0
 }
 
-h1, h2, h3, b {
+h1, h2, h3, b, input {
 	display: inline;
 	font-family: "Lucida Console", "Courier New", monospace
 }
@@ -61,7 +61,6 @@ h1, h2, h3, b {
 	font-size: 40px;
 	font-family: "Lucida Console", "Courier New", monospace;
 	color: rgba(0, 0, 0, 0.5);
-	font-weight: bold;
 	text-shadow: var(--hqProperty3);
 }
 
@@ -93,7 +92,7 @@ h1, h2, h3, b {
 }
 
 .bought {
-	background-color: #68a66b !important;
+	background-color: #77bf5f !important;
 	cursor: default;
 }
 
@@ -155,6 +154,11 @@ h1, h2, h3, b {
 	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
 }
 
+#points {
+	color: white;
+	text-shadow: 0px 0px 10px white;
+}
+
 .p {
 	background-color: #439ea3;
 	color: rgba(0, 0, 0, 0.5);
@@ -206,13 +210,13 @@ h1, h2, h3, b {
 }
 
 .s {
-	background-color: white;
+	background-color: #dfdfdf;
 	color: rgba(0, 0, 0, 0.5);
 }
 
 .s_txt {
-	color: white;
-	text-shadow: 0px 0px 10px white;
+	color: #dfdfdf;
+	text-shadow: 0px 0px 10px #dfdfdf;
 }
 
 .sb {
@@ -385,6 +389,7 @@ a {
 	border: 4px solid;
 	background-color: #a1a1a1;
 	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	color: rgba(0, 0, 0, 0.5);
 	cursor: pointer;
 }
 
@@ -407,14 +412,21 @@ a {
 .milestone {
 	width: 100%;
 	height: 75px;
-	background-color: #9e6d64;
+	background-color: #bf8f8f;
+	border: 4px solid;
+	border-radius: 4px;
+	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	color: rgba(0, 0, 0, 0.5);
 }
 
 .milestoneDone {
 	width: 100%;
 	height: 75px;
-	background-color: #68a66b;
-	color: black;
+	background-color: #77bf5f;
+	border: 4px solid;
+	border-radius: 4px;
+	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	color: rgba(0, 0, 0, 0.5);
 }
 
 .left {
@@ -488,22 +500,23 @@ ul {
 
 .hChall {
 	background-color: #fa7f8a;
-	border: 4px solid #ff0017;
+	border: 2px solid #ff0017;
 	color: #ff0017;
 	width: 300px;
 	height: 300px;
+	font-size: 15px;
 	border-radius: 33.33%;
 }
 
 .hChall.done {
 	background-color: #95fcb4;
-	border: 4px solid #038c2c;
+	border: 2px solid #038c2c;
 	color: #038c2c;
 }
 
 .hChall.canComplete {
 	background-color: #93f0fa;
-	border: 4px solid #03858f;
+	border: 2px solid #03858f;
 	color: #03858f;
 }
 

@@ -1877,19 +1877,19 @@ function layerUnl(layer) {
 			return player.q.unl&&player.ss.unl
 			break;
 		case "sp":
-			return false //player.m.unl && player.ba.unl
+			return true //player.m.unl && player.ba.unl
 			break;
 		case "l":
-			return false //player.sp.unl
+			return true //player.sp.unl
 			break;
 		case "ps":
-			return false //player.l.unl
+			return true //player.l.unl
 			break;
 		case "hs":
-			return false //player.sp.unl
+			return true //player.sp.unl
 			break;
 		case "i":
-			return false //player.ps.unl && player.hs.unl
+			return true //player.ps.unl && player.hs.unl
 			break;
 	}
 }
