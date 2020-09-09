@@ -2969,7 +2969,7 @@ function spellActive(x) {
 
 function activateSpell(x, force=false) {
 	if (tmp.spellsUnl<x) return;
-	let toCast = setToCast(player.m.toCast[x])
+	let toCast = setToCast(player.m.toCast[x]).max(1)
 	if (!force) {
 		if (!player.m.unl) return
 		if (spellActive(x)) return
@@ -3046,7 +3046,10 @@ function gameLoop(diff) {
 	player.timePlayed += diff.toNumber()
 	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff)).max(0)
 	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff)).max(0)
-	if (player.g.best.gte(10)) player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff)).max(0)
+	if (player.g.best.gte(10)) {
+		player.p.points = player.p.points.plus(tmp.resetGain.p.times(diff)).max(0)
+		player.p.best = player.p.best.max(player.p.points)
+	}
 	if (player.t.unl) {
 		let data = tmp.layerEffs.t
 		player.t.energy = player.t.energy.plus(data.gain.times(diff)).min(data.limit).max(0)
@@ -3058,7 +3061,10 @@ function gameLoop(diff) {
 		let exp = getQuirkEnergyGainExp()
 		if (exp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.pow(exp).times(mult).times(diff)).max(0)
 	}
-	if (player.q.best.gte(15)) player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff)).max(0)
+	if (player.q.best.gte(15)) {
+		player.e.points = player.e.points.plus(tmp.resetGain.e.times(diff)).max(0)
+		player.e.best = player.e.best.max(player.e.points)
+	}
 	if (player.ss.unl) player.ss.subspace = player.ss.subspace.plus(tmp.layerEffs.ss.times(diff)).max(0)
 	if (player.ba.unl) {
 		player.ba.power = player.ba.power.plus(tmp.layerEffs.ba.power.times(tmp.balEff2).times(getBalPowGainMult()).times(diff)).max(0)
@@ -3069,11 +3075,15 @@ function gameLoop(diff) {
 	if (player.m.best.gte(3)) {
 		player.h.points = player.h.points.plus(tmp.resetGain.h.times(diff)).max(0)
 		player.q.points = player.q.points.plus(tmp.resetGain.q.times(diff)).max(0)
+		player.h.best = player.h.best.max(player.h.points)
+		player.q.best = player.q.best.max(player.q.points)
 	}
 	if (player.m.best.gte(2.5e9)) player.m.hexes = player.m.hexes.plus(getHexGain().times(diff)).max(0)
 	if (player.sp.total.gte(10)) {
 		player.m.points = player.m.points.plus(tmp.resetGain.m.times(diff)).max(0)
 		player.ba.points = player.ba.points.plus(tmp.resetGain.ba.times(diff)).max(0)
+		player.m.best = player.m.best.max(player.m.points)
+		player.ba.best = player.ba.best.max(player.ba.points)
 	}
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
