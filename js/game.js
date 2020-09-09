@@ -2975,7 +2975,7 @@ function activateSpell(x, force=false) {
 		if (spellActive(x)) return
 		if (player.m.points.lt(toCast)) return
 	}
-	if (player.sp.total.lt(2)) player.m.points = player.m.points.sub(toCast)
+	if (player.sp.total.lt(2)) player.m.points = player.m.points.sub(toCast).max(0)
 	player.m.casted[x] = toCast
 	player.m.spellTimes[x] = getSpellTime()
 	if (!force) player.m.hexes = player.m.hexes.plus(getHexGain())
