@@ -376,9 +376,8 @@
 				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
 				<td id="l" v-if="layerUnl('l')"><button class="treeNode l">L</button></td>
 				<td id="sp" v-if="layerUnl('sp')"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
-				<td v-if="layerUnl('ps')&&layerUnl('i')"><button class="treeNode hidden"></button></td>
 				<td id="hs" v-if="layerUnl('hs')"><button class="treeNode hs">HS</button></td>
-				<td id="i" v-if="layerUnl('i')"><button class="treeNode i">I</button></td>
+				<td id="i" v-if="layerUnl('ps')||layerUnl('i')"><button v-bind:class="{treeNode: true, i: true, hidden: !layerUnl('i')}">I</button></td>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
