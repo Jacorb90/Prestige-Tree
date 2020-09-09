@@ -1396,7 +1396,11 @@ const LAYER_UPGS = {
 			desc: "Spells are stronger based on your Total Super-Prestige Points.",
 			cost: new Decimal(30),
 			unl: function() { return player.sp.upgrades.includes(13)||player.sp.upgrades.includes(22) },
-			currently: function() { return player.sp.total.plus(1).log10().div(5).plus(1) },
+			currently: function() {
+				let sp = player.sp.total
+				if (sp.gte(250)) sp = sp.log10().times(250/Math.log10(250)).min(sp)
+				return sp.plus(1).log10().div(5).plus(1) 
+			},
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		24: {
