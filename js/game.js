@@ -1355,7 +1355,7 @@ const LAYER_UPGS = {
 		},
 	},
 	sp: {
-		rows: 1,
+		rows: 2,
 		cols: 4,
 		11: {
 			desc: "The Prestige Upgrade 3, 6, & 7 effects are raised to the power of 100.",
@@ -1379,6 +1379,36 @@ const LAYER_UPGS = {
 			cost: new Decimal(8),
 			unl: function() { return player.sp.upgrades.includes(13) },
 			currently: function() { return player.sp.best.plus(1).pow(1.9) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		21: {
+			desc: "Super-Prestige Points add to the Super-Generator base.",
+			cost: new Decimal(15),
+			unl: function() { return player.sp.upgrades.includes(11) },
+			currently: function() { return player.sp.points.plus(1).log10().plus(1).log10().times(1.5) },
+			effDisp: function(x) { return "+"+format(x) },
+		},
+		22: {
+			desc: 'The effects of "Anti-Upgrades" & "Prestigeless" Hindrances are 24,900% stronger.',
+			cost: new Decimal(20),
+			unl: function() { return player.sp.upgrades.includes(12)||player.sp.upgrades.includes(21) },
+		},
+		23: {
+			desc: "Spells are stronger based on your Total Super-Prestige Points.",
+			cost: new Decimal(30),
+			unl: function() { return player.sp.upgrades.includes(13)||player.sp.upgrades.includes(22) },
+			currently: function() {
+				let sp = player.sp.total
+				if (sp.gte(250)) sp = sp.log10().times(250/Math.log10(250)).min(sp)
+				return sp.plus(1).log10().div(5).plus(1) 
+			},
+			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
+		},
+		24: {
+			desc: "Super-Prestige Points boost Super-Prestige Point gain.",
+			cost: new Decimal(40),
+			unl: function() { return player.sp.upgrades.includes(14)||player.sp.upgrades.includes(23) },
+			currently: function() { return player.sp.points.plus(1).sqrt() },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -1855,6 +1885,9 @@ function getLayerGainMult(layer) {
 			break;
 		case "ba": 
 			if (player.sp.upgrades.includes(12)) mult = mult.times(LAYER_UPGS.sp[12].currently())
+			break;
+		case "sp": 
+			if (player.sp.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.sp[24].currently())
 			break;
 	}
 	return mult
@@ -2716,7 +2749,7 @@ const H_CHALLS = {
 		unl: function() { return player.h.challs.includes(11) },
 		goal: new Decimal("1e840"),
 		reward: "Quirk gain is boosted by your Quirk Layers",
-		currently: function() { return Decimal.pow(1.5, player.q.layers) },
+		currently: function() { return Decimal.pow(1.5, player.q.layers.times(player.sp.upgrades.includes(22)?250:1)) },
 		effDisp: function(x) { return format(x)+"x" },
 	},
 	21: {
@@ -2725,7 +2758,7 @@ const H_CHALLS = {
 		unl: function() { return player.h.challs.includes(12) },
 		goal: new Decimal("1e1200"),
 		reward: "Hindrance Spirit & Quirks make Time Capsules & Space Energy cheaper.",
-		currently: function() { return player.h.points.plus(player.q.points).div(2).plus(1).pow(1000) },
+		currently: function() { return player.h.points.plus(player.q.points).div(2).plus(1).pow(1000).pow(player.sp.upgrades.includes(22)?250:1) },
 		effDisp: function(x) { return format(x)+"x cheaper" },
 	},
 	22: {
@@ -2992,7 +3025,8 @@ function getSpellPower(x) {
 	if (player.m.upgrades.includes(21) && (x==2||x==3)) power = power.times(LAYER_UPGS.m[21].currently())
 	if (player.m.upgrades.includes(22) && (x==2)) power = power.times(10)
 	if (player.m.upgrades.includes(41)) power = power.times(player.m.casted[x].max(1).log10().plus(1).log10().div(5).plus(1))
-	return power;
+	if (player.sp.upgrades.includes(23)) power = power.times(LAYER_UPGS.sp[23].currently())
+	return power.max(1);
 }
 
 function getSpellEff(x) {
@@ -3088,6 +3122,7 @@ function getSuperGenPowerGainMult() {
 function addToSGBase() {
 	let toAdd = new Decimal(0)
 	if (player.ba.upgrades.includes(23)) toAdd = toAdd.plus(LAYER_UPGS.ba[23].currently())
+	if (player.sp.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sp[21].currently())
 	return toAdd
 }
 
@@ -3120,7 +3155,7 @@ function gameLoop(diff) {
 		player.ba.positivity = player.ba.positivity.plus(tmp.layerEffs.ba.pos.times(getPosGainMult()).times(diff)).max(0)
 		player.ba.negativity = player.ba.negativity.plus(tmp.layerEffs.ba.neg.times(getNegGainMult()).times(diff)).max(0)
 	}
-	if (player.m.unl) for (let i=1;i<=3;i++) player.m.spellTimes[i] = Decimal.sub(player.m.spellTimes[i], diff).max(0).toNumber()
+	if (player.m.unl) for (let i=1;i<=tmp.spellsUnl;i++) player.m.spellTimes[i] = Decimal.sub(player.m.spellTimes[i], diff).max(0).toNumber()
 	if (player.m.best.gte(3)) {
 		generatePoints("h", diff)
 		generatePoints("q", diff)
