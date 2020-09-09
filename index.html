@@ -24,7 +24,12 @@
 		</div>
 		<div v-if="player.tab=='changelog_beta'" class="col right">
 			<button class="back" onclick="showTab('changelog')">←</button><br>
-			<h3>Beta v1.2 Alpha 14</h3>
+			<h3>v1.0 Beta 1</h3>
+			<ul>
+				<li>Implemented the Super-Prestige layer (unfinished)</li>
+				<li>Balanced up to 1e18,000,000 Points & 10 Super-Prestige Points</li>
+			</ul><br>
+			<h3>Beta v1.2</h3>
 			<ul>
 				<li>Balanced up to 1e15,000,000 Points</li>
 			</ul><br>
@@ -303,6 +308,7 @@
 				3: Cast spell 3
 			</span><br>
 			<span v-if="player.ba.unl">A: Balance reset</span><br>
+			<span v-if="player.sp.unl">Shift+P: Super-Prestige reset</span><br>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
@@ -356,23 +362,23 @@
 				<td id="h" v-if="layerUnl('h')"><button onclick="showTab('h')" v-bind:tooltip="((player.t.energy.gte(tmp.layerReqs.h)||player.h.unl)&&layerUnl('h')) ? (formatWhole(player.h.points)+' hindrance spirit') : ('Reach '+format(tmp.layerReqs.h)+' time energy to unlock')" v-bind:class="{ treeNode: true, h: true, locked: (player.t.energy.lt(tmp.layerReqs.h)&&!player.h.unl), notify: player.notify.h, can: (player.t.energy.gte(tmp.layerReqs.h)||player.h.unl) }">H</button></td>
 				<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), notify: player.notify.q, can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
 				<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), notify: player.notify.ss, can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
+				<td id="hg" v-if="layerUnl('hg')"><button class="treeNode hg">HG</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&(player.m.unl||player.ba.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(4)"></img></td>
 				<td id="m" v-if="layerUnl('m')"><button onclick="showTab('m')" v-bind:tooltip="((player.h.points.gte(tmp.layerReqs.m)||player.m.unl)&&layerUnl('m')) ? (formatWhole(player.m.points)+' magic') : ('Reach '+format(tmp.layerReqs.m)+' hindrance spirit to unlock')" v-bind:class="{ treeNode: true, m: true, locked: (player.h.points.lt(tmp.layerReqs.m)&&!player.m.unl), notify: player.notify.m, can: (player.h.points.gte(tmp.layerReqs.m)||player.m.unl) }">M</button></td>
-				<td id="ps" v-if="layerUnl('ps')"><button class="treeNode ps can">PS</button></td>
+				<td id="ps" v-if="layerUnl('ps')"><button class="treeNode ps">PS</button></td>
 				<td id="ba" v-if="layerUnl('ba')"><button onclick="showTab('ba')" v-bind:tooltip="((player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl)&&layerUnl('ba')) ? (formatWhole(player.ba.points)+' balance energy') : ('Reach '+format(tmp.layerReqs.ba)+' quirks to unlock')" v-bind:class="{ treeNode: true, ba: true, locked: (player.q.points.lt(tmp.layerReqs.ba)&&!player.ba.unl), notify: player.notify.ba, can: (player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl) }">BA</button></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&layerUnl('sp')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
-				<td id="l" v-if="layerUnl('l')"><button class="treeNode l can">L</button></td>
-				<td><button class="treeNode hidden"></button></td>
-				<td id="sp" v-if="layerUnl('sp')"><button class="treeNode sp can">SP</button></td>
-				<td><button class="treeNode hidden"></button></td>
-				<td id="hs" v-if="layerUnl('hs')"><button class="treeNode hs can">HS</button></td>
-				<td id="i" v-if="layerUnl('i')"><button class="treeNode i can">I</button></td>
+				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
+				<td id="l" v-if="layerUnl('l')"><button class="treeNode l">L</button></td>
+				<td id="sp" v-if="layerUnl('sp')"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
+				<td v-if="layerUnl('ps')&&layerUnl('i')"><button class="treeNode hidden"></button></td>
+				<td id="hs" v-if="layerUnl('hs')"><button class="treeNode hs">HS</button></td>
+				<td id="i" v-if="layerUnl('i')"><button class="treeNode i">I</button></td>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
@@ -472,9 +478,9 @@
 				</div>
 				<div v-if="layer=='m'">
 					<br>
-					Note: Activating a Spell costs Magic.<br><br>
+					<span v-if="player.sp.total.lt(2)">Note: Activating a Spell costs Magic.</span><br><br>
 					<div class="upgRow">
-						<div v-for="id in 3">
+						<div v-for="id in tmp.spellsUnl">
 							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(player.m.toCast[id]))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(player.m.toCast[id])||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>{{getSpellDesc(id)}}<br><br>Time: {{formatTime(player.m.spellTimes[id])}}</button><br><br>
 							<div v-if="player.m.upgrades.includes(41)">
 								<input v-model="player.m.toCast[id]" v-on:change="updateToCast(id)"></input><br><br>
@@ -500,6 +506,15 @@
 						<tr><td v-if="milestoneShown(player.ba.best.gte(3), true)" v-bind:class="{ milestone: player.ba.best.lt(3), milestoneDone: player.ba.best.gte(3) }"><h3>3 Balance Energy</h3><br>Automatically purchase Quirk Layers&nbsp;&nbsp;&nbsp;<button v-if="player.ba.best.gte(3)" class="smallUpg can q" onclick="toggleAuto('q')">{{player.q.auto?"ON":"OFF"}}</button></td></tr>
 						<tr><td v-if="milestoneShown(player.ba.best.gte(5))" v-bind:class="{ milestone: player.ba.best.lt(5), milestoneDone: player.ba.best.gte(5) }"><h3>5 Balance Energy</h3><br>Keep Hyper-Booster & Subspace Upgrades on all resets</td></tr>
 						<tr><td v-if="milestoneShown(player.ba.best.gte(8))" v-bind:class="{ milestone: player.ba.best.lt(8), milestoneDone: player.ba.best.gte(8) }"><h3>8 Balance Energy</h3><br>You can buy max Hyper-Boosters & Subspace Energy, and Hyper-Boosters/Subspace Energy reset nothing</td></tr>
+					</table>
+				</div>
+				<div v-if="layer=='sp'">
+					You have made a total of {{formatWhole(player.sp.total)}} super-prestige points<br><br>
+					<table>
+						<tr><td v-if="milestoneShown(player.sp.total.gte(1))" v-bind:class="{ milestone: player.sp.total.lt(1), milestoneDone: player.sp.total.gte(1) }"><h3>1 total Super-Prestige Point</h3><br>Upgrades of Rows 1-5 and Hindrances are kept on all resets</td></tr>
+						<tr><td v-if="milestoneShown(player.sp.total.gte(2), true)" v-bind:class="{ milestone: player.sp.total.lt(2), milestoneDone: player.sp.total.gte(2) }"><h3>2 total Super-Prestige Points</h3><br>Keep Magic Milestones on reset, Spells do not cost Magic, and Magic Upgrade 13's effect can be auto-set to your current Magic&nbsp;&nbsp;&nbsp;<button v-if="player.sp.total.gte(2)" class="smallUpg can m" onclick="toggleAuto('m', 'Ins')">{{player.m.autoIns?"ON":"OFF"}}</button></td></tr>
+						<tr><td v-if="milestoneShown(player.sp.total.gte(5))" v-bind:class="{ milestone: player.sp.total.lt(5), milestoneDone: player.sp.total.gte(5) }"><h3>5 total Super-Prestige Points</h3><br>Keep Balance Milestones on reset</td></tr>
+						<tr><td v-if="milestoneShown(player.sp.total.gte(10))" v-bind:class="{ milestone: player.sp.total.lt(10), milestoneDone: player.sp.total.gte(10) }"><h3>10 total Super-Prestige Points</h3><br>Gain 100% of Magic & Balance Power gain every second</td></tr>
 					</table>
 				</div>
 				<br><br><br>

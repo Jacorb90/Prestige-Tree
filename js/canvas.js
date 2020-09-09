@@ -51,6 +51,9 @@ function drawTree() {
 		drawTreeBranch("e", "ss")
 		drawTreeBranch("s", "ss")
 	}
+	if (layerUnl('hg')) {
+		drawTreeBranch("sg", "hg")
+	}
 	if (layerUnl('m')) {
 		drawTreeBranch("hb", "m")
 		drawTreeBranch("h", "m")
