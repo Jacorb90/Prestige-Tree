@@ -138,6 +138,7 @@ function getStartPlayer() {
 			autoIns: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
+			total: new Decimal(0),
 			spellTimes: {
 				1: 0,
 				2: 0,
@@ -210,11 +211,11 @@ const LAYER_REQS = {
 	q: new Decimal("1e512"),
 	hb: new Decimal(12),
 	ss: new Decimal(36),
-	m: new Decimal(1e80),
-	ba: new Decimal(1e130),
+	m: new Decimal(2e78),
+	ba: new Decimal(5e129),
 	sp: new Decimal("1e8500000"),
-	l: new Decimal(1415),
-	hs: new Decimal(715),
+	l: new Decimal(1e230),
+	hs: new Decimal(725),
 }
 
 const LAYER_RES = {
@@ -669,12 +670,12 @@ const LAYER_UPGS = {
 		22: {
 			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
 			cost: new Decimal(1e22),
-			unl: function() { return (player.t.unl&&player.s.unl&&player.e.order==2)||player.e.upgrades.includes(22)||player.e.upgrades.includes(23) },
+			unl: function() { return (player.t.unl&&player.s.unl&&player.e.order==2)||player.e.upgrades.includes(22) },
 		},
 		23: {
 			desc: "This layer behaves as if you chose it first (base req is now 1e120 points)",
 			cost: new Decimal(1e40),
-			unl: function() { return (player.t.unl&&player.s.unl)||player.e.upgrades.includes(22)||player.e.upgrades.includes(23) },
+			unl: function() { return (player.t.unl&&player.s.unl&&player.e.order==1)||player.e.upgrades.includes(23) },
 		},
 		24: {
 			desc: "Prestige Points boost Enhance Point gain.",
@@ -1177,28 +1178,28 @@ const LAYER_UPGS = {
 		cols: 4,
 		11: {
 			desc: "Hexes boost all Spells.",
-			cost: new Decimal(10),
+			cost: new Decimal(5),
 			unl: function() { return player.m.unl },
-			currently: function() { return player.m.hexes.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
+			currently: function() { return player.m.hexes.times(3).plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		12: {
 			desc: "Unlock 2 new Hindrances.",
-			cost: new Decimal(25),
+			cost: new Decimal(10),
 			unl: function() { return player.m.upgrades.includes(11) },
 		},
 		13: {
 			desc: "Hexes add to the Hyper-Booster base.",
-			cost: new Decimal(40),
+			cost: new Decimal(15),
 			unl: function() { return player.m.upgrades.includes(11) },
 			currently: function() { return player.m.hexes.plus(1).log10().plus(1).log10().plus(1).log10().div(2.5) },
 			effDisp: function(x) { return "+"+format(x)+" to base" },
 		},
 		14: {
 			desc: "You get more Hexes based on your best Magic.",
-			cost: new Decimal(100),
+			cost: new Decimal(20),
 			unl: function() { return player.m.upgrades.includes(12) },
-			currently: function() { return player.m.best.div(3).plus(1).pow(0.8) },
+			currently: function() { return player.m.best.times(1.2).plus(1).pow(0.8) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		21: {
@@ -1279,19 +1280,19 @@ const LAYER_UPGS = {
 		cols: 4,
 		11: {
 			desc: "All Balance Energy effects use better formulas.",
-			cost: new Decimal(25),
+			cost: new Decimal(5),
 			unl: function() { return player.ba.unl },
 		},
 		12: {
 			desc: "Subspace is generated faster based on your Positivity & Negativity.",
-			cost: new Decimal(40),
+			cost: new Decimal(10),
 			unl: function() { return player.ba.upgrades.includes(11) },
 			currently: function() { return (tmp.balEff2?tmp.balEff2:new Decimal(1)).max(1).pow(4) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		13: {
 			desc: "Multiply all Quirk Layers based on your Balance Power, and the Quirk Energy effect is cubed.",
-			cost: new Decimal(50),
+			cost: new Decimal(25),
 			unl: function() { return player.ba.upgrades.includes(11) },
 			currently: function() { return player.ba.power.plus(1).pow(1.25) },
 			effDisp: function(x) { return format(x)+"x" },
@@ -1570,7 +1571,7 @@ function getLayerAmt(layer) {
 			return player.p.points;
 			break;
 		case "l": 
-			return player.b.points;
+			return player.m.points;
 			break;
 		case "hs": 
 			return player.s.points;
@@ -1685,39 +1686,31 @@ function versionCheck() {
 
 function checkForVars() {
 	let start = getStartPlayer()
+	for (var i=0; i<LAYERS.length; i++) {
+		if (player[LAYERS[i]] === undefined) player[LAYERS[i]] = start[LAYERS[i]]
+		else if (player[LAYERS[i]].total === undefined && start[LAYERS[i]].total !== undefined) player[LAYERS[i]].total = Decimal.max(player[LAYERS[i]].points, player[LAYERS[i]].best)
+	}
 	if (player.autosave===undefined) player.autosave = true;
-	if (player.b===undefined) player.b = start.b
-	if (player.g===undefined) player.g = start.g
 	if (player.p.best===undefined) player.p.best = player.p.points
 	if (player.b.best===undefined) player.b.best = player.b.points
 	if (player.b.auto===undefined) player.b.auto = false
 	if (player.g.best===undefined) player.g.best = player.g.points
 	if (player.g.auto===undefined) player.g.auto = false
-	if (player.e === undefined) player.e = start.e
 	if (player.e.order === undefined) player.e.order = 0
 	if (player.e.auto===undefined) player.e.auto = false
-	if (player.t === undefined) player.t = start.t
 	if (player.t.auto===undefined) player.t.auto = false
 	if (player.t.autoCap===undefined) player.t.autoCap = false
-	if (player.s === undefined) player.s = start.s
 	if (player.s.auto === undefined) player.s.auto = false
 	if (player.s.autoBuild === undefined) player.s.autoBuild = false
-	if (player.sb === undefined) player.sb = start.sb
 	if (player.sb.auto === undefined) player.sb.auto = false
-	if (player.sg === undefined) player.sg = start.sg
 	if (player.timePlayed === undefined) player.timePlayed = 0
 	if (player.hasNaN === undefined) player.hasNaN = false
-	if (player.h === undefined) player.h = start.h
 	if (player.h.active === undefined) player.h.active = 0
 	if (player.h.time === undefined) player.h.time = 0
-	if (player.q === undefined) player.q = start.q
 	if (player.q.auto === undefined) player.q.auto = false
 	if (player.msDisplay === undefined) player.msDisplay = "always"
-	if (player.hb === undefined) player.hb = start.hb
 	if (player.hb.auto === undefined) player.hb.auto = false
-	if (player.ss === undefined) player.ss = start.ss
 	if (player.ss.auto === undefined) player.ss.auto = false
-	if (player.m === undefined) player.m = start.m
 	if (player.m.auto === undefined) player.m.auto = false
 	if (player.m.toCast === undefined) player.m.toCast = start.m.toCast
 	if (player.m.casted === undefined) player.m.casted = start.m.casted
@@ -1727,69 +1720,39 @@ function checkForVars() {
 		player.m.toCast[4] = "1"
 		player.m.casted[4] = new Decimal(1)
 	}
-	if (player.ba === undefined) player.ba = start.ba
 	if (player.offlineProd === undefined) player.offlineProd = true
 	if (player.notify === undefined) player.notify = {}
-	if (player.sp === undefined) player.sp = start.sp
 	if (player.keepGoing === undefined) player.keepGoing = false
-	if (player.l === undefined) player.l = start.l
-	if (player.hs === undefined) player.hs = start.hs
+	if (player.l.boosts !== undefined) player.l = start.l
+	if (player.hs.hyper_upgrades !== undefined) player.hs = start.hs
 }
 
 function convertToDecimal() {
 	player.points = new Decimal(player.points)
-	player.p.points = new Decimal(player.p.points)
-	player.p.best = new Decimal(player.p.best)
-	player.b.points = new Decimal(player.b.points)
-	player.b.best = new Decimal(player.b.best)
-	player.g.points = new Decimal(player.g.points)
-	player.g.best = new Decimal(player.g.best)
+	for (var i=0; i<LAYERS.length; i++) {
+		var data = player[LAYERS[i]]
+		console.log(data)
+		data.points = new Decimal(data.points)
+		data.best = new Decimal(data.best)
+		if (data.total !== undefined) data.total = new Decimal(data.total)
+	}
 	player.g.power = new Decimal(player.g.power)
-	player.e.points = new Decimal(player.e.points)
-	player.e.best = new Decimal(player.e.best)
 	player.e.enhancers = new Decimal(player.e.enhancers)
-	player.t.points = new Decimal(player.t.points)
-	player.t.best = new Decimal(player.t.best)
 	player.t.energy = new Decimal(player.t.energy)
 	player.t.extCapsules = new Decimal(player.t.extCapsules)
-	player.s.points = new Decimal(player.s.points)
-	player.s.best = new Decimal(player.s.best)
 	player.s.spent = new Decimal(player.s.spent)
 	for (let i=1;i<=MAX_BUILDINGS;i++) if (player.s.buildings[i]) player.s.buildings[i] = new Decimal(player.s.buildings[i])
-	player.sb.points = new Decimal(player.sb.points)
-	player.sb.best = new Decimal(player.sb.best)
-	player.sg.points = new Decimal(player.sg.points)
-	player.sg.best = new Decimal(player.sg.best)
 	player.sg.power = new Decimal(player.sg.power)
-	player.h.points = new Decimal(player.h.points)
-	player.h.best = new Decimal(player.h.best)
-	player.q.points = new Decimal(player.q.points)
-	player.q.best = new Decimal(player.q.best)
 	player.q.layers = new Decimal(player.q.layers)
 	player.q.energy = new Decimal(player.q.energy)
 	player.q.time = new Decimal(player.q.time)
-	player.hb.points = new Decimal(player.hb.points)
-	player.hb.best = new Decimal(player.hb.best)
-	player.ss.points = new Decimal(player.ss.points)
-	player.ss.best = new Decimal(player.ss.best)
 	player.ss.subspace = new Decimal(player.ss.subspace)
-	player.m.points = new Decimal(player.m.points)
-	player.m.best = new Decimal(player.m.best)
 	player.m.hexes = new Decimal(player.m.hexes)
 	for (let i=1;i<=MAX_SPELLS;i++) if (player.m.casted[i]) player.m.casted[i] = new Decimal(player.m.casted[i])
-	player.ba.points = new Decimal(player.ba.points)
-	player.ba.best = new Decimal(player.ba.best)
 	player.ba.power = new Decimal(player.ba.power)
 	player.ba.positivity = new Decimal(player.ba.positivity)
 	player.ba.negativity = new Decimal(player.ba.negativity)
-	player.sp.points = new Decimal(player.sp.points)
-	player.sp.best = new Decimal(player.sp.best)
-	player.sp.total = new Decimal(player.sp.total)
-	player.l.points = new Decimal(player.l.points)
-	player.l.best = new Decimal(player.l.best)
 	player.l.power = new Decimal(player.l.power)
-	player.hs.points = new Decimal(player.hs.points)
-	player.hs.best = new Decimal(player.hs.best)
 	for (let i=1;i<=MAX_BUILDINGS;i++) if (player.hs.hyperUpgrades[i]) player.hs.hyperUpgrades[i] = new Decimal(player.hs.hyperUpgrades[i])
 }
 
@@ -1824,7 +1787,7 @@ function fixValue(x, y = 0) {
 function sumValues(x) {
 	x = Object.values(x)
 	if (x.length == 0) return new Decimal(0)
-	return x.reduce((a,b) => Decimal.add())
+	return x.reduce((a, b) => Decimal.add(a, b))
 }
 
 function format(decimal, precision=3) {
@@ -2149,11 +2112,11 @@ function rowReset(row, layer) {
 			break;
 		case 2: 
 			player.b.points = new Decimal(0);
-			player.b.best = player.m.best.gte(1)?player.b.best:new Decimal(0);
+			player.b.best = player.m.total.gte(1)?player.b.best:new Decimal(0);
 			if (!player.t.best.gte(4)&&!player.sp.total.gte(1)) player.b.upgrades = [];
 			player.g.points = new Decimal(0);
 			player.g.power = new Decimal(0);
-			player.g.best = player.m.best.gte(1)?player.g.best:new Decimal(0);
+			player.g.best = player.m.total.gte(1)?player.g.best:new Decimal(0);
 			if (!player.s.best.gte(4)&&!player.sp.total.gte(1)) player.g.upgrades = [];
 			player.t.energy = new Decimal(0);
 			if (layer=="t"||layer=="e"||layer=="s") {
@@ -2169,19 +2132,19 @@ function rowReset(row, layer) {
 		case 3: 
 			player.t.points = new Decimal(0);
 			player.t.order = 0
-			if (player.h.best.lt(2)&&player.m.best.lt(1)) player.t.best = new Decimal(0);
+			if (player.h.best.lt(2)&&player.m.total.lt(1)) player.t.best = new Decimal(0);
 			if (player.h.best.lt(4)&&!player.sp.total.gte(1)) player.t.upgrades = [];
 			player.t.extCapsules = new Decimal(0);
 			player.e.order = 0
 			player.e.points = new Decimal(0);
-			if (player.h.best.lt(2)&&player.m.best.lt(1)) player.e.best = new Decimal(0);
+			if (player.h.best.lt(2)&&player.m.total.lt(1)) player.e.best = new Decimal(0);
 			player.e.enhancers = new Decimal(0);
 			if (player.h.best.lt(4)&&!player.sp.total.gte(1)) player.e.upgrades = [];
 			player.s = {
 				unl: player.s.unl,
 				order: 0,
 				points: new Decimal(0),
-				best: (player.h.best.gte(2)||player.m.best.gte(1)) ? player.s.best : new Decimal(0),
+				best: (player.h.best.gte(2)||player.m.total.gte(1)) ? player.s.best : new Decimal(0),
 				spent: (player.q.best.gte(4)&&(layer=="h"||layer=="q"||layer=="ss"||layer=="hb")) ? player.s.spent : new Decimal(0),
 				buildings: (player.q.best.gte(4)&&(layer=="h"||layer=="q"||layer=="ss"||layer=="hb")) ? player.s.buildings : ({}),
 				upgrades: (player.h.best.gte(4)||player.sp.total.gte(1)) ? player.s.upgrades : [],
@@ -2193,7 +2156,7 @@ function rowReset(row, layer) {
 				auto: player.sb.auto,
 				order: 0,
 				points: new Decimal(0),
-				best: (player.h.best.gte(2)||player.m.best.gte(1)) ? player.sb.best : new Decimal(0),
+				best: (player.h.best.gte(2)||player.m.total.gte(1)) ? player.sb.best : new Decimal(0),
 				upgrades: (player.h.best.gte(10)||player.sp.total.gte(1)) ? player.sb.upgrades : [],
 			}
 			player.sg = {
@@ -2213,16 +2176,16 @@ function rowReset(row, layer) {
 				unl: player.h.unl,
 				time: 0,
 				points: new Decimal(0),
-				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.h.best:new Decimal(0),
+				best: (player.ba.best.gte(1)||player.m.total.gte(1))?player.h.best:new Decimal(0),
 				active: 0,
-				challs: (player.m.best.gte(2)||player.sp.total.gte(1))?player.h.challs:[],
+				challs: (player.m.total.gte(2)||player.sp.total.gte(1))?player.h.challs:[],
 				upgrades: [],
 			}
 			player.q = {
 				unl: player.q.unl,
 				auto: player.q.auto,
 				points: new Decimal(0),
-				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.q.best:new Decimal(0),
+				best: (player.ba.best.gte(1)||player.m.total.gte(1))?player.q.best:new Decimal(0),
 				layers: new Decimal(0),
 				energy: new Decimal(0),
 				time: new Decimal(0),
@@ -2233,7 +2196,7 @@ function rowReset(row, layer) {
 				auto: player.hb.auto,
 				order: player.hb.order,
 				points: new Decimal(0),
-				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.hb.best:new Decimal(0),
+				best: (player.ba.best.gte(1)||player.m.total.gte(1))?player.hb.best:new Decimal(0),
 				upgrades: (player.ba.best.gte(5)||player.sp.total.gte(1))?player.hb.upgrades:[],
 			}
 			player.ss = {
@@ -2241,7 +2204,7 @@ function rowReset(row, layer) {
 				auto: player.ss.auto,
 				order: player.ss.order,
 				points: new Decimal(0),
-				best: (player.ba.best.gte(1)||player.m.best.gte(1))?player.ss.best:new Decimal(0),
+				best: (player.ba.best.gte(1)||player.m.total.gte(1))?player.ss.best:new Decimal(0),
 				subspace: new Decimal(0),
 				upgrades: (player.ba.best.gte(5)||player.sp.total.gte(1))?player.ss.upgrades:[],
 			}
@@ -2252,7 +2215,8 @@ function rowReset(row, layer) {
 				auto: player.m.auto,
 				autoIns: player.m.autoIns,
 				points: new Decimal(0),
-				best: player.sp.total.gte(2) ? player.m.best : new Decimal(0),
+				best: new Decimal(0),
+				total: player.sp.total.gte(2) ? player.m.total : new Decimal(0),
 				spellTimes: {
 					1: 0,
 					2: 0,
@@ -3086,8 +3050,8 @@ function getHyperBoosterPow() {
 }
 
 function getBalancePowerEff() {
-	let eff = player.ba.power.plus(1).sqrt()
-	if (player.ba.upgrades.includes(14)) eff = eff.pow(5)
+	let eff = player.ba.power.times(2).plus(1).pow(2/3)
+	if (player.ba.upgrades.includes(14)) eff = eff.pow(3.85)
 	if (player.ba.upgrades.includes(33)) eff = eff.pow(2)
 	return eff;
 }
@@ -3179,8 +3143,8 @@ function getSpellDesc(x) {
 }
 
 function getSpellTime() {
-	let time = 20
-	if (player.m.best.gte(2.5e9)) time *= 10
+	let time = 60
+	if (player.m.total.gte(2.5e9)) time *= 4
 	if (player.m.upgrades.includes(43)) time *= LAYER_UPGS.m[43].currently().toNumber()
 	return time
 }
@@ -3214,7 +3178,7 @@ function getHexGain() {
 }
 
 function getHexEff() {
-	let eff = player.m.hexes.plus(1).pow(5)
+	let eff = player.m.hexes.times(2).max(1).pow(5)
 	return eff;
 }
 
@@ -3308,11 +3272,11 @@ function gameLoop(diff) {
 			player.m.spellTimes[i] = Decimal.sub(player.m.spellTimes[i], diff).max(0).toNumber()
 		}
 	}
-	if (player.m.best.gte(3)) {
+	if (player.m.total.gte(3)) {
 		generatePoints("h", diff)
 		generatePoints("q", diff)
 	}
-	if (player.m.best.gte(2.5e9)) player.m.hexes = player.m.hexes.plus(getHexGain().times(diff)).max(0)
+	if (player.m.total.gte(2.5e9)) player.m.hexes = player.m.hexes.plus(getHexGain().times(diff)).max(0)
 	if (player.sp.total.gte(10)) {
 		generatePoints("m", diff)
 		generatePoints("ba", diff)
@@ -3328,13 +3292,13 @@ function gameLoop(diff) {
 	if (player.sb.auto&&player.h.best.gte(15)) doReset("sb")
 	if (player.sg.auto&&player.sg.best.gte(2)) doReset("sg")
 	if (player.q.auto&&player.ba.best.gte(3)) maxQuirkLayers()
-	if (player.hb.auto&&player.m.best.gte(4)) doReset("hb")
-	if (player.ss.auto&&player.m.best.gte(4)) doReset("ss")
+	if (player.hb.auto&&player.m.total.gte(4)) doReset("hb")
+	if (player.ss.auto&&player.m.total.gte(4)) doReset("ss")
 	if (player.m.autoIns&&player.sp.total.gte(2)) for (let i=1;i<=tmp.spellsUnl;i++) {
 		player.m.casted[i] = player.m.points
 		player.m.toCast[i] = player.m.points
 	}
-	if (player.m.auto&&player.m.best.gte(1000)) for (let i=1;i<=tmp.spellsUnl;i++) activateSpell(i)
+	if (player.m.auto&&player.m.total.gte(50)) for (let i=1;i<=tmp.spellsUnl;i++) activateSpell(i)
 
 	if (player.hasNaN&&!NaNalert) {
 		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")

@@ -409,7 +409,7 @@
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
-				<td id="l" v-if="layerUnl('l')"><button onclick="showTab('l')" v-bind:tooltip="(player.b.points.gte(tmp.layerReqs.l)||player.l.unl) ? (formatWhole(player.l.points)+' life essence') : ('Reach '+format(tmp.layerReqs.l)+' boosters to unlock')" v-bind:class="{ treeNode: true, l: true, locked: (player.b.points.lt(tmp.layerReqs.l)&&!player.l.unl), can: (player.b.points.gte(tmp.layerReqs.l)||player.l.unl) }">L</button></td>
+				<td id="l" v-if="layerUnl('l')"><button onclick="showTab('l')" v-bind:tooltip="(player.m.points.gte(tmp.layerReqs.l)||player.l.unl) ? (formatWhole(player.l.points)+' life essence') : ('Reach '+format(tmp.layerReqs.l)+' magic to unlock')" v-bind:class="{ treeNode: true, l: true, locked: (player.m.points.lt(tmp.layerReqs.l)&&!player.l.unl), can: (player.m.points.gte(tmp.layerReqs.l)||player.l.unl) }">L</button></td>
 				<td id="sp" v-if="layerUnl('sp')"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
 				<td id="hs" v-if="layerUnl('hs')"><button onclick="showTab('hs')" v-bind:tooltip="(player.s.points.gte(tmp.layerReqs.hs)||player.hs.unl) ? (formatWhole(player.hs.points)+' hyperspace') : ('Reach '+format(tmp.layerReqs.hs)+' space energy to unlock')" v-bind:class="{ treeNode: true, hs: true, locked: (player.s.points.lt(tmp.layerReqs.hs)&&!player.hs.unl), can: (player.s.points.gte(tmp.layerReqs.hs)||player.hs.unl) }">HS</button></td>
 				<td id="i" v-if="layerUnl('ps')||layerUnl('i')"><button v-bind:class="{treeNode: true, i: true, hidden: !layerUnl('i')}">I</button></td>
@@ -533,12 +533,12 @@
 				</div>
 				<div v-if="layer=='m'">
 					<table>
-						<tr v-if="milestoneShown(player.m.best.gte(1))"><td v-bind:class="{ milestone: player.m.best.lt(1), milestoneDone: player.m.best.gte(1) }"><h3>1 Magic</h3><br>Keep row 4 milestones on all resets</td></tr>
-						<tr v-if="milestoneShown(player.m.best.gte(2))"><td v-bind:class="{ milestone: player.m.best.lt(2), milestoneDone: player.m.best.gte(2) }"><h3>2 Magic</h3><br>Keep Hindrance completions on all resets</td></tr>
-						<tr v-if="milestoneShown(player.m.best.gte(3))"><td v-bind:class="{ milestone: player.m.best.lt(3), milestoneDone: player.m.best.gte(3) }"><h3>3 Magic</h3><br>Gain 100% of Hindrance Spirit & Quirk gain every second</td></tr>
-						<tr v-if="milestoneShown(player.m.best.gte(4), true)"><td v-bind:class="{ milestone: player.m.best.lt(4), milestoneDone: player.m.best.gte(4) }"><h3>4 Magic</h3><br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.m.best.gte(1000), true)"><td v-bind:class="{ milestone: player.m.best.lt(1000), milestoneDone: player.m.best.gte(1000) }"><h3>1,000 Magic</h3><br>Automatically cast Spells&nbsp;&nbsp;&nbsp;<button v-if="player.m.best.gte(1000)" class="smallUpg can m" onclick="toggleAuto('m')">{{player.m.auto?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.m.best.gte(2.5e9))"><td v-bind:class="{ milestone: player.m.best.lt(2.5e9), milestoneDone: player.m.best.gte(2.5e9) }"><h3>2.5e9 Magic</h3><br>Gain 100% of Hex gain every second, and Spells last 10x longer</td></tr>
+						<tr v-if="milestoneShown(player.m.total.gte(1))"><td v-bind:class="{ milestone: player.m.total.lt(1), milestoneDone: player.m.total.gte(1) }"><h3>1 total Magic</h3><br>Keep row 4 milestones on all resets</td></tr>
+						<tr v-if="milestoneShown(player.m.total.gte(2))"><td v-bind:class="{ milestone: player.m.total.lt(2), milestoneDone: player.m.total.gte(2) }"><h3>2 total Magic</h3><br>Keep Hindrance completions on all resets</td></tr>
+						<tr v-if="milestoneShown(player.m.total.gte(3))"><td v-bind:class="{ milestone: player.m.total.lt(3), milestoneDone: player.m.total.gte(3) }"><h3>3 total Magic</h3><br>Gain 100% of Hindrance Spirit & Quirk gain every second</td></tr>
+						<tr v-if="milestoneShown(player.m.total.gte(4), true)"><td v-bind:class="{ milestone: player.m.total.lt(4), milestoneDone: player.m.total.gte(4) }"><h3>4 total Magic</h3><br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.total.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.total.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
+						<tr v-if="milestoneShown(player.m.total.gte(50), true)"><td v-bind:class="{ milestone: player.m.total.lt(50), milestoneDone: player.m.total.gte(50) }"><h3>50 total Magic</h3><br>Automatically cast Spells&nbsp;&nbsp;&nbsp;<button v-if="player.m.total.gte(50)" class="smallUpg can m" onclick="toggleAuto('m')">{{player.m.auto?"ON":"OFF"}}</button></td></tr>
+						<tr v-if="milestoneShown(player.m.total.gte(2.5e9))"><td v-bind:class="{ milestone: player.m.total.lt(2.5e9), milestoneDone: player.m.total.gte(2.5e9) }"><h3>2.5e9 total Magic</h3><br>Gain 100% of Hex gain every second, and Spells last 4x longer</td></tr>
 					</table><br><br>
 					<span v-if="player.sp.total.lt(2)">Note: Activating a Spell costs Magic.<br></span>
 					<div class="upgRow">
@@ -549,7 +549,7 @@
 							</div>
 						</div>
 					</div>
-					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}
+					You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}
 				</div>
 				<div v-if="layer=='ba'">
 					<table>
