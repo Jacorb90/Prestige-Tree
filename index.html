@@ -18,10 +18,14 @@
 			<h2>Thank you for playing The Prestige Tree v1.0!</h2><br><br>
 			<h4>It took you {{formatTime(player.timePlayed)}}</h4><br><br><br><br><br>
 			If you would like to speedrun this, play again from the beginning and record the whole thing as fast as possible, then submit in <span class="link" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" target="_blank">my discord</span><br><br><br><br><br>
-			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>
+			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>v1.0 Patch 1</h3>
+			<ul>
+				<li>Added an option to keep going at endgame</li>
+			</ul><br>
 			<h3>v1.0 Full Release</h3>
 			<ul>
 				<li>Converted Vue to production mode</li>

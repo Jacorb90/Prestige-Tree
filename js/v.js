@@ -32,6 +32,7 @@ function loadVue() {
 		  activateSpell,
 		  spellActive,
 		  updateToCast,
+		  keepGoing,
 		  LAYERS,
 		  LAYER_RES,
 		  LAYER_TYPE,

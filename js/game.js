@@ -15,9 +15,10 @@ function getStartPlayer() {
 		autosave: true,
 		msDisplay: "always",
 		offlineProd: true,
-		versionType: "beta",
-		version: 1.3,
+		versionType: "real",
+		version: 1.0,
 		timePlayed: 0,
+		keepGoing: false,
 		hasNaN: false,
 		points: new Decimal(10),
 		p: {
@@ -1684,6 +1685,7 @@ function checkForVars() {
 	if (player.ba === undefined) player.ba = start.ba
 	if (player.offlineProd === undefined) player.offlineProd = true
 	if (player.sp === undefined) player.sp = start.sp
+	if (player.keepGoing === undefined) player.keepGoing = false
 }
 
 function convertToDecimal() {
@@ -3128,13 +3130,19 @@ function addToSGBase() {
 	return toAdd
 }
 
+function keepGoing() {
+	player.keepGoing = true;
+	player.tab = "tree"
+	needCanvasUpdate = true;
+}
+
 const ENDGAME = new Decimal("1e40000000");
 
 function gameLoop(diff) {
 	diff = new Decimal(diff)
 	if (isNaN(diff.toNumber())) diff = new Decimal(0);
 	if (player.points.gte(ENDGAME)) gameEnded = true;
-	if (gameEnded) {
+	if (gameEnded&&!player.keepGoing) {
 		diff = new Decimal(0);
 		player.tab = "gameEnded";
 	}
@@ -3221,13 +3229,13 @@ function hardReset() {
 
 var saveInterval = setInterval(function() {
 	if (player===undefined) return;
-	if (gameEnded) return;
+	if (gameEnded&&!player.keepGoing) return;
 	if (player.autosave) save();
 }, 5000)
 
 var interval = setInterval(function() {
 	if (player===undefined||tmp===undefined) return;
-	if (gameEnded) return;
+	if (gameEnded&&!player.keepGoing) return;
 	let diff = (Date.now()-player.time)/1000
 	if (!player.offlineProd) offTime.remain = 0
 	if (offTime.remain>0) {
@@ -3243,7 +3251,7 @@ var interval = setInterval(function() {
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
-	if (gameEnded) return;
+	if (gameEnded&&!player.keepGoing) return;
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key
