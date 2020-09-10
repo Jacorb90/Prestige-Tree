@@ -6,6 +6,7 @@ var offTime = {
 };
 var needCanvasUpdate = true;
 var NaNalert = false;
+var gameEnded = false;
 
 function getStartPlayer() {
 	return {
@@ -1422,7 +1423,11 @@ const LAYER_UPGS = {
 			desc: "Super-Prestige Points boost Super-Prestige Point gain.",
 			cost: new Decimal(40),
 			unl: function() { return player.sp.upgrades.includes(14)||player.sp.upgrades.includes(23) },
-			currently: function() { return player.sp.points.plus(1).sqrt() },
+			currently: function() {
+				let sp = player.sp.points
+				if (sp.gte(2e4)) sp = sp.cbrt().times(Math.pow(2e4, 2/3));
+				return sp.plus(1).sqrt() 
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		31: {
@@ -1438,14 +1443,16 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x.pow(player.sp.upgrades.includes(11)?100:1))+"x later" },
 		},
 		33: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Points boost Super-Prestige Point gain.",
+			cost: new Decimal(1e4),
+			unl: function() { return player.sp.upgrades.includes(24)&&player.sp.upgrades.includes(32) },
+			currently: function() { return player.points.plus(1).log10().pow(0.1) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		34: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return false },
+			desc: "Boosters & Generators are 25% stronger.",
+			cost: new Decimal(1.5e5),
+			unl: function() { return player.sp.upgrades.includes(33) },
 		},
 	},
 }
@@ -1901,6 +1908,7 @@ function getLayerGainMult(layer) {
 			break;
 		case "sp": 
 			if (player.sp.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.sp[24].currently())
+			if (player.sp.upgrades.includes(33)) mult = mult.times(LAYER_UPGS.sp[33].currently())
 			break;
 	}
 	return mult
@@ -2264,6 +2272,7 @@ function getFreeBoosters() {
 function getBoosterPower() {
 	let power = new Decimal(1)
 	if (spellActive(1)) power = power.times(tmp.spellEffs[1])
+	if (player.sp.upgrades.includes(34)) power = power.times(1.25)
 	return power
 }
 
@@ -2284,6 +2293,7 @@ function addToGenBase() {
 function getGenPow() {
 	let pow = new Decimal(1)
 	if (player.g.upgrades.includes(34)) pow = pow.times(LAYER_UPGS.g[34].currently())
+	if (player.sp.upgrades.includes(34)) pow = pow.times(1.25)
 	return pow
 }
 
@@ -3118,9 +3128,16 @@ function addToSGBase() {
 	return toAdd
 }
 
+const ENDGAME = new Decimal("1e40000000");
+
 function gameLoop(diff) {
 	diff = new Decimal(diff)
 	if (isNaN(diff.toNumber())) diff = new Decimal(0);
+	if (player.points.gte(ENDGAME)) gameEnded = true;
+	if (gameEnded) {
+		diff = new Decimal(0);
+		player.tab = "gameEnded";
+	}
 	player.h.time += diff.toNumber()
 	if (tmp.hcActive ? tmp.hcActive[42] : true) {
 		if (player.h.time>=10) diff = new Decimal(0)
@@ -3204,11 +3221,13 @@ function hardReset() {
 
 var saveInterval = setInterval(function() {
 	if (player===undefined) return;
+	if (gameEnded) return;
 	if (player.autosave) save();
 }, 5000)
 
 var interval = setInterval(function() {
 	if (player===undefined||tmp===undefined) return;
+	if (gameEnded) return;
 	let diff = (Date.now()-player.time)/1000
 	if (!player.offlineProd) offTime.remain = 0
 	if (offTime.remain>0) {
@@ -3224,6 +3243,7 @@ var interval = setInterval(function() {
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
+	if (gameEnded) return;
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key

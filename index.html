@@ -2,7 +2,7 @@
 <head>
 	<title>The Prestige Tree</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 	<script type="text/javascript" src="js/break_eternity.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
 	<script type="text/javascript" src="js/saves.js"></script>
@@ -12,9 +12,25 @@
 </head>
 <body onload="load()">
 	<div id="app">
-		<div class="vl"></div>
+		<div class="vl" v-if="player.tab!='gameEnded'"></div>
+		<div v-if="player.tab=='gameEnded'" class="fullWidth">
+			<br><br>
+			<h2>Thank you for playing The Prestige Tree v1.0!</h2><br><br>
+			<h4>It took you {{formatTime(player.timePlayed)}}</h4><br><br><br><br><br>
+			If you would like to speedrun this, play again from the beginning and record the whole thing as fast as possible, then submit in <span class="link" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" target="_blank">my discord</span><br><br><br><br><br>
+			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>
+		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>v1.0 Full Release</h3>
+			<ul>
+				<li>Converted Vue to production mode</li>
+				<li>Added an end screen at 1e40,000,000 Points</li>
+			</ul><br>
+			<h3>v1.0 Beta 4</h3>
+			<ul>
+				<li>Balanced up to 1e40,000,000 Points & 500,000 Super-Prestige Points</li>
+			</ul><br>
 			<h3>v1.0 Beta 3</h3>
 			<ul>
 				<li>Added a hotkey for the fourth Spell</li>
@@ -327,7 +343,7 @@
 				</tr>
 			</table>
 		</div>
-		<div id="treeTab" onscroll="resizeCanvas()" class="col left">
+		<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" class="col left">
 			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
 			<span v-if="offTime.remain>0">
