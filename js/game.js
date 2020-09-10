@@ -6,6 +6,7 @@ var offTime = {
 };
 var needCanvasUpdate = true;
 var NaNalert = false;
+var gameEnded = false;
 
 function getStartPlayer() {
 	return {
@@ -15,9 +16,10 @@ function getStartPlayer() {
 		notify: {},
 		msDisplay: "always",
 		offlineProd: true,
-		versionType: "release",
+		versionType: "real",
 		version: 1.1,
 		timePlayed: 0,
+		keepGoing: false,
 		hasNaN: false,
 		points: new Decimal(10),
 		p: {
@@ -347,7 +349,9 @@ const LAYER_UPGS = {
 			unl: function() { return player.p.upgrades.includes(11) },
 			currently: function() {
 				if (tmp.hcActive ? tmp.hcActive[32] : true) return new Decimal(1)
-				return player.p.points.plus(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) 
+				let ret = player.p.points.plus(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) 
+				if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
+				return ret;
 			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
@@ -394,7 +398,9 @@ const LAYER_UPGS = {
 			unl: function() { return player.e.upgrades.includes(33) },
 			currently: function() { 
 				let ret = player.p.points.plus(1).log10().plus(1).pow(player.p.points.plus(1).log10().div(200).plus(1)).pow(player.p.upgrades.includes(32) ? LAYER_UPGS.p[32].currently() : 1) 
-				if (ret.gte("1e1000")) ret = ret.log10().times("1e997")
+				let capStart = new Decimal("1e1000")
+				if (player.sp.upgrades.includes(32)) capStart = capStart.times(LAYER_UPGS.sp[32].currently())
+				if (ret.gte(capStart)) ret = ret.log10().times(capStart.div(1e3))
 				if (player.sp.upgrades.includes(11)) ret = ret.pow(100)
 				return ret;
 			},
@@ -404,7 +410,10 @@ const LAYER_UPGS = {
 			desc: "The upgrade to the left is stronger based on your Points.",
 			cost: new Decimal("1e5140"),
 			unl: function() { return player.e.upgrades.includes(33) },
-			currently: function() { return player.points.plus(1).log10().plus(1).root(16) },
+			currently: function() {
+				let ret = player.points.plus(1).log10().plus(1).root(16);
+				return ret;
+			},
 			effDisp: function(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 		33: {
@@ -465,7 +474,11 @@ const LAYER_UPGS = {
 			desc: "Add free Boosters based on your Generator Power.",
 			cost: new Decimal(1261),
 			unl: function() { return player.hb.upgrades.includes(14) },
-			currently: function() { return player.g.power.plus(1).log10().sqrt().floor() },
+			currently: function() {
+				let ret = player.g.power.plus(1).log10().sqrt().floor();
+				if (ret.gte(1e3)) ret = ret.log10().times(1e3/3)
+				return ret;
+			},
 			effDisp: function(x) { return "+"+formatWhole(x) },
 		},
 		33: {
@@ -507,7 +520,11 @@ const LAYER_UPGS = {
 			desc: "Prestige Upgrade 3 is stronger based on your Generators.",
 			cost: new Decimal(15),
 			unl: function() { return player.g.upgrades.includes(13) },
-			currently: function() { return player.g.points.sqrt().plus(1).times((player.e.upgrades.includes(32)&&!(tmp.hcActive?tmp.hcActive[12]:true)) ? LAYER_UPGS.e[32].currently() : 1) },
+			currently: function() { 
+				let ret = player.g.points.sqrt().plus(1).times((player.e.upgrades.includes(32)&&!(tmp.hcActive?tmp.hcActive[12]:true)) ? LAYER_UPGS.e[32].currently() : 1) 
+				if (ret.gte(400)) ret = ret.cbrt().times(Math.pow(400, 2/3))
+				return ret;
+			},
 			effDisp: function(x) { return "^"+format(x) },
 		},
 		21: {
@@ -1355,7 +1372,7 @@ const LAYER_UPGS = {
 		},
 	},
 	sp: {
-		rows: 2,
+		rows: 3,
 		cols: 4,
 		11: {
 			desc: "The Prestige Upgrade 3, 6, & 7 effects are raised to the power of 100.",
@@ -1408,8 +1425,36 @@ const LAYER_UPGS = {
 			desc: "Super-Prestige Points boost Super-Prestige Point gain.",
 			cost: new Decimal(40),
 			unl: function() { return player.sp.upgrades.includes(14)||player.sp.upgrades.includes(23) },
-			currently: function() { return player.sp.points.plus(1).sqrt() },
+			currently: function() {
+				let sp = player.sp.points
+				if (sp.gte(2e4)) sp = sp.cbrt().times(Math.pow(2e4, 2/3));
+				return sp.plus(1).sqrt() 
+			},
 			effDisp: function(x) { return format(x)+"x" },
+		},
+		31: {
+			desc: "Super-Generators are 45% cheaper.",
+			cost: new Decimal(1000),
+			unl: function() { return player.sp.upgrades.includes(22) },
+		},
+		32: {
+			desc: "Prestige Upgrade 7 softcaps later based on your Super-Prestige Points.",
+			cost: new Decimal(4000),
+			unl: function() { return player.sp.upgrades.includes(23)&&player.sp.upgrades.includes(31) },
+			currently: function() { return player.sp.points.plus(1).log10().plus(1).pow(1e4) },
+			effDisp: function(x) { return format(x.pow(player.sp.upgrades.includes(11)?100:1))+"x later" },
+		},
+		33: {
+			desc: "Points boost Super-Prestige Point gain.",
+			cost: new Decimal(1e4),
+			unl: function() { return player.sp.upgrades.includes(24)&&player.sp.upgrades.includes(32) },
+			currently: function() { return player.points.plus(1).log10().pow(0.1) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		34: {
+			desc: "Boosters & Generators are 25% stronger.",
+			cost: new Decimal(1.5e5),
+			unl: function() { return player.sp.upgrades.includes(33) },
 		},
 	},
 }
@@ -1643,6 +1688,7 @@ function checkForVars() {
 	if (player.offlineProd === undefined) player.offlineProd = true
 	if (player.notify === undefined) player.notify = {}
 	if (player.sp === undefined) player.sp = start.sp
+	if (player.keepGoing === undefined) player.keepGoing = false
 }
 
 function convertToDecimal() {
@@ -1752,8 +1798,7 @@ function showTab(name) {
 	player.tab = name
 	
 	if (toTreeTab != onTreeTab) {
-		document.getElementById("treeTab").className = "col " + (toTreeTab ? "full" : "left")
-		document.getElementById("vl").className = "vl " + (toTreeTab ? "none" : "")
+		document.getElementById("treeTab").className = toTreeTab ? "fullWidth" : "col left"
 		onTreeTab = toTreeTab
 		resizeCanvas()
 	}
@@ -1865,6 +1910,9 @@ function getLayerGainMult(layer) {
 		case "sb":
 			if (player.ss.upgrades.includes(14)) mult = mult.div(1.0825)
 			break;
+		case "sg": 
+			if (player.sp.upgrades.includes(31)) mult = mult.div(1.45)
+			break;
 		case "h": 
 			if (player.h.challs.includes(71)) mult = mult.times(H_CHALLS[71].currently())
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
@@ -1888,6 +1936,7 @@ function getLayerGainMult(layer) {
 			break;
 		case "sp": 
 			if (player.sp.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.sp[24].currently())
+			if (player.sp.upgrades.includes(33)) mult = mult.times(LAYER_UPGS.sp[33].currently())
 			break;
 	}
 	return mult
@@ -2272,6 +2321,7 @@ function getFreeBoosters() {
 function getBoosterPower() {
 	let power = new Decimal(1)
 	if (spellActive(1)) power = power.times(tmp.spellEffs[1])
+	if (player.sp.upgrades.includes(34)) power = power.times(1.25)
 	return power
 }
 
@@ -2292,6 +2342,7 @@ function addToGenBase() {
 function getGenPow() {
 	let pow = new Decimal(1)
 	if (player.g.upgrades.includes(34)) pow = pow.times(LAYER_UPGS.g[34].currently())
+	if (player.sp.upgrades.includes(34)) pow = pow.times(1.25)
 	return pow
 }
 
@@ -2665,13 +2716,16 @@ function getQuirkLayerCostBase() {
 }
 
 function getQuirkLayerCost() {
-	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, player.q.layers)).sub(1)
+	let layers = player.q.layers
+	if (layers.gte(20)) layers = Decimal.pow(1.05, layers.sub(20)).times(20)
+	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, layers)).sub(1)
 	return cost.max(1);
 }
 
 function getQuirkLayerTarg() {
-	let targ = player.q.points.plus(1).log(tmp.qCB).plus(1).log(tmp.qCB).plus(1).floor()
-	return targ
+	let targ = player.q.points.plus(1).log(tmp.qCB).plus(1).log(tmp.qCB)
+	if (targ.gte(20)) targ = targ.div(20).log(1.05).plus(20)
+	return targ.plus(1).floor()
 }
 
 function getQuirkLayerMult() {
@@ -3024,8 +3078,13 @@ function getSpellPower(x) {
 	if (player.m.upgrades.includes(11)) power = power.times(LAYER_UPGS.m[11].currently())
 	if (player.m.upgrades.includes(21) && (x==2||x==3)) power = power.times(LAYER_UPGS.m[21].currently())
 	if (player.m.upgrades.includes(22) && (x==2)) power = power.times(10)
-	if (player.m.upgrades.includes(41)) power = power.times(player.m.casted[x].max(1).log10().plus(1).log10().div(5).plus(1))
+	if (player.m.upgrades.includes(41)) {
+		let casted = player.m.casted[x]
+		power = power.times(casted.max(1).log10().plus(1).log10().div(5).plus(1))
+	}
 	if (player.sp.upgrades.includes(23)) power = power.times(LAYER_UPGS.sp[23].currently())
+	
+	if (power.gte(50)) power = power.log10().times(50/Math.log10(50)).min(power)
 	return power.max(1);
 }
 
@@ -3126,8 +3185,21 @@ function addToSGBase() {
 	return toAdd
 }
 
+function keepGoing() {
+	player.keepGoing = true;
+	player.tab = "tree"
+	needCanvasUpdate = true;
+}
+
+const ENDGAME = new Decimal(1/0);
+
 function gameLoop(diff) {
+	if (player.points.gte(ENDGAME)) gameEnded = true;
 	if (isNaN(diff)) diff = 0
+	if (gameEnded && !player.keepGoing) {
+		diff = 0
+		player.tab = "gameEnded"
+	}
 	player.timePlayed += diff
 	player.h.time += diff
 	if (tmp.hcActive ? tmp.hcActive[42] : true) {
@@ -3201,11 +3273,13 @@ function hardReset() {
 
 var saveInterval = setInterval(function() {
 	if (player===undefined) return;
+	if (gameEnded&&!player.keepGoing) return;
 	if (player.autosave) save();
 }, 5000)
 
 var interval = setInterval(function() {
 	if (player===undefined||tmp===undefined) return;
+	if (gameEnded&&!player.keepGoing) return;
 	let diff = (Date.now()-player.time)/1000
 	if (!player.offlineProd) offTime.remain = 0
 	if (offTime.remain>0) {
@@ -3221,6 +3295,7 @@ var interval = setInterval(function() {
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
+	if (gameEnded&&!player.keepGoing) return;
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key
@@ -3243,13 +3318,16 @@ document.onkeydown = function(e) {
 				if (player.ss.unl) doReset("ss")
 				break;
 			case "1": 
-				if (player.ba.unl) activateSpell(1)
+				if (player.m.unl) activateSpell(1)
 				break;
 			case "2": 
-				if (player.ba.unl) activateSpell(2)
+				if (player.m.unl) activateSpell(2)
 				break;
 			case "3": 
-				if (player.ba.unl) activateSpell(3)
+				if (player.m.unl) activateSpell(3)
+				break;
+			case "4": 
+				if (player.m.unl&&player.sp.upgrades.includes(13)) activateSpell(4)
 				break;
 			case "P": 
 				if (player.sp.unl) doReset("sp")

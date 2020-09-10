@@ -3,7 +3,7 @@
 	<title>The Prestige Tree</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 	<script type="text/javascript" src="js/break_eternity.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
 	<script type="text/javascript" src="js/saves.js"></script>
@@ -13,17 +13,45 @@
 </head>
 <body onload="load()">
 	<div id="app">
-		<div id="vl" class="vl none"></div>
+		<div class="vl" v-if="player.tab!='tree'&&player.tab!='gameEnded'"></div>
+		<div v-if="player.tab=='gameEnded'" class="fullWidth">
+			<h2>Prestige Tree</h2>
+			<br>
+			<h3>Version 1.1: The Life Update</h3>
+			<br><br>
+			<h2>Thank you for playing this game!</h2><br><br>
+			<h4>It took you {{formatTime(player.timePlayed)}}</h4><br><br><br><br><br>
+			If you would like to speedrun this, play again from the beginning and record the whole thing as fast as possible, then submit in <span class="link" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" target="_blank">my discord</span><br><br><br><br><br>
+			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
+		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('info')">←</button><br>
 			<h3>Version 1.1: The Life Update</h3>
 			<ul>
 				<li>???</li>
 			</ul><br>
+			<h3>v1.0 Patch 1</h3>
+			<ul>
+				<li>Added an option to keep going at endgame</li>
+			</ul><br>
 			<div class="link" onclick="showTab('changelog_beta')">Alpha / Beta</div><br>
 		</div>
 		<div v-if="player.tab=='changelog_beta'" class="col right">
 			<button class="back" onclick="showTab('changelog')">←</button><br>
+			<h3>v1.0 Full Release</h3>
+			<ul>
+				<li>Converted Vue to production mode</li>
+				<li>Added an end screen at 1e40,000,000 Points</li>
+			</ul><br>
+			<h3>v1.0 Beta 4</h3>
+			<ul>
+				<li>Balanced up to 1e40,000,000 Points & 500,000 Super-Prestige Points</li>
+			</ul><br>
+			<h3>v1.0 Beta 3</h3>
+			<ul>
+				<li>Added a hotkey for the fourth Spell</li>
+				<li>Balanced up to 1e29,000,000 Points & 10,000 Super-Prestige Points</li>
+			</ul><br>
 			<h3>v1.0 Beta 2</h3>
 			<ul>
 				<li>Fixed a bug involving the fourth Spell</li>
@@ -311,8 +339,9 @@
 				M: Magic reset<br>
 				1: Cast spell 1<br>
 				2: Cast spell 2<br>
-				3: Cast spell 3
-			</span><br>
+				3: Cast spell 3<br>
+				<span v-if="player.sp.upgrades.includes(13)">4: Cast spell 4<br></span>
+			</span>
 			<span v-if="player.ba.unl">A: Balance reset</span><br>
 			<span v-if="player.sp.unl">Shift+P: Super-Prestige reset</span><br>
 		</div>
@@ -335,7 +364,7 @@
 				</tr>
 			</table>
 		</div>
-		<div id="treeTab" onscroll="resizeCanvas()" class="col full">
+		<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" class="fullWidth">
 			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
 			<span v-if="offTime.remain>0">
