@@ -409,10 +409,17 @@
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
-				<td id="l" v-if="layerUnl('l')"><button class="treeNode l">L</button></td>
+				<td id="l" v-if="layerUnl('l')"><button onclick="showTab('l')" v-bind:tooltip="(player.b.points.gte(tmp.layerReqs.l)||player.l.unl) ? (formatWhole(player.l.points)+' life essence') : ('Reach '+format(tmp.layerReqs.l)+' boosters to unlock')" v-bind:class="{ treeNode: true, l: true, locked: (player.b.points.lt(tmp.layerReqs.l)&&!player.l.unl), can: (player.b.points.gte(tmp.layerReqs.l)||player.l.unl) }">L</button></td>
 				<td id="sp" v-if="layerUnl('sp')"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
-				<td id="hs" v-if="layerUnl('hs')"><button class="treeNode hs">HS</button></td>
+				<td id="hs" v-if="layerUnl('hs')"><button onclick="showTab('hs')" v-bind:tooltip="(player.s.points.gte(tmp.layerReqs.hs)||player.hs.unl) ? (formatWhole(player.hs.points)+' hyperspace') : ('Reach '+format(tmp.layerReqs.hs)+' space energy to unlock')" v-bind:class="{ treeNode: true, hs: true, locked: (player.s.points.lt(tmp.layerReqs.hs)&&!player.hs.unl), can: (player.s.points.gte(tmp.layerReqs.hs)||player.hs.unl) }">HS</button></td>
 				<td id="i" v-if="layerUnl('ps')||layerUnl('i')"><button v-bind:class="{treeNode: true, i: true, hidden: !layerUnl('i')}">I</button></td>
+			</table><table>
+				<td><button class="treeNode hidden"></button></td>
+			</table><table>
+				<td v-if="player.tab=='tree'&&layerUnl('tm')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(6)"></img></td>
+				<td id="mb" v-if="layerUnl('mb')"><button class="treeNode mb">MB</button></td>
+				<td id="ge" v-if="layerUnl('ge')"><button class="treeNode ge">Ge</button></td>
+				<td id="ma" v-if="layerUnl('ma')"><button class="treeNode tm">Ma</button></td>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
@@ -471,10 +478,10 @@
 					You have {{ format(player.g.power) }} Generator Power<br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<div class="upgRow">
-						<div v-for="id in tmp.sbUnl">
-							<button v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)"><h3>Building {{id}}</h3><br>{{getSpaceBuildingEffDesc(id)}}<br><br>Level: {{formatWhole(player.s.buildings[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power</button><br><br>
-							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: player.s.buildings[id].gte(1), locked: player.s.buildings[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
-							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: player.s.buildings[id].gte(1), locked: player.s.buildings[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
+						<div v-for="id in tmp.trueSbUnl">
+							<button v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)"><h3>Building {{id}}</h3><br>{{getSpaceBuildingEffDesc(id)}}<br><br>Level: {{formatWhole(tmp.spaceBuildLvl[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power</button><br><br>
+							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: tmp.spaceBuildLvl[id].gte(1), locked: tmp.spaceBuildLvl[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
+							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: tmp.spaceBuildLvl[id].gte(1), locked: tmp.spaceBuildLvl[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
 						</div>
 					</div>
 				</div>

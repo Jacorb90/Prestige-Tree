@@ -83,6 +83,17 @@ function drawTree() {
 	if (layerUnl('i')) {
 		drawTreeBranch("ss", "i")
 	}
+	if (layerUnl('mb')) {
+		drawTreeBranch("l", "mb")
+		drawTreeBranch("ps", "mb", 2)
+	}
+	if (layerUnl('ge')) {
+		drawTreeBranch("sp", "ge")
+	}
+	if (layerUnl('ma')) {
+		drawTreeBranch("hs", "ma")
+		drawTreeBranch("i", "ma")
+	}
 	needCanvasUpdate = false;
 }
 

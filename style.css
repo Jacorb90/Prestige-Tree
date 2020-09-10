@@ -65,7 +65,7 @@ h1, h2, h3, b, input {
 }
 
 .locked {
-	background-color: #9c6e6e !important;
+	background-color: #bf8f8f !important;
 	cursor: not-allowed;
 }
 
@@ -357,6 +357,36 @@ h1, h2, h3, b, input {
 .i_txt {
 	color: #e5dab7;
 	text-shadow: 0px 0px 10px #e5dab7;
+}
+
+.mb {
+	background-color: #ff9f7f;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.mb_txt {
+	color: #ff9f7f;
+	text-shadow: 0px 0px 10px #ff9f7f;
+}
+
+.ge {
+	background-color: #bfbfbf;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.ge_txt {
+	color: #bfbfbf;
+	text-shadow: 0px 0px 10px #bfbfbf;
+}
+
+.ma {
+	background-color: #9f9f9f;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.ma_txt {
+	color: #9f9f9f;
+	text-shadow: 0px 0px 10px #9f9f9f;
 }
 
 #optionWheel {

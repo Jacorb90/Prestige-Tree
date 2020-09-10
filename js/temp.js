@@ -23,14 +23,14 @@ function updateTemp() {
 		tmp.resetGain[LAYERS[i]] = getResetGain(LAYERS[i])
 		tmp.nextAt[LAYERS[i]] = getNextAt(LAYERS[i])
 	}
-	
+
 	tmp.pointGen = getPointGen()
-	
+
 	tmp.atbb = addToBoosterBase()
 	tmp.atgb = addToGenBase()
-	
+
 	tmp.genPowEff = getGenPowerEff()
-	
+
 	tmp.enhPow = getEnhancerPow()
 	tmp.enhEff = getEnhancerEff()
 	tmp.enhEff2 = getEnhancerEff2()
@@ -38,14 +38,19 @@ function updateTemp() {
 	if (tmp.hcActive ? tmp.hcActive[52] : true) {
 		tmp.subbedEnh = tmp.subbedEnh.plus(new Decimal(player.h.time).times(40).plus(1).log10().pow(10).max(10)).round()
 	}
-	
+
 	tmp.freeExtCap = getFreeExtCapsules()
 	tmp.timeEff = getTimeEnergyEff()
 	tmp.attb = addToTimeBase()
-	
+
+	if (!tmp.spaceBuildLvl) tmp.spaceBuildLvl = {}
 	if (!tmp.spaceBuildEff) tmp.spaceBuildEff = {}
-	for (let i=1;i<=5;i++) tmp.spaceBuildEff[i] = getSpaceBuildingEff(i)
+	for (let i=1;i<=MAX_BUILDINGS;i++) {
+		tmp.spaceBuildLvl[i] = fixValue(player.s.buildings[i])
+		tmp.spaceBuildEff[i] = getSpaceBuildingEff(i)
+	}
 	tmp.sbUnl = getSpaceBuildingsUnl()
+	tmp.trueSbUnl = Decimal.min(tmp.sbUnl, MAX_BUILDINGS).floor().toNumber()
 
 	tmp.quirkEff = getQuirkEnergyEff()
 	tmp.qCB = getQuirkLayerCostBase()
