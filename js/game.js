@@ -6,6 +6,7 @@ var offTime = {
 };
 var needCanvasUpdate = true;
 var NaNalert = false;
+var gameEnded = false;
 
 function getStartPlayer() {
 	return {
@@ -3127,9 +3128,16 @@ function addToSGBase() {
 	return toAdd
 }
 
+const ENDGAME = new Decimal("1e40000000");
+
 function gameLoop(diff) {
 	diff = new Decimal(diff)
 	if (isNaN(diff.toNumber())) diff = new Decimal(0);
+	if (player.points.gte(ENDGAME)) gameEnded = true;
+	if (gameEnded) {
+		diff = new Decimal(0);
+		player.tab = "gameEnded";
+	}
 	player.h.time += diff.toNumber()
 	if (tmp.hcActive ? tmp.hcActive[42] : true) {
 		if (player.h.time>=10) diff = new Decimal(0)
@@ -3213,11 +3221,13 @@ function hardReset() {
 
 var saveInterval = setInterval(function() {
 	if (player===undefined) return;
+	if (gameEnded) return;
 	if (player.autosave) save();
 }, 5000)
 
 var interval = setInterval(function() {
 	if (player===undefined||tmp===undefined) return;
+	if (gameEnded) return;
 	let diff = (Date.now()-player.time)/1000
 	if (!player.offlineProd) offTime.remain = 0
 	if (offTime.remain>0) {
@@ -3233,6 +3243,7 @@ var interval = setInterval(function() {
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
+	if (gameEnded) return;
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key

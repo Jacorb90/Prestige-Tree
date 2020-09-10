@@ -324,6 +324,22 @@ h1, h2 {
               -3px 0px 12px #02f2f2;
 }
 
+.link {
+	color: white;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: bold;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: #02f2f2;
+	text-decoration: none;
+}
+
+.link:hover {
+	transform: scale(1.2, 1.2);
+	text-shadow: 5px 0px 10px #02f2f2,
+              -3px 0px 12px #02f2f2;
+}
+
 .opt {
 	height: 100px;
 	width: 100px;
@@ -433,6 +449,12 @@ ul {
 	background-color: #93f0fa;
 	border: 4px solid #03858f;
 	color: #03858f;
+}
+
+.fullWidth {
+	position: absolute;
+	width: 100%;
+	min-width: 100%;
 }
 
 [tooltip] {
