@@ -15,6 +15,11 @@
 		<div class="vl"></div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br>
+			<h3>v1.0 Beta 3</h3>
+			<ul>
+				<li>Added a hotkey for the fourth Spell</li>
+				<li>Balanced up to 1e29,000,000 Points & 10,000 Super-Prestige Points</li>
+			</ul><br>
 			<h3>v1.0 Beta 2</h3>
 			<ul>
 				<li>Fixed a bug involving the fourth Spell</li>
@@ -298,8 +303,9 @@
 				M: Magic reset<br>
 				1: Cast spell 1<br>
 				2: Cast spell 2<br>
-				3: Cast spell 3
-			</span><br>
+				3: Cast spell 3<br>
+				<span v-if="player.sp.upgrades.includes(13)">4: Cast spell 4<br></span>
+			</span>
 			<span v-if="player.ba.unl">A: Balance reset</span><br>
 			<span v-if="player.sp.unl">Shift+P: Super-Prestige reset</span><br>
 		</div>
