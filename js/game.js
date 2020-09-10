@@ -1516,7 +1516,7 @@ const TAB_REQS = {
 	m: function() { return (player.m.unl||player.h.points.gte(tmp.layerReqs.m))&&layerUnl('m') },
 	ba: function() { return (player.ba.unl||player.q.points.gte(tmp.layerReqs.ba))&&layerUnl('ba') },
 	sp: function() { return (player.sp.unl||player.p.points.gte(tmp.layerReqs.sp))&&layerUnl('sp') },
-	l: function() { return (player.l.unl||player.b.points.gte(tmp.layerReqs.l))&&layerUnl('l') },
+	l: function() { return (player.l.unl||player.m.points.gte(tmp.layerReqs.l))&&layerUnl('l') },
 	hs: function() { return (player.hs.unl||player.s.points.gte(tmp.layerReqs.hs))&&layerUnl('hs') },
 }
 
