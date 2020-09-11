@@ -54,19 +54,35 @@ function updateTemp() {
 
 	tmp.quirkEff = getQuirkEnergyEff()
 	tmp.qCB = getQuirkLayerCostBase()
-	
+
 	tmp.ssEff1 = getSubspaceEff1()
 	tmp.ssEff2 = getSubspaceEff2()
 	tmp.ssEff3 = getSubspaceEff3()
-	
+
 	tmp.balEff = getBalancePowerEff()
 	tmp.balEff2 = getBalanceTypesEff()
 	tmp.baExp = getBalanceEnergyExp()
-	
+
 	tmp.hexEff = getHexEff()
 	tmp.spellsUnl = player.sp.upgrades.includes(13)?4:3
 	if (!tmp.spellEffs) tmp.spellEffs = {}
 	for (let i=1;i<=4;i++) tmp.spellEffs[i] = getSpellEff(i)
-	
+
 	tmp.sGenPowEff = getSGenPowEff()
+
+	if (layerUnl("l")) {
+		if (!tmp.l) tmp.l = {
+			lb: {},
+			lbEff: {}
+		}
+		var data = tmp.l
+		var data2 = LIFE_BOOSTERS
+
+		data.lpEff = data2.eff()
+		data.lbUnl = data2.unl()
+		for (let i=1;i<=data2.max;i++) {
+			data.lb[i] = fixValue(player.l.boosters[i])
+			data.lbEff[i] = data2[i].eff(data.lb[i].times(data.lpEff))
+		}
+	}
 }

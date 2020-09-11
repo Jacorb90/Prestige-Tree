@@ -31,66 +31,66 @@ var colors = {
 function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	if (layerUnl('b')) drawTreeBranch("p", "b")
-	if (layerUnl('g')) drawTreeBranch("p", "g")
-	if (layerUnl('e')) {
+	if (layerShown('b')) drawTreeBranch("p", "b")
+	if (layerShown('g')) drawTreeBranch("p", "g")
+	if (layerShown('e')) {
 		drawTreeBranch("b", "e")
 		drawTreeBranch("g", "e")
 	}
-	if (layerUnl('t')) drawTreeBranch("b", "t")
-	if (layerUnl('sb')) drawTreeBranch("b", "sb")
-	if (layerUnl('sg')) drawTreeBranch("g", "sg")
-	if (layerUnl('s')) drawTreeBranch("g", "s")
-	if (layerUnl('h')) drawTreeBranch("t", "h")
-	if (layerUnl('q')) drawTreeBranch("e", "q")
-	if (layerUnl('hb')) {
+	if (layerShown('t')) drawTreeBranch("b", "t")
+	if (layerShown('sb')) drawTreeBranch("b", "sb")
+	if (layerShown('sg')) drawTreeBranch("g", "sg")
+	if (layerShown('s')) drawTreeBranch("g", "s")
+	if (layerShown('h')) drawTreeBranch("t", "h")
+	if (layerShown('q')) drawTreeBranch("e", "q")
+	if (layerShown('hb')) {
 		drawTreeBranch("sb", "hb")
 		drawTreeBranch("t", "hb")
 	}
-	if (layerUnl('ss')) {
+	if (layerShown('ss')) {
 		drawTreeBranch("e", "ss")
 		drawTreeBranch("s", "ss")
 	}
-	if (layerUnl('hg')) {
+	if (layerShown('hg')) {
 		drawTreeBranch("sg", "hg")
 	}
-	if (layerUnl('m')) {
+	if (layerShown('m')) {
 		drawTreeBranch("hb", "m")
 		drawTreeBranch("h", "m")
 		drawTreeBranch("q", "m")
 	}
-	if (layerUnl('ba')) {
+	if (layerShown('ba')) {
 		drawTreeBranch("h", "ba", 2)
 		drawTreeBranch("q", "ba")
 		drawTreeBranch("ss", "ba")
 	}
-	if (layerUnl('sp')) {
+	if (layerShown('sp')) {
 		drawTreeBranch("m", "sp")
 		drawTreeBranch("ba", "sp")
 	}
-	if (layerUnl('l')) {
+	if (layerShown('l')) {
 		drawTreeBranch("hb", "l")
 		drawTreeBranch("m", "l")
 	}
-	if (layerUnl('ps')) {
+	if (layerShown('ps')) {
 		drawTreeBranch("h", "ps", 3)
 		drawTreeBranch("q", "ps", 3)
 	}
-	if (layerUnl('hs')) {
+	if (layerShown('hs')) {
 		drawTreeBranch("ss", "hs")
 		drawTreeBranch("ba", "hs")
 	}
-	if (layerUnl('i')) {
+	if (layerShown('i')) {
 		drawTreeBranch("ss", "i")
 	}
-	if (layerUnl('mb')) {
+	if (layerShown('mb')) {
 		drawTreeBranch("l", "mb")
 		drawTreeBranch("ps", "mb", 2)
 	}
-	if (layerUnl('ge')) {
+	if (layerShown('ge')) {
 		drawTreeBranch("sp", "ge")
 	}
-	if (layerUnl('ma')) {
+	if (layerShown('ma')) {
 		drawTreeBranch("hs", "ma")
 		drawTreeBranch("i", "ma")
 	}

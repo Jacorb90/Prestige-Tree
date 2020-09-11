@@ -15,18 +15,14 @@
 	<div id="app">
 		<div class="vl" v-if="player.tab!='tree'&&player.tab!='gameEnded'"></div>
 		<div v-if="player.tab=='gameEnded'" class="fullWidth">
-			<h2>Prestige Tree</h2>
-			<br>
-			<h3>Version 1.1: The Life Update</h3>
-			<br><br>
-			<h2>Thank you for playing this game!</h2><br><br>
+			<h2>Thank you for playing Prestige Tree v{{player.version}}!</h2><br>
 			<h4>It took you {{formatTime(player.timePlayed)}}</h4><br><br><br><br><br>
 			If you would like to speedrun this, play again from the beginning and record the whole thing as fast as possible, then submit in <span class="link" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" target="_blank">my discord</span><br><br><br><br><br>
 			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
-			<button class="back" onclick="showTab('info')">←</button><br>
-			<h3>Version 1.1: The Life Update</h3>
+			<button class="back" onclick="showTab('tree')">←</button><br>
+			<h3>v1.1: The Life Update</h3>
 			<ul>
 				<li>???</li>
 			</ul><br>
@@ -309,7 +305,7 @@
 			<button class="back" onclick="showTab('tree')">←</button><br>
 			<h2>Prestige Tree</h2>
 			<br>
-			<h3>Version 1.1: The Life Update</h3>
+			<h3>v1.1: The Life Update</h3>
 			<br>
 			Made by Jacorb and Aarex
 			<br>
@@ -323,27 +319,29 @@
 			<br><br>
 			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
 			<h3>Hotkeys</h3><br>
-			P: Prestige reset<br>
-			<span v-if="player.b.unl">B: Booster reset</span><br>
-			<span v-if="player.g.unl">G: Generator reset</span><br>
-			<span v-if="player.t.unl">T: Time reset</span><br>
-			<span v-if="player.e.unl">E: Enhance reset</span><br>
-			<span v-if="player.s.unl">S: Space reset</span><br>
-			<span v-if="player.sb.unl">Shift+B: Super-Booster reset</span><br>
-			<span v-if="player.sg.unl">Shift+G: Super-Generator reset</span><br>
-			<span v-if="player.h.unl">H: Hindrance reset</span><br>
-			<span v-if="player.q.unl">Q: Quirk reset</span><br>
-			<span v-if="player.hb.unl">Ctrl+B: Hyper-Booster reset</span><br>
-			<span v-if="player.ss.unl">Shift+S: Subspace reset</span><br>
+			<span v-if="player.p.unl"><br>P: Prestige reset</span>
+			<span v-if="player.b.unl"><br>B: Booster reset</span>
+			<span v-if="player.g.unl"><br>G: Generator reset</span>
+			<span v-if="player.t.unl"><br>T: Time reset</span>
+			<span v-if="player.e.unl"><br>E: Enhance reset</span>
+			<span v-if="player.s.unl"><br>S: Space reset</span>
+			<span v-if="player.sb.unl"><br>Shift+B: Super-Booster reset</span>
+			<span v-if="player.sg.unl"><br>Shift+G: Super-Generator reset</span>
+			<span v-if="player.h.unl"><br>H: Hindrance reset</span>
+			<span v-if="player.q.unl"><br>Q: Quirk reset</span>
+			<span v-if="player.hb.unl"><br>Ctrl+B: Hyper-Booster reset</span>
+			<span v-if="player.ss.unl"><br>Shift+S: Subspace reset</span>
+			<span v-if="player.m.unl"><br>M: Magic reset</span>
+			<span v-if="player.ba.unl"><br>A: Balance reset</span>
+			<span v-if="player.ps.unl"><br>Ctrl+P: Phantom Soul reset</span>
+			<span v-if="player.sp.unl"><br>Shift+P: Super-Prestige reset</span>
+			<span v-if="player.l.unl"><br>L: Life Essence reset</span>
+			<span v-if="player.hs.unl"><br>Ctrl+S: Hyperspace reset</span>
+			<span v-if="player.i.unl"><br>I: Imperium Brick reset</span>
 			<span v-if="player.m.unl">
-				M: Magic reset<br>
-				1: Cast spell 1<br>
-				2: Cast spell 2<br>
-				3: Cast spell 3<br>
-				<span v-if="player.sp.upgrades.includes(13)">4: Cast spell 4<br></span>
+				<br>
+				<span v-for="i in tmp.spellsUnl"><br>{{i}}: Cast spell {{i}}</span>
 			</span>
-			<span v-if="player.ba.unl">A: Balance reset</span><br>
-			<span v-if="player.sp.unl">Shift+P: Super-Prestige reset</span><br>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
@@ -364,72 +362,78 @@
 				</tr>
 			</table>
 		</div>
-		<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" class="fullWidth">
+		<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.tab == 'tree', col: player.tab != 'tree', left: player.tab != 'tree'}">
+			<div id="version" v-if="player.tab!='changelog'" onclick="showTab('changelog')">v{{player.version}}</div>
 			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
 			<span v-if="offTime.remain>0">
 				<br>Offline Time: {{formatTime(offTime.remain)}} ({{format(offTime.speed)}}x speed)<br>
 			</span>
-			<br>You have <h2 id="points">{{format(player.points)}}</h2> Points
+			<br>
+			<span v-if="player.points.lt('1e1000')">You have </span>
+			<h2 id="points">{{format(player.points)}}</h2>
+			<span v-if="player.points.lt('1e1e6')"> points</span>
 			<br><br><br><br><br>
 			<table>
-				<td id="p"><button onclick="showTab('p')" v-bind:tooltip="(player.points.gte(tmp.layerReqs.p)||player.p.unl) ? (formatWhole(player.p.points)+' prestige points') : ('Reach '+format(tmp.layerReqs.p)+' points to unlock')" v-bind:class="{ treeNode: true, p: true, locked: (player.points.lt(tmp.layerReqs.p)&&!player.p.unl), notify: player.notify.p, can: (player.points.gte(tmp.layerReqs.p)||player.p.unl) }">P</button></td>
+				<td><layer-node layer='p' abb='P'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&(player.b.unl||player.g.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
-				<td id="b" v-if="layerUnl('b')"><button onclick="showTab('b')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.b)||player.b.unl)&&layerUnl('b')) ? (formatWhole(player.b.points)+' boosters') : ('Reach '+format(tmp.layerReqs.b)+' points to unlock')" v-bind:class="{ treeNode: true, b: true, locked: (player.points.lt(tmp.layerReqs.b)&&!player.b.unl), notify: player.notify.b, can: (player.points.gte(tmp.layerReqs.b)||player.b.unl) }">B</button></td>
-				<td id="g" v-if="layerUnl('g')"><button onclick="showTab('g')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.g)||player.g.unl)&&layerUnl('g')) ? (formatWhole(player.g.points)+' generators') : ('Reach '+format(tmp.layerReqs.g)+' points to unlock')" v-bind:class="{ treeNode: true, g: true, locked: (player.points.lt(tmp.layerReqs.g)&&!player.g.unl), notify: player.notify.g, can: (player.points.gte(tmp.layerReqs.g)||player.g.unl) }">G</button></td>
+				<td><layer-node layer='b' abb='B'></layer-node></td>
+				<td><layer-node layer='g' abb='G'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&(player.e.unl||player.t.unl||player.s.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
-				<td id="sb" v-if="layerUnl('sb')"><button onclick="showTab('sb')" v-bind:tooltip="((player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl)&&layerUnl('sb')) ? (formatWhole(player.sb.points)+' super-boosters') : ('Reach '+formatWhole(tmp.layerReqs.sb)+' boosters to unlock')" v-bind:class="{ treeNode: true, sb: true, locked: (player.b.points.lt(tmp.layerReqs.sb)&&!player.sb.unl), notify: player.notify.sb, can: (player.b.points.gte(tmp.layerReqs.sb)||player.sb.unl) }">SB</button></td>
-				<td id="t" v-if="layerUnl('t')"><button onclick="showTab('t')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.t)||player.t.unl)&&layerUnl('t')) ? (formatWhole(player.t.points)+' time capsules') : ('Reach '+format(tmp.layerReqs.t)+' points to unlock')" v-bind:class="{ treeNode: true, t: true, locked: (player.points.lt(tmp.layerReqs.t)&&!player.t.unl), notify: player.notify.t, can: (player.points.gte(tmp.layerReqs.t)||player.t.unl) }">T</button></td>
-				<td id="e" v-if="layerUnl('e')"><button onclick="showTab('e')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.e)||player.e.unl)&&layerUnl('e')) ? (formatWhole(player.e.points)+' enhance points') : ('Reach '+format(tmp.layerReqs.e)+' points to unlock')" v-bind:class="{ treeNode: true, e: true, locked: (player.points.lt(tmp.layerReqs.e)&&!player.e.unl), notify: player.notify.e, can: (player.points.gte(tmp.layerReqs.e)||player.e.unl) }">E</button></td>
-				<td id="s" v-if="layerUnl('s')"><button onclick="showTab('s')" v-bind:tooltip="((player.points.gte(tmp.layerReqs.s)||player.s.unl)&&layerUnl('s')) ? (formatWhole(player.s.points)+' space energy') : ('Reach '+format(tmp.layerReqs.s)+' points to unlock')" v-bind:class="{ treeNode: true, s: true, locked: (player.points.lt(tmp.layerReqs.s)&&!player.s.unl), notify: player.notify.s, can: (player.points.gte(tmp.layerReqs.s)||player.s.unl) }">S</button></td>
-				<td id="sg" v-if="layerUnl('sg')"><button onclick="showTab('sg')" v-bind:tooltip="((player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl)&&layerUnl('sg')) ? (formatWhole(player.sg.points)+' super-generators') : ('Reach '+formatWhole(tmp.layerReqs.sg)+' generators to unlock')" v-bind:class="{ treeNode: true, sg: true, locked: (player.g.points.lt(tmp.layerReqs.sg)&&!player.sg.unl), notify: player.notify.sg, can: (player.g.points.gte(tmp.layerReqs.sg)||player.sg.unl) }">SG</button></td>
+				<td><layer-node layer='sb' abb='SB'></layer-node></td>
+				<td><layer-node layer='t' abb='T'></layer-node></td>
+				<td><layer-node layer='e' abb='E'></layer-node></td>
+				<td><layer-node layer='s' abb='S'></layer-node></td>
+				<td><layer-node layer='sg' abb='SG'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&(player.h.unl||player.q.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(3)"></img></td>
-				<td id="hb" v-if="layerUnl('hb')"><button onclick="showTab('hb')" v-bind:tooltip="((player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl)&&layerUnl('hb')) ? (formatWhole(player.hb.points)+' hyper-boosters') : ('Reach '+formatWhole(tmp.layerReqs.hb)+' super-boosters to unlock')" v-bind:class="{ treeNode: true, hb: true, locked: (player.sb.points.lt(tmp.layerReqs.hb)&&!player.hb.unl), notify: player.notify.hb, can: (player.sb.points.gte(tmp.layerReqs.hb)||player.hb.unl) }">HB</button></td>
-				<td id="h" v-if="layerUnl('h')"><button onclick="showTab('h')" v-bind:tooltip="((player.t.energy.gte(tmp.layerReqs.h)||player.h.unl)&&layerUnl('h')) ? (formatWhole(player.h.points)+' hindrance spirit') : ('Reach '+format(tmp.layerReqs.h)+' time energy to unlock')" v-bind:class="{ treeNode: true, h: true, locked: (player.t.energy.lt(tmp.layerReqs.h)&&!player.h.unl), notify: player.notify.h || (player.h.active != 0 && player.points.gte(H_CHALLS[player.h.active].goal)), can: (player.t.energy.gte(tmp.layerReqs.h)||player.h.unl) }">H</button></td>
-				<td id="q" v-if="layerUnl('q')"><button onclick="showTab('q')" v-bind:tooltip="((player.g.power.gte(tmp.layerReqs.q)||player.q.unl)&&layerUnl('q')) ? (formatWhole(player.q.points)+' quirks') : ('Reach '+format(tmp.layerReqs.q)+' generator power to unlock')" v-bind:class="{ treeNode: true, q: true, locked: (player.g.power.lt(tmp.layerReqs.q)&&!player.q.unl), notify: player.notify.q, can: (player.g.power.gte(tmp.layerReqs.q)||player.q.unl) }">Q</button></td>
-				<td id="ss" v-if="layerUnl('ss')"><button onclick="showTab('ss')" v-bind:tooltip="((player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl)&&layerUnl('ss')) ? (formatWhole(player.ss.points)+' subspace energy') : ('Reach '+format(tmp.layerReqs.ss)+' space energy to unlock')" v-bind:class="{ treeNode: true, ss: true, locked: (player.s.points.lt(tmp.layerReqs.ss)&&!player.ss.unl), notify: player.notify.ss, can: (player.s.points.gte(tmp.layerReqs.ss)||player.ss.unl) }">SS</button></td>
-				<td id="hg" v-if="layerUnl('hg')"><button class="treeNode hg">HG</button></td>
+				<td v-if="player.tab=='tree'&&(player.e.unl||player.t.unl||player.s.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
+				<td><layer-node layer='hb' abb='HB'></layer-node></td>
+				<td><layer-node layer='h' abb='H'></layer-node></td>
+				<td><layer-node layer='q' abb='Q'></layer-node></td>
+				<td><layer-node layer='ss' abb='SS'></layer-node></td>
+				<td><layer-node layer='hg' abb='HG'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&(player.m.unl||player.ba.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(4)"></img></td>
-				<td id="m" v-if="layerUnl('m')"><button onclick="showTab('m')" v-bind:tooltip="((player.h.points.gte(tmp.layerReqs.m)||player.m.unl)&&layerUnl('m')) ? (formatWhole(player.m.points)+' magic') : ('Reach '+format(tmp.layerReqs.m)+' hindrance spirit to unlock')" v-bind:class="{ treeNode: true, m: true, locked: (player.h.points.lt(tmp.layerReqs.m)&&!player.m.unl), notify: player.notify.m, can: (player.h.points.gte(tmp.layerReqs.m)||player.m.unl) }">M</button></td>
-				<td id="ps" v-if="layerUnl('ps')"><button class="treeNode ps">PS</button></td>
-				<td id="ba" v-if="layerUnl('ba')"><button onclick="showTab('ba')" v-bind:tooltip="((player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl)&&layerUnl('ba')) ? (formatWhole(player.ba.points)+' balance energy') : ('Reach '+format(tmp.layerReqs.ba)+' quirks to unlock')" v-bind:class="{ treeNode: true, ba: true, locked: (player.q.points.lt(tmp.layerReqs.ba)&&!player.ba.unl), notify: player.notify.ba, can: (player.q.points.gte(tmp.layerReqs.ba)||player.ba.unl) }">BA</button></td>
+				<td><layer-node layer='m' abb='M'></layer-node></td>
+				<td><layer-node layer='ps' abb='PS'></layer-node></td>
+				<td><layer-node layer='ba' abb='BA'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
 				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
-				<td id="l" v-if="layerUnl('l')"><button onclick="showTab('l')" v-bind:tooltip="(player.m.points.gte(tmp.layerReqs.l)||player.l.unl) ? (formatWhole(player.l.points)+' life essence') : ('Reach '+format(tmp.layerReqs.l)+' magic to unlock')" v-bind:class="{ treeNode: true, l: true, locked: (player.m.points.lt(tmp.layerReqs.l)&&!player.l.unl), can: (player.m.points.gte(tmp.layerReqs.l)||player.l.unl) }">L</button></td>
-				<td id="sp" v-if="layerUnl('sp')"><button onclick="showTab('sp')" v-bind:tooltip="(player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) ? (formatWhole(player.sp.points)+' super-prestige points') : ('Reach '+format(tmp.layerReqs.sp)+' prestige points to unlock')" v-bind:class="{ treeNode: true, sp: true, locked: (player.p.points.lt(tmp.layerReqs.sp)&&!player.sp.unl), can: (player.p.points.gte(tmp.layerReqs.sp)||player.sp.unl) }">SP</button></td>
-				<td id="hs" v-if="layerUnl('hs')"><button onclick="showTab('hs')" v-bind:tooltip="(player.s.points.gte(tmp.layerReqs.hs)||player.hs.unl) ? (formatWhole(player.hs.points)+' hyperspace') : ('Reach '+format(tmp.layerReqs.hs)+' space energy to unlock')" v-bind:class="{ treeNode: true, hs: true, locked: (player.s.points.lt(tmp.layerReqs.hs)&&!player.hs.unl), can: (player.s.points.gte(tmp.layerReqs.hs)||player.hs.unl) }">HS</button></td>
-				<td id="i" v-if="layerUnl('ps')||layerUnl('i')"><button v-bind:class="{treeNode: true, i: true, hidden: !layerUnl('i')}">I</button></td>
+				<td><layer-node layer='l' abb='L'></layer-node></td>
+				<td><layer-node layer='sp' abb='SP'></layer-node></td>
+				<td><layer-node layer='hs' abb='HS'></layer-node></td>
+				<td><layer-node layer='i' abb='I'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&layerUnl('tm')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(6)"></img></td>
-				<td id="mb" v-if="layerUnl('mb')"><button class="treeNode mb">MB</button></td>
-				<td id="ge" v-if="layerUnl('ge')"><button class="treeNode ge">Ge</button></td>
-				<td id="ma" v-if="layerUnl('ma')"><button class="treeNode tm">Ma</button></td>
+				<td v-if="player.tab=='tree'&&layerShown('tm')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(6)"></img></td>
+				<td><layer-node layer='mb' abb='MB'></layer-node></td>
+				<td><layer-node layer='ge' abb='Ge'></layer-node></td>
+				<td><layer-node layer='ma' abb='Ma'></layer-node></td>
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
 		<div v-for="layer in LAYERS">
 			<div v-if="player.tab==layer" class="col right">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				You have <h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_RES[layer]}}<span v-if="Object.keys(LAYER_EFFS).includes(layer)">, {{getLayerEffDesc(layer)}}</span>
+				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_RES[layer]}}<span v-if="Object.keys(LAYER_EFFS).includes(layer)">, {{getLayerEffDesc(layer)}}</span>
 				<br><br>
-				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)">Reset for +<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</button>
-				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)">Reset for +<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br>Req: {{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
+				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</span></button>
+				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
+				<span v-if="LAYER_TYPE[layer]=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{LAYER_AMT_NAMES[layer]}}</span>
 				<br><br>
 				<span v-if="layer!='p'">Your best {{LAYER_RES[layer]}} is {{formatWhole(player[layer].best)}}<br></span>
 				<span v-if="player[layer].total">You have made a total of {{formatWhole(player[layer].total)}} {{LAYER_RES[layer]}}<br></span>
@@ -545,7 +549,7 @@
 						<div v-for="id in tmp.spellsUnl">
 							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(player.m.toCast[id]))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(player.m.toCast[id])||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>{{getSpellDesc(id)}}<br><br>Time: {{formatTime(player.m.spellTimes[id])}}</button><br><br>
 							<div v-if="player.m.upgrades.includes(41)">
-								<input v-model="player.m.toCast[id]" v-on:change="updateToCast(id)"></input><br><br>
+								<input v-model="player.m.toCast[id]" v-on:focus="focused(true)" v-on:blur="focused(false)" v-on:change="updateToCast(id)"></input><br><br>
 							</div>
 						</div>
 					</div>
@@ -562,6 +566,12 @@
 					You have {{format(player.ba.power)}} Balance Power, which is multiplying Hindrance Spirit & Quirk gain by {{format(tmp.balEff)}}<br>
 					You have {{format(player.ba.positivity)}} Positivity and {{format(player.ba.negativity)}} Negativity, which are multiplying Balance Power gain by {{format(tmp.balEff2)}}
 				</div>
+				<div v-if="layer=='ps'">
+					<table>
+						<tr v-if="milestoneShown(player.ps.best.gte(5), true)"><td v-bind:class="{ milestone: player.ps.best.lt(5), milestoneDone: player.ps.best.gte(5) }"><h3>5 Phantom Souls</h3><br>You can buy max Phantom Souls, and automatically purchase Phantom Souls&nbsp;&nbsp;&nbsp;<button v-if="player.ps.best.gte(5)" class="smallUpg can ps" onclick="toggleAuto('ps')">{{player.ps.auto?"ON":"OFF"}}</button></td></tr>
+						<tr v-if="milestoneShown(player.ps.best.gte(10))"><td v-bind:class="{ milestone: player.ps.best.lt(10), milestoneDone: player.ps.best.gte(10) }"><h3>10 Phantom Souls</h3><br>Phantom Souls reset nothing</td></tr>
+					</table><br><br>
+				</div>
 				<div v-if="layer=='sp'">
 					<table>
 						<tr v-if="milestoneShown(player.sp.total.gte(1))"><td v-bind:class="{ milestone: player.sp.total.lt(1), milestoneDone: player.sp.total.gte(1) }"><h3>1 total Super-Prestige Point</h3><br>Upgrades of Rows 1-5 and Hindrances are kept on all resets</td></tr>
@@ -569,6 +579,16 @@
 						<tr v-if="milestoneShown(player.sp.total.gte(5))"><td v-bind:class="{ milestone: player.sp.total.lt(5), milestoneDone: player.sp.total.gte(5) }"><h3>5 total Super-Prestige Points</h3><br>Keep Balance Milestones on reset</td></tr>
 						<tr v-if="milestoneShown(player.sp.total.gte(10))"><td v-bind:class="{ milestone: player.sp.total.lt(10), milestoneDone: player.sp.total.gte(10) }"><h3>10 total Super-Prestige Points</h3><br>Gain 100% of Magic & Balance Power gain every second</td></tr>
 					</table>
+				</div>
+				<div v-if="layer=='l'">
+					<br><br>
+					You have {{format(player.l.power)}} Life Power, which is translating to:
+					<div class="upgRow">
+						<div v-for="i in tmp.l.lbUnl">
+							<button v-bind:class="{ upgBig: true, l: true }"><h3>Life Booster {{i}}</h3><br>{{LIFE_BOOSTERS[i].effDesc(tmp.l.lbEff[i])}}<br><br>Boosters: {{formatWhole(tmp.l.lb[i])}}<br>Next at: {{formatWhole(LIFE_BOOSTERS.req(i))}} Phantom Souls</button>
+						</div>
+					</div>
+					You have {{formatWhole(player.ps.points)}} Phantom Souls
 				</div>
 				<br><br>
 				<div class="upgTable">
