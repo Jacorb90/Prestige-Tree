@@ -298,7 +298,7 @@ const LAYER_EXP = {
 	ba: new Decimal(0.00667),
 	ps: new Decimal(1),
 	sp: new Decimal(2e-7),
-	l: new Decimal(1e-9),
+	l: new Decimal(0.001),
 	hs: new Decimal(1e-9),
 	i: new Decimal(1),
 }
@@ -1578,26 +1578,26 @@ const LAYER_UPGS = {
 		41: {
 			desc: "Gain more Life Essence based on total SP.",
 			cost: new Decimal(1/0),
-			unl: function() { return player.ps.unl || player.hs.unl },
+			unl: function() { return player.l.unl },
 			currently: function() { return new Decimal(1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		42: {
 			desc: "You produce Life Power 2x faster.",
 			cost: new Decimal(1/0),
-			unl: function() { return player.ps.unl || player.hs.unl },
+			unl: function() { return player.l.unl },
 		},
 		43: {
 			desc: "Gain more Hyperspace based on best SP.",
 			cost: new Decimal(1/0),
-			unl: function() { return player.ps.unl || player.hs.unl },
+			unl: function() { return player.hs.unl },
 			currently: function() { return new Decimal(1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		44: {
 			desc: "SP divides the Phantom Souls requirement.",
 			cost: new Decimal(1/0),
-			unl: function() { return player.ps.unl || player.hs.unl },
+			unl: function() { return player.ps.unl },
 			currently: function() { return new Decimal(1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
@@ -2179,74 +2179,74 @@ function layerShown(layer) {
 	if (layerUnl(layer)) return true
 	switch(layer) {
 		case "p":
-			return true;
-			break;
+			return true
+			break
 		case "b":
-			return player.p.unl;
-			break;
+			return player.p.unl
+			break
 		case "g":
-			return player.p.unl;
-			break;
+			return player.p.unl
+			break
 		case "e":
-			return player.b.unl&&player.g.unl;
-			break;
+			return player.b.unl && player.g.unl
+			break
 		case "t":
-			return player.b.unl;
-			break;
+			return player.b.unl
+			break
 		case "s":
-			return player.g.unl;
-			break;
+			return player.g.unl
+			break
 		case "sb":
-			return player.e.unl&&player.t.unl&&player.s.unl;
-			break;
+			return player.e.unl && player.t.unl && player.s.unl
+			break
 		case "sg":
-			return player.g.unl&&player.h.challs.includes(62);
-			break;
+			return player.h.challs.includes(62)
+			break
 		case "h": 
-			return player.t.unl&&player.sb.unl
-			break;
+			return player.t.unl && player.sb.unl
+			break
 		case "q": 
-			return player.e.unl&&player.sb.unl
-			break;
+			return player.e.unl && player.sb.unl
+			break
 		case "hb": 
-			return player.sb.unl&&player.h.unl&&player.q.unl
-			break;
+			return player.sb.unl && player.h.unl && player.q.unl
+			break
 		case "ss": 
-			return player.s.unl&&player.h.unl&&player.q.unl
-			break;
+			return player.s.unl && player.h.unl && player.q.unl
+			break
 		case "hg": 
-			return false //player.sp.unl
-			break;
+			return false
+			break
 		case "m": 
-			return player.h.unl&&player.hb.unl
-			break;
+			return player.h.unl && player.hb.unl
+			break
 		case "ba":
-			return player.q.unl&&player.ss.unl
-			break;
+			return player.q.unl && player.ss.unl
+			break
 		case "sp": 
-			return player.m.unl&&player.ba.unl
-			break;
+			return player.m.unl && player.ba.unl
+			break
 		case "l":
 			return player.sp.unl
-			break;
+			break
 		case "ps":
 			return player.l.unl
-			break;
+			break
 		case "hs":
 			return player.sp.unl
-			break;
+			break
 		case "i":
 			return player.ps.unl && player.hs.unl
-			break;
+			break
 		case "mb":
 			return false //player.ps.unl && player.hs.unl
-			break;
+			break
 		case "ge":
 			return false //player.ps.unl && player.hs.unl
-			break;
+			break
 		case "ma":
 			return false //player.ps.unl && player.hs.unl
-			break;
+			break
 	}
 }
 
@@ -2275,24 +2275,25 @@ function rowReset(row, layer) {
 			player.g.power = new Decimal(0);
 			break;
 		case 2: 
-			player.b.points = new Decimal(0);
-			player.b.best = player.m.total.gte(1)?player.b.best:new Decimal(0);
-			if (!player.t.best.gte(4)&&!player.sp.total.gte(1)) player.b.upgrades = [];
-			player.g.points = new Decimal(0);
-			player.g.power = new Decimal(0);
-			player.g.best = player.m.total.gte(1)?player.g.best:new Decimal(0);
-			if (!player.s.best.gte(4)&&!player.sp.total.gte(1)) player.g.upgrades = [];
-			player.t.energy = new Decimal(0);
-			if (layer=="t"||layer=="e"||layer=="s") {
-				if (player[layer].best.gte(2)) {
-					player.b.best = new Decimal(prevOnReset.b.best)
-					player.g.best = new Decimal(prevOnReset.g.best)
-				}
-			} else if (player.sb.best.gte(4)&&layer=="sb") {
-				player.b.best = new Decimal(prevOnReset.b.best)
-				player.g.best = new Decimal(prevOnReset.g.best)
-			}
-			break;
+			var keepMilestones = 0
+			if (player.h.best.gte(2)) keepMilestones = 1
+			else if (layer=="sb" && player.sb.best.gte(4)) keepMilestones = 1
+			else if ((layer=="t" || layer=="e" || layer=="s") && player[layer].best.gte(2)) keepMilestones = 1
+
+			var keepUpgrades = 0
+			if (player.sp.total.gte(1)) keepUpgrades = 1
+
+			player.b.points = new Decimal(0)
+			if (!keepMilestones) player.b.best = new Decimal(0)
+			if (!keepUpgrades && !player.t.best.gte(4)) player.b.upgrades = []
+
+			player.g.points = new Decimal(0)
+			player.g.power = new Decimal(0)
+			if (!keepMilestones) player.g.best = new Decimal(0)
+			if (!keepUpgrades && !player.s.best.gte(4)) player.g.upgrades = []
+
+			player.t.energy = new Decimal(0)
+			break
 		case 3: 
 			player.t.points = new Decimal(0);
 			player.t.order = 0
@@ -2442,17 +2443,17 @@ function doReset(layer, force=false) {
 		let gain = tmp.resetGain[layer]
 		if (LAYER_TYPE[layer]=="static") {
 			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
-			addPoints(layer, canBuyMax(layer)?gain:1)
+			addPoints(layer, canBuyMax(layer) ? gain : 1)
 		} else addPoints(layer, gain)
-	
+
 		if (!player[layer].unl) {
 			player[layer].unl = true;
 			needCanvasUpdate = true;
-			
+
 			let layers = ROW_LAYERS[LAYER_ROW[layer]]
 			for (let i in layers) if (!player[layers[i]].unl && player[layers[i]]!==undefined) player[layers[i]].order += ORDER_UP[LAYER_ROW[layer]].includes(layer)?1:0
 		}
-		
+	
 		tmp.layerAmt[layer] = new Decimal(0) // quick fix
 	}
 
@@ -3400,7 +3401,6 @@ function updateToCast(id) {
 
 function getSGenPowEff() {
 	if (!player.sg.unl) return new Decimal(1)
-	if (!player.h.challs.includes(62)) return new Decimal(1)
 	let eff = player.sg.power.plus(1).pow(3)
 	return eff
 }
@@ -3416,6 +3416,28 @@ function addToSGBase() {
 	if (player.ba.upgrades.includes(23)) toAdd = toAdd.plus(LAYER_UPGS.ba[23].currently())
 	if (player.sp.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sp[21].currently())
 	return toAdd
+}
+
+function getLifePowerMult() {
+	let x = tmp.layerEffs.ps.mult.div(10)
+	if (player.sp.upgrades.includes(42)) x = x.times(2)
+	return x
+}
+
+function getLifePowerExp() {
+	let x = tmp.layerEffs.ps.exp
+	return x
+}
+
+function getLifePowerSoftcapStart() {
+	let x = player.l.points.times(10).max(1).log10()
+	return x
+}
+
+function getLifePowerSoftcapExp() {
+	let x = 1/3
+	if (player.sp.upgrades.includes(52)) x = 0.5
+	return x
 }
 
 let LIFE_BOOSTERS = {
@@ -3538,15 +3560,14 @@ function gameLoop(diff) {
 		generatePoints("ba", diff)
 	}
 	if (player.l.unl) {
-		let exp = tmp.layerEffs.ps.exp
-		let mult = tmp.layerEffs.ps.mult.div(player.sp.upgrades.includes(42) ? 5 : 10)
-		let cap = player.l.points.times(10).max(1).log10()
-		let capExp = player.sp.upgrades.includes(52) ? 0.5 : 1/3
+		let exp = getLifePowerExp()
+		let cap = getLifePowerSoftcapStart()
+		let capExp = getLifePowerSoftcapExp()
 
 		let power = player.l.power
 		power = power.pow(exp.pow(-1))
 		if (power.gt(cap)) power = power.div(cap).pow(1/capExp).times(cap)
-		power = power.add(mult.times(diff))
+		power = power.add(getLifePowerMult().times(diff))
 		if (power.gt(cap)) power = power.div(cap).pow(capExp).times(cap)
 		power = power.pow(exp)
 		player.l.power = power
