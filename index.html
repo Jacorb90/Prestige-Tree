@@ -482,10 +482,10 @@
 					You have {{ format(player.g.power) }} Generator Power<br><br>
 					<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
 					<div class="upgRow">
-						<div v-for="id in tmp.trueSbUnl">
-							<button v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)"><h3>Building {{id}}</h3><br>{{getSpaceBuildingEffDesc(id)}}<br><br>Level: {{formatWhole(tmp.spaceBuildLvl[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power</button><br><br>
-							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: tmp.spaceBuildLvl[id].gte(1), locked: tmp.spaceBuildLvl[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
-							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: tmp.spaceBuildLvl[id].gte(1), locked: tmp.spaceBuildLvl[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
+						<div v-for="id in tmp.s.trueSbUnl">
+							<button v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)"><h3>Building {{id}}</h3><br>{{getSpaceBuildingEffDesc(id)}}<br><br>Level: {{formatWhole(tmp.s.sb[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power</button><br><br>
+							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: tmp.s.sb[id].gte(1), locked: tmp.s.sb[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
+							<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, can: tmp.s.sb[id].gte(1), locked: tmp.s.sb[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
 						</div>
 					</div>
 				</div>

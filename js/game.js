@@ -296,7 +296,7 @@ const LAYER_EXP = {
 	ss: new Decimal(1.1),
 	m: new Decimal(0.01),
 	ba: new Decimal(0.00667),
-	ps: new Decimal(1),
+	ps: new Decimal(1.2),
 	sp: new Decimal(2e-7),
 	l: new Decimal(0.001),
 	hs: new Decimal(1e-9),
@@ -312,7 +312,7 @@ const LAYER_BASE = {
 	sg: new Decimal(1.2),
 	hb: new Decimal(1.05),
 	ss: new Decimal(1.15),
-	ps: new Decimal("1e500"),
+	ps: new Decimal("1e450"),
 	i: new Decimal(1e100),
 }
 
@@ -527,7 +527,7 @@ const LAYER_UPGS = {
 			desc: "Boosters are cheaper based on your points.",
 			cost: new Decimal(18),
 			unl: function() { return player.b.upgrades.includes(21) || player.b.upgrades.includes(22) },
-			currently: function() { return player.points.plus(1).log10().plus(1).pow(3.2).pow(tmp.spaceBuildEff?tmp.spaceBuildEff[4]:1) },
+			currently: function() { return player.points.plus(1).log10().plus(1).pow(3.2).pow((tmp.s && tmp.s.sbEff)?tmp.s.sbEff[4]:1) },
 			effDisp: function(x) { return "/"+format(x) },
 		},
 		31: {
@@ -1400,7 +1400,7 @@ const LAYER_UPGS = {
 			desc: "The Space Building 1 effect is stronger based on your Space Building 1 amount.",
 			cost: new Decimal(3e11),
 			unl: function() { return player.ba.upgrades.includes(33)&&player.ba.upgrades.includes(34) },
-			currently: function() { return tmp.spaceBuildLvl[1].plus(1).pow(0.8) },
+			currently: function() { return tmp.s.sb[1].plus(1).pow(0.8) },
 			effDisp: function(x) { return "^"+format(x) },
 		},
 		43: {
@@ -1913,7 +1913,7 @@ function commaFormat(num, precision) {
 }
 
 function fixValue(x, y = 0) {
-	return x || new Decimal(y)
+	return new Decimal(x || y)
 }
 
 function sumValues(x) {
@@ -2048,17 +2048,17 @@ function getLayerGainMult(layer) {
 			if (player.e.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(1e10)
 			if (player.e.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(1e40)
 			if (player.t.unl) mult = mult.times(tmp.timeEff)
-			if (player.s.unl && tmp.spaceBuildEff) mult = mult.times(tmp.spaceBuildEff[1])
+			if (player.s.unl && tmp.s && tmp.s.sbEff) mult = mult.times(tmp.s.sbEff[1])
 			if (player.q.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.q[11].currently())
 			if (tmp.hcActive ? tmp.hcActive[62] : true) mult = mult.times(0)
 			break;
 		case "b": 
 			if (player.b.upgrades.includes(23)) mult = mult.div(LAYER_UPGS.b[23].currently())
-			if (player.s.unl && tmp.spaceBuildEff) mult = mult.div(tmp.spaceBuildEff[3])
+			if (player.s.unl && tmp.s && tmp.s.sbEff) mult = mult.div(tmp.s.sbEff[3])
 			break;
 		case "g":
 			if (player.g.upgrades.includes(22)) mult = mult.div(LAYER_UPGS.g[22].currently())
-			if (player.s.unl && tmp.spaceBuildEff) mult = mult.div(tmp.spaceBuildEff[3])
+			if (player.s.unl && tmp.s && tmp.s.sbEff) mult = mult.div(tmp.s.sbEff[3])
 			break;
 		case "e": 
 			if (player.e.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.e[24].currently())
@@ -2508,7 +2508,7 @@ function getPointGen() {
 	if (player.b.unl) gain = gain.times(tmp.layerEffs.b)
 	if (player.g.unl) gain = gain.times(tmp.genPowEff)
 	if (player.t.unl) gain = gain.times(tmp.timeEff)
-	if (player.s.unl && tmp.spaceBuildEff) gain = gain.times(tmp.spaceBuildEff[1])
+	if (player.s.unl && tmp.s && tmp.s.sbEff) gain = gain.times(tmp.s.sbEff[1])
 	if (player.q.unl && tmp.quirkEff) gain = gain.times(tmp.quirkEff)
 	if (player.q.upgrades.includes(11)) gain = gain.times(LAYER_UPGS.q[11].currently())
 		
@@ -2525,7 +2525,7 @@ function addToBoosterBase() {
 	if (player.t.upgrades.includes(33)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(40)
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
-	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
+	if (player.s.unl && tmp.s && tmp.s.sbEff) toAdd = toAdd.plus(tmp.s.sbEff[2])
 	if (player.sb.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sb[21].currently())
 	
 	if (player.b.upgrades.includes(31)) toAdd = toAdd.times(LAYER_UPGS.b[31].currently())
@@ -2556,7 +2556,7 @@ function addToGenBase() {
 	if (player.g.upgrades.includes(33)) toAdd = toAdd.plus(LAYER_UPGS.g[33].currently())
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
 	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
-	if (player.s.unl && tmp.spaceBuildEff) toAdd = toAdd.plus(tmp.spaceBuildEff[2])
+	if (player.s.unl && tmp.s && tmp.s.sbEff) toAdd = toAdd.plus(tmp.s.sbEff[2])
 		
 	if (player.h.challs.includes(51)) toAdd = toAdd.times(H_CHALLS[51].currently())
 	if (player.q.upgrades.includes(53)) toAdd = toAdd.times(tmp.enhEff2)
@@ -2776,7 +2776,7 @@ function getSpaceBuildingCostMult() {
 
 function getSpaceBuildingCost(x) {
 	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
-	let bought = tmp.spaceBuildLvl[x]
+	let bought = tmp.s.sb[x]
 	if (bought.gte(100)) bought = bought.pow(2).div(100)
 	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0).times(getSpaceBuildingCostMult())
 	return cost
@@ -2809,15 +2809,15 @@ function getExtraBuildingLevels(x) {
 	if (player.s.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
 	if (player.s.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
 	if (player.q.upgrades.includes(31)) lvl = lvl.plus(1);
-	if (x<5) lvl = lvl.plus(tmp.spaceBuildEff[5])
+	if (x<5) lvl = lvl.plus(tmp.s.sbEff[5])
 	if (player.m.upgrades.includes(32)) lvl = lvl.plus(LAYER_UPGS.m[32].currently())
 	return lvl
 }
 
 function getSpaceBuildingEff(x) {
-	let bought = tmp.spaceBuildLvl[x].plus(getExtraBuildingLevels(x));
+	let bought = tmp.s.sb[x].plus(getExtraBuildingLevels(x));
 	if (!player.s.unl) bought = new Decimal(0);
-	if (tmp.trueSbUnl<x) bought = new Decimal(0);
+	if (tmp.s.trueSbUnl<x) bought = new Decimal(0);
 	let power = getSpaceBuildingPow()
 	bought = bought.times(power)
 	let ret;
@@ -2846,7 +2846,7 @@ function getSpaceBuildingEff(x) {
 }
 
 function getSpaceBuildingEffDesc(x) {
-	let eff = tmp.spaceBuildEff[x]
+	let eff = tmp.s.sbEff[x]
 	switch(x) {
 		case 1: 
 			return "Space Energy boosts Point gain & Prestige Point gain ("+format(eff)+"x)"
@@ -2868,34 +2868,38 @@ function getSpaceBuildingEffDesc(x) {
 
 function buyBuilding(x) {
 	if (!player.s.unl) return
-	if (tmp.trueSbUnl<x) return
+	if (tmp.s.trueSbUnl<x) return
 	if (getSpace().lt(1)) return
 	let cost = getSpaceBuildingCost(x)
 	if (player.g.power.lt(cost)) return
 	player.g.power = player.g.power.sub(cost)
-	player.s.spent = player.s.spent.plus(1)
-	player.s.buildings[x] = tmp.spaceBuildLvl[x].plus(1)
+	addSpaceBuilding(x, 1)
 }
 
 function maxSpaceBuilding(x) {
 	if (!player.s.unl) return
-	if (tmp.trueSbUnl<x) return
+	if (tmp.s.trueSbUnl<x) return
 	let space = getSpace()
 	if (space.lt(1)) return
 	let target = getSpaceBuildingTarg(x)
-	let bulk = target.sub(tmp.spaceBuildLvl[x]).min(space)
+	let bulk = target.sub(tmp.s.sb[x]).min(space)
 	if (bulk.lt(1)) return
-	player.s.spent = player.s.spent.plus(bulk)
-	player.s.buildings[x] = tmp.spaceBuildLvl[x].plus(bulk)
+	addSpaceBuilding(x, bulk)
 }
 
 function destroyBuilding(x, all=false) {
 	if (!player.s.unl) return
-	if (tmp.trueSbUnl<x) return
-	if (tmp.spaceBuildLvl[x].lt(1)) return
+	if (tmp.s.trueSbUnl<x) return
+	if (tmp.s.sb[x].lt(1)) return
 	if (player.q.best.lt(2500)) return
-	player.s.spent = player.s.spent.sub(all?tmp.spaceBuildLvl[x]:1)
-	player.s.buildings[x] = all?new Decimal(0):tmp.spaceBuildLvl[x].sub(1)
+	addSpaceBuilding(x, all ? tmp.s.sb[x].neg() : -1)
+}
+
+function addSpaceBuilding(x, amt) {
+	amt = getSpace().min(amt)
+	player.s.spent = player.s.spent.add(amt)
+	tmp.s.sb[x] = tmp.s.sb[x].add(amt)
+	player.s.buildings[x] = tmp.s.sb[x]
 }
 
 function respecSpaceBuildings() {
@@ -3579,7 +3583,7 @@ function gameLoop(diff) {
 	if (player.t.autoCap&&player.h.best.gte(5)) maxExtTimeCapsules()
 	if (player.t.auto&&player.q.best.gte(10)) doReset("t")
 	if (player.s.auto&&player.q.best.gte(10)) doReset("s")
-	if (player.s.autoBuild&&player.ss.best.gte(1)) for (let i=tmp.trueSbUnl;i>=1;i--) maxSpaceBuilding(i)
+	if (player.s.autoBuild&&player.ss.best.gte(1)) for (let i=tmp.s.trueSbUnl;i>=1;i--) maxSpaceBuilding(i)
 	if (player.sb.auto&&player.h.best.gte(15)) doReset("sb")
 	if (player.sg.auto&&player.sg.best.gte(2)) doReset("sg")
 	if (player.q.auto&&player.ba.best.gte(3)) maxQuirkLayers()

@@ -43,14 +43,20 @@ function updateTemp() {
 	tmp.timeEff = getTimeEnergyEff()
 	tmp.attb = addToTimeBase()
 
-	if (!tmp.spaceBuildLvl) tmp.spaceBuildLvl = {}
-	if (!tmp.spaceBuildEff) tmp.spaceBuildEff = {}
-	for (let i=1;i<=MAX_BUILDINGS;i++) {
-		tmp.spaceBuildLvl[i] = fixValue(player.s.buildings[i])
-		tmp.spaceBuildEff[i] = getSpaceBuildingEff(i)
+	if (layerUnl("s")) {
+		if (!tmp.s) tmp.s = {
+			sb: {},
+			sbEff: {}
+		}
+		var data = tmp.s
+
+		for (let i=1;i<=MAX_BUILDINGS;i++) {
+			tmp.s.sb[i] = fixValue(player.s.buildings[i])
+			tmp.s.sbEff[i] = getSpaceBuildingEff(i)
+		}
+		tmp.s.sbUnl = getSpaceBuildingsUnl()
+		tmp.s.trueSbUnl = Decimal.min(tmp.s.sbUnl, MAX_BUILDINGS).floor().toNumber()
 	}
-	tmp.sbUnl = getSpaceBuildingsUnl()
-	tmp.trueSbUnl = Decimal.min(tmp.sbUnl, MAX_BUILDINGS).floor().toNumber()
 
 	tmp.quirkEff = getQuirkEnergyEff()
 	tmp.qCB = getQuirkLayerCostBase()
