@@ -2310,8 +2310,8 @@ function rowReset(row, layer) {
 		case 1: 
 			var keepUpgrades = 0
 			if (player.h.best.gte(1) || player.q.best.gte(1)) keepUpgrades = 1
-			else if (LAYER_ROW[layer] == 3 && player[layer].best.gte(layer == "e" ? 10 : 3)) keepUpgrades = 1
-			else if (LAYER_ROW[layer] == 2 && player[layer].best.gte(8)) keepUpgrades = 1
+			else if (LAYER_ROW[layer] == 2 && player[layer].best.gte(layer == "e" ? 10 : 3)) keepUpgrades = 1
+			else if (LAYER_ROW[layer] == 1 && player[layer].best.gte(8)) keepUpgrades = 1
 
 			player.points = new Decimal(10)
 			player.p.points = new Decimal(0)
@@ -2321,7 +2321,7 @@ function rowReset(row, layer) {
 		case 2: 
 			var keepMilestones = 0
 			if (player.h.best.gte(2) || player.q.best.gte(2)) keepMilestones = 1
-			else if (LAYER_ROW[layer] == 3 && player.sb.best.gte(layer == "sb" ? 4 : 2)) keepMilestones = 1
+			else if (LAYER_ROW[layer] == 2 && player.sb.best.gte(layer == "sb" ? 4 : 2)) keepMilestones = 1
 
 			var keepUpgrades = 0
 			if (player.sp.total.gte(1)) keepUpgrades = 1
