@@ -2321,7 +2321,7 @@ function rowReset(row, layer) {
 		case 2: 
 			var keepMilestones = 0
 			if (player.h.best.gte(2) || player.q.best.gte(2)) keepMilestones = 1
-			else if (LAYER_ROW[layer] == 2 && player.sb.best.gte(layer == "sb" ? 4 : 2)) keepMilestones = 1
+			else if (LAYER_ROW[layer] == 2 && player[layer].best.gte(layer == "sb" ? 4 : 2)) keepMilestones = 1
 
 			var keepUpgrades = 0
 			if (player.sp.total.gte(1)) keepUpgrades = 1
