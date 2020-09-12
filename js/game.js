@@ -1858,7 +1858,7 @@ function checkForVars() {
 	if (player.sb.auto === undefined) player.sb.auto = false
 	if (player.timePlayed === undefined) player.timePlayed = 0
 	else if (typeof(player.timePlayed) == "string") {
-		player.timePlayed = player.timePlayed.toNumber() || 0
+		player.timePlayed = Number(player.timePlayed)
 		if (isNaN(player.timePlayed)) player.timePlayed = 0
 		if (player.timePlayed == 0) player.timePlayedReset = true
 	}
