@@ -568,8 +568,8 @@
 				</div>
 				<div v-if="layer=='ps'">
 					<table>
-						<tr v-if="milestoneShown(player.ps.best.gte(5), true)"><td v-bind:class="{ milestone: player.ps.best.lt(5), milestoneDone: player.ps.best.gte(5) }"><h3>5 Phantom Souls</h3><br>You can buy max Phantom Souls, and automatically purchase Phantom Souls&nbsp;&nbsp;&nbsp;<button v-if="player.ps.best.gte(5)" class="smallUpg can ps" onclick="toggleAuto('ps')">{{player.ps.auto?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.ps.best.gte(10))"><td v-bind:class="{ milestone: player.ps.best.lt(10), milestoneDone: player.ps.best.gte(10) }"><h3>10 Phantom Souls</h3><br>Phantom Souls reset nothing</td></tr>
+						<tr v-if="milestoneShown(player.ps.best.gte(3), true)"><td v-bind:class="{ milestone: player.ps.best.lt(5), milestoneDone: player.ps.best.gte(3) }"><h3>3 Phantom Souls</h3><br>You can buy max Phantom Souls, and automatically purchase Phantom Souls&nbsp;&nbsp;&nbsp;<button v-if="player.ps.best.gte(3)" class="smallUpg can ps" onclick="toggleAuto('ps')">{{player.ps.auto?"ON":"OFF"}}</button></td></tr>
+						<tr v-if="milestoneShown(player.ps.best.gte(5))"><td v-bind:class="{ milestone: player.ps.best.lt(5), milestoneDone: player.ps.best.gte(5) }"><h3>5 Phantom Souls</h3><br>Phantom Souls reset nothing</td></tr>
 					</table><br><br>
 				</div>
 				<div v-if="layer=='sp'">
@@ -585,10 +585,10 @@
 					You have {{format(player.l.power)}} Life Power, which is translating to:
 					<div class="upgRow">
 						<div v-for="i in tmp.l.lbUnl">
-							<button v-bind:class="{ upgBig: true, l: true }"><h3>Life Booster {{i}}</h3><br>{{LIFE_BOOSTERS[i].effDesc(tmp.l.lbEff[i])}}<br><br>Boosters: {{formatWhole(tmp.l.lb[i])}}<br>Next at: {{formatWhole(LIFE_BOOSTERS.req(i))}} Phantom Souls</button>
+							<button v-bind:class="{ upgBig: true, l: true }"><h3>Life Booster {{i}}</h3><br>{{LIFE_BOOSTERS[i].effDesc(tmp.l.lbEff[i])}}<br><br>Boosters: {{formatWhole(tmp.l.lb[i])}}<br>Next at: {{formatWhole(LIFE_BOOSTERS.req(i).ceil())}} Phantom Souls</button>
 						</div>
 					</div>
-					You have {{formatWhole(player.ps.points)}} Phantom Souls
+					You have {{formatWhole(player.ps.points)}} Phantom Souls, {{getLayerEffDesc("ps")}}
 				</div>
 				<br><br>
 				<div class="upgTable">
