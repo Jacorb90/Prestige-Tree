@@ -9,10 +9,10 @@ function updateTemp() {
 	
 	if (!tmp.layerEffs) tmp.layerEffs = {}
 	for (let name in LAYER_EFFS) tmp.layerEffs[name] = LAYER_EFFS[name]()
-	
+
 	if (!tmp.layerReqs) tmp.layerReqs = {}
 	for (let name in LAYER_REQS) tmp.layerReqs[name] = getLayerReq(name)
-		
+
 	if (!tmp.gainMults) tmp.gainMults = {}
 	if (!tmp.resetGain) tmp.resetGain = {}
 	if (!tmp.nextAt) tmp.nextAt = {}
@@ -25,6 +25,8 @@ function updateTemp() {
 	}
 
 	tmp.pointGen = getPointGen()
+
+	tmp.scaling12b = getScaling12Boosters()
 
 	tmp.atbb = addToBoosterBase()
 	tmp.atgb = addToGenBase()
@@ -42,6 +44,7 @@ function updateTemp() {
 	tmp.freeExtCap = getFreeExtCapsules()
 	tmp.timeEff = getTimeEnergyEff()
 	tmp.attb = addToTimeBase()
+	tmp.mttb = multiplyToTimeBase()
 
 	if (layerUnl("s")) {
 		if (!tmp.s) tmp.s = {
