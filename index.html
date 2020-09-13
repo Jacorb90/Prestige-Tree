@@ -591,6 +591,21 @@
 					</div>
 					You have {{formatWhole(player.ps.points)}} Phantom Souls, {{getLayerEffDesc("ps")}}
 				</div>
+				<div v-if="layer=='hs'">
+					<br><br>
+					You have {{formatWhole(player.ba.points)}} Balance Energy
+					<br>
+					<button v-on:click="HYPERSPACE.buy()" v-bind:class="{ upgBig: true, hs: true, can: HYPERSPACE.canBuy(), locked: !HYPERSPACE.canBuy() }">Buy a Hyperspace<br>Amount: {{formatWhole(player.hs.space.sub(player.hs.spent))}}<br><br>Cost: {{formatWhole(HYPERSPACE.cost().hs)}} Hyperspace Energy & {{formatWhole(HYPERSPACE.cost().ba)}} Balance Energy</button>
+					<br><br>
+					<button v-on:click="HYPERSPACE.respec()" v-bind:class="{ longUpg: true, hs: true, can: player.hs.unl, locked: !player.hs.unl }">Respec Super-Upgrades</button><br>
+					<div class="upgRow">
+						<div v-for="i in tmp.s.trueSbUnl">
+							<button v-on:click="HYPERSPACE.superUpg(i)" v-bind:class="{ upg: true, hs: true, can: HYPERSPACE.canSuperUpg(i), locked: !HYPERSPACE.canSuperUpg(i) }"><h3>Building {{i}}</h3><br>{{getSpaceBuildingEffDesc(i)}}<br><br>Super-Level: {{formatWhole(tmp.hs.su[i])}} / {{formatWhole(player.hs.superUpgradeCap)}}<br>({{format(tmp.hs.suEff[i])}}x strength)</button>
+						</div>
+					</div>
+					<br>
+					Get {{formatWhole(player.g.points)}} / {{formatWhole(HYPERSPACE.nextCapReq())}} Generators to increase the cap of Super-Upgrades
+				</div>
 				<br><br>
 				<div class="upgTable">
 					<div v-for="row in LAYER_UPGS[layer].rows" class="upgRow">
@@ -617,4 +632,11 @@
 			</div>
 		</div>
 	</div>
+	<script>
+		// Mod Identifier, for ~~btpt~~ any userscripts. Consider adding this to your mod!
+		const modInfo = {
+			name: "Prestige Tree",
+			id: "default"
+		}
+	</script>
 </body>

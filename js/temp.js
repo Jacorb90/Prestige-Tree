@@ -14,12 +14,14 @@ function updateTemp() {
 	for (let name in LAYER_REQS) tmp.layerReqs[name] = getLayerReq(name)
 
 	if (!tmp.gainMults) tmp.gainMults = {}
+	if (!tmp.gainExp) tmp.gainExp = {}
 	if (!tmp.resetGain) tmp.resetGain = {}
 	if (!tmp.nextAt) tmp.nextAt = {}
 	if (!tmp.layerAmt) tmp.layerAmt = {}
 	for (let i in LAYERS) {
 		tmp.layerAmt[LAYERS[i]] = getLayerAmt(LAYERS[i])
 		tmp.gainMults[LAYERS[i]] = getLayerGainMult(LAYERS[i])
+		tmp.gainExp[LAYERS[i]] = getLayerGainExp(LAYERS[i])
 		tmp.resetGain[LAYERS[i]] = getResetGain(LAYERS[i])
 		tmp.nextAt[LAYERS[i]] = getNextAt(LAYERS[i])
 	}
@@ -93,5 +95,16 @@ function updateTemp() {
 			data.lb[i] = fixValue(player.l.boosters[i])
 			data.lbEff[i] = data2[i].eff(data.lb[i].times(data.lpEff))
 		}
+	}
+	if (layerUnl("hs")) {
+		if (!tmp.hs) tmp.hs = {
+			su: {},
+			suEff: {}
+		}
+		var data = tmp.hs
+		var data2 = HYPERSPACE
+
+		data.eff = data2.eff()
+		for (let i=1;i<=MAX_BUILDINGS;i++) data.su[i] = fixValue(player.hs.superUpgrades[i])
 	}
 }

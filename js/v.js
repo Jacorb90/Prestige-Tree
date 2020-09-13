@@ -66,7 +66,8 @@ function loadVue() {
 			LAYER_RES_CEIL,
 			H_CHALLS,
 			SPELL_NAMES,
-			LIFE_BOOSTERS
+			LIFE_BOOSTERS,
+			HYPERSPACE
 		},
 	})
 }
