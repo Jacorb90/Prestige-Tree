@@ -1863,18 +1863,9 @@ function checkForVars() {
 	if (player.s.autoBuild === undefined) player.s.autoBuild = false
 	if (player.sb.auto === undefined) player.sb.auto = false
 	if (player.timePlayed === undefined) player.timePlayed = 0
-	else if (typeof(player.timePlayed) == "string") {
-		player.timePlayed = Number(player.timePlayed)
-		if (isNaN(player.timePlayed)) player.timePlayed = 0
-		if (player.timePlayed == 0) player.timePlayedReset = true
-	}
 	if (player.hasNaN === undefined) player.hasNaN = false
 	if (player.h.active === undefined) player.h.active = 0
 	if (player.h.time === undefined) player.h.time = player.timePlayed
-	else if (typeof(player.h.time) == "string") {
-		player.h.time = Number(player.h.time)
-		if (isNaN(player.h.time)) player.h.time = player.timePlayed
-	}
 	if (player.q.auto === undefined) player.q.auto = false
 	if (player.msDisplay === undefined) player.msDisplay = "always"
 	if (player.hb.auto === undefined) player.hb.auto = false
@@ -3844,6 +3835,31 @@ function keepGoing() {
 	showTab("tree")
 }
 
+function addTime(diff, layer) {
+	let data = player
+	let time = data.timePlayed
+	if (layer) {
+		data = data[layer]
+		time = data.time
+	}
+
+	//I am not that good to perfectly fix that leak. ~ DB Aarex
+	if (time + 0 !== time) {
+		console.log("Memory leak detected. Trying to fix...")
+		if (time.mag !== undefined) time = time.toNumber()
+		else time = parseFloat(time)
+		if (isNaN(time) || time == 0) {
+			console.log("Couldn't fix! Resetting...")
+			time = layer ? player.timePlayed : 0
+			if (!layer) player.timePlayedReset = true
+		}
+	}
+	time += diff
+
+	if (layer) data.time = time
+	else data.timePlayed = time
+}
+
 function gameLoop(diff) {
 	if (player.points.gte(ENDGAME) || gameEnded) gameEnded = 1
 
@@ -3854,8 +3870,8 @@ function gameLoop(diff) {
 	}
 	if (player.devSpeed) diff *= player.devSpeed
 
-	player.timePlayed += diff
-	player.h.time += diff
+	addTime(diff)
+	addTime(diff, "h")
 
 	if (tmp.challActive ? tmp.challActive.h[42] : true) {
 		if (player.h.time>=10) diff = 0
