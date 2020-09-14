@@ -1,9 +1,10 @@
 function updateTemp() {
-	if (!tmp.hcActive) tmp.hcActive = {}
-	for (let row=1;row<=H_CHALLS.rows;row++) {
-		for (let col=1;col<=H_CHALLS.cols;col++) {
-			let id = row*10+col
-			tmp.hcActive[id] = HCActive(id)
+	if (!tmp.challActive) {
+		let LAYERS_WITH_CHALLS = Object.keys(LAYER_CHALLS)
+		tmp.challActive = {}
+		for (let i = 0; i < LAYERS_WITH_CHALLS.length; i++) {
+			tmp.challActive[LAYERS_WITH_CHALLS[i]] = {}
+			updateChallTemp(LAYERS_WITH_CHALLS[i])
 		}
 	}
 	
@@ -39,7 +40,7 @@ function updateTemp() {
 	tmp.enhEff = getEnhancerEff()
 	tmp.enhEff2 = getEnhancerEff2()
 	tmp.subbedEnh = new Decimal(0)
-	if (tmp.hcActive ? tmp.hcActive[52] : true) {
+	if (tmp.challActive ? tmp.challActive.h[52] : true) {
 		tmp.subbedEnh = tmp.subbedEnh.plus(new Decimal(player.h.time).times(40).plus(1).log10().pow(10).max(10)).round()
 	}
 
@@ -49,18 +50,23 @@ function updateTemp() {
 	tmp.mttb = multiplyToTimeBase()
 
 	if (layerUnl("s")) {
-		if (!tmp.s) tmp.s = {
+		tmp.s = {
 			sb: {},
 			sbEff: {}
 		}
 		var data = tmp.s
 
-		for (let i=1;i<=MAX_BUILDINGS;i++) {
-			tmp.s.sb[i] = fixValue(player.s.buildings[i])
-			tmp.s.sbEff[i] = getSpaceBuildingEff(i)
+		data.sbUnl = getSpaceBuildingsUnl()
+		data.trueSbUnl = Decimal.min(data.sbUnl, SPACE_BUILDINGS.max).floor().toNumber()
+		data.sbCostMult = getSpaceBuildingCostMult()
+		data.sbCostMod = getSpaceBuildingCostMod()
+		data.sbExtra = getExtraBuildingLevels()
+		data.sbPow = getSpaceBuildingPow()
+		data.sbSum = sumValues(player.s.buildings)
+		for (let i=data.trueSbUnl;i>=1;i--) {
+			data.sb[i] = fixValue(player.s.buildings[i])
+			data.sbEff[i] = getSpaceBuildingEff(i)
 		}
-		tmp.s.sbUnl = getSpaceBuildingsUnl()
-		tmp.s.trueSbUnl = Decimal.min(tmp.s.sbUnl, MAX_BUILDINGS).floor().toNumber()
 	}
 
 	tmp.quirkEff = getQuirkEnergyEff()
@@ -96,6 +102,7 @@ function updateTemp() {
 			data.lbEff[i] = data2[i].eff(data.lb[i].times(data.lpEff))
 		}
 	}
+
 	if (layerUnl("hs")) {
 		if (!tmp.hs) tmp.hs = {
 			su: {},
@@ -105,6 +112,31 @@ function updateTemp() {
 		var data2 = HYPERSPACE
 
 		data.eff = data2.eff()
-		for (let i=1;i<=MAX_BUILDINGS;i++) data.su[i] = fixValue(player.hs.superUpgrades[i])
+		for (let i=1;i<=tmp.s.trueSbUnl;i++) data.su[i] = fixValue(player.hs.superUpgrades[i])
+	}
+
+	if (layerUnl("i")) {
+		if (!tmp.i) tmp.i = {}
+		var data = tmp.i
+
+		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
+		data.work = new Decimal(1)
+		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(1).log10().add(2).div(5))
+		data.workEff = Decimal.pow(2, data.work.sub(1))
+	}
+}
+
+function updateChallTemp(layer) {
+	if (player[layer] === undefined) return
+
+	let data = tmp.challActive[layer]
+	let data2 = LAYER_CHALLS[layer]
+	let customActive = data2.active !== undefined
+	for (let row = 1; row <= data2.rows; row++) {
+		for (let col = 1; col <= data2.cols; col++) {
+			let id = row * 10 + col
+			if (customActive ? data2.active(id) : player[layer].active == id) data[id] = 1
+			else delete data[id]
+		}
 	}
 }

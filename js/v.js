@@ -48,8 +48,7 @@ function loadVue() {
 			buyBuilding,
 			getQuirkLayerCost,
 			buyQuirkLayer,
-			startHindrance,
-			HCActive,
+			startChall,
 			milestoneShown,
 			destroyBuilding,
 			getSpellDesc,
@@ -64,10 +63,12 @@ function loadVue() {
 			LAYER_EFFS,
 			LAYER_AMT_NAMES,
 			LAYER_RES_CEIL,
-			H_CHALLS,
+			LAYER_CHALLS,
+			SPACE_BUILDINGS,
 			SPELL_NAMES,
 			LIFE_BOOSTERS,
-			HYPERSPACE
+			HYPERSPACE,
+			IMPERIUM
 		},
 	})
 }

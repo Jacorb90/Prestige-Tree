@@ -94,16 +94,13 @@ function getStartPlayer() {
 			points: new Decimal(0),
 			best: new Decimal(0),
 			power: new Decimal(0),
-			upgrades: [],
 		},
 		h: {
 			unl: false,
 			time: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
-			active: 0,
 			challs: [],
-			upgrades: [],
 		},
 		q: {
 			unl: false,
@@ -187,7 +184,6 @@ function getStartPlayer() {
 			order: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
-			upgrades: [],
 			power: new Decimal(0),
 			boosters: {},
 		},
@@ -196,7 +192,6 @@ function getStartPlayer() {
 			order: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
-			upgrades: [],
 			space: new Decimal(0),
 			spent: new Decimal(0),
 			superUpgrades: {},
@@ -206,7 +201,6 @@ function getStartPlayer() {
 			unl: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
-			upgrades: [],
 			lifeBricks: new Decimal(0),
 			progress: 0,
 			extraBuildings: new Decimal(0)
@@ -235,7 +229,7 @@ const LAYER_REQS = {
 	sp: new Decimal("1e8500000"),
 	l: new Decimal(1e195),
 	hs: new Decimal(725),
-	i: new Decimal("1e1000"),
+	i: new Decimal(Number.MAX_VALUE),
 }
 
 const LAYER_RES = {
@@ -316,7 +310,7 @@ const LAYER_BASE = {
 	hb: new Decimal(1.05),
 	ss: new Decimal(1.15),
 	ps: new Decimal("1e250"),
-	i: new Decimal(1e100),
+	i: Decimal.pow(Number.MAX_VALUE, 0.25),
 }
 
 const LAYER_ROW = {
@@ -363,7 +357,7 @@ const ORDER_UP = [
 
 const LAYER_EFFS = {
 	b: function() { 
-		if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1);
+		if (tmp.challActive ? tmp.challActive.h[11] : true) return new Decimal(1);
 		return Decimal.pow(Decimal.add(2, tmp.atbb).max(0), player.b.points.plus(getFreeBoosters()).times(getBoosterPower())).max(0)
 	},
 	g: function() { return Decimal.pow(Decimal.add(2, tmp.atgb).times(tmp.sGenPowEff).times((player.ss.upgrades.includes(23) ? LAYER_UPGS.ss[23].currently() : 1)).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
@@ -416,7 +410,7 @@ const LAYER_UPGS = {
 			cost: new Decimal(1),
 			unl: function() { return player.p.upgrades.includes(11) },
 			currently: function() {
-				if (tmp.hcActive ? tmp.hcActive[32] : true) return new Decimal(1)
+				if (tmp.challActive ? tmp.challActive.h[32] : true) return new Decimal(1)
 				let ret = player.p.points.plus(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) 
 				if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
 				return ret;
@@ -504,7 +498,7 @@ const LAYER_UPGS = {
 			desc: "Generators add to the Booster effect.",
 			cost: new Decimal(7),
 			unl: function() { return player.g.unl },
-			currently: function() { return player.g.points.plus(1).log10().sqrt().div(3).times((player.t.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true))?8.5:1) },
+			currently: function() { return player.g.points.plus(1).log10().sqrt().div(3).times((player.t.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true))?8.5:1) },
 			effDisp: function(x) { return "+"+format(x)+" to base" },
 		},
 		13: {
@@ -569,7 +563,7 @@ const LAYER_UPGS = {
 			desc: "Boosters boost Generator Power gain.",
 			cost: new Decimal(7),
 			unl: function() { return player.b.unl },
-			currently: function() { return player.b.points.plus(1).log10().sqrt().div(3).times((player.t.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true))?3.75:1) },
+			currently: function() { return player.b.points.plus(1).log10().sqrt().div(3).times((player.t.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true))?3.75:1) },
 			effDisp: function(x) { return "+"+format(x)+" to base" },
 		},
 		13: {
@@ -589,7 +583,7 @@ const LAYER_UPGS = {
 			cost: new Decimal(15),
 			unl: function() { return player.g.upgrades.includes(13) },
 			currently: function() { 
-				let ret = player.g.points.sqrt().plus(1).times((player.e.upgrades.includes(32)&&!(tmp.hcActive?tmp.hcActive[12]:true)) ? LAYER_UPGS.e[32].currently() : 1) 
+				let ret = player.g.points.sqrt().plus(1).times((player.e.upgrades.includes(32)&&!(tmp.challActive?tmp.challActive.h[12]:true)) ? LAYER_UPGS.e[32].currently() : 1) 
 				if (ret.gte(400)) ret = ret.cbrt().times(Math.pow(400, 2/3))
 				return ret;
 			},
@@ -625,7 +619,7 @@ const LAYER_UPGS = {
 			desc: "Prestige Points boost Generator Power gain.",
 			cost: new Decimal(28),
 			unl: function() { return player.g.upgrades.includes(23) && player.g.upgrades.includes(24) },
-			currently: function() { return player.p.points.plus(1).log10().sqrt().plus(1).pow((player.t.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1).pow(player.g.upgrades.includes(31) ? LAYER_UPGS.g[31].currently() : 1) },
+			currently: function() { return player.p.points.plus(1).log10().sqrt().plus(1).pow((player.t.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true))?2.75:1).pow(player.g.upgrades.includes(31) ? LAYER_UPGS.g[31].currently() : 1) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		31: {
@@ -671,7 +665,7 @@ const LAYER_UPGS = {
 			unl: function() { return player.e.unl },
 			currently: function() { 
 				let exp = 1
-				if (player.e.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true)) exp = 1.5
+				if (player.e.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true)) exp = 1.5
 				return {g: player.b.points.plus(1).log10().pow(exp), b: player.g.points.plus(1).log10().pow(exp)} 
 			},
 			effDisp: function(x) { return "+"+format(x.g)+" to Generator base, +"+format(x.b)+" to Booster base" },
@@ -681,7 +675,7 @@ const LAYER_UPGS = {
 			cost: new Decimal(150),
 			unl: function() { return player.e.unl&&player.e.best.gte(40) },
 			currently: function() { 
-				let ret = player.e.points.plus(1).pow((player.e.upgrades.includes(15)&&!(tmp.hcActive?tmp.hcActive[12]:true))?3.25:1.5) 
+				let ret = player.e.points.plus(1).pow((player.e.upgrades.includes(15)&&!(tmp.challActive?tmp.challActive.h[12]:true))?3.25:1.5) 
 				if (ret.gte("1e1500")) ret = ret.sqrt().times("1e750")
 				return ret
 			},
@@ -777,7 +771,7 @@ const LAYER_UPGS = {
 			desc: "Non-extra Time Capsules boost the Booster effect.",
 			cost: new Decimal(2),
 			unl: function() { return player.t.unl },
-			currently: function() { return player.t.points.pow(0.9).plus(0.5).plus((player.t.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true))?LAYER_UPGS.t[13].currently():0) },
+			currently: function() { return player.t.points.pow(0.9).plus(0.5).plus((player.t.upgrades.includes(13)&&!(tmp.challActive?tmp.challActive.h[12]:true))?LAYER_UPGS.t[13].currently():0) },
 			effDisp: function(x) { return "+"+format(x)+" to base" },
 		},
 		12: {
@@ -871,7 +865,7 @@ const LAYER_UPGS = {
 			desc: "Space Building Levels boost Generator Power gain, and get 2 extra Space.",
 			cost: new Decimal(3),
 			unl: function() { return player.s.upgrades.includes(11) },
-			currently: function() { return Decimal.pow(20, sumValues(player.s.buildings)) },
+			currently: function() { return Decimal.pow(20, tmp.s !== undefined ? tmp.s.sbSum : 0) },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		14: {
@@ -924,7 +918,7 @@ const LAYER_UPGS = {
 			desc: "Space Buildings boost the Generator Power effect (before all other boosts).",
 			cost: new Decimal(15),
 			unl: function() { return player.t.unl&&player.e.unl&&player.t.order==0&&player.e.order==0&&player.s.order==0 },
-			currently: function() { return Decimal.pow(sumValues(player.s.buildings), 0.2).div(17.5) },
+			currently: function() { return Decimal.pow(tmp.s !== undefined ? tmp.s.sbSum : 0, 0.2).div(17.5) },
 			effDisp: function(x) { return "Add "+format(x)+" to exponent" },
 		},
 		41: {
@@ -986,14 +980,6 @@ const LAYER_UPGS = {
 			currently: function() { return player.sb.points.plus(1).log10().div(3) },
 			effDisp: function(x) { return "+"+format(x) },
 		},
-	},
-	sg: {
-		rows: 0,
-		cols: 0,
-	},
-	h: {
-		rows: 0,
-		cols: 0,
 	},
 	q: {
 		rows: 5,
@@ -1203,14 +1189,22 @@ const LAYER_UPGS = {
 			desc: "Subspace Energy boosts Subspace gain.",
 			cost: new Decimal(7),
 			unl: function() { return player.ba.upgrades.includes(24) },
-			currently: function() { return Decimal.pow(2, player.ss.points) },
+			currently: function() {
+				let x = player.ss.points
+				if (player.ba.upgrades.includes(25)) x = x.times(LAYER_UPGS.ba[25].currently())
+				return Decimal.pow(2, x)
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		25: {
 			desc: "Subspace is generated faster based on your Quirk Layers.",
 			cost: new Decimal(8),
 			unl: function() { return player.ba.upgrades.includes(24) },
-			currently: function() { return Decimal.pow(10, player.q.layers.sqrt()) },
+			currently: function() {
+				let x = player.q.layers.sqrt()
+				if (player.ba.upgrades.includes(25)) x = x.times(LAYER_UPGS.ba[25].currently())
+				return Decimal.pow(10, x)
+			},
 			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
@@ -1441,30 +1435,36 @@ const LAYER_UPGS = {
 		},
 		15: {
 			desc: "Positivity and Negativity reduce the cost scaling of Space Buildings.",
-			cost: new Decimal(1e205),
+			cost: new Decimal(1e200),
 			unl: function() { return player.sp.upgrades.includes(44) },
-			currently: function() { return player.ba.positivity.add(1).div(player.ba.negativity.add(1)).log10().div(20).add(1) },
+			currently: function() { return player.ba.positivity.add(1).div(player.ba.negativity.add(1)).log10().div(20).add(0.5).max(1) },
 			effDisp: function(x) { return format(Decimal.sub(1, x.recip()).times(100))+"%" },
 		},
 		25: {
-			desc: "Balance Energy boosts Positivity and Negativity more.",
+			desc: "Balance Power boosts Subspace Upgrades 9 and 10.",
 			cost: new Decimal(1e245),
 			unl: function() { return player.sp.upgrades.includes(44) },
+			currently: function() { return player.ba.power.add(1).log10().div(10).add(1).cbrt() },
+			effDisp: function(x) { return "^"+format(x) },
 		},
 		35: {
-			desc: "Balance Upgrades reduce the Quirk Layer cost scaling more.",
-			cost: new Decimal(1/0),
+			desc: "Super-Upgrades are 25% stronger.",
+			cost: new Decimal(1e270),
 			unl: function() { return player.sp.upgrades.includes(44) },
 		},
 		45: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return player.ps.upgrades.includes(23) },
+			desc: "Subspace reduces both Hyperspace costs.",
+			cost: new Decimal("1e5000"),
+			unl: function() { return player.sp.upgrades.includes(44) },
+			currently: function() { return player.ss.subspace.add(1) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 		55: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl: function() { return player.ps.upgrades.includes(23) },
+			desc: "Best Hyperspace Energy slows down the Quirk Layer cost scaling.",
+			cost: new Decimal("1e5000"),
+			unl: function() { return player.sp.upgrades.includes(44) },
+			currently: function() { return player.hs.best.add(1).pow(0.01) },
+			effDisp: function(x) { return format(x)+"x" },
 		},
 	},
 	ps: {
@@ -1491,12 +1491,12 @@ const LAYER_UPGS = {
 		},
 		14: {
 			desc: "The Life Essence layer acts like you choose it first.",
-			cost: new Decimal(1/0),
+			cost: new Decimal(8),
 			unl: function() { return player.l.order > 0 || player.ps.upgrades.includes(14) },
 		},
 		21: {
 			desc: "Unlock the fifth Life Booster.",
-			cost: new Decimal(3),
+			cost: new Decimal(5),
 			unl: function() { return player.hs.unl },
 		},
 		22: {
@@ -1507,18 +1507,18 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x) + "x" },
 		},
 		23: {
-			desc: "Unlock 2 new Balance Upgrades.",
+			desc: "???",
 			cost: new Decimal(1/0),
 			unl: function() { return player.hs.unl },
 		},
 		24: {
-			desc: "The Subspace layer acts like you choose it first.",
-			cost: new Decimal(1/0),
+			desc: "The Hyperspace layer acts like you choose it first.",
+			cost: new Decimal(15),
 			unl: function() { return (player.hs.unl && player.hs.order > 0) || player.ps.upgrades.includes(24) },
 		},
 	},
 	sp: {
-		rows: 5,
+		rows: 3,
 		cols: 4,
 		11: {
 			desc: "The Prestige Upgrade 3, 6, & 7 effects are raised to the power of 100.",
@@ -1617,49 +1617,17 @@ const LAYER_UPGS = {
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		43: {
-			desc: "Gain more Hyperspace Energy based on best SP.",
+			desc: "Gain more Hyperspace Energy based on total SP.",
 			cost: new Decimal(6e5),
 			unl: function() { return player.hs.unl },
-			currently: function() { return player.sp.best.div(5e5).add(1).sqr() },
+			currently: function() { return player.sp.total.div(7.5e5).add(1).sqr() },
 			effDisp: function(x) { return format(x)+"x" },
 		},
 		44: {
-			desc: "Unlock 3 new Balance Upgrades.",
+			desc: "Unlock 5 new Balance Upgrades.",
 			cost: new Decimal(1.2e6),
 			unl: function() { return player.hs.unl },
-		},
-		51: {
-			desc: "Add 1 extra Hyper-Booster to its effect.",
-			cost: new Decimal(1/0),
-			unl: function() { return player.l.unl && player.l.order == player.hs.order },
-		},
-		52: {
-			desc: "Life Power softcap is reduced.",
-			cost: new Decimal(1/0),
-			unl: function() { return player.l.unl && player.l.order == player.hs.order },
-		},
-		53: {
-			desc: "Space Buildings 9 & 10 are 50% stronger.",
-			cost: new Decimal(1/0),
-			unl: function() { return player.l.unl && player.l.order == player.hs.order },
-		},
-		54: {
-			desc: "Space Upgrades 13 & 14 are stronger.",
-			cost: new Decimal(1/0),
-			unl: function() { return player.l.unl && player.l.order == player.hs.order },
-		},
-	},
-	l: {
-		rows: 0,
-		cols: 0,
-	},
-	hs: {
-		rows: 0,
-		cols: 0,
-	},
-	i: {
-		rows: 0,
-		cols: 0,
+		}
 	},
 }
 
@@ -1841,8 +1809,16 @@ function versionCheck() {
 function checkForVars() {
 	let start = getStartPlayer()
 	for (var i=0; i<LAYERS.length; i++) {
-		if (player[LAYERS[i]] === undefined) player[LAYERS[i]] = start[LAYERS[i]]
-		else if (player[LAYERS[i]].total === undefined && start[LAYERS[i]].total !== undefined) player[LAYERS[i]].total = Decimal.max(player[LAYERS[i]].points, player[LAYERS[i]].best)
+		var layer = LAYERS[i]
+
+		if (player[layer] === undefined) player[layer] = start[layer]
+		else if (player[layer].total === undefined && start[layer].total !== undefined) player[layer].total = Decimal.max(player[layer].points, player[layer].best)
+
+		if (LAYER_UPGS[layer] !== undefined && player[layer].upgrades === undefined) player[layer].upgrades = []
+		if (LAYER_UPGS[layer] === undefined && player[layer].upgrades !== undefined) delete player[layer].upgrades
+
+		if (LAYER_CHALLS[layer] !== undefined && player[layer].challs === undefined) player[layer].challs = []
+		if (LAYER_CHALLS[layer] === undefined && player[layer].challs !== undefined) delete player[layer].challs
 	}
 	if (player.autosave===undefined) player.autosave = true;
 	if (player.p.best===undefined) player.p.best = player.p.points
@@ -1907,7 +1883,7 @@ function convertToDecimal() {
 	player.t.energy = new Decimal(player.t.energy)
 	player.t.extCapsules = new Decimal(player.t.extCapsules)
 	player.s.spent = new Decimal(player.s.spent)
-	for (let i=1;i<=MAX_BUILDINGS;i++) if (player.s.buildings[i]) player.s.buildings[i] = new Decimal(player.s.buildings[i])
+	for (let i=1;i<=SPACE_BUILDINGS.max;i++) if (player.s.buildings[i] !== undefined) player.s.buildings[i] = new Decimal(player.s.buildings[i])
 	player.sg.power = new Decimal(player.sg.power)
 	player.q.layers = new Decimal(player.q.layers)
 	player.q.energy = new Decimal(player.q.energy)
@@ -1922,7 +1898,7 @@ function convertToDecimal() {
 	for (let i=1;i<=5;i++) if (player.l.boosters[i]) player.l.boosters[i] = new Decimal(player.l.boosters[i])
 	player.hs.space = new Decimal(player.hs.space)
 	player.hs.spent = new Decimal(player.hs.spent)
-	for (let i=1;i<=MAX_BUILDINGS;i++) if (player.hs.superUpgrades[i]) player.hs.superUpgrades[i] = new Decimal(player.hs.superUpgrades[i])
+	for (let i=1;i<=SPACE_BUILDINGS.max;i++) if (player.hs.superUpgrades[i] !== undefined) player.hs.superUpgrades[i] = new Decimal(player.hs.superUpgrades[i])
 	player.hs.superUpgradeCap = new Decimal(player.hs.superUpgradeCap)
 	player.i.lifeBricks = new Decimal(player.i.lifeBricks)
 	player.i.extraBuildings = new Decimal(player.i.extraBuildings)
@@ -1949,16 +1925,17 @@ function exponentialFormat(num, precision) {
 
 function commaFormat(num, precision) {
 	if (num === null || num === undefined) return "NaN"
+	if (num.mag < 0.001) return (0).toFixed(precision)
 	return num.toStringWithDecimalPlaces(precision).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
 function fixValue(x, y = 0) {
-	return new Decimal(x || y)
+	return x || new Decimal(y)
 }
 
 function sumValues(x) {
 	x = Object.values(x)
-	if (x.length == 0) return new Decimal(0)
+	if (!x[0]) return new Decimal(0)
 	return x.reduce((a, b) => Decimal.add(a, b))
 }
 
@@ -1968,14 +1945,13 @@ function format(decimal, precision=3) {
 		player.hasNaN = true;
 		return "NaN"
 	}
-	if (decimal.lt(0)) return "-"+format(decimal.neg(), precision)
-	if (decimal.eq(1/0)) return "Infinity"
-	if (decimal.gte("eeee1000000")) {
+	if (decimal.sign<0) return "-"+format(decimal.neg(), precision)
+	if (decimal.mag == Number.POSITIVE_INFINITY) return "Infinity"
+	if (decimal.gte("eeee1000")) {
 		var slog = decimal.slog()
 		if (slog.gte(1e6)) return "F" + format(slog.floor())
 		else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-	} else if (decimal.gte("1e1000000")) return "e"+formatWhole(decimal.log10())
-	else if (decimal.gte("1e1000")) return decimal.div(Decimal.pow(10, decimal.log10().floor())).toStringWithDecimalPlaces(3)+"e"+commaFormat(decimal.log10().floor())
+	} else if (decimal.gte("1e1000")) return "e"+formatWhole(decimal.log10())
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
@@ -2040,6 +2016,9 @@ function canBuyMax(layer) {
 		case "ps": 
 			return player.ps.best.gte(3)
 			break;
+		case "i": 
+			return player.i.best.gte(3)
+			break;
 	}
 	return false;
 }
@@ -2069,10 +2048,10 @@ function getLayerReq(layer) {
 			if (player.ss.order>0) req = new Decimal(45)
 			break;
 		case "l":
-			if (player.l.order>0) req = new Decimal("1e1000")
+			if (player.l.order>0) req = new Decimal("1e345")
 			break;
 		case "hs":
-			if (player.hs.order>0) req = new Decimal(905)
+			if (player.hs.order>0) req = new Decimal(900)
 			break;
 	}
 	return req
@@ -2088,13 +2067,13 @@ function getLayerGainMult(layer) {
 			if (player.b.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.b[11].currently())
 			if (player.g.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.g[11].currently())
 			if (player.e.unl) mult = mult.times(tmp.enhEff)
-			if (player.e.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.e[12].currently())
-			if (player.e.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(1e10)
-			if (player.e.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(1e40)
+			if (player.e.upgrades.includes(12)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.e[12].currently())
+			if (player.e.upgrades.includes(13)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(1e10)
+			if (player.e.upgrades.includes(34)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(1e40)
 			if (player.t.unl) mult = mult.times(tmp.timeEff)
 			if (player.s.unl && tmp.s !== undefined) mult = mult.times(tmp.s.sbEff[1])
 			if (player.q.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.q[11].currently())
-			if (tmp.hcActive ? tmp.hcActive[62] : true) mult = mult.times(0)
+			if (tmp.challActive ? tmp.challActive.h[62] : true) mult = mult.times(0)
 			break;
 		case "b": 
 			if (player.b.upgrades.includes(23)) mult = mult.div(LAYER_UPGS.b[23].currently())
@@ -2105,16 +2084,16 @@ function getLayerGainMult(layer) {
 			if (player.s.unl && tmp.s !== undefined) mult = mult.div(tmp.s.sbEff[3])
 			break;
 		case "e": 
-			if (player.e.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.e[24].currently())
+			if (player.e.upgrades.includes(24)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.e[24].currently())
 			if (player.h.best.gte(1)) mult = mult.times(100)
 			if (player.q.best.gte(1)) mult = mult.times(100)
 			if (player.q.upgrades.includes(11)) mult = mult.times(LAYER_UPGS.q[11].currently())
 			break;
 		case "t":
-			if (player.h.challs.includes(21)) mult = mult.div(H_CHALLS[21].currently())
+			if (player.h.challs.includes(21)) mult = mult.div(LAYER_CHALLS.h[21].currently())
 			break;
 		case "s":
-			if (player.h.challs.includes(21)) mult = mult.div(H_CHALLS[21].currently())
+			if (player.h.challs.includes(21)) mult = mult.div(LAYER_CHALLS.h[21].currently())
 			break;
 		case "sb":
 			if (player.ss.upgrades.includes(14)) mult = mult.div(1.0825)
@@ -2128,7 +2107,7 @@ function getLayerGainMult(layer) {
 			if (player.l.unl && tmp.l !== undefined) mult = mult.div(tmp.l.lbEff[4])
 			break;
 		case "h": 
-			if (player.h.challs.includes(71)) mult = mult.times(H_CHALLS[71].currently())
+			if (player.h.challs.includes(71)) mult = mult.times(LAYER_CHALLS.h[71].currently())
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().h)
 			if (player.q.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.q[34].currently())
 			if (player.q.upgrades.includes(44)) mult = mult.times(LAYER_UPGS.q[44].currently())
@@ -2136,7 +2115,7 @@ function getLayerGainMult(layer) {
 			if (player.m.unl) mult = mult.times(tmp.hexEff)
 			break;
 		case "q": 
-			if (player.h.challs.includes(12)) mult = mult.times(H_CHALLS[12].currently())
+			if (player.h.challs.includes(12)) mult = mult.times(LAYER_CHALLS.h[12].currently())
 			if (player.q.upgrades.includes(22)) mult = mult.times(LAYER_UPGS.q[22].currently().q)
 			if (player.q.upgrades.includes(34)) mult = mult.times(LAYER_UPGS.q[34].currently())
 			if (player.ba.unl) mult = mult.times(tmp.balEff)
@@ -2150,10 +2129,12 @@ function getLayerGainMult(layer) {
 			break;
 		case "ps": 
 			if (player.ps.upgrades.includes(11)) mult = mult.div(LAYER_UPGS.ps[11].currently())
+			if (tmp.s !== undefined && tmp.s.trueSbUnl >= 7) mult = mult.div(tmp.s.sbEff[7])
 			break;
 		case "sp": 
 			if (player.sp.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.sp[24].currently())
 			if (player.sp.upgrades.includes(33)) mult = mult.times(LAYER_UPGS.sp[33].currently())
+			if (tmp.s !== undefined && tmp.s.trueSbUnl >= 10) mult = mult.times(tmp.s.sbEff[10])
 			break;
 		case "l": 
 			if (player.sp.upgrades.includes(41)) mult = mult.times(LAYER_UPGS.sp[41].currently())
@@ -2168,15 +2149,19 @@ function getLayerGainMult(layer) {
 
 function getLayerGainExp(layer) {
 	let exp = new Decimal(1);
+	if (LAYER_ROW[layer] < 5) exp = fixValue(tmp.i && tmp.i.workEff).recip()
 	switch(layer) {
 		case "p": 
-			if (tmp.hcActive ? tmp.hcActive[21] : true) exp = exp.div(100)
+			if (tmp.challActive ? tmp.challActive.h[21] : true) exp = exp.div(100)
+			break;
+		case "ps": 
+			if (player.l.order > 0) exp = exp.div(2)
 			break;
 		case "l": 
 			if (player.l.order > 0) exp = exp.div(2)
 			break;
 		case "hs":
-			if (player.hs.order > 0) exp = exp.div(5)
+			if (player.hs.order > 0) exp = exp.div(2)
 			break;
 	}
 	return exp;
@@ -2396,9 +2381,7 @@ function rowReset(row, layer) {
 				time: 0,
 				points: new Decimal(0),
 				best: (player.ba.best.gte(1)||player.m.total.gte(1))?player.h.best:new Decimal(0),
-				active: 0,
 				challs: (player.m.total.gte(2)||player.sp.total.gte(1))?player.h.challs:[],
-				upgrades: [],
 			}
 			player.q = {
 				unl: player.q.unl,
@@ -2516,11 +2499,16 @@ function doReset(layer, force=false) {
 	if ((layer=="hb"&&player.ba.best.gte(8))||(layer=="ss"&&player.ba.best.gte(8))) return;
 	if (layer=="ps"&&player.ps.best.gte(5)) return;
 	let row = LAYER_ROW[layer]
-	if (!force && row>=3) completeHindrance()
+
+	var layersWithChalls = Object.keys(LAYER_CHALLS)
+	for (let y = 0; y < layersWithChalls.length; y++) {
+		var layerResetting = layersWithChalls[y]
+		if (row >= LAYER_ROW[layerResetting] && (!force || layerResetting != layer)) completeChall(layerResetting)
+	}
 
 	prevOnReset = {...player} //Deep Copy
-	if (row==0) rowReset(0, layer)
-	else for (let x=row;x>=1;x--) rowReset(x, layer)
+	if (row == 0) rowReset(0, layer)
+	else for (let x = row; x >= 1; x--) rowReset(x, layer)
 	prevOnReset = undefined
 
 	updateTemp()
@@ -2560,7 +2548,7 @@ function getPointGen() {
 	if (player.q.unl && tmp.quirkEff) gain = gain.times(tmp.quirkEff)
 	if (player.q.upgrades.includes(11)) gain = gain.times(LAYER_UPGS.q[11].currently())
 		
-	if (tmp.hcActive ? tmp.hcActive[31] : true) gain = gain.tetrate(0.1)
+	if (tmp.challActive ? tmp.challActive.h[31] : true) gain = gain.tetrate(0.1)
 	return gain
 }
 
@@ -2574,11 +2562,11 @@ function addToBoosterBase() {
 	let toAdd = new Decimal(0)
 	if (player.b.upgrades.includes(12)) toAdd = toAdd.plus(LAYER_UPGS.b[12].currently())
 	if (player.b.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.b[13].currently())
-	if (player.t.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.t[11].currently())
-	if (player.t.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(25)
-	if (player.t.upgrades.includes(33)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(40)
+	if (player.t.upgrades.includes(11)&&!(tmp.challActive?tmp.challActive.h[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.t[11].currently())
+	if (player.t.upgrades.includes(31)&&!(tmp.challActive?tmp.challActive.h[12]:true)) toAdd = toAdd.plus(25)
+	if (player.t.upgrades.includes(33)&&!(tmp.challActive?tmp.challActive.h[12]:true)) toAdd = toAdd.plus(40)
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
-	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
+	if (player.e.upgrades.includes(11)&&!(tmp.challActive?tmp.challActive.h[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().b)
 	if (player.s.unl && tmp.s !== undefined) toAdd = toAdd.plus(tmp.s.sbEff[2])
 	if (player.sb.upgrades.includes(21)) toAdd = toAdd.plus(LAYER_UPGS.sb[21].currently())
 	
@@ -2590,7 +2578,7 @@ function addToBoosterBase() {
 
 function getFreeBoosters() {
 	let free = new Decimal(0)
-	if (player.t.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) free = free.plus(18)
+	if (player.t.upgrades.includes(24)&&!(tmp.challActive?tmp.challActive.h[12]:true)) free = free.plus(18)
 	if (player.b.upgrades.includes(32)) free = free.plus(LAYER_UPGS.b[32].currently())
 	if (player.b.upgrades.includes(33)) free = free.plus(100)
 	return free
@@ -2609,10 +2597,10 @@ function addToGenBase() {
 	if (player.g.upgrades.includes(13)) toAdd = toAdd.plus(LAYER_UPGS.g[13].currently())
 	if (player.g.upgrades.includes(33)) toAdd = toAdd.plus(LAYER_UPGS.g[33].currently())
 	if (player.e.unl) toAdd = toAdd.plus(tmp.enhEff2)
-	if (player.e.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
+	if (player.e.upgrades.includes(11)&&!(tmp.challActive?tmp.challActive.h[12]:true)) toAdd = toAdd.plus(LAYER_UPGS.e[11].currently().g)
 	if (player.s.unl && tmp.s !== undefined) toAdd = toAdd.plus(tmp.s.sbEff[2])
 		
-	if (player.h.challs.includes(51)) toAdd = toAdd.times(H_CHALLS[51].currently())
+	if (player.h.challs.includes(51)) toAdd = toAdd.times(LAYER_CHALLS.h[51].currently())
 	if (player.q.upgrades.includes(53)) toAdd = toAdd.times(tmp.enhEff2)
 	return toAdd
 }
@@ -2628,9 +2616,9 @@ function getGenPowerGainMult() {
 	let mult = new Decimal(1)
 	if (player.g.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.g[21].currently())
 	if (player.g.upgrades.includes(25)) mult = mult.times(LAYER_UPGS.g[25].currently())
-	if (player.e.upgrades.includes(35)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.e[35].currently())
-	if (player.s.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.s[12].currently())
-	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.s[13].currently())
+	if (player.e.upgrades.includes(35)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.e[35].currently())
+	if (player.s.upgrades.includes(12)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.s[12].currently())
+	if (player.s.upgrades.includes(13)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.s[13].currently())
 	if (player.q.unl && tmp.quirkEff) mult = mult.times(tmp.quirkEff)
 	if (player.g.upgrades.includes(35)) mult = mult.times(LAYER_UPGS.g[35].currently())
 	return mult
@@ -2638,17 +2626,17 @@ function getGenPowerGainMult() {
 
 function getGenPowerEffExp() {
 	let exp = new Decimal(1/3)
-	if (player.s.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) exp = exp.plus(LAYER_UPGS.s[34].currently())
+	if (player.s.upgrades.includes(34)&&!(tmp.challActive?tmp.challActive.h[12]:true)) exp = exp.plus(LAYER_UPGS.s[34].currently())
 	if (player.b.upgrades.includes(21)) exp = exp.times(2)
 	if (player.b.upgrades.includes(22)) exp = exp.times(1.2)
-	if (player.e.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) exp = exp.times(1.15)
+	if (player.e.upgrades.includes(21)&&!(tmp.challActive?tmp.challActive.h[12]:true)) exp = exp.times(1.15)
 	if (player.h.challs.includes(11)) exp = exp.times(1.25)
 	if (player.h.challs.includes(42)) exp = exp.times(3)
 	return exp;
 }
 
 function getGenPowerEff() {
-	if (tmp.hcActive ? tmp.hcActive[11] : true) return new Decimal(1)
+	if (tmp.challActive ? tmp.challActive.h[11] : true) return new Decimal(1)
 	let eff = player.g.power.plus(1).pow(getGenPowerEffExp());
 	return eff
 }
@@ -2669,11 +2657,11 @@ function resetRow(row) {
 }
 
 function getEnhancerPow() {
-	if (tmp.hcActive ? tmp.hcActive[22] : true) return new Decimal(0);
-	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0);
+	if (tmp.challActive ? tmp.challActive.h[22] : true) return new Decimal(0);
+	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0);
 	let pow = new Decimal(1)
-	if (player.e.upgrades.includes(25)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[25].currently())
-	if (player.e.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.e[31].currently())
+	if (player.e.upgrades.includes(25)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.e[25].currently())
+	if (player.e.upgrades.includes(31)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.e[31].currently())
 	if (player.h.challs.includes(31)) pow = pow.times(2)
 	if (player.q.upgrades.includes(42)) pow = pow.times(1.4)
 	if (player.ba.upgrades.includes(32)) pow = pow.times(LAYER_UPGS.ba[32].currently())
@@ -2722,13 +2710,13 @@ function maxEnhancers() {
 
 function getFreeExtCapsules() {
 	let amt = new Decimal(0)
-	if (player.t.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) amt = amt.plus(1)
+	if (player.t.upgrades.includes(12)&&!(tmp.challActive?tmp.challActive.h[12]:true)) amt = amt.plus(1)
 	if (player.h.unl) amt = amt.plus(tmp.layerEffs.h)
 	return amt
 }
 
 function getCapPow() {
-	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	if (player.q.upgrades.includes(33)) pow = pow.times(LAYER_UPGS.q[33].currently())
 	if (spellActive(2)) pow = pow.times(tmp.spellEffs[2])
@@ -2736,7 +2724,7 @@ function getCapPow() {
 }
 
 function getFreeExtPow() {
-	if (tmp.hcActive ? tmp.hcActive[22] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.h[22] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	return pow
 }
@@ -2744,7 +2732,7 @@ function getFreeExtPow() {
 function getTimeEnergyEff() {
 	if (!player.t.unl) return new Decimal(1)
 	let exp = 1.2
-	if (player.t.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) exp = 1.75
+	if (player.t.upgrades.includes(21)&&!(tmp.challActive?tmp.challActive.h[12]:true)) exp = 1.75
 	let eff = player.t.energy.plus(1).pow(exp)
 	return eff;
 }
@@ -2752,21 +2740,21 @@ function getTimeEnergyEff() {
 function getTimeEnergyGainMult() {
 	if (!player.t.unl) return new Decimal(1)
 	let mult = new Decimal(1);
-	if (player.t.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[21].currently())
-	if (player.t.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[22].currently())
-	if (player.t.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[23].currently())
-	if (player.t.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[34].currently())
+	if (player.t.upgrades.includes(21)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[21].currently())
+	if (player.t.upgrades.includes(22)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[22].currently())
+	if (player.t.upgrades.includes(23)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[23].currently())
+	if (player.t.upgrades.includes(34)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[34].currently())
 	return mult;
 }
 
 function getTimeEnergyLimitMult() {
 	if (!player.t.unl) return new Decimal(1)
 	let mult = new Decimal(1);
-	if (player.t.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[12].currently())
-	if (player.t.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[21].currently())
-	if (player.t.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[22].currently())
-	if (player.t.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[23].currently())
-	if (player.t.upgrades.includes(34)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mult = mult.times(LAYER_UPGS.t[34].currently())
+	if (player.t.upgrades.includes(12)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[12].currently())
+	if (player.t.upgrades.includes(21)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[21].currently())
+	if (player.t.upgrades.includes(22)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[22].currently())
+	if (player.t.upgrades.includes(23)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[23].currently())
+	if (player.t.upgrades.includes(34)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mult = mult.times(LAYER_UPGS.t[34].currently())
 	if (player.q.upgrades.includes(23)) mult = mult.times(1e10)
 	if (player.q.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.q[24].currently())
 	if (player.m.upgrades.includes(23)) mult = mult.times("1e500")
@@ -2809,18 +2797,115 @@ function multiplyToTimeBase() {
 
 function getSpace() {
 	let baseSpace = player.s.best.pow(1.1).times(3).floor()
-	if (player.s.upgrades.includes(13)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(2);
-	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) baseSpace = baseSpace.plus(3);
+	if (player.s.upgrades.includes(13)&&!(tmp.challActive?tmp.challActive.h[12]:true)) baseSpace = baseSpace.plus(2);
+	if (player.s.upgrades.includes(24)&&!(tmp.challActive?tmp.challActive.h[12]:true)) baseSpace = baseSpace.plus(3);
 	if (player.ss.unl) baseSpace = baseSpace.plus(tmp.ssEff1)
 	if (player.ss.upgrades.includes(11)) baseSpace = baseSpace.plus(LAYER_UPGS.ss[11].currently())
 	return baseSpace.sub(player.s.spent).max(0)
 }
 
-const MAX_BUILDINGS = 5
+let SPACE_BUILDINGS = {
+	max: 10,
+	1: {
+		cost: new Decimal(1e3),
+		eff: function(x) {
+			let ret = Decimal.pow(Decimal.add(1, x.pow((player.s.upgrades.includes(31)&&!(tmp.challActive?tmp.challActive.h[12]:true))?2.75:1)), player.s.points.sqrt()).times(Decimal.mul(4, x.pow((player.s.upgrades.includes(31)&&!(tmp.challActive?tmp.challActive.h[12]:true))?2.75:1))).max(1)
+			if (player.ba.upgrades.includes(42)) ret = ret.pow(LAYER_UPGS.ba[42].currently())
+			return ret
+		},
+		effDesc: function(x) {
+			return "Space Energy boosts Point gain & Prestige Point gain ("+format(x)+"x)"
+		}
+	},
+	2: {
+		cost: new Decimal(1e10),
+		eff: function(x) {
+			if (player.s.upgrades.includes(43)) return Decimal.pow(1.0001, x).times(x.sqrt())
+			else return x.sqrt()
+		},
+		effDesc: function(x) {
+			return "Adds to base of Booster/Generator effects by "+format(x)
+		}
+	},
+	3: {
+		cost: new Decimal(1e25),
+		eff: function(x) {
+			return Decimal.pow(1e18, x.pow(0.9))
+		},
+		effDesc: function(x) {
+			return "Makes Boosters/Generators cheaper by "+format(x)+"x"
+		}
+	},
+	4: {
+		cost: new Decimal(1e48),
+		eff: function(x) {
+			let ret = x.plus(1).pow(1.25)
+			if (ret.gte(1e6)) ret = ret.log10().times(1e6/6)
+			return ret;
+		},
+		effDesc: function(x) {
+			return "Booster Upgrade 6's effect is raised to the power of "+format(x)
+		}
+	},
+	5: {
+		cost: new Decimal(1e100),
+		eff: function(x) {
+			return x.sqrt().times(2)
+		},
+		effDesc: function(x) {
+			return "Add "+format(x)+" free levels to all previous Space Buildings"
+		}
+	},
+	6: {
+		cost: new Decimal("e6000000"),
+		eff: function(x) {
+			return x.div(1e3).add(1).cbrt()
+		},
+		effDesc: function(x) {
+			return "You produce Life Power " + format(x) + "x faster"
+		}
+	},
+	7: {
+		cost: new Decimal(1e100),
+		eff: function(x) {
+			return Decimal.pow(1.1, x)
+		},
+		effDesc: function(x) {
+			return "Reduce the requirement of Phantom Souls by " + format(x) + "x"
+		}
+	},
+	8: {
+		cost: new Decimal(1e100),
+		eff: function(x) {
+			return x.pow(0.25).div(10)
+		},
+		effDesc: function(x) {
+			return "Gain " + format(x) + " free extra Quirk layers"
+		}
+	},
+	9: {
+		cost: new Decimal(1e100),
+		eff: function(x) {
+			return x.max(1).log10().add(1)
+		},
+		effDesc: function(x) {
+			return "Boost all previous Space Buildings by " + format(x.sub(1).times(100)) + "%"
+		}
+	},
+	10: {
+		cost: new Decimal(1e100),
+		eff: function(x) {
+			return Decimal.pow(1.1, x.sqrt())
+		},
+		effDesc: function(x) {
+			return "Gain " + format(x) + "x more Super-Prestige Points"
+		}
+	},
+}
 
 function getSpaceBuildingCostMod() {
 	let mod = new Decimal(1)
-	if (player.s.upgrades.includes(24)&&!(tmp.hcActive?tmp.hcActive[12]:true)) mod = mod.times(0.5)
+	if (player.s.upgrades.includes(24)&&!(tmp.challActive?tmp.challActive.h[12]:true)) mod = mod.times(0.5)
 	if (player.s.upgrades.includes(42)) mod = mod.times(0.6)
 	if (spellActive(4)) mod = mod.times(Decimal.sub(1, tmp.spellEffs[4].sub(1)))
 	if (player.ba.upgrades.includes(15)) mod = mod.div(LAYER_UPGS.ba[15].currently())
@@ -2835,99 +2920,67 @@ function getSpaceBuildingCostMult() {
 }
 
 function getSpaceBuildingCost(x) {
-	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
+	let inputVal = SPACE_BUILDINGS[x].cost
 	let bought = tmp.s.sb[x]
 	if (bought.gte(100)) bought = bought.pow(2).div(100)
-	let cost = Decimal.pow(inputVal, bought.times(getSpaceBuildingCostMod()).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0).times(getSpaceBuildingCostMult())
+	let cost = Decimal.pow(inputVal, bought.times(tmp.s.sbCostMod).pow(1.35)).times(inputVal).times((bought.gt(0)||x>1)?1:0).times(tmp.s.sbCostMult)
 	return cost
 }
 
 function getSpaceBuildingTarg(x) {
-	let inputVal = new Decimal([1e3,1e10,1e25,1e48,1e100][x-1])
-	let target = player.g.power.div(getSpaceBuildingCostMult()).div(inputVal).max(1).log(inputVal).pow(1/1.35).div(getSpaceBuildingCostMod())
+	let inputVal = SPACE_BUILDINGS[x].cost
+	let target = player.g.power.div(tmp.s.sbCostMult).div(inputVal).max(1).log(inputVal).pow(1/1.35).div(tmp.s.sbCostMod)
 	if (target.gte(100)) target = target.times(100).sqrt()
 	return target.plus(1).floor()
 }
 
 function getSpaceBuildingPow() {
 	if (!player.s.unl) return new Decimal(0)
-	if (tmp.hcActive ? tmp.hcActive[22] : true) return new Decimal(0)
-	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.h[22] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0)
 	let pow = new Decimal(1)
-	if (player.s.upgrades.includes(21)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[21].currently())
-	if (player.s.upgrades.includes(22)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
-	if (player.s.upgrades.includes(23)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.s[23].currently())
-	if (player.s.upgrades.includes(44)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(1.25)
+	if (player.s.upgrades.includes(21)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.s[21].currently())
+	if (player.s.upgrades.includes(22)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
+	if (player.s.upgrades.includes(23)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.s[23].currently())
+	if (player.s.upgrades.includes(44)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(1.25)
 	if (player.q.upgrades.includes(41)) pow = pow.times(1.4)
 	if (player.ss.unl) pow = pow.times(tmp.ssEff3)
 	if (player.ba.upgrades.includes(44)) pow = pow.times(1.5)
 	return pow
 }
 
-function getExtraBuildingLevels(x) {
+function getExtraBuildingLevels() {
 	let lvl = new Decimal(0)
-	if (player.s.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
-	if (player.s.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true)) lvl = lvl.plus(1);
+	if (player.s.upgrades.includes(11)&&!(tmp.challActive?tmp.challActive.h[12]:true)) lvl = lvl.plus(1);
+	if (player.s.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true)) lvl = lvl.plus(1);
 	if (player.q.upgrades.includes(31)) lvl = lvl.plus(1);
-	if (x<5) lvl = lvl.plus(tmp.s.sbEff[5])
 	if (player.m.upgrades.includes(32)) lvl = lvl.plus(LAYER_UPGS.m[32].currently())
 	return lvl
 }
 
 function getSpaceBuildingEff(x) {
-	let bought = tmp.s.sb[x].plus(getExtraBuildingLevels(x));
-	if (!player.s.unl) bought = new Decimal(0);
-	if (tmp.s.trueSbUnl<x) bought = new Decimal(0);
-	let power = getSpaceBuildingPow()
-	bought = bought.times(power)
-	if (layerUnl("hs") && tmp.hs !== undefined) {
-		tmp.hs.suEff[x] = HYPERSPACE.effs[x](bought, tmp.hs.su[x].times(tmp.hs.eff))
-		bought = bought.times(tmp.hs.suEff[x])
+	let bought
+	if (!player.s.unl) bought = new Decimal(0)
+	else {
+		bought = tmp.s.sb[x].plus(tmp.s.sbExtra)
+		if (x<9) bought = bought.times(fixValue(tmp.s.sbEff[9], 1))
+		if (x<5) bought = bought.plus(fixValue(tmp.s.sbEff[5]))
+
+		var compressLvl = new Decimal(1)
+		if (tmp.i !== undefined && layerUnl("i") && tmp.i.compressed >= x) compressLvl = tmp.s.sbUnl.sub(x - SPACE_BUILDINGS.max - 1).ceil()
+
+		bought = bought.times(tmp.s.sbPow).times(compressLvl)
+		if (tmp.hs !== undefined && layerUnl("hs")) {
+			tmp.hs.suEff[x] = HYPERSPACE.effs[x](bought, fixValue(tmp.hs.su[x]).times(tmp.hs.eff).times(compressLvl))
+			bought = bought.times(tmp.hs.suEff[x])
+		}
 	}
-	let ret;
-	switch(x) {
-		case 1: 
-			ret = Decimal.pow(Decimal.add(1, bought.pow((player.s.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1)), player.s.points.sqrt()).times(Decimal.mul(4, bought.pow((player.s.upgrades.includes(31)&&!(tmp.hcActive?tmp.hcActive[12]:true))?2.75:1))).max(1)
-			if (player.ba.upgrades.includes(42)) ret = ret.pow(LAYER_UPGS.ba[42].currently())
-			return ret;
-			break;
-		case 2: 	
-			if (player.s.upgrades.includes(43)) return Decimal.pow(1.0001, bought).times(bought.sqrt())
-			else return bought.sqrt()
-			break;
-		case 3: 
-			return Decimal.pow(1e18, bought.pow(0.9))
-			break;
-		case 4: 
-			ret = bought.plus(1).pow(1.25)
-			if (ret.gte(1e6)) ret = ret.log10().times(1e6/6)
-			return ret;
-			break;
-		case 5: 
-			return bought.sqrt().times(2)
-			break;
-	}
+	return SPACE_BUILDINGS[x].eff(bought)
 }
 
 function getSpaceBuildingEffDesc(x) {
 	let eff = tmp.s.sbEff[x]
-	switch(x) {
-		case 1: 
-			return "Space Energy boosts Point gain & Prestige Point gain ("+format(eff)+"x)"
-			break;
-		case 2: 
-			return "Adds to base of Booster/Generator effects by "+format(eff)
-			break;
-		case 3: 
-			return "Makes Boosters/Generators cheaper by "+format(eff)+"x"
-			break;
-		case 4: 
-			return "Booster Upgrade 6's effect is raised to the power of "+format(eff)
-			break;
-		case 5: 
-			return "Add "+format(eff)+" free levels to all previous Space Buildings."
-			break;
-	}
+	return SPACE_BUILDINGS[x].effDesc(eff)
 }
 
 function buyBuilding(x) {
@@ -2976,8 +3029,12 @@ function respecSpaceBuildings() {
 
 function getSpaceBuildingsUnl() {
 	let x = 3
-	if (player.s.upgrades.includes(14)&&!(tmp.hcActive?tmp.hcActive[12]:true)) x++;
-	if (player.s.upgrades.includes(32)&&!(tmp.hcActive?tmp.hcActive[12]:true)) x++;
+	if (player.s.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true)) x++;
+	if (player.s.upgrades.includes(32)&&!(tmp.challActive?tmp.challActive.h[12]:true)) x++;
+	if (layerUnl("i")) {
+		x = new Decimal(x)
+		if (player.i.unl) x = x.add(player.i.extraBuildings)
+	}
 	return x;
 }
 
@@ -2986,10 +3043,10 @@ function toggleAuto(layer, end="") {
 }
 
 function getSuperBoosterPow() {
-	if (tmp.hcActive ? tmp.hcActive[41] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0)
 	let pow = new Decimal(1)
-	if (player.sb.upgrades.includes(11)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.sb[11].currently())
-	if (player.sb.upgrades.includes(12)&&!(tmp.hcActive?tmp.hcActive[12]:true)) pow = pow.times(LAYER_UPGS.sb[12].currently())
+	if (player.sb.upgrades.includes(11)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.sb[11].currently())
+	if (player.sb.upgrades.includes(12)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.sb[12].currently())
 	if (player.hb.upgrades.includes(11)) pow = pow.times(LAYER_UPGS.hb[11].currently())
 	return pow;
 }
@@ -3012,12 +3069,14 @@ function getQuirkLayerCostBase() {
 function getQuirkLayerCost(layers) {
 	if (layers === undefined) layers = player.q.layers
 	if (layers.gte(20)) layers = Decimal.pow(1.05, layers.sub(20)).times(20)
-	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, layers)).div(2)
+	if (player.ba.upgrades.includes(55)) layers = layers.div(LAYER_UPGS.ba[55].currently())
+	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, layers).sub(1))
 	return cost.max(1);
 }
 
 function getQuirkLayerTarg() {
-	let targ = player.q.points.times(2).log(tmp.qCB).log(tmp.qCB)
+	let targ = player.q.points.log(tmp.qCB).add(1).log(tmp.qCB)
+	if (player.ba.upgrades.includes(55)) targ = targ.times(LAYER_UPGS.ba[55].currently())
 	if (targ.gte(20)) targ = targ.div(20).log(1.05).plus(20)
 	return targ.plus(1).floor()
 }
@@ -3028,7 +3087,7 @@ function getQuirkLayerMult() {
 	if (player.q.upgrades.includes(14)) mult = mult.times(3)
 	if (player.q.upgrades.includes(21)) mult = mult.times(LAYER_UPGS.q[21].currently())
 	if (player.q.upgrades.includes(52)) mult = mult.times(LAYER_UPGS.q[52].currently())
-	if (player.h.challs.includes(52)) mult = mult.times(H_CHALLS[52].currently())
+	if (player.h.challs.includes(52)) mult = mult.times(LAYER_CHALLS.h[52].currently())
 	if (player.ba.upgrades.includes(13)) mult = mult.times(LAYER_UPGS.ba[13].currently())
 	return mult
 }
@@ -3038,6 +3097,7 @@ function getExtraQuirkLayers() {
 	if (player.q.upgrades.includes(51)) layers = layers.plus(LAYER_UPGS.q[51].currently())
 	if (player.m.upgrades.includes(24)) layers = layers.plus(LAYER_UPGS.m[24].currently())
 	if (player.m.upgrades.includes(34)) layers = layers.plus(1)
+	if (tmp.s !== undefined && tmp.s.trueSbUnl >= 8) layers = layers.add(tmp.s.sbEff[8])
 	return layers;
 }
 
@@ -3081,156 +3141,170 @@ function maxQuirkLayers() {
 	player.q.layers = player.q.layers.max(target)
 }
 
-const H_CHALLS = {
-	rows: 7,
-	cols: 2,
-	11: {
-		name: "Skip the Second",
-		desc: "Boosters and Generator Power do nothing",
-		unl: function() { return player.h.best.gt(0) },
-		goal: new Decimal("1e2400"),
-		reward: "The generator power effect is raised to the power of 1.25",
-	},
-	12: {
-		name: "Anti-Upgrades",
-		desc: "Row 3 Upgrades do nothing",
-		unl: function() { return player.h.challs.includes(11) },
-		goal: new Decimal("1e840"),
-		reward: "Quirk gain is boosted by your Quirk Layers",
-		currently: function() { return Decimal.pow(1.5, player.q.layers.times(player.sp.upgrades.includes(22)?250:1)) },
-		effDisp: function(x) { return format(x)+"x" },
-	},
-	21: {
-		name: "Prestigeless",
-		desc: "Prestige Point gain is raised to the power of 0.01",
-		unl: function() { return player.h.challs.includes(12) },
-		goal: new Decimal("1e1200"),
-		reward: "Hindrance Spirit & Quirks make Time Capsules & Space Energy cheaper.",
-		currently: function() { return player.h.points.plus(player.q.points).div(2).plus(1).pow(1000).pow(player.sp.upgrades.includes(22)?250:1) },
-		effDisp: function(x) { return format(x)+"x cheaper" },
-	},
-	22: {
-		name: "Impaired Nodes",
-		desc: "Enhancers, Extra Time Capsules, and Space Buildings do nothing.",
-		unl: function() { return player.h.challs.includes(12) },
-		goal: new Decimal("1e4600"),
-		reward: "Add 0.25 to the Super-Booster base.",
-	},
-	31: {
-		name: "Flattened Curve",
-		desc: "Point generation is tetrated by 0.1",
-		unl: function() { return player.h.challs.includes(21)||player.h.challs.includes(22) },
-		goal: new Decimal(1e208),
-		reward: "Enhancers are twice as strong.",
-	},
-	32: {
-		name: "Surprise Junction",
-		desc: "Prestige Upgrade 2 does nothing",
-		unl: function() { return player.h.challs.includes(21)&&player.h.challs.includes(22) },
-		goal: new Decimal("1e2580"),
-		reward: "Unlock 2 new Super-Booster Upgrades and 7 new Quirk Upgrades.",
-	},
-	41: {
-		name: "Skip the Third",
-		desc: "Enhancers, Time Capsules, Space Buildings, and Super-Boosters do nothing.",
-		unl: function() { return player.h.challs.includes(31)||player.h.challs.includes(32) },
-		goal: new Decimal("4.444e4444"),
-		reward: "Add 0.25 to the Super-Booster base.",
-	},
-	42: {
-		name: "Slowed to a Halt",
-		desc: "Time slows down over time, halting to a stop after 10 seconds. Hint: This also impacts auto Enhance Point generation, so make sure to manually press E!",
-		unl: function() { return player.h.challs.includes(31)&&player.h.challs.includes(32) },
-		goal: new Decimal("1e16500"),
-		reward: "Cube the Generator Power effect.",
-	},
-	51: {
-		name: "It's all Gone",
-		desc: '"Skip the Second" and "Skip the Third" are both applied at once.',
-		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42) },
-		goal: new Decimal("1e2840"),
-		reward: "Super-Boosters multiply the Generator base.",
-		currently: function() { return player.sb.points.plus(1).sqrt() },
-		effDisp: function(x) { return format(x)+"x" },
-	},
-	52: {
-		name: "Anti-Enhancers",
-		desc: "You lose Enhancers over time, which can make your Enhancer amount get below 0. Hint: Maybe it's best to not have any Time Capsules or Space Energy?",
-		unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42)&&player.h.challs.includes(51) },
-		goal: new Decimal("1e440000"),
-		reward: "Quirk Layers are faster based on your Hindrance Spirit & Quirks.",
-		currently: function() { 
-			let h = player.h.points.times(player.q.points).sqrt();
-			if (h.gte(1e150)) h = h.log10().pow(50).times(1e150/Math.pow(150, 50)).min(h)
-			if (h.gte(1e100)) h = h.times(1e100).sqrt()
-			let ret = h.plus(1).pow(0.04);
-			return ret;
+const LAYER_CHALLS = {
+	h: {
+		rows: 7,
+		cols: 2,
+		active: function(x) {
+			if (x<71&&x!=42&&x!=52) if (this.active(71)) return true
+			if (x==11||x==41) if (this.active(51)) return true
+			if (x==31||x==32) if (this.active(61)) return true
+			return player.h.active==x;
 		},
-		effDisp: function(x) { return format(x)+"x" },
-	},
-	61: {
-		name: "Microanalysis",
-		desc: '"Flattened Curve" and "Surprised Junction" are both applied at once.',
-		unl: function() { return player.m.upgrades.includes(12) },
-		goal: new Decimal("1e12300"),
-		reward: "Hindrance Spirit & Quirk Energy are 20% stronger.",
-	},
-	62: {
-		name: "Truly Prestigeless",
-		desc: "You cannot gain Prestige Points.",
-		unl: function() { return player.m.upgrades.includes(12) },
-		goal: new Decimal("1e134000"),
-		reward: "Unlock Super-Generators.",
-	},
-	71: {
-		name: "The Final Stockade",
-		desc: 'All previous Hindrances (except "Slowed to a Halt" and "Anti-Enhancers") are applied at once.',
-		unl: function() { return player.m.upgrades.includes(31) },
-		goal: new Decimal("1e1150"),
-		reward: "Gain more Hindrance Spirit based on your Quirk Energy.",
-		currently: function() { 
-			let ret = player.q.energy.plus(1).sqrt() 
-			if (ret.gte("1.8e308")) ret = ret.sqrt().times(Decimal.sqrt("1.8e308"))
-			return ret;
+		11: {
+			name: "Skip the Second",
+			desc: "Boosters and Generator Power do nothing",
+			unl: function() { return player.h.best.gt(0) },
+			goal: new Decimal("1e2400"),
+			reward: "The generator power effect is raised to the power of 1.25",
 		},
-		effDisp: function(x) { return format(x)+"x" },
+		12: {
+			name: "Anti-Upgrades",
+			desc: "Row 3 Upgrades do nothing",
+			unl: function() { return player.h.challs.includes(11) },
+			goal: new Decimal("1e840"),
+			reward: "Quirk gain is boosted by your Quirk Layers",
+			currently: function() { return Decimal.pow(1.5, player.q.layers.times(player.sp.upgrades.includes(22)?250:1)) },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		21: {
+			name: "Prestigeless",
+			desc: "Prestige Point gain is raised to the power of 0.01",
+			unl: function() { return player.h.challs.includes(12) },
+			goal: new Decimal("1e1200"),
+			reward: "Hindrance Spirit & Quirks make Time Capsules & Space Energy cheaper.",
+			currently: function() { return player.h.points.plus(player.q.points).div(2).plus(1).pow(1000).pow(player.sp.upgrades.includes(22)?250:1) },
+			effDisp: function(x) { return format(x)+"x cheaper" },
+		},
+		22: {
+			name: "Impaired Nodes",
+			desc: "Enhancers, Extra Time Capsules, and Space Buildings do nothing.",
+			unl: function() { return player.h.challs.includes(12) },
+			goal: new Decimal("1e4600"),
+			reward: "Add 0.25 to the Super-Booster base.",
+		},
+		31: {
+			name: "Flattened Curve",
+			desc: "Point generation is tetrated by 0.1",
+			unl: function() { return player.h.challs.includes(21)||player.h.challs.includes(22) },
+			goal: new Decimal(1e208),
+			reward: "Enhancers are twice as strong.",
+		},
+		32: {
+			name: "Surprise Junction",
+			desc: "Prestige Upgrade 2 does nothing",
+			unl: function() { return player.h.challs.includes(21)&&player.h.challs.includes(22) },
+			goal: new Decimal("1e2580"),
+			reward: "Unlock 2 new Super-Booster Upgrades and 7 new Quirk Upgrades.",
+		},
+		41: {
+			name: "Skip the Third",
+			desc: "Enhancers, Time Capsules, Space Buildings, and Super-Boosters do nothing.",
+			unl: function() { return player.h.challs.includes(31)||player.h.challs.includes(32) },
+			goal: new Decimal("4.444e4444"),
+			reward: "Add 0.25 to the Super-Booster base.",
+		},
+		42: {
+			name: "Slowed to a Halt",
+			desc: "Time slows down over time, halting to a stop after 10 seconds. Hint: This also impacts auto Enhance Point generation, so make sure to manually press E!",
+			unl: function() { return player.h.challs.includes(31)&&player.h.challs.includes(32) },
+			goal: new Decimal("1e16500"),
+			reward: "Cube the Generator Power effect.",
+		},
+		51: {
+			name: "It's all Gone",
+			desc: '"Skip the Second" and "Skip the Third" are both applied at once.',
+			unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42) },
+			goal: new Decimal("1e2840"),
+			reward: "Super-Boosters multiply the Generator base.",
+			currently: function() { return player.sb.points.plus(1).sqrt() },
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		52: {
+			name: "Anti-Enhancers",
+			desc: "You lose Enhancers over time, which can make your Enhancer amount get below 0. Hint: Maybe it's best to not have any Time Capsules or Space Energy?",
+			unl: function() { return player.h.challs.includes(41)&&player.h.challs.includes(42)&&player.h.challs.includes(51) },
+			goal: new Decimal("1e440000"),
+			reward: "Quirk Layers are faster based on your Hindrance Spirit & Quirks.",
+			currently: function() { 
+				let h = player.h.points.times(player.q.points).sqrt();
+				if (h.gte(1e150)) h = h.log10().pow(50).times(1e150/Math.pow(150, 50)).min(h)
+				if (h.gte(1e100)) h = h.times(1e100).sqrt()
+				let ret = h.plus(1).pow(0.04);
+				return ret;
+			},
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		61: {
+			name: "Microanalysis",
+			desc: '"Flattened Curve" and "Surprised Junction" are both applied at once.',
+			unl: function() { return player.m.upgrades.includes(12) },
+			goal: new Decimal("1e12300"),
+			reward: "Hindrance Spirit & Quirk Energy are 20% stronger.",
+		},
+		62: {
+			name: "Truly Prestigeless",
+			desc: "You cannot gain Prestige Points.",
+			unl: function() { return player.m.upgrades.includes(12) },
+			goal: new Decimal("1e134000"),
+			reward: "Unlock Super-Generators.",
+		},
+		71: {
+			name: "The Final Stockade",
+			desc: 'All previous Hindrances (except "Slowed to a Halt" and "Anti-Enhancers") are applied at once.',
+			unl: function() { return player.m.upgrades.includes(31) },
+			goal: new Decimal("1e1150"),
+			reward: "Gain more Hindrance Spirit based on your Quirk Energy.",
+			currently: function() { 
+				let ret = player.q.energy.plus(1).sqrt() 
+				if (ret.gte("1.8e308")) ret = ret.sqrt().times(Decimal.sqrt("1.8e308"))
+				return ret;
+			},
+			effDisp: function(x) { return format(x)+"x" },
+		},
+		72: {
+			name: "You shouldn't be seeing this",
+			desc: "Never gonna give you up, never gonna let you down, never gonna run around and dessert you",
+			unl: function() { return false },
+			goal: new Decimal(1/0),
+			reward: "???",
+		},
 	},
-	72: {
-		name: "You shouldn't be seeing this",
-		desc: "Never gonna give you up, never gonna let you down, never gonna run around and dessert you",
-		unl: function() { return false },
-		goal: new Decimal(1/0),
-		reward: "???",
+	test: {
+		rows: 1,
+		cols: 1,
+		11: {
+			name: "You shouldn't be seeing this",
+			desc: "Never gonna give you up, never gonna let you down, never gonna run around and dessert you",
+			unl: function() { return true },
+			goal: new Decimal(0),
+			reward: "???",
+		},
 	},
 }
 
-function HCActive(x) {
-	if (x<71&&x!=42&&x!=52) if (HCActive(71)) return true
-	if (x==11||x==41) if (HCActive(51)) return true
-	if (x==31||x==32) if (HCActive(61)) return true
-	return player.h.active==x;
-}
-
-function startHindrance(x) {
-	if (!player.h.unl) return
-	if (player.h.active==x) {
-		completeHindrance(x)
-		player.h.active = 0
+function startChall(layer, x) {
+	if (!player[layer].unl) return
+	if (player[layer].active == x) {
+		completeChall(layer, x)
+		delete player[layer].active
 	} else {
-		player.h.active = x
+		player[layer].active = x
 	}
-	doReset("h", true)
+	doReset(layer, true)
+	updateChallTemp(layer)
 }
 
-function completeHindrance() {
-	var x = player.h.active
-	if (x == 0) return
-	if (!player.points.gte(H_CHALLS[x].goal)) return
-	if (!player.h.challs.includes(x)) {
-		if (x==62) needCanvasUpdate = true
-		player.h.challs.push(x);
+function completeChall(layer, x) {
+	var x = player[layer].active
+	if (!x) return
+	if (!player.points.gte(LAYER_CHALLS[layer][x].goal)) return
+	if (!player[layer].challs.includes(x)) {
+		if (layer == "h" && x == 62) needCanvasUpdate = true
+		player[layer].challs.push(x);
 	}
-	player.h.active = 0
+	delete player[layer].active
+	updateChallTemp(layer)
 }
 
 function adjustMSDisp() {
@@ -3302,7 +3376,6 @@ function getHyperBoosterExp() {
 function getExtraHyperBoosters() {
 	let x = new Decimal(0)
 	if (player.l.unl && tmp.l !== undefined) x = x.add(tmp.l.lbEff[1])
-	if (player.sp.upgrades.includes(51)) x = x.add(1)
 	return x
 }
 
@@ -3492,6 +3565,7 @@ function addToSGBase() {
 function getLifePowerMult() {
 	let x = tmp.layerEffs.ps.mult.div(10)
 	if (player.sp.upgrades.includes(42)) x = x.times(LAYER_UPGS.sp[42].currently())
+	if (tmp.s !== undefined && tmp.s.trueSbUnl >= 6) x = x.times(tmp.s.sbEff[6])
 	return x
 }
 
@@ -3507,7 +3581,6 @@ function getLifePowerSoftcapStart() {
 
 function getLifePowerSoftcapExp() {
 	let x = 1/3
-	if (player.sp.upgrades.includes(52)) x = 0.5
 	return x
 }
 
@@ -3522,6 +3595,9 @@ let LIFE_BOOSTERS = {
 	},
 	req: function(x) {
 		return tmp.l.lb[x].times(this[x].reqMult).add(this[x].req)
+	},
+	reqTarget: function(x) {
+		return player.ps.points.sub(this[x].req).div(this[x].reqMult).floor().add(1)
 	},
 	1: {
 		req: new Decimal(1),
@@ -3569,7 +3645,7 @@ let LIFE_BOOSTERS = {
 		req: new Decimal(3),
 		reqMult: new Decimal(100),
 		eff: function(str) {
-			return Decimal.pow(1.1, str)
+			return Decimal.pow(1.5, str)
 		},
 		effDesc: function(x) {
 			return "Gain " + format(x) + "x more Hyperspace Energy"
@@ -3580,13 +3656,15 @@ let LIFE_BOOSTERS = {
 let HYPERSPACE = {
 	cost: function(x) {
 		if (x === undefined) x = player.hs.space
+		let reduction = this.costReduction()
 		return {
-			hs: Decimal.pow(100, x.add(1).div(3).sqr()).floor(),
-			ba: Decimal.pow(10, x.times(20).add(150)).div(this.costReduction())
+			hs: Decimal.pow(2, x.sqr()).div(reduction).floor(),
+			ba: Decimal.pow(10, x.max(x.div(2).sqr()).times(20).add(150)).div(reduction).floor()
 		}
 	},
 	costReduction: function() {
 		let r = new Decimal(1)
+		if (player.ba.upgrades.includes(45)) r = LAYER_UPGS.ba[45].currently()
 		return r
 	},
 	canBuy: function() {
@@ -3616,14 +3694,16 @@ let HYPERSPACE = {
 		doReset("hs", true)
 	},
 	eff: function() {
-		return new Decimal(1)
+		let r = new Decimal(1)
+		if (player.ba.upgrades.includes(35)) r = new Decimal(1.25)
+		return r
 	},
 	nextCapReq: function(x) {
 		if (x === undefined) x = player.hs.superUpgradeCap
-		return Decimal.times(x, 100).add(1400)
+		return Decimal.times(x, 200).add(1300)
 	},
 	nextCapTarget: function() {
-		let x = player.g.points.sub(1400).div(100)
+		let x = player.g.points.sub(1300).div(200)
 		return x.floor().add(1)
 	},
 	effs: {
@@ -3640,8 +3720,49 @@ let HYPERSPACE = {
 			return Decimal.pow(2, sb.cbrt().times(su.sqrt()))
 		},
 		5: function(sb, su) {
-			return sb.add(10).log10().times(su.sqrt()).div(2).add(1)
+			return sb.add(10).log10().times(su.sqrt()).div(1.75).max(1)
+		},
+		6: function(sb, su) {
+			return sb.cbrt().times(su.sqrt()).max(1)
+		},
+		7: function(sb, su) {
+			return sb.times(su).max(1)
+		},
+		8: function(sb, su) {
+			return sb.times(su).max(1)
+		},
+		9: function(sb, su) {
+			return sb.times(su).max(1)
+		},
+		10: function(sb, su) {
+			return sb.times(su).max(1)
 		}
+	}
+}
+
+let IMPERIUM = {
+	lifeReq: function() {
+		return Decimal.pow(10, player.i.lifeBricks.times(6).plus(18))
+	},
+	lifeTarget: function() {
+		return player.l.power.log10().sub(18).div(6).floor().add(1)
+	},
+	canBuild: function() {
+		return player.i.building || true
+	},
+	build: function() {
+		if (!this.canBuild()) return
+		if (player.i.building) {
+			if (!confirm("Are you sure?")) return
+			delete player.i.building
+		} else {
+			player.i.building = 1
+			doReset("i", true)
+		}
+		player.i.progress = 0
+	},
+	speed: function() {
+		return Decimal.pow(10, player.i.extraBuildings.times(10).add(2)).recip().times(player.l.power.add(1).pow(0.05))
 	}
 }
 
@@ -3661,10 +3782,12 @@ function gameLoop(diff) {
 	}
 	player.timePlayed += diff
 	player.h.time += diff
-	if (tmp.hcActive ? tmp.hcActive[42] : true) {
+	if (tmp.challActive ? tmp.challActive.h[42] : true) {
 		if (player.h.time>=10) diff = 0
 		else diff = Decimal.div(diff, Decimal.div(10, Decimal.sub(10, player.h.time + 1)).pow(1000))
 	}
+	if (diff === 0) return
+
 	if (player.p.upgrades.includes(11)) player.points = player.points.plus(tmp.pointGen.times(diff)).max(0)
 	if (player.g.unl) player.g.power = player.g.power.plus(tmp.layerEffs.g.times(diff)).max(0)
 	if (player.g.best.gte(10)) generatePoints("p", diff)
@@ -3700,6 +3823,7 @@ function gameLoop(diff) {
 		generatePoints("m", diff)
 		generatePoints("ba", diff)
 	}
+	if (player.hs.best.gte(2e4)) generatePoints("sp", Decimal.div(diff, 10))
 	if (player.l.unl) {
 		let exp = getLifePowerExp()
 		let cap = getLifePowerSoftcapStart()
@@ -3713,13 +3837,17 @@ function gameLoop(diff) {
 		if (power.gt(1)) power = power.pow(exp)
 		player.l.power = power
 
-		for (var i=1; i<=tmp.l.lbUnl; i++) {
-			var req = LIFE_BOOSTERS.req(i)
-			if (player.ps.points.gte(req)) player.l.boosters[i] = player.ps.points.sub(req).div(LIFE_BOOSTERS[i].reqMult).floor().add(1).add(tmp.l.lb[i])
-		}
+		for (var i=1; i<=tmp.l.lbUnl; i++) player.l.boosters[i] = LIFE_BOOSTERS.reqTarget(i).max(player.l.boosters[i])
 	}
-	if (player.hs.unl) {
-		player.hs.superUpgradeCap = player.hs.superUpgradeCap.max(HYPERSPACE.nextCapTarget())
+	if (player.hs.unl) player.hs.superUpgradeCap = player.hs.superUpgradeCap.max(HYPERSPACE.nextCapTarget())
+	if (player.i.unl) {
+		player.i.lifeBricks = player.i.lifeBricks.max(IMPERIUM.lifeTarget())
+		if (player.i.building) player.i.progress += IMPERIUM.speed().times(diff).toNumber()
+		if (player.i.progress >= 1) {
+			player.i.progress = 0
+			player.i.extraBuildings = player.i.extraBuildings.add(1)
+			delete player.i.building
+		}
 	}
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")

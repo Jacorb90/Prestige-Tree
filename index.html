@@ -25,7 +25,9 @@
 			<button class="back" onclick="showTab('tree')">←</button><br>
 			<h3>v1.1: The Life Update</h3>
 			<ul>
-				<li>???</li>
+				<li>Added 4 new layers</li>
+				<li>Rebalanced early parts of rows 4 - 5 progression</li>
+				<li>Balanced up to e???,000,000</li>
 			</ul><br>
 			<h3>v1.0 Patch 1</h3>
 			<ul>
@@ -592,6 +594,9 @@
 					You have {{formatWhole(player.ps.points)}} Phantom Souls, {{getLayerEffDesc("ps")}}
 				</div>
 				<div v-if="layer=='hs'">
+					<table>
+						<tr v-if="milestoneShown(player.hs.best.gte(2e4))"><td v-bind:class="{ milestone: player.hs.best.lt(2e4), milestoneDone: player.hs.best.gte(2e4) }"><h3>20,000 Hyperspace Energy</h3><br>Gain 10% of Super-Prestige Points gain every second</td></tr>
+					</table>
 					<br><br>
 					You have {{formatWhole(player.ba.points)}} Balance Energy
 					<br>
@@ -606,24 +611,44 @@
 					<br>
 					Get {{formatWhole(player.g.points)}} / {{formatWhole(HYPERSPACE.nextCapReq())}} Generators to increase the cap of Super-Upgrades
 				</div>
+				<div v-if="layer=='i'">
+					<table>
+						<tr v-if="milestoneShown(player.i.best.gte(3))"><td v-bind:class="{ milestone: player.i.best.lt(3), milestoneDone: player.i.best.gte(3) }"><h3>3 Imperium Bricks</h3><br>You can max out Imperium Bricks</td></tr>
+					</table>
+					<br><br>
+					You have {{formatWhole(player.i.lifeBricks)}} Life Bricks<br>
+					Next Life Brick is at {{format(player.l.power)}} / {{format(IMPERIUM.lifeReq())}} Life Power
+					<br><br>
+					<button v-on:click="IMPERIUM.build()" v-bind:class="{ upgBig: true, i: true, can: IMPERIUM.canBuild(), locked: !IMPERIUM.canBuild() }">
+						<span v-if="tmp.s.sbUnl.lt(SPACE_BUILDINGS.max)">Build Space Building {{formatWhole(tmp.s.sbUnl.add(1))}}</span>
+						<span v-if="tmp.s.sbUnl.gte(SPACE_BUILDINGS.max)">Enhance<sup v-if="tmp.s.sbUnl.div(SPACE_BUILDINGS.max).gte(2)">{{formatWhole(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor())}}</sup> Space Building {{formatWhole(tmp.s.sbUnl.sub(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor().times(SPACE_BUILDINGS.max)).add(1))}}</span>
+						<br>
+						Built Buildings: {{formatWhole(player.i.extraBuildings)}}
+						<br><br>
+						<span v-if="!player.i.building">Cost: {{0}} Imperium Bricks & {{0}} Life Bricks</span>
+						<span v-if="player.i.building">Progress: {{format(player.i.progress * 100)}}%<br><br>Click to cancel building</span>
+					</button>
+					<br>
+					Your Work is currently {{format(tmp.i.work)}}, which reduces the gain power of rows 1 - 5 by {{format(tmp.i.workEff)}}x
+				</div>
 				<br><br>
-				<div class="upgTable">
+				<div v-if="LAYER_UPGS[layer]" class="upgTable">
 					<div v-for="row in LAYER_UPGS[layer].rows" class="upgRow">
 						<div v-for="col in LAYER_UPGS[layer].cols" class="upgAlign">
 							<button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span><br><br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}</button>
 						</div>
 					</div>
 				</div>
-				<div v-if="layer=='h'" class="upgTable">
-					<div v-for="row in H_CHALLS.rows" class="upgRow">
-						<div v-for="col in H_CHALLS.cols">
-							<div v-if="H_CHALLS[row*10+col].unl()" v-bind:class="{hChall: true, done: player.h.challs.includes(row*10+col), canComplete: (player.points.gte(H_CHALLS[row*10+col].goal)&&tmp.hcActive[row*10+col]&&!player.h.challs.includes(row*10+col))}">
-								<br><h3>{{H_CHALLS[row*10+col].name}}</h3><br><br>
-								<button class="longUpg can h" v-on:click="startHindrance(row*10+col)">{{player.h.active==(row*10+col)?(player.points.gte(H_CHALLS[row*10+col].goal)?"Finish":"Exit Early"):(player.h.challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
-								{{H_CHALLS[row*10+col].desc}}<br>
-								Goal: {{format(H_CHALLS[row*10+col].goal)}} Points<br>
-								Reward: {{H_CHALLS[row*10+col].reward}}<br>
-								<span v-if="H_CHALLS[row*10+col].effDisp!==undefined">Currently: {{H_CHALLS[row*10+col].effDisp(H_CHALLS[row*10+col].currently())}}</span>
+				<div v-if="LAYER_CHALLS[layer]" class="upgTable">
+					<div v-for="row in LAYER_CHALLS[layer].rows" class="upgRow">
+						<div v-for="col in LAYER_CHALLS[layer].cols">
+							<div v-if="LAYER_CHALLS[layer][row*10+col].unl()" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: (player.points.gte(LAYER_CHALLS[layer][row*10+col].goal)&&tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col))}">
+								<br><h3>{{LAYER_CHALLS[layer][row*10+col].name}}</h3><br><br>
+								<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-on:click="startChall(layer, row*10+col)">{{player[layer].active==(row*10+col)?(player.points.gte(LAYER_CHALLS[layer][row*10+col].goal)?"Finish":"Exit Early"):(player[layer].challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
+								{{LAYER_CHALLS[layer][row*10+col].desc}}<br>
+								Goal: {{format(LAYER_CHALLS[layer][row*10+col].goal)}} Points<br>
+								Reward: {{LAYER_CHALLS[layer][row*10+col].reward}}<br>
+								<span v-if="LAYER_CHALLS[layer][row*10+col].effDisp!==undefined">Currently: {{LAYER_CHALLS[layer][row*10+col].effDisp(LAYER_CHALLS[layer][row*10+col].currently())}}</span>
 							</div>
 						</div>
 					</div>
