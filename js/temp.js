@@ -41,7 +41,7 @@ function updateTemp() {
 	tmp.enhEff2 = getEnhancerEff2()
 	tmp.subbedEnh = new Decimal(0)
 	if (tmp.challActive ? tmp.challActive.h[52] : true) {
-		tmp.subbedEnh = tmp.subbedEnh.plus(new Decimal(player.h.time).times(40).plus(1).log10().pow(10).max(10)).round()
+		tmp.subbedEnh = tmp.subbedEnh.add(new Decimal(player.h.time).times(40).add(1).log10().pow(10).max(10)).round()
 	}
 
 	tmp.freeExtCap = getFreeExtCapsules()
@@ -121,7 +121,7 @@ function updateTemp() {
 
 		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
 		data.work = new Decimal(1)
-		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(1).log10().add(2).div(5))
+		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(4).sqrt().div(5))
 		data.workEff = Decimal.pow(2, data.work.sub(1))
 	}
 }

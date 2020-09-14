@@ -23,10 +23,18 @@ function resizeCanvas() {
 }
 
 var colors = {
-	1: "#ffffff",
-	2: "#bfbfbf",
-	3: "#7f7f7f"
+	default: {
+		1: "#ffffff",
+		2: "#bfbfbf",
+		3: "#7f7f7f",
+	},
+	aqua: {
+		1: "#bfefff",
+		2: "#8fb3bf",
+		3: "#5f777f",
+	},
 }
+var colors_theme
 
 function drawTree() {
 	if (!retrieveCanvasData()) return;
@@ -107,7 +115,7 @@ function drawTreeBranch(num1, num2, color_id = 1) { // taken from Antimatter Dim
     let y2 = end.top + (end.height / 2) + (document.getElementById("treeTab").scrollTop || document.body.scrollTop);
     ctx.lineWidth = 15;
     ctx.beginPath();
-    ctx.strokeStyle = colors[color_id]
+    ctx.strokeStyle = colors_theme[color_id]
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();

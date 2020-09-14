@@ -13,9 +13,12 @@
 }
 
 body {
-	background-color: black;
-	color: #dfdfdf;
+	background-color: var(--background);
+	color: var(--color);
 	overflow: hidden;
+	--background: #000000;
+	--color: #dfdfdf;
+	--points: #ffffff;
 }
 
 html, body {
@@ -79,7 +82,7 @@ h1, h2, h3, b, input {
 
 .can:hover {
 	transform: scale(1.15, 1.15);
-	box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5)
+	box-shadow: 0px 0px 20px var(--points)
 }
 
 .treeNode.notify {
@@ -91,7 +94,7 @@ h1, h2, h3, b, input {
 
 .treeNode.can:hover {
 	transform: scale(1.15, 1.15);
-	box-shadow: var(--hqProperty2a), 0px 0px 20px rgba(255, 255, 255, 0.5);
+	box-shadow: var(--hqProperty2a), 0px 0px 20px var(--points);
 	z-index: 4
 }
 
@@ -104,16 +107,16 @@ h1, h2, h3, b, input {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	background-color: black;
-	border: 1px solid black;
-	color: white;
+	background-color: var(--background);
+	border: 1px solid var(--background);
+	color: var(--color);
 	font-size: 40px;
 	cursor: pointer;
 }
 
 .back:hover {
 	transform: scale(1.1, 1.1);
-	text-shadow: 0px 0px 7px white;
+	text-shadow: 0px 0px 7px var(--color);
 }
 
 .reset {
@@ -144,6 +147,7 @@ h1, h2, h3, b, input {
 .longUpg {
 	height: 50px;
 	width: 120px;
+	background: var(--points);
 	border-radius: 50%;
 	border: 2px solid;
 	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
@@ -159,8 +163,8 @@ h1, h2, h3, b, input {
 }
 
 #points {
-	color: white;
-	text-shadow: 0px 0px 10px white;
+	color: var(--points);
+	text-shadow: 0px 0px 10px var(--points);
 }
 
 .p {
@@ -425,13 +429,26 @@ h1, h2, h3, b, input {
               -3px 0px 12px #02f2f2;
 }
 
+#discord {
+	position: absolute;
+	top: 120px;
+	left: 4px;
+	width: 40px;
+	height: 40px;
+	cursor: pointer
+}
+
+#discord:hover {
+	transform: scale(1.2, 1.2);
+}
+
 #version {
 	position: absolute;
 	right: 4px;
 	top: 4px;
 	text-align: right;
-	color: white;
-	text-shadow: 0px 0px 10px #ffffff;
+	color: var(--points);
+	text-shadow: 0px 0px 10px var(--points);
 	cursor: pointer;
 }
 
@@ -471,7 +488,7 @@ a {
 	width: 100px;
 	border-radius: 25%;
 	border: 4px solid;
-	background-color: #a1a1a1;
+	background-color: var(--color);
 	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
 	color: rgba(0, 0, 0, 0.5);
 	cursor: pointer;
@@ -553,7 +570,7 @@ a {
 }
 
 .vl {
-	border-left: 6px solid #969696;
+	border-left: 6px solid var(--color);
 	height: 100%;
 	position: absolute;
 	left: 50%;
