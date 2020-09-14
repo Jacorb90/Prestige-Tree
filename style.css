@@ -16,7 +16,7 @@ body {
 	background-color: var(--background);
 	color: var(--color);
 	overflow: hidden;
-	--background: #000000;
+	--background: #0f0f0f;
 	--color: #dfdfdf;
 	--points: #ffffff;
 }
@@ -583,9 +583,10 @@ ul {
 }
 
 .hChall {
-	background-color: #fa7f8a;
-	border: 2px solid #ff0017;
-	color: #ff0017;
+	background-color: #bf8f8f;
+	border: 4px solid;
+	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	color: rgba(0, 0, 0, 0.5);
 	width: 300px;
 	height: 300px;
 	font-size: 15px;
@@ -593,15 +594,11 @@ ul {
 }
 
 .hChall.done {
-	background-color: #95fcb4;
-	border: 2px solid #038c2c;
-	color: #038c2c;
+	background-color: #77bf5f;
 }
 
 .hChall.canComplete {
-	background-color: #93f0fa;
-	border: 2px solid #03858f;
-	color: #03858f;
+	background-color: #ffbf00;
 }
 
 .fullWidth {
@@ -640,9 +637,8 @@ ul {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #000;
-	background-color: hsla(0, 0%, 5%, 0.9);
-	color: #fff;
+	background-color: var(--background_tooltip);
+	color: var(--points);
 	content: attr(tooltip);
 	text-align: center;
 	font-size: 14px;
@@ -657,8 +653,7 @@ ul {
 	left: 50%;
 	margin-left: -5px;
 	width: 0;
-	border-top: 5px solid #000;
-	border-top: 5px solid hsla(0, 0%, 5%, 0.9);
+	border-top: 5px solid var(--background_tooltip);
 	border-right: 5px solid transparent;
 	border-left: 5px solid transparent;
 	content: " ";

@@ -1870,7 +1870,11 @@ function checkForVars() {
 	}
 	if (player.hasNaN === undefined) player.hasNaN = false
 	if (player.h.active === undefined) player.h.active = 0
-	if (player.h.time === undefined) player.h.time = 0
+	if (player.h.time === undefined) player.h.time = player.timePlayed
+	else if (typeof(player.h.time) == "string") {
+		player.h.time = Number(player.h.time)
+		if (isNaN(player.h.time)) player.h.time = player.timePlayed
+	}
 	if (player.q.auto === undefined) player.q.auto = false
 	if (player.msDisplay === undefined) player.msDisplay = "always"
 	if (player.hb.auto === undefined) player.hb.auto = false
@@ -3849,8 +3853,10 @@ function gameLoop(diff) {
 		player.tab = "gameEnded"
 	}
 	if (player.devSpeed) diff *= player.devSpeed
+
 	player.timePlayed += diff
 	player.h.time += diff
+
 	if (tmp.challActive ? tmp.challActive.h[42] : true) {
 		if (player.h.time>=10) diff = 0
 		else diff = Decimal.div(diff, Decimal.div(10, Decimal.sub(10, player.h.time + 1)).pow(1000))
@@ -3939,10 +3945,11 @@ function gameLoop(diff) {
 	if (player.ps.auto&&player.ps.best.gte(2)) doReset("ps")
 
 	if (player.hasNaN&&!NaNalert) {
-		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
 		clearInterval(interval);
 		player.autosave = false;
 		NaNalert = true;
+
+		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
 	}
 }
 
@@ -3985,9 +3992,10 @@ const theme_names = {
 function changeTheme() {
 	let aqua = player.theme == "aqua"
 	colors_theme = colors[player.theme || "default"]
-	document.body.style.setProperty('--background', aqua ? "#002f3f" : "#000000")
-	document.body.style.setProperty('--color', aqua ? "#bfefff" : "#bfbfbf")
-	document.body.style.setProperty('--points', aqua ? "#dff7ff" : "#ffffff")
+	document.body.style.setProperty('--background', aqua ? "#001f3f" : "#0f0f0f")
+	document.body.style.setProperty('--background_tooltip', aqua ? "rgba(0, 15, 31, 0.75)" : "rgba(0, 0, 0, 0.75)")
+	document.body.style.setProperty('--color', aqua ? "#bfdfff" : "#dfdfdf")
+	document.body.style.setProperty('--points', aqua ? "#dfefff" : "#ffffff")
 }
 
 function getThemeName() {
@@ -4010,8 +4018,8 @@ document.onkeydown = function(e) {
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key
-	if (ctrlDown && (key != "a" || key != "c" || key != "v")) e.preventDefault()
 	if (onFocused) return
+	if (ctrlDown) e.preventDefault()
 	if (player.m.unl && key >= 0 && key <= 9) {
 		if (key == 0) activateSpell(10)
 		else activateSpell(key)
@@ -4031,7 +4039,7 @@ document.onkeydown = function(e) {
 				if (player.sg.unl) doReset("sg")
 				return
 			case "s": 
-				if (ctrlDown && player.hs.unl) doReset("ss")
+				if (ctrlDown && player.hs.unl) doReset("hs")
 				return
 			case "S": 
 				if (player.ss.unl) doReset("ss")
