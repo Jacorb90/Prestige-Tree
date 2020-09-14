@@ -523,7 +523,7 @@ const LAYER_UPGS = {
 			desc: "Boosters are cheaper based on your points.",
 			cost: new Decimal(18),
 			unl() { return player.b.upgrades.includes(21) || player.b.upgrades.includes(22) },
-			currently() { return player.points.add(1).log10().add(1).pow(3.2).pow((tmp.s !== undefined)?tmp.s.sbEff[4]:1) },
+			currently() { return player.points.add(1).log10().add(1).pow(3.2).pow(tmp.s !== undefined && tmp.s.trueSbUnl >= 4 ? tmp.s.sbEff[4] : 1) },
 			effDisp(x) { return "/"+format(x) },
 		},
 		31: {
@@ -2994,7 +2994,7 @@ function getSpaceBuildingEff(x) {
 	if (!player.s.unl) bought = new Decimal(0)
 	else {
 		bought = tmp.s.sb[x].add(tmp.s.sbExtra)
-		if (x<5) bought = bought.add(fixValue(tmp.s.sbEff[5]))
+		if (x < 5 && tmp.s.trueSbUnl >= 5) bought = bought.add(tmp.s.sbEff[5])
 
 		var compressLvl = new Decimal(1)
 		if (tmp.i !== undefined && layerUnl("i") && tmp.i.compressed >= x) compressLvl = tmp.s.sbUnl.sub(x - SPACE_BUILDINGS.max - 1).ceil().cbrt()
