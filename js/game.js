@@ -2149,7 +2149,7 @@ function getLayerGainMult(layer) {
 
 function getLayerGainExp(layer) {
 	let exp = new Decimal(1);
-	if (LAYER_ROW[layer] < 5) exp = fixValue(tmp.i && tmp.i.workEff).recip()
+	if (LAYER_ROW[layer] < 5) exp = fixValue(tmp.i && tmp.i.workEff, 1).recip()
 	switch(layer) {
 		case "p": 
 			if (tmp.challActive ? tmp.challActive.h[21] : true) exp = exp.div(100)
