@@ -1450,7 +1450,7 @@ const LAYER_UPGS = {
 		},
 		35: {
 			desc: "Super-Upgrades are 25% stronger.",
-			cost: new Decimal(1e270),
+			cost: new Decimal(1e260),
 			unl() { return player.sp.upgrades.includes(44) },
 		},
 		45: {
@@ -1650,7 +1650,7 @@ const LAYER_UPGS = {
 			unl() { return player.ps.upgrades.includes(23) },
 		},
 		45: {
-			desc: "Subtract the cost of Imperium Buildings by 3 and you build 10x faster.",
+			desc: "Subtract the cost of Imperium Buildings by 3 and you build 4x faster.",
 			cost: new Decimal(1e23),
 			unl() { return player.ps.upgrades.includes(23) },
 		},
@@ -3623,6 +3623,20 @@ let LIFE_BOOSTERS = {
 		if (player.ps.upgrades.includes(21)) return 5
 		return 4
 	},
+	calcNewPower(diff) {
+		let exp = getLifePowerExp()
+		let cap = getLifePowerSoftcapStart()
+		let capExp = getLifePowerSoftcapExp()
+
+		let power = player.l.power
+		if (power.gt(1)) power = power.root(exp)
+		if (power.gt(cap)) power = power.div(cap).pow(1/capExp).times(cap)
+		power = power.add(getLifePowerMult().times(diff))
+		if (power.gt(cap)) power = power.div(cap).pow(capExp).times(cap)
+		if (power.gt(1)) power = power.pow(exp)
+
+		return power
+	},
 	eff() {
 		return player.l.power.add(1).log10()
 	},
@@ -3818,9 +3832,9 @@ let IMPERIUM = {
 		}
 	},
 	speed() {
-		let x = Decimal.pow(4, player.i.extraBuildings.add(5)).recip()
+		let x = Decimal.pow(3.75, player.i.extraBuildings.add(5)).recip()
 		x = x.times(IMPERIUM.sgSpeedBoost())
-		if (player.sp.upgrades.includes(45)) x = x.times(10)
+		if (player.sp.upgrades.includes(45)) x = x.times(4)
 		return x
 	},
 	sgSpeedBoost() {
@@ -3916,18 +3930,7 @@ function gameLoop(diff) {
 	}
 	if (player.hs.best.gte(2e4)) generatePoints("sp", Decimal.div(diff, 100))
 	if (player.l.unl) {
-		let exp = getLifePowerExp()
-		let cap = getLifePowerSoftcapStart()
-		let capExp = getLifePowerSoftcapExp()
-
-		let power = player.l.power
-		if (power.gt(1)) power = power.root(exp)
-		if (power.gt(cap)) power = power.div(cap).pow(1/capExp).times(cap)
-		power = power.add(getLifePowerMult().times(diff))
-		if (power.gt(cap)) power = power.div(cap).pow(capExp).times(cap)
-		if (power.gt(1)) power = power.pow(exp)
-		player.l.power = power
-
+		player.l.power = LIFE_BOOSTERS.calcNewPower(diff)
 		for (var i=1; i<=tmp.l.lbUnl; i++) player.l.boosters[i] = LIFE_BOOSTERS.reqTarget(i).max(player.l.boosters[i])
 	}
 	if (player.hs.unl) player.hs.superUpgradeCap = player.hs.superUpgradeCap.max(HYPERSPACE.nextCapTarget())
@@ -3982,20 +3985,25 @@ var saveInterval = setInterval(function() {
 	if (player.autosave) save();
 }, 5000)
 
+var ticking = false
 var interval = setInterval(function() {
 	if (player===undefined||tmp===undefined) return;
+	if (ticking) return;
 	if (gameEnded&&!player.keepGoing) return;
-	let diff = (Date.now()-player.time)/1000
+	ticking = true
+	let now = Date.now()
+	let diff = (now - player.time) / 1000
 	if (!player.offlineProd) offTime.remain = 0
-	if (offTime.remain>0) {
-		offTime.speed = offTime.remain/5+1
-		diff += offTime.speed/50
-		offTime.remain = Math.max(offTime.remain-offTime.speed/50, 0)
+	if (offTime.remain > 0) {
+		offTime.speed = offTime.remain / 5 + 1
+		diff += offTime.speed / 50
+		offTime.remain = Math.max(offTime.remain - offTime.speed / 50, 0)
 	}
-	player.time = Date.now()
+	player.time = now
 	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();
 	gameLoop(diff)
+	ticking = false
 }, 50)
 
 const themes = {
@@ -4035,7 +4043,7 @@ document.onkeydown = function(e) {
 	let ctrlDown = e.ctrlKey
 	let key = e.key
 	if (onFocused) return
-	if (ctrlDown) e.preventDefault()
+	if (ctrlDown && key != "-" && key != "_" && key != "+" && key != "=" && key != "r" && key != "R" && key != "F5") e.preventDefault()
 	if (player.m.unl && key >= 0 && key <= 9) {
 		if (key == 0) activateSpell(10)
 		else activateSpell(key)

@@ -613,7 +613,8 @@
 				</div>
 				<div v-if="layer=='l'">
 					<br><br>
-					You have {{format(player.l.power)}} Life Power, which is translating to:
+					You have {{format(player.l.power)}} Life Power (+{{format(LIFE_BOOSTERS.calcNewPower(1).sub(player.l.power))}}/s),<br>
+					which is translating to:
 					<div class="upgRow">
 						<div v-for="i in tmp.l.lbUnl">
 							<button v-bind:class="{ upgBig: true, l: true }"><h3>Life Booster {{i}}</h3><br>{{LIFE_BOOSTERS[i].effDesc(tmp.l.lbEff[i])}}<br><br>Boosters: {{formatWhole(tmp.l.lb[i])}}<br>Next at: {{formatWhole(LIFE_BOOSTERS.req(i).ceil())}} Phantom Souls</button>
