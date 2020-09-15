@@ -3851,6 +3851,12 @@ function keepGoing() {
 	showTab("tree")
 }
 
+function toNumber(x) {
+	if (x.mag !== undefined) return x.toNumber()
+	if (x + 0 !== x) return parseFloat(x)
+	return x
+}
+
 function addTime(diff, layer) {
 	let data = player
 	let time = data.timePlayed
@@ -3862,15 +3868,14 @@ function addTime(diff, layer) {
 	//I am not that good to perfectly fix that leak. ~ DB Aarex
 	if (time + 0 !== time) {
 		console.log("Memory leak detected. Trying to fix...")
-		if (time.mag !== undefined) time = time.toNumber()
-		else time = parseFloat(time)
+		time = toNumber(time)
 		if (isNaN(time) || time == 0) {
 			console.log("Couldn't fix! Resetting...")
 			time = layer ? player.timePlayed : 0
 			if (!layer) player.timePlayedReset = true
 		}
 	}
-	time += diff
+	time += toNumber(diff)
 
 	if (layer) data.time = time
 	else data.timePlayed = time
