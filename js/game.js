@@ -2997,7 +2997,7 @@ function getSpaceBuildingEff(x) {
 		if (x < 5 && tmp.s.trueSbUnl >= 5) bought = bought.add(tmp.s.sbEff[5])
 
 		var compressLvl = new Decimal(1)
-		if (tmp.i !== undefined && layerUnl("i") && tmp.i.compressed >= x) compressLvl = tmp.s.sbUnl.sub(x - SPACE_BUILDINGS.max - 1).ceil().cbrt()
+		if (tmp.i !== undefined && layerUnl("i") && tmp.i.compressed >= x) compressLvl = tmp.s.sbUnl.sub(x - SPACE_BUILDINGS.max - 1).div(SPACE_BUILDINGS.max).ceil().cbrt()
 
 		bought = bought.times(tmp.s.sbPow).times(compressLvl)
 		if (tmp.hs !== undefined && layerUnl("hs")) {
