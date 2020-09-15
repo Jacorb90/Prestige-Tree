@@ -1,9 +1,5 @@
 var player;
 var tmp = {};
-var offTime = {
-	remain: 0,
-	speed: 1,
-};
 var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
@@ -394,6 +390,9 @@ const LAYER_EFFS = {
 			exp: x.div(2).add(1),
 			mult: x.div(3).add(1).sqrt()
 		}
+	},
+	l() { 
+		return player.l.points.times(5).max(1).log10()
 	},
 }
 
@@ -1616,7 +1615,7 @@ const LAYER_UPGS = {
 			unl() { return player.l.unl },
 			currently() {
 				if (player.sp.upgrades.includes(15)) return Decimal.pow(6, player.l.points.max(1).log10().cbrt())
-				return player.l.points.add(1).log10().times(100).add(1).cbrt()
+				return player.l.points.add(1).log10().add(1).pow(0.75)
 			},
 			effDisp(x) { return format(x)+"x" },
 		},
@@ -1639,19 +1638,19 @@ const LAYER_UPGS = {
 		},
 		25: {
 			desc: "Super-Prestige Points strength all Subspace effects.",
-			cost: new Decimal(1.5e21),
+			cost: new Decimal(5e20),
 			unl() { return player.ps.upgrades.includes(23) },
 			currently() { return player.sp.points.log10().div(15).sqrt().max(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"%" },
 		},
 		35: {
 			desc: "Reduce the cost scaling of Hyperspace by 20%.",
-			cost: new Decimal(2.222e22),
+			cost: new Decimal(1e21),
 			unl() { return player.ps.upgrades.includes(23) },
 		},
 		45: {
-			desc: "Subtract the cost of Imperium Buildings by 3 and you build 4x faster.",
-			cost: new Decimal(1e23),
+			desc: "Subtract the cost of Imperium Buildings by 3 and you build 5x faster.",
+			cost: new Decimal(2.222e22),
 			unl() { return player.ps.upgrades.includes(23) },
 		},
 	},
@@ -1759,6 +1758,9 @@ function getLayerEffDesc(layer) {
 		case "ps":
 			return "which are speeding up the Life Power production by " + format(eff.mult) + "x and raising the Life Power amount to the power of " + format(eff.exp)
 			break;
+		case "l":
+			return "which are making that Life Power softcap starts at " + format(eff.pow(tmp.layerEffs.ps.exp))
+			break;
 	}
 }
 
@@ -1771,8 +1773,10 @@ function load() {
 	if (get===null||get===undefined) player = getStartPlayer()
 	else player = JSON.parse(atob(get))
 	player.tab = "tree"
-	offTime.remain = (Date.now()-player.time)/10000
-	if (!player.offlineProd) offTime.remain = 0
+	if (player.offlineProd) {
+		if (player.offTime === undefined) player.offTime = { remain: 0 }
+		player.offTime.remain += (Date.now() - player.time) / 1000
+	}
 	player.time = Date.now()
 	checkForVars();
 	convertToDecimal();
@@ -3608,7 +3612,7 @@ function getLifePowerExp() {
 }
 
 function getLifePowerSoftcapStart() {
-	let x = player.l.points.times(5).max(1).log10()
+	let x = tmp.layerEffs.l
 	return x
 }
 
@@ -3794,10 +3798,11 @@ let HYPERSPACE = {
 
 let VERSION = {
 	num: 1.1,
+	pre: 4,
 	name: "The Life Update"
 }
 
-VERSION.withoutName = "v" + VERSION.num + (VERSION.beta ? " Beta " + VERSION.beta : "")
+VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.pre ? " Beta " + VERSION.beta : "")
 VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "")
 
 let IMPERIUM = {
@@ -3836,7 +3841,7 @@ let IMPERIUM = {
 	speed() {
 		let x = Decimal.pow(3.75, player.i.extraBuildings.add(5)).recip()
 		x = x.times(IMPERIUM.sgSpeedBoost())
-		if (player.sp.upgrades.includes(45)) x = x.times(4)
+		if (player.sp.upgrades.includes(45)) x = x.times(5)
 		return x
 	},
 	sgSpeedBoost() {
@@ -3999,13 +4004,16 @@ var interval = setInterval(function() {
 	if (gameEnded&&!player.keepGoing) return;
 	ticking = true
 	let now = Date.now()
-	let diff = (now - player.time) / 1000
-	if (!player.offlineProd) offTime.remain = 0
-	if (offTime.remain > 0) {
-		offTime.speed = offTime.remain / 5 + 1
-		diff += offTime.speed / 50
-		offTime.remain = Math.max(offTime.remain - offTime.speed / 50, 0)
+	let diff = (now - player.time) / 1e3
+	if (player.offTime !== undefined) {
+		if (player.offTime.remain > 0) {
+			let offlineDiff = Math.max(player.offTime.remain / 10, diff)
+			player.offTime.remain -= offlineDiff
+			diff += offlineDiff
+		}
+		if (!player.offlineProd || player.offTime.remain <= 0) delete player.offTime
 	}
+	if (player.devSpeed) diff *= player.devSpeed
 	player.time = now
 	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();

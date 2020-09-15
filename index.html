@@ -394,8 +394,8 @@
 			<span v-if="player.devSpeed && player.devSpeed != 1">
 				<br>Dev Speed: {{format(player.devSpeed)}}x<br>
 			</span>
-			<span v-if="offTime.remain>0">
-				<br>Offline Time: {{formatTime(offTime.remain)}} ({{format(offTime.speed)}}x speed)<br>
+			<span v-if="player.offTime !== undefined">
+				<br>Offline Time: {{formatTime(player.offTime.remain)}}<br>
 			</span>
 			<span v-if="player.sp.unl && !player.keepGoing">
 				<br>Reach {{formatWhole(ENDGAME)}} to beat the game!<br>
@@ -634,7 +634,7 @@
 					<button v-on:click="HYPERSPACE.respec()" v-bind:class="{ longUpg: true, hs: true, can: player.hs.unl, locked: !player.hs.unl }">Respec Super-Upgrades</button><br>
 					<div class="upgRow">
 						<div v-for="i in tmp.s.trueSbUnl">
-							<button v-on:click="HYPERSPACE.superUpg(i)" v-bind:class="{ upg: true, hs: true, can: HYPERSPACE.canSuperUpg(i), locked: !HYPERSPACE.canSuperUpg(i) }"><h3>Building {{i}}</h3><br>{{getSpaceBuildingEffDesc(i)}}<br><br>Super-Level: {{formatWhole(tmp.hs.su[i])}} / {{formatWhole(player.hs.superUpgradeCap)}}<br>({{format(tmp.hs.suEff[i])}}x strength)</button>
+							<button v-on:click="HYPERSPACE.superUpg(i)" v-bind:class="{ upg: true, hs: true, can: HYPERSPACE.canSuperUpg(i), locked: !HYPERSPACE.canSuperUpg(i) }"><h3>Building {{i}}</h3><br>{{getSpaceBuildingEffDesc(i)}}<br><br>Super-Level: {{formatWhole(tmp.hs.su[i])}} / {{formatWhole(player.hs.superUpgradeCap)}}<br>({{format(tmp.hs.suEff[i].sub(1).times(100))}}% stronger)<br>Cost: 1 Hyperspace</button>
 						</div>
 					</div>
 					<br>

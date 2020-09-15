@@ -29,7 +29,6 @@ function loadVue() {
 		data: {
 			player,
 			tmp,
-			offTime,
 			Decimal,
 			format,
 			formatWhole,
