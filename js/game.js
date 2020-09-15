@@ -3624,6 +3624,8 @@ let LIFE_BOOSTERS = {
 		return 4
 	},
 	calcNewPower(diff) {
+		if (!player.l.unl) return new Decimal(0)
+
 		let exp = getLifePowerExp()
 		let cap = getLifePowerSoftcapStart()
 		let capExp = getLifePowerSoftcapExp()
