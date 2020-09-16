@@ -413,6 +413,7 @@ const LAYER_UPGS = {
 				if (tmp.challActive ? tmp.challActive.h[32] : true) return new Decimal(1)
 				let ret = player.p.points.add(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) 
 				if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
+				if (IMPERIUM.collapsed(1)) ret = ret.pow(Decimal.sub(1, tmp.i.collapse[1]))
 				return ret;
 			},
 			effDisp(x) { return format(x)+"x" },
@@ -425,6 +426,7 @@ const LAYER_UPGS = {
 				let ret = player.points.add(1).log10().pow(0.75).add(1)
 				if (player.g.upgrades.includes(15)) ret = ret.pow(LAYER_UPGS.g[15].currently())
 				if (player.sp.upgrades.includes(11)) ret = ret.pow(100)
+				if (IMPERIUM.collapsed(1)) ret = ret.pow(Decimal.sub(1, tmp.i.collapse[1]))
 				return ret;
 			},
 			effDisp(x) { return format(x)+"x" },
@@ -438,7 +440,11 @@ const LAYER_UPGS = {
 			desc: "Point generation is faster based on your Prestige Upgrades bought.",
 			cost: new Decimal(75),
 			unl() { return (player.b.unl||player.g.unl)&&player.p.upgrades.includes(12) },
-			currently() { return Decimal.pow(1.4, player.p.upgrades.length) },
+			currently() {
+				let ret = Decimal.pow(1.4, player.p.upgrades.length)
+				if (IMPERIUM.collapsed(1)) ret = ret.pow(Decimal.sub(1, tmp.i.collapse[1]))
+				return ret
+			},
 			effDisp(x) { return format(x)+"x" },
 		},
 		23: {
@@ -2182,9 +2188,10 @@ function getLayerGainMult(layer) {
 }
 
 function getLayerGainExp(layer) {
-	let exp = new Decimal(1);
-	if (layer == "p" && tmp.i && tmp.i.work.gt(1.5)) exp = exp.times(Decimal.sub(2, tmp.i.work).times(2))
+	let exp = new Decimal(1)
+	let row = LAYER_ROW[layer] + 1
 	if (LAYER_ROW[layer] < 5) exp = fixValue(tmp.i && tmp.i.workEff, 1).recip()
+	if (IMPERIUM.collapsed(row)) exp = exp.times(Decimal.sub(1, tmp.i.collapse[row]))
 	switch(layer) {
 		case "p": 
 			if (tmp.challActive ? tmp.challActive.h[21] : true) exp = exp.div(100)
@@ -2203,6 +2210,7 @@ function getLayerGainExp(layer) {
 }
 
 function getResetGain(layer) {
+	if (tmp.gainExp[layer].eq(0)) return new Decimal(0)
 	if (LAYER_TYPE[layer]=="static") {
 		if ((!canBuyMax(layer)) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(LAYER_BASE[layer]).times(tmp.gainExp[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
@@ -2223,6 +2231,7 @@ function getResetGain(layer) {
 }
 
 function getNextAt(layer) {
+	if (tmp.gainExp[layer].eq(0)) return new Decimal(1/0)
 	if (LAYER_TYPE[layer]=="static") {
 		let amt = player[layer].points
 		if ((LAYER_ROW[layer] < 4 && layer != "hb") || layer == "ps") {
@@ -3847,7 +3856,11 @@ let IMPERIUM = {
 	},
 	sgSpeedBoost() {
 		return player.sg.points.add(1).pow(2)
-	}
+	},
+	collapsed(row) {
+		return tmp.i !== undefined && tmp.i.collapse !== undefined && tmp.i.collapse[row]
+	},
+	maxCollapseRows: 1
 }
 
 const ENDGAME = new Decimal("e280000000");

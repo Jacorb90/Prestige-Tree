@@ -660,7 +660,7 @@
 					</button>
 					<br>
 					Your Work is currently {{format(tmp.i.work)}}, which reduces the gain power of rows 1 - 5 by {{format(tmp.i.workEff)}}x
-					<span v-if="tmp.i.work.gt(1.5)"><br>Your Work also collapses Prestige layer by {{format(tmp.i.work.sub(1.5).times(200).min(100))}}%</span>
+					<span v-for="i in IMPERIUM.maxCollapseRows"><span v-if="IMPERIUM.collapsed(i)"><br>Your Work also collapses row {{i}} layers by {{format(tmp.i.collapse[i].times(100))}}%</span></span>
 				</div>
 				<br><br>
 				<div v-if="LAYER_UPGS[layer]" class="upgTable">

@@ -119,10 +119,14 @@ function updateTemp() {
 		if (!tmp.i) tmp.i = {}
 		var data = tmp.i
 
-		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
 		data.work = new Decimal(1)
 		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(1).sqrt().add(1).div(5))
 		data.workEff = Decimal.pow(2, data.work.sub(1))
+
+		data.collapse = {}
+		for (var i = 1; i <= IMPERIUM.maxCollapseRows; i++) if (data.work.gt(i + 0.5)) data.collapse[i] = data.work.sub(i + 0.5).times(2).min(1)
+
+		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
 	}
 }
 
