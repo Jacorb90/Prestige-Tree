@@ -3808,7 +3808,6 @@ let HYPERSPACE = {
 
 let VERSION = {
 	num: 1.1,
-	pre: 5,
 	name: "The Life Update"
 }
 
