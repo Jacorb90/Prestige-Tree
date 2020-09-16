@@ -1785,7 +1785,7 @@ function load() {
 	if (get===null||get===undefined) player = getStartPlayer()
 	else player = JSON.parse(atob(get))
 	player.tab = "tree"
-	if (false && player.offlineProd) {
+	if (player.offlineProd) {
 		if (player.offTime === undefined) player.offTime = { remain: 0 }
 		player.offTime.remain += (Date.now() - player.time) / 1000
 	}
