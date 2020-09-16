@@ -656,10 +656,11 @@
 						Built Buildings: {{formatWhole(player.i.extraBuildings)}}
 						<br><br>
 						<span v-if="!player.i.building">Cost: {{IMPERIUM.cost().i}} Imperium Bricks & {{IMPERIUM.cost().l}} Life Bricks</span>
-						<span v-if="player.i.building">Progress: {{format(player.i.progress * 100)}}%<br>Your Super-Generator Power speeds up your progress by {{format(IMPERIUM.sgSpeedBoost())}}x<br><br>Click to cancel building</span>
+						<span v-if="player.i.building">Progress: {{format(player.i.progress * 100)}}%<br>Your {{formatWhole(player.sg.points)}} Super-Generators speed up your progress by {{format(IMPERIUM.sgSpeedBoost())}}x<br><br>Click to cancel building</span>
 					</button>
 					<br>
 					Your Work is currently {{format(tmp.i.work)}}, which reduces the gain power of rows 1 - 5 by {{format(tmp.i.workEff)}}x
+					<span v-if="tmp.i.work.gt(1.5)"><br>Your Work also collapses Prestige layer by {{format(tmp.i.work.sub(1.5).times(200).min(100))}}%</span>
 				</div>
 				<br><br>
 				<div v-if="LAYER_UPGS[layer]" class="upgTable">

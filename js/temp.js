@@ -121,7 +121,7 @@ function updateTemp() {
 
 		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
 		data.work = new Decimal(1)
-		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(4).sqrt().div(5))
+		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(1).sqrt().add(1).div(5))
 		data.workEff = Decimal.pow(2, data.work.sub(1))
 	}
 }

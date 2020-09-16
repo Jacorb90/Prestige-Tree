@@ -226,7 +226,7 @@ const LAYER_REQS = {
 	sp: new Decimal("1e8500000"),
 	l: new Decimal(1e195),
 	hs: new Decimal(725),
-	i: new Decimal("1e290"),
+	i: new Decimal("1e285"),
 }
 
 const LAYER_RES = {
@@ -294,7 +294,7 @@ const LAYER_EXP = {
 	sp: new Decimal(2e-7),
 	l: new Decimal(0.012),
 	hs: new Decimal(40),
-	i: new Decimal(1.1),
+	i: new Decimal(1),
 }
 
 const LAYER_BASE = {
@@ -1341,7 +1341,11 @@ const LAYER_UPGS = {
 			desc: "Negativity boosts Super-Generator Power gain.",
 			cost: new Decimal(300),
 			unl() { return player.ba.upgrades.includes(13)&&player.sg.unl },
-			currently() { return player.ba.negativity.add(1).sqrt() },
+			currently() {
+				let x = player.ba.negativity.add(1).sqrt()
+				if (x.gte("1e400")) x = Decimal.pow(10, x.log10().times(20).pow(2/3))
+				return x
+			},
 			effDisp(x) { return format(x)+"x" },
 		},
 		22: {
@@ -1427,7 +1431,7 @@ const LAYER_UPGS = {
 			effDisp(x) { return "^"+format(x) },
 		},
 		54: {
-			desc: "Balance Power boosts the first Balance Energy effect (even stronger based on your Best Balance Power).",
+			desc: "Balance Power boosts the first Balance Energy effect. (stronger based on your Best Balance Power)",
 			cost: new Decimal(5e25),
 			unl() { return player.ba.upgrades.includes(53) },
 			currently() { return player.ba.power.add(1).times(player.ba.best.add(1).sqrt()).cbrt() },
@@ -1508,7 +1512,7 @@ const LAYER_UPGS = {
 		},
 		23: {
 			desc: "Unlock 4 new Super-Prestige Upgrades.",
-			cost: new Decimal(24),
+			cost: new Decimal(21),
 			unl() { return player.hs.unl },
 		},
 		24: {
@@ -1534,32 +1538,32 @@ const LAYER_UPGS = {
 		},
 		13: {
 			desc: "Unlock a new Spell.",
-			cost: new Decimal(3),
-			unl() { return player.sp.upgrades.includes(12) },
+			cost: new Decimal(2),
+			unl() { return player.sp.upgrades.includes(11) },
 		},
 		14: {
 			desc: "Your Best Super-Prestige Points boost Hex & Balance Energy gain.",
-			cost: new Decimal(8),
-			unl() { return player.sp.upgrades.includes(13) },
+			cost: new Decimal(3),
+			unl() { return player.sp.upgrades.includes(12) || player.sp.upgrades.includes(13) },
 			currently() { return player.sp.best.add(1).pow(1.9) },
 			effDisp(x) { return format(x)+"x" },
 		},
 		21: {
 			desc: "Super-Prestige Points add to the Super-Generator base.",
-			cost: new Decimal(15),
+			cost: new Decimal(4),
 			unl() { return player.sp.upgrades.includes(11) },
 			currently() { return player.sp.points.add(1).log10().add(1).log10().times(1.5) },
 			effDisp(x) { return "+"+format(x) },
 		},
 		22: {
 			desc: 'The effects of "Anti-Upgrades" & "Prestigeless" Hindrances are 24,900% stronger.',
-			cost: new Decimal(20),
-			unl() { return player.sp.upgrades.includes(12)||player.sp.upgrades.includes(21) },
+			cost: new Decimal(6),
+			unl() { return player.sp.upgrades.includes(12) || player.sp.upgrades.includes(21) },
 		},
 		23: {
 			desc: "Spells are stronger based on your Total Super-Prestige Points.",
-			cost: new Decimal(30),
-			unl() { return player.sp.upgrades.includes(13)||player.sp.upgrades.includes(22) },
+			cost: new Decimal(8),
+			unl() { return player.sp.upgrades.includes(13) || player.sp.upgrades.includes(22) },
 			currently() {
 				let sp = player.sp.total
 				if (sp.gte(250)) sp = sp.log10().times(250/Math.log10(250)).min(sp)
@@ -1569,12 +1573,12 @@ const LAYER_UPGS = {
 		},
 		24: {
 			desc: "Super-Prestige Points boost Super-Prestige Point gain.",
-			cost: new Decimal(40),
-			unl() { return player.sp.upgrades.includes(14)||player.sp.upgrades.includes(23) },
+			cost: new Decimal(15),
+			unl() { return player.sp.upgrades.includes(14) || player.sp.upgrades.includes(23) },
 			currently() {
 				let sp = player.sp.points
 				if (sp.gte(2e4)) sp = sp.cbrt().times(Math.pow(2e4, 2/3));
-				return sp.add(1).sqrt() 
+				return sp.times(2).add(1).sqrt() 
 			},
 			effDisp(x) { return format(x)+"x" },
 		},
@@ -1586,14 +1590,14 @@ const LAYER_UPGS = {
 		32: {
 			desc: "Prestige Upgrade 7 softcaps later based on your Super-Prestige Points.",
 			cost: new Decimal(4000),
-			unl() { return player.sp.upgrades.includes(23)&&player.sp.upgrades.includes(31) },
+			unl() { return player.sp.upgrades.includes(23) && player.sp.upgrades.includes(31) },
 			currently() { return player.sp.points.add(1).log10().add(1).pow(1e4) },
 			effDisp(x) { return format(x.pow(player.sp.upgrades.includes(11)?100:1))+"x later" },
 		},
 		33: {
 			desc: "Points boost Super-Prestige Point gain.",
 			cost: new Decimal(1e4),
-			unl() { return player.sp.upgrades.includes(24)&&player.sp.upgrades.includes(32) },
+			unl() { return player.sp.upgrades.includes(24) && player.sp.upgrades.includes(32) },
 			currently() { return player.points.add(1).log10().pow(0.1) },
 			effDisp(x) { return format(x)+"x" },
 		},
@@ -1604,53 +1608,55 @@ const LAYER_UPGS = {
 		},
 		41: {
 			desc: "Gain more Life Essence based on total SP.",
-			cost: new Decimal(8e5),
+			cost: new Decimal(1e6),
 			unl() { return player.l.unl },
 			currently() { return player.sp.total.div(5e5).add(1).sqrt() },
 			effDisp(x) { return format(x)+"x" },
 		},
 		42: {
 			desc: "Life Essence speeds up the Life Power production.",
-			cost: new Decimal(1e6),
+			cost: new Decimal(1.5e6),
 			unl() { return player.l.unl },
 			currently() {
-				if (player.sp.upgrades.includes(15)) return Decimal.pow(6, player.l.points.max(1).log10().cbrt())
+				if (player.sp.upgrades.includes(15)) return Decimal.pow(8, player.l.points.max(1).log10().pow(0.4))
 				return player.l.points.add(1).log10().add(1).pow(0.75)
 			},
 			effDisp(x) { return format(x)+"x" },
 		},
 		43: {
 			desc: "Gain more Hyperspace Energy based on total SP.",
-			cost: new Decimal(6e5),
+			cost: new Decimal(8e5),
 			unl() { return player.hs.unl },
 			currently() { return player.sp.total.div(7.5e5).add(1).sqr() },
 			effDisp(x) { return format(x)+"x" },
 		},
 		44: {
 			desc: "Unlock 5 new Balance Upgrades.",
-			cost: new Decimal(1.2e6),
+			cost: new Decimal(1.5e6),
 			unl() { return player.hs.unl },
 		},
 		15: {
 			desc: "Life Essence speeds up the Life Power production more.",
-			cost: new Decimal(1e18),
+			cost: new Decimal(3e16),
 			unl() { return player.ps.upgrades.includes(23) },
 		},
 		25: {
-			desc: "Super-Prestige Points strength all Subspace effects.",
-			cost: new Decimal(5e20),
+			desc: "Super-Upgrades of Space Building 4 divides the Super-Generator requirement.",
+			cost: new Decimal(2e17),
 			unl() { return player.ps.upgrades.includes(23) },
-			currently() { return player.sp.points.log10().div(15).sqrt().max(1) },
-			effDisp(x) { return format(x.sub(1).times(100))+"%" },
+			currently() { return fixValue(tmp.hs !== undefined && tmp.hs.su[4]).add(1).sqr() },
+			effDisp(x) { return format(x)+"x" },
 		},
 		35: {
-			desc: "Reduce the cost scaling of Hyperspace by 20%.",
-			cost: new Decimal(1e21),
+			desc: "Super-Prestige Points strengthen all Subspace effects.",
+			cost: new Decimal(6e17),
 			unl() { return player.ps.upgrades.includes(23) },
+			currently() { return player.sp.points.log10().div(15).add(1).cbrt() },
+			effDisp(x) { return format(x.sub(1).times(100))+"%" },
 		},
 		45: {
-			desc: "Subtract the cost of Imperium Buildings by 3 and you build 5x faster.",
-			cost: new Decimal(2.222e22),
+			desc: "Subtract the cost of Imperium Buildings by 3.",
+			cost: new Decimal(1e22),
 			unl() { return player.ps.upgrades.includes(23) },
 		},
 	},
@@ -1759,7 +1765,7 @@ function getLayerEffDesc(layer) {
 			return "which are speeding up the Life Power production by " + format(eff.mult) + "x and raising the Life Power amount to the power of " + format(eff.exp)
 			break;
 		case "l":
-			return "which are making that Life Power softcap starts at " + format(eff.pow(tmp.layerEffs.ps.exp))
+			return "which makes the Life Power softcap starts at " + format(eff.pow(tmp.layerEffs.ps.exp))
 			break;
 	}
 }
@@ -1773,7 +1779,7 @@ function load() {
 	if (get===null||get===undefined) player = getStartPlayer()
 	else player = JSON.parse(atob(get))
 	player.tab = "tree"
-	if (player.offlineProd) {
+	if (false && player.offlineProd) {
 		if (player.offTime === undefined) player.offTime = { remain: 0 }
 		player.offTime.remain += (Date.now() - player.time) / 1000
 	}
@@ -2129,6 +2135,7 @@ function getLayerGainMult(layer) {
 			break;
 		case "sg": 
 			if (player.sp.upgrades.includes(31)) mult = mult.div(1.45)
+			if (player.sp.upgrades.includes(25)) mult = mult.div(LAYER_UPGS.sp[25].currently())
 			if (player.l.unl && tmp.l !== undefined) mult = mult.div(tmp.l.lbEff[4])
 			break;
 		case "hb": 
@@ -2176,6 +2183,7 @@ function getLayerGainMult(layer) {
 
 function getLayerGainExp(layer) {
 	let exp = new Decimal(1);
+	if (layer == "p" && tmp.i && tmp.i.work.gt(1.5)) exp = exp.times(Decimal.sub(2, tmp.i.work).times(2))
 	if (LAYER_ROW[layer] < 5) exp = fixValue(tmp.i && tmp.i.workEff, 1).recip()
 	switch(layer) {
 		case "p": 
@@ -2903,7 +2911,7 @@ let SPACE_BUILDINGS = {
 	7: {
 		cost: new Decimal("e6500000"),
 		eff(x) {
-			return Decimal.pow(1.1, x)
+			return Decimal.pow(1.05, x)
 		},
 		effDesc(x) {
 			return "Reduce the requirement of Phantom Souls by " + format(x) + "x"
@@ -2912,7 +2920,7 @@ let SPACE_BUILDINGS = {
 	8: {
 		cost: new Decimal("e7000000"),
 		eff(x) {
-			return x.pow(0.1).div(4)
+			return x.sqrt().div(100)
 		},
 		effDesc(x) {
 			return "Gain " + format(x) + " free extra Quirk layers"
@@ -3367,14 +3375,14 @@ function milestoneShown(complete, auto=false) {
 function getSubspaceEff1() {
 	if (!player.ss.unl) return new Decimal(0)
 	let eff = player.ss.subspace.times(player.ss.points).add(1).log10().times(100)
-	if (player.sp.upgrades.includes(25)) eff = eff.times(LAYER_UPGS.sp[25].currently())
+	if (player.sp.upgrades.includes(35)) eff = eff.times(LAYER_UPGS.sp[35].currently())
 	return eff.floor();
 }
 
 function getSubspaceEff2() {
 	if (!player.ss.unl) return new Decimal(1)
 	let eff = player.ss.subspace.add(1).pow(750)
-	if (player.sp.upgrades.includes(25)) eff = eff.pow(LAYER_UPGS.sp[25].currently())
+	if (player.sp.upgrades.includes(35)) eff = eff.pow(LAYER_UPGS.sp[35].currently())
 	return eff;
 }
 
@@ -3382,7 +3390,7 @@ function getSubspaceEff3() {
 	if (!player.ss.unl) return new Decimal(1)
 	let eff = player.ss.subspace.add(1).log10().add(1).log10().div(2.5).add(1)
 	if (player.ss.upgrades.includes(13)) eff = eff.times(1.5)
-	if (player.sp.upgrades.includes(25)) eff = eff.times(LAYER_UPGS.sp[25].currently())
+	if (player.sp.upgrades.includes(35)) eff = eff.times(LAYER_UPGS.sp[35].currently())
 	if (eff.gte(2)) eff = eff.log2().add(1)
 	return eff;
 }
@@ -3709,18 +3717,11 @@ let LIFE_BOOSTERS = {
 let HYPERSPACE = {
 	cost(x) {
 		if (x === undefined) x = player.hs.space
-		if (player.sp.upgrades.includes(35)) x = x.times(0.8)
 		if (tmp.s !== undefined && tmp.s.trueSbUnl >= 9) x = x.div(tmp.s.sbEff[9])
-		let reduction = this.costReduction()
 		return {
-			hs: Decimal.pow(2, x.sqr()).div(reduction).floor(),
-			ba: Decimal.pow(10, x.max(x.div(2).sqr()).times(20).add(150)).div(reduction).floor()
+			hs: Decimal.pow(2, x.sqr()).floor(),
+			ba: Decimal.pow(10, x.max(x.div(2).sqr()).times(20).add(150)).floor()
 		}
-	},
-	costReduction() {
-		let r = new Decimal(1)
-		if (player.ba.upgrades.includes(45)) r = LAYER_UPGS.ba[45].currently()
-		return r
 	},
 	canBuy() {
 		let cost = this.cost()
@@ -3785,7 +3786,7 @@ let HYPERSPACE = {
 			return sb.add(1).log10().times(su.cbrt()).div(25).add(1)
 		},
 		8(sb, su) {
-			return sb.times(su).div(100).max(1).log10().add(1)
+			return sb.times(su.sqr()).div(100).max(1).log10().add(1)
 		},
 		9(sb, su) {
 			return sb.times(su).max(1).log10().add(1)
@@ -3798,7 +3799,7 @@ let HYPERSPACE = {
 
 let VERSION = {
 	num: 1.1,
-	pre: 4,
+	pre: 5,
 	name: "The Life Update"
 }
 
@@ -3834,7 +3835,7 @@ let IMPERIUM = {
 		if (x === undefined) x = player.i.extraBuildings
 		let sub = player.sp.upgrades.includes(45) ? 3 : 0
 		return {
-			i: x.times(2).add(1).sub(sub).ceil(),
+			i: x.times(1.75).add(0.5).sub(sub).ceil(),
 			l: x.times(1.5).add(1).sub(sub).ceil()
 		}
 	},
@@ -3845,11 +3846,11 @@ let IMPERIUM = {
 		return x
 	},
 	sgSpeedBoost() {
-		return player.sg.power.add(1).pow(0.01)
+		return player.sg.points.add(1).pow(2)
 	}
 }
 
-const ENDGAME = new Decimal("e290000000");
+const ENDGAME = new Decimal("e280000000");
 
 function keepGoing() {
 	player.keepGoing = true;
