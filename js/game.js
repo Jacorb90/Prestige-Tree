@@ -2938,7 +2938,7 @@ let SPACE_BUILDINGS = {
 	9: {
 		cost: new Decimal("e8000000"),
 		eff(x) {
-			return x.max(1).log10().div(2).add(1).cbrt()
+			return x.max(1).log10().div(3).max(1).cbrt()
 		},
 		effDesc(x) {
 			return "Reduce the cost scaling of Hyperspace by " + format(Decimal.sub(1, x.recip()).times(100)) + "%"
@@ -3727,10 +3727,16 @@ let HYPERSPACE = {
 	cost(x) {
 		if (x === undefined) x = player.hs.space
 		if (tmp.s !== undefined && tmp.s.trueSbUnl >= 9) x = x.div(tmp.s.sbEff[9])
+		let reduction = this.costReduction()
 		return {
-			hs: Decimal.pow(2, x.sqr()).floor(),
-			ba: Decimal.pow(10, x.max(x.div(2).sqr()).times(20).add(150)).floor()
+			hs: Decimal.pow(2, x.sqr()).div(reduction).floor(),
+			ba: Decimal.pow(10, x.max(x.div(2).sqr()).times(20).add(150)).div(reduction).floor()
 		}
+	},
+	costReduction() {
+		let r = new Decimal(1)
+		if (player.ba.upgrades.includes(45)) r = LAYER_UPGS.ba[45].currently()
+		return r
 	},
 	canBuy() {
 		let cost = this.cost()
@@ -3801,7 +3807,7 @@ let HYPERSPACE = {
 			return sb.times(su).max(1).log10().add(1)
 		},
 		10(sb, su) {
-			return sb.add(1).pow(su.cbrt().div(3))
+			return sb.add(1).pow(su.cbrt().div(5))
 		}
 	}
 }
