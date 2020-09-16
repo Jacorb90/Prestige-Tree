@@ -212,10 +212,6 @@
         this.layer = 0;
         this.mag = 0;
       }
-	  
-	  if (isNaN(this.sign)) this.sign = 0
-	  if (isNaN(this.layer)) this.layer = 0
-	  if (isNaN(this.mag)) this.mag = 0
     }
 
     Object.defineProperty(Decimal.prototype, "m", {
