@@ -412,9 +412,13 @@ const ORDER_UP = [
 const LAYER_EFFS = {
 	b() { 
 		if (tmp.challActive ? tmp.challActive.h[11] : true) return new Decimal(1);
-		return Decimal.pow(Decimal.add(2, tmp.atbb).max(0), player.b.points.add(getFreeBoosters()).times(getBoosterPower())).max(0)
+		let ret = Decimal.pow(Decimal.add(2, tmp.atbb).max(0), player.b.points.add(getFreeBoosters()).times(getBoosterPower())).max(0);
+		return ret;
 	},
-	g() { return Decimal.pow(Decimal.add(2, tmp.atgb).times(tmp.sGenPowEff).times((player.ss.upgrades.includes(23) ? LAYER_UPGS.ss[23].currently() : 1)).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0) },
+	g() { 
+		let ret = Decimal.pow(Decimal.add(2, tmp.atgb).times(tmp.sGenPowEff).times((player.ss.upgrades.includes(23) ? LAYER_UPGS.ss[23].currently() : 1)).max(0), player.g.points.times(getGenPow())).sub(1).times(getGenPowerGainMult()).max(0);
+		return ret;
+	},
 	t() { return {
 		gain: Decimal.pow(Decimal.add(3, tmp.attb).times(tmp.mttb), player.t.points.add(player.t.extCapsules.add(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(getTimeEnergyGainMult()),
 		limit: Decimal.pow(Decimal.add(2, tmp.attb).times(tmp.mttb), player.t.points.add(player.t.extCapsules.add(tmp.freeExtCap).times(getFreeExtPow())).times(getCapPow())).sub(1).times(100).times(getTimeEnergyLimitMult()),
@@ -1394,7 +1398,12 @@ const LAYER_UPGS = {
 			desc: "Multiply all Quirk Layers based on your Balance Power, and the Quirk Energy effect is cubed.",
 			cost: new Decimal(25),
 			unl() { return player.ba.upgrades.includes(11) },
-			currently() { return player.ba.power.add(1).pow(1.25) },
+			currently() { 
+				let ret = player.ba.power.add(1).pow(1.25);
+				if (ret.gte("1e1000")) ret = ret.log10().pow(10).times("1e970").min(ret);
+				if (ret.gte("1e2000")) ret = ret.log10().pow(10).times("1e1967").min(ret);
+				return ret;
+			},
 			effDisp(x) { return format(x)+"x" },
 		},
 		14: {
@@ -3206,7 +3215,7 @@ function getSpaceBuildingEff(x) {
 
 		bought = bought.times(tmp.s.sbPow).times(compressLvl)
 		if (tmp.hs !== undefined && layerUnl("hs")) {
-			tmp.hs.suEff[x] = HYPERSPACE.effs[x](bought, fixValue(tmp.hs.su[x].plus(extraSU)).times(tmp.hs.eff).times(compressLvl))
+			tmp.hs.suEff[x] = HYPERSPACE.effs[x](bought, fixValue(tmp.hs.su[x]).plus(extraSU).times(tmp.hs.eff).times(compressLvl))
 			bought = bought.times(tmp.hs.suEff[x])
 		}
 	}
@@ -3355,6 +3364,7 @@ function getQuirkEnergyEff() {
 	if (player.q.upgrades.includes(32)) eff = eff.pow(2)
 	if (player.h.challs.includes(61)) eff = eff.pow(1.2)
 	if (player.ba.upgrades.includes(13)) eff = eff.pow(3)
+
 	return eff;
 }
 
