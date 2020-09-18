@@ -267,7 +267,7 @@ const LAYER_REQS = {
 	hs: new Decimal(725),
 	i: new Decimal("1e285"),
 	mb: new Decimal(29),
-	ge: new Decimal(1/0),
+	ge: new Decimal(1e50),
 	ma: new Decimal(1/0),
 }
 
@@ -359,8 +359,10 @@ const LAYER_BASE = {
 	ss: new Decimal(1.15),
 	ps: new Decimal("1e250"),
 	i: new Decimal("1e20"),
-	mb: new Decimal(1.1),
+	mb: new Decimal(1.033),
 }
+
+const LAYER_USE_TOTAL = ["mb"]
 
 const LAYER_ROW = {
 	p: 0,
@@ -1759,9 +1761,11 @@ const LAYER_UPGS = {
 			unl() { return player.mb.unl&&player.sp.upgrades.includes(53) },
 		},
 		55: {
-			desc: "???",
-			cost: new Decimal(1/0),
-			unl() { return false },
+			desc: "Imperium Bricks & Hyperspace Energy boost Super-Prestige Point gain.",
+			cost: new Decimal(2.5e41),
+			unl() { return player.mb.unl&&player.sp.upgrades.includes(54) },
+			currently() { return player.hs.points.plus(1).pow(0.02).times(Decimal.pow(2, player.i.points)) },
+			effDisp(x) { return format(x)+"x" },
 		},
 	},
 	ge: {
@@ -2120,10 +2124,11 @@ function format(decimal, precision=3) {
 	}
 	if (decimal.sign<0) return "-"+format(decimal.neg(), precision)
 	if (decimal.mag == Number.POSITIVE_INFINITY) return "Infinity"
-	if (decimal.gte("eeee1000")) {
+	if (decimal.gte("eeee10")) {
 		var slog = decimal.slog()
-		if (slog.gte(1e6)) return "F" + format(slog.floor())
-		else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
+		if (slog.gte(1e9)) return "10^^" + format(slog.floor())
+		else if (slog.gte(1000)) return "10^^"+commaFormat(slog, 0)
+		else return "10^^" + commaFormat(slog, 3)
 	} else if (decimal.gte("1e1000")) return "e"+formatWhole(decimal.log10())
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
@@ -2308,6 +2313,7 @@ function getLayerGainMult(layer) {
 		case "sp": 
 			if (player.sp.upgrades.includes(24)) mult = mult.times(LAYER_UPGS.sp[24].currently())
 			if (player.sp.upgrades.includes(33)) mult = mult.times(LAYER_UPGS.sp[33].currently())
+			if (player.sp.upgrades.includes(55)) mult = mult.times(LAYER_UPGS.sp[55].currently())
 			if (spellActive(9)) mult = mult.times(tmp.spellEffs[9]);
 			break;
 		case "l": 
@@ -2356,7 +2362,7 @@ function getResetGain(layer) {
 			}
 			if (gain.gte(1225)) gain = gain.times(Decimal.pow(1225, 9)).pow(0.1)
 		}
-		return gain.floor().sub(player[layer].points).add(1).max(1);
+		return gain.floor().sub(player[layer][LAYER_USE_TOTAL.includes(layer)?"total":"points"]).add(1).max(1);
 	} else {
 		if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(LAYER_EXP[layer]).times(tmp.gainMults[layer]).pow(tmp.gainExp[layer])
@@ -2369,7 +2375,7 @@ function getNextAt(layer, disp=false) {
 	if (tmp.gainExp[layer].eq(0)) return new Decimal(1/0)
 	if (LAYER_TYPE[layer]=="static") {
 		if (!canBuyMax(layer)) disp = false
-		let amt = player[layer].points.plus((disp&&tmp.layerAmt[layer].gte(tmp.nextAt[layer]))?tmp.resetGain[layer]:0)
+		let amt = player[layer][LAYER_USE_TOTAL.includes(layer)?"total":"points"].plus((disp&&tmp.layerAmt[layer].gte(tmp.nextAt[layer]))?tmp.resetGain[layer]:0)
 		if ((LAYER_ROW[layer] < 4 && layer != "hb") || layer == "ps") {
 			if (amt.gte(1225)) amt = amt.pow(10).div(Decimal.pow(1225, 9))
 			if (amt.gte(12)) {
@@ -2677,6 +2683,7 @@ function rowReset(row, layer) {
 			}
 			player.i = {
 				unl: player.i.unl,
+				auto: player.i.auto,
 				points: new Decimal(0),
 				best: (keepRow6Milestones||keepRow6) ? player.i.best : new Decimal(0),
 				lifeBricks: new Decimal(0),
@@ -2728,7 +2735,7 @@ function doReset(layer, force=false) {
 	if ((layer=="t"&&player.h.best.gte(25))||(layer=="s"&&player.q.best.gte(25))||(layer=="sb"&&player.h.best.gte(2500))||(layer=="sg"&&player.sg.best.gte(1))) return;
 	if ((layer=="hb"&&player.ba.best.gte(8))||(layer=="ss"&&player.ba.best.gte(8))) return;
 	if (layer=="ps"&&player.ps.best.gte(5)) return;
-	if (layer=="i"&&player.mb.total.gte(12)&&!force) return;
+	if (layer=="i"&&player.mb.total.gte(10)&&!force) return;
 	let row = LAYER_ROW[layer]
 
 	var layersWithChalls = Object.keys(LAYER_CHALLS)
@@ -3710,7 +3717,7 @@ const SPELL_BASE = {
 	2: 1.1,
 	3: 1.04,
 	4: 1.01,
-	5: 1.08,
+	5: 1.175,
 	6: 1.45,
 	7: 1.1,
 	8: 5,
@@ -4309,6 +4316,7 @@ function gameLoop(diff) {
 	}
 	if (player.mb.total.gte(3)) generatePoints("l", diff)
 	if (player.mb.total.gte(5)) generatePoints("hs", diff)
+	if (player.mb.total.gte(10)) generatePoints("sp", diff)
 
 	if (player.b.auto&&player.t.best.gte(5)) doReset("b")
 	if (player.g.auto&&player.s.best.gte(5)) doReset("g")
@@ -4328,7 +4336,7 @@ function gameLoop(diff) {
 	}
 	if (player.m.auto&&player.m.total.gte(50)) for (let i=1;i<=tmp.spellsUnl;i++) activateSpell(i)
 	if (player.ps.auto&&player.ps.best.gte(2)) doReset("ps")
-	if (player.i.auto&&player.mb.total.gte(12)) doReset("i")
+	if (player.i.auto&&player.mb.total.gte(10)) doReset("i")
 
 	if (player.hasNaN&&!NaNalert) {
 		clearInterval(interval);

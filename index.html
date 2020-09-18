@@ -335,7 +335,9 @@
 			<br>
 			<h3>{{VERSION.withName}}</h3>
 			<br>
-			Made by Jacorb and Aarex
+			Made by Jacorb
+			<br>
+			With help by Aarex (made all of v1.1, planned most of v1.2)
 			<br>
 			Idea by papyrus (on discord)
 			<br><br>
@@ -344,7 +346,7 @@
 			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Jacorb's Discord</a><br>
 			<a class="link" href="http://aarextiaokhiao.github.io/" target="_blank">Aarex's Home</a>
 			<br>
-			Note by Jacorb: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
+			Note: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
 			<br><br>
 			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
 			<h3>Hotkeys</h3><br>
@@ -679,7 +681,7 @@
 						<tr v-if="milestoneShown(player.mb.total.gte(3))"><td v-bind:class="{ milestone: player.mb.total.lt(3), milestoneDone: player.mb.total.gte(3) }"><h3>3 Total Mastery Bricks</h3><br>Keep Row 6 Upgrades on Row 7 resets, and gain 100% of Life Essence gain every second.</td></tr>
 						<tr v-if="milestoneShown(player.mb.total.gte(5))"><td v-bind:class="{ milestone: player.mb.total.lt(5), milestoneDone: player.mb.total.gte(5) }"><h3>5 Total Mastery Bricks</h3><br>Keep Imperium Buildings on Row 7 resets, and gain 100% of Hyperspace Energy gain every second.</td></tr>
 						<tr v-if="milestoneShown(player.mb.total.gte(8))"><td v-bind:class="{ milestone: player.mb.total.lt(8), milestoneDone: player.mb.total.gte(8) }"><h3>8 Total Mastery Bricks</h3><br>Keep Hyperspace and Super-Upgrades on Row 7 resets.</td></tr>
-						<tr v-if="milestoneShown(player.mb.total.gte(12), true)"><td v-bind:class="{ milestone: player.mb.total.lt(12), milestoneDone: player.mb.total.gte(12) }"><h3>12 Total Mastery Bricks</h3><br>Automate Imperium Bricks, and Imperium resets nothing.&nbsp;&nbsp;&nbsp;<button v-if="player.mb.total.gte(12)" class="smallUpg can i" onclick="toggleAuto('i')">{{player.i.auto?"ON":"OFF"}}</button></td></tr>
+						<tr v-if="milestoneShown(player.mb.total.gte(10), true)"><td v-bind:class="{ milestone: player.mb.total.lt(10), milestoneDone: player.mb.total.gte(10) }"><h3>10 Total Mastery Bricks</h3><br>Automate Imperium Bricks, Imperium resets nothing, and gain 100% of Super-Prestige Point gain on reset.&nbsp;&nbsp;&nbsp;<button v-if="player.mb.total.gte(10)" class="smallUpg can i" onclick="toggleAuto('i')">{{player.i.auto?"ON":"OFF"}}</button></td></tr>
 					</table><br><br>
 					Note: Buying a Mastery Building makes all others more expensive<br><br>
 					<button v-on:click="MASTERY.respec()" v-bind:class="{ longUpg: true, mb: true, can: player.mb.unl, locked: !player.mb.unl }">Respec Mastery Buildings</button><br>
