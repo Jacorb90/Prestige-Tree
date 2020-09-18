@@ -62,7 +62,7 @@ h1, h2, h3, b, input {
 	height: 100px;
 	width: 100px;
 	border: var(--hqProperty1);
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	border-radius: 50%;
 	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
 	font-size: 40px;
@@ -444,7 +444,7 @@ h1, h2, h3, b, input {
 
 #version {
 	position: absolute;
-	right: 4px;
+	right: 8px;
 	top: 4px;
 	text-align: right;
 	color: var(--points);
@@ -454,7 +454,7 @@ h1, h2, h3, b, input {
 
 #version:hover {
 	transform: scale(1.2, 1.2);
-	right: 4.8px;
+	right: 9.6px;
 }
 
 a {

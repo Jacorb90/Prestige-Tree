@@ -32,12 +32,18 @@
 			<h1>Oh, you are still reading this?</h1>
 			<br>
 			Yeah. You also can test the next update whether you want to.<br>
-			<a class="link">Test server</a> (Coming soon!)
+			<a class="link">Test server</a> (You're in it!)
 			<br><br>
 			For this next update, there will be 3 new layers which come after row 6! Stay tuned.
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
+			<h3>v1.2: The Mechanical Update</h3>
+			<ul>
+				<li>Added a new row with 3 new layers (only 1 is made so far)</li>
+				<li>Balanced up to e500,000,000</li>
+				<li>Fixed some more bugs</li>
+			</ul><br>
 			<h3>v1.1: The Life Update</h3>
 			<ul>
 				<li>Added 4 new layers</li>
@@ -45,7 +51,7 @@
 				<li>Added Aqua theme</li>
 				<li>Added HQ Tree option</li>
 				<li>Rebalanced early parts of rows 4 - 6</li>
-				<li>Balanced up to e28,000,000</li>
+				<li>Balanced up to e280,000,000</li>
 				<li>Fixed some bugs</li>
 			</ul><br>
 			<h3>v1.0 Patch 1</h3>
@@ -323,7 +329,7 @@
 				<li>Balanced the row 3 prestige layers up to 1e560 points</li>
 			</ul><br><br>
 		</div>
-		<div v-if="player.tab=='info'" class="col right">
+		<div v-if="player.tab=='info'" class="col right" style="overflow-x: hidden;">
 			<button class="back" onclick="showTab('tree')">←</button><br>
 			<h2>Prestige Tree</h2>
 			<br>
@@ -334,7 +340,7 @@
 			Idea by papyrus (on discord)
 			<br><br>
 			<div class="link" onclick="showTab('changelog')">Changelog</div><br>
-			<a class="link">Test server</a> (Coming soon!)<br><br>
+			<a class="link">Test server</a> (You're in it!)<br><br>
 			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Jacorb's Discord</a><br>
 			<a class="link" href="http://aarextiaokhiao.github.io/" target="_blank">Aarex's Home</a>
 			<br>
@@ -361,6 +367,9 @@
 			<span v-if="player.l.unl"><br>L: Life Essence reset</span>
 			<span v-if="player.hs.unl"><br>Ctrl+S: Hyperspace reset</span>
 			<span v-if="player.i.unl"><br>I: Imperium Brick reset</span>
+			<span v-if="player.mb.unl"><br>Shift+M: Mastery Brick reset</span>
+			<span v-if="player.ge.unl"><br>Ctrl+G: Gear reset</span>
+			<span v-if="player.ma.unl"><br>Ctrl+M: Machine reset</span>
 			<span v-if="player.m.unl">
 				<br>
 				<span v-for="i in tmp.spellsUnl"><br>{{i}}: Cast spell {{i}}</span>
@@ -450,7 +459,7 @@
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&layerShown('tm')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(6)"></img></td>
+				<td v-if="player.tab=='tree'&&layerShown('i')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(6)"></img></td>
 				<td><layer-node layer='mb' abb='MB'></layer-node></td>
 				<td><layer-node layer='ge' abb='Ge'></layer-node></td>
 				<td><layer-node layer='ma' abb='Ma'></layer-node></td>
@@ -462,8 +471,8 @@
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_RES[layer]}}<span v-if="Object.keys(LAYER_EFFS).includes(layer)">, {{getLayerEffDesc(layer)}}</span>
 				<br><br>
-				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</span></button>
-				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
+				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</span></button>
+				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
 				<span v-if="LAYER_TYPE[layer]=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{LAYER_AMT_NAMES[layer]}}</span>
 				<br><br>
 				<span v-if="layer!='p'">Your best {{LAYER_RES[layer]}} is {{formatWhole(player[layer].best)}}<br></span>
@@ -648,19 +657,36 @@
 					You have {{formatWhole(player.i.lifeBricks)}} Life Bricks<br>
 					Next Life Brick is at {{format(player.l.power)}} / {{format(IMPERIUM.lifeReq())}} Life Power
 					<br><br>
-					<button v-on:click="IMPERIUM.build()" v-bind:class="{ upgBig: true, i: true, can: IMPERIUM.canBuild(), locked: !IMPERIUM.canBuild() }">
+					<button v-if="tmp.s.sbUnl.gte(IMPERIUM.minSB)" v-on:click="IMPERIUM.build()" v-bind:class="{ upgBig: true, i: true, can: IMPERIUM.canBuild(), locked: !IMPERIUM.canBuild() }">
 						<h3>Imperium Buildings</h3><br>
 						<span v-if="tmp.s.sbUnl.lt(SPACE_BUILDINGS.max)">Build Space Building {{formatWhole(tmp.s.sbUnl.add(1))}}</span>
-						<span v-if="tmp.s.sbUnl.gte(SPACE_BUILDINGS.max)">Enhance<sup v-if="tmp.s.sbUnl.div(SPACE_BUILDINGS.max).gte(2)">{{formatWhole(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor())}}</sup> Space Building {{formatWhole(tmp.s.sbUnl.sub(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor().times(SPACE_BUILDINGS.max)).add(1))}}</span>
+						<span v-if="tmp.s.sbUnl.max(IMPERIUM.minSB).gte(SPACE_BUILDINGS.max)">Enhance<sup v-if="tmp.s.sbUnl.div(SPACE_BUILDINGS.max).gte(2)">{{formatWhole(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor())}}</sup> Space Building {{formatWhole(tmp.s.sbUnl.sub(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor().times(SPACE_BUILDINGS.max)).add(1))}}</span>
 						<br>
 						Built Buildings: {{formatWhole(player.i.extraBuildings)}}
 						<br><br>
 						<span v-if="!player.i.building">Cost: {{IMPERIUM.cost().i}} Imperium Bricks & {{IMPERIUM.cost().l}} Life Bricks</span>
 						<span v-if="player.i.building">Progress: {{format(player.i.progress * 100)}}%<br>Your {{formatWhole(player.sg.points)}} Super-Generators speed up your progress by {{format(IMPERIUM.sgSpeedBoost())}}x<br><br>Click to cancel building</span>
 					</button>
+					<div v-if="tmp.s.sbUnl.lt(IMPERIUM.minSB)">Unlock Space Building 5 to build Imperium Buildings.</div>
 					<br>
 					Your Work is currently {{format(tmp.i.work)}}, which reduces the gain power of rows 1 - 5 by {{format(tmp.i.workEff)}}x
 					<span v-for="i in IMPERIUM.maxCollapseRows"><span v-if="IMPERIUM.collapsed(i)"><br>Your Work also collapses row {{i}} layers by {{format(tmp.i.collapse[i].times(100))}}%</span></span>
+				</div>
+				<div v-if="layer=='mb'">
+					<table>
+						<tr v-if="milestoneShown(player.mb.total.gte(1))"><td v-bind:class="{ milestone: player.mb.total.lt(1), milestoneDone: player.mb.total.gte(1) }"><h3>1 Total Mastery Brick</h3><br>Keep Milestones, Upgrades, and Hindrances of Rows 1-4 on Row 7 resets. Also keep Row 5 milestones on Row 7 resets.</td></tr>
+						<tr v-if="milestoneShown(player.mb.total.gte(2))"><td v-bind:class="{ milestone: player.mb.total.lt(2), milestoneDone: player.mb.total.gte(2) }"><h3>2 Total Mastery Bricks</h3><br>Keep Row 5 Upgrades and Row 6 Milestones on Row 7 resets.</td></tr>
+						<tr v-if="milestoneShown(player.mb.total.gte(3))"><td v-bind:class="{ milestone: player.mb.total.lt(3), milestoneDone: player.mb.total.gte(3) }"><h3>3 Total Mastery Bricks</h3><br>Keep Row 6 Upgrades on Row 7 resets, and gain 100% of Life Essence gain every second.</td></tr>
+						<tr v-if="milestoneShown(player.mb.total.gte(5))"><td v-bind:class="{ milestone: player.mb.total.lt(5), milestoneDone: player.mb.total.gte(5) }"><h3>5 Total Mastery Bricks</h3><br>Keep Imperium Buildings on Row 7 resets, and gain 100% of Hyperspace Energy gain every second.</td></tr>
+						<tr v-if="milestoneShown(player.mb.total.gte(8))"><td v-bind:class="{ milestone: player.mb.total.lt(8), milestoneDone: player.mb.total.gte(8) }"><h3>8 Total Mastery Bricks</h3><br>Keep Hyperspace and Super-Upgrades on Row 7 resets.</td></tr>
+						<tr v-if="milestoneShown(player.mb.total.gte(12), true)"><td v-bind:class="{ milestone: player.mb.total.lt(12), milestoneDone: player.mb.total.gte(12) }"><h3>12 Total Mastery Bricks</h3><br>Automate Imperium Bricks, and Imperium resets nothing.&nbsp;&nbsp;&nbsp;<button v-if="player.mb.total.gte(12)" class="smallUpg can i" onclick="toggleAuto('i')">{{player.i.auto?"ON":"OFF"}}</button></td></tr>
+					</table><br><br>
+					Note: Buying a Mastery Building makes all others more expensive<br><br>
+					<button v-on:click="MASTERY.respec()" v-bind:class="{ longUpg: true, mb: true, can: player.mb.unl, locked: !player.mb.unl }">Respec Mastery Buildings</button><br>
+					<div class="upgRow">
+						<div><button onclick="unlockNewSpell()" v-bind:class="{ upgBig: true, mb: true, can: player.mb.points.gte(MASTERY.spellCost()), locked: player.mb.points.lt(MASTERY.spellCost()) }"><h3>Mastery Building 1</h3><br><div v-if="player.mb.extraSpells.lt(MAX_SPELLS-4)">Unlock a new Spell</div><div v-if="player.mb.extraSpells.gte(MAX_SPELLS-4)">Enhance all Spells<br>(enhanced {{formatWhole(player.mb.extraSpells.sub(MAX_SPELLS-4))}} times)</div><br>Cost: {{ formatWhole(MASTERY.spellCost()) }} Mastery Bricks</button></div>
+						<div><button onclick="unlockNewLB()" v-bind:class="{ upgBig: true, mb: true, can: player.mb.points.gte(MASTERY.boosterCost()), locked: player.mb.points.lt(MASTERY.boosterCost()) }"><h3>Mastery Building 2</h3><br><div v-if="player.mb.extraBoosters.lt(LIFE_BOOSTERS.max-5)">Unlock a new Life Booster</div><div v-if="player.mb.extraBoosters.gte(LIFE_BOOSTERS.max-5)">Enhance all Life Boosters<br>(enhanced {{formatWhole(player.mb.extraBoosters.sub(LIFE_BOOSTERS.max-5))}} times)</div><br>Cost: {{ formatWhole(MASTERY.boosterCost()) }} Mastery Bricks</button></div>
+					</div>
 				</div>
 				<br><br>
 				<div v-if="LAYER_UPGS[layer]" class="upgTable">

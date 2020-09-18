@@ -18,6 +18,7 @@ function updateTemp() {
 	if (!tmp.gainExp) tmp.gainExp = {}
 	if (!tmp.resetGain) tmp.resetGain = {}
 	if (!tmp.nextAt) tmp.nextAt = {}
+	if (!tmp.nextAtDisp) tmp.nextAtDisp = {}
 	if (!tmp.layerAmt) tmp.layerAmt = {}
 	for (let i in LAYERS) {
 		tmp.layerAmt[LAYERS[i]] = getLayerAmt(LAYERS[i])
@@ -25,11 +26,13 @@ function updateTemp() {
 		tmp.gainExp[LAYERS[i]] = getLayerGainExp(LAYERS[i])
 		tmp.resetGain[LAYERS[i]] = getResetGain(LAYERS[i])
 		tmp.nextAt[LAYERS[i]] = getNextAt(LAYERS[i])
+		tmp.nextAtDisp[LAYERS[i]] = getNextAt(LAYERS[i], true)
 	}
 
 	tmp.pointGen = getPointGen()
 
 	tmp.scaling12b = getScaling12Boosters()
+	tmp.scaling12ps = getScaling12PS()
 
 	tmp.atbb = addToBoosterBase()
 	tmp.atgb = addToGenBase()
@@ -81,9 +84,9 @@ function updateTemp() {
 	tmp.baExp = getBalanceEnergyExp()
 
 	tmp.hexEff = getHexEff()
-	tmp.spellsUnl = player.sp.upgrades.includes(13)?4:3
+	tmp.spellsUnl = Math.min((player.sp.upgrades.includes(13)?4:3)+player.mb.extraSpells.toNumber(), MAX_SPELLS)
 	if (!tmp.spellEffs) tmp.spellEffs = {}
-	for (let i=1;i<=4;i++) tmp.spellEffs[i] = getSpellEff(i)
+	for (let i=1;i<=MAX_SPELLS;i++) tmp.spellEffs[i] = getSpellEff(i)
 
 	tmp.sGenPowEff = getSGenPowEff()
 
@@ -98,7 +101,7 @@ function updateTemp() {
 		data.lpEff = data2.eff()
 		data.lbUnl = data2.unl()
 		for (let i=1;i<=data2.max;i++) {
-			data.lb[i] = fixValue(player.l.boosters[i])
+			data.lb[i] = new Decimal(fixValue(player.l.boosters[i]))
 			data.lbEff[i] = data2[i].eff(data.lb[i].times(data.lpEff))
 		}
 	}
@@ -127,6 +130,14 @@ function updateTemp() {
 		for (var i = 1; i <= IMPERIUM.maxCollapseRows; i++) if (data.work.gt(i + 0.5)) data.collapse[i] = data.work.sub(i + 0.5).times(2).min(1)
 
 		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
+	}
+	
+	if (layerUnl("mb")) {
+		if (!tmp.mb) tmp.mb = {}
+		var data = tmp.mb
+		
+		data.spellBoost = player.mb.extraSpells.sub(MAX_SPELLS-4).max(0).plus(1).log10().div(2).plus(1).sqrt()
+		data.lbBoost = player.mb.extraBoosters.sub(LIFE_BOOSTERS.max-5).max(0).plus(1).log10().div(2).plus(1).sqrt()
 	}
 }
 

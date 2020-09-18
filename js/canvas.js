@@ -90,7 +90,7 @@ function drawTree() {
 	}
 	if (layerShown('i')) {
 		drawTreeBranch("ss", "i")
-		drawTreeBranch("sg", "i")
+		if (layerShown('sg')) drawTreeBranch("sg", "i")
 	}
 	if (layerShown('mb')) {
 		drawTreeBranch("l", "mb")

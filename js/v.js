@@ -70,7 +70,8 @@ function loadVue() {
 			SPELL_NAMES,
 			LIFE_BOOSTERS,
 			HYPERSPACE,
-			IMPERIUM
+			IMPERIUM,
+			MASTERY
 		},
 	})
 }
