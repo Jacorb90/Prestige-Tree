@@ -8,8 +8,7 @@
 }
 
 *:focus {
-	outline: none;
-	webkit-outline: none;
+	outline: thin dotted white;
 }
 
 body {

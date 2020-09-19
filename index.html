@@ -1,15 +1,22 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
 	<title>The Prestige Tree</title>
-	<link rel="stylesheet" type="text/css" href="style.css" />
-	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-	<script type="text/javascript" src="js/break_eternity.js"></script>
-	<script type="text/javascript" src="js/temp.js"></script>
-	<script type="text/javascript" src="js/saves.js"></script>
-	<script type="text/javascript" src="js/game.js"></script>
-	<script type="text/javascript" src="js/v.js"></script>
-	<script type="text/javascript" src="js/canvas.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Prestige Tree is an incremental game based around a skill tree where each node is a prestige layer.
+		At the time of writing this, it has 7 rows of prestige layers, and 20 prestige layers.
+		The game is compatible with almost all playstyles and lasts anywhere from 6 hours to a week.">
+	<link rel="stylesheet" type="text/css" href="style.css" media="all" />
+	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" media="all">
+	<script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/remove-focus-outline@1.2.1/outline.min.js"></script>
+	<script defer src="js/break_eternity.js"></script>
+	<script defer src="js/temp.js"></script>
+	<script defer src="js/saves.js"></script>
+	<script defer src="js/game.js"></script>
+	<script defer src="js/v.js"></script>
+	<script defer src="js/canvas.js"></script>
 </head>
 <body onload="load()">
 	<div id="app">
@@ -399,9 +406,10 @@
 		</div>
 		<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.tab == 'tree', col: player.tab != 'tree', left: player.tab != 'tree'}">
 			<div id="version" onclick="showTab('changelog')">{{VERSION.withoutName}}</div>
-			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
+			<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" alt="Options" onclick="showTab('options')">
 			<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
-			<img id="discord" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" src="discord.png"  target="_blank"></img>
+			<!-- `rel=noopener` attr prevents reverse tabnabbing (https://owasp.org/www-community/attacks/Reverse_Tabnabbing) -->
+			<img id="discord" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" src="discord.png" alt="Discord" rel="noopener">
 			<span v-if="player.devSpeed && player.devSpeed != 1">
 				<br>Dev Speed: {{format(player.devSpeed)}}x<br>
 			</span>
@@ -421,13 +429,13 @@
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&(player.b.unl||player.g.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
+				<td v-if="player.tab=='tree'&&(player.b.unl||player.g.unl)" class="left"><br><br><img class="remove" alt="Reset Row 2" src="remove.png" onclick="resetRow(1)"></td>
 				<td><layer-node layer='b' abb='B'></layer-node></td>
 				<td><layer-node layer='g' abb='G'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&(player.e.unl||player.t.unl||player.s.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
+				<td v-if="player.tab=='tree'&&(player.e.unl||player.t.unl||player.s.unl)" class="left"><br><br><img class="remove" alt="Reset Row 3" src="remove.png" onclick="resetRow(2)"></td>
 				<td><layer-node layer='sb' abb='SB'></layer-node></td>
 				<td><layer-node layer='t' abb='T'></layer-node></td>
 				<td><layer-node layer='e' abb='E'></layer-node></td>
@@ -436,8 +444,8 @@
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&(player.h.unl||player.q.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(3)"></img></td>
-				<td v-if="player.tab=='tree'&&(player.e.unl||player.t.unl||player.s.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></img></td>
+				<td v-if="player.tab=='tree'&&(player.h.unl||player.q.unl)" class="left"><br><br><img class="remove" alt="Reset Row 4" src="remove.png" onclick="resetRow(3)"></td>
+				<td v-if="player.tab=='tree'&&(player.e.unl||player.t.unl||player.s.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(2)"></td>
 				<td><layer-node layer='hb' abb='HB'></layer-node></td>
 				<td><layer-node layer='h' abb='H'></layer-node></td>
 				<td><layer-node layer='q' abb='Q'></layer-node></td>
@@ -446,14 +454,14 @@
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&(player.m.unl||player.ba.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(4)"></img></td>
+				<td v-if="player.tab=='tree'&&(player.m.unl||player.ba.unl)" class="left"><br><br><img class="remove" alt="Reset Row 5" src="remove.png" onclick="resetRow(4)"></td>
 				<td><layer-node layer='m' abb='M'></layer-node></td>
 				<td><layer-node layer='ps' abb='PS'></layer-node></td>
 				<td><layer-node layer='ba' abb='BA'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(5)"></img></td>
+				<td v-if="player.tab=='tree'&&player.sp.unl" class="left"><br><br><img class="remove" alt="Reset Row 6" src="remove.png" onclick="resetRow(5)"></td>
 				<td><layer-node layer='l' abb='L'></layer-node></td>
 				<td><layer-node layer='sp' abb='SP'></layer-node></td>
 				<td><layer-node layer='hs' abb='HS'></layer-node></td>
@@ -461,7 +469,7 @@
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
-				<td v-if="player.tab=='tree'&&layerShown('i')" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(6)"></img></td>
+				<td v-if="player.tab=='tree'&&layerShown('i')" class="left"><br><br><img class="remove" alt="Reset Row 7" src="remove.png" onclick="resetRow(6)"></td>
 				<td><layer-node layer='mb' abb='MB'></layer-node></td>
 				<td><layer-node layer='ge' abb='Ge'></layer-node></td>
 				<td><layer-node layer='ma' abb='Ma'></layer-node></td>
@@ -591,7 +599,7 @@
 						<div v-for="id in tmp.spellsUnl">
 							<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(player.m.toCast[id]))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(player.m.toCast[id])||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>{{getSpellDesc(id)}}<br><br>Time: {{formatTime(player.m.spellTimes[id])}}</button><br><br>
 							<div v-if="player.m.upgrades.includes(41)">
-								<input v-model="player.m.toCast[id]" v-on:focus="focused(true)" v-on:blur="focused(false)" v-on:change="updateToCast(id)"></input><br><br>
+								<input v-model="player.m.toCast[id]" v-on:focus="focused(true)" v-on:blur="focused(false)" v-on:change="updateToCast(id)"><br><br>
 							</div>
 						</div>
 					</div>
@@ -724,3 +732,4 @@
 		}
 	</script>
 </body>
+</html>
