@@ -83,7 +83,7 @@ function updateTemp() {
 	tmp.hexEff = getHexEff()
 	tmp.spellsUnl = player.sp.upgrades.includes(13)?4:3
 	if (!tmp.spellEffs) tmp.spellEffs = {}
-	for (let i=1;i<=4;i++) tmp.spellEffs[i] = getSpellEff(i)
+	for (let i=1;i<=MAX_SPELLS;i++) tmp.spellEffs[i] = getSpellEff(i)
 
 	tmp.sGenPowEff = getSGenPowEff()
 
@@ -98,7 +98,7 @@ function updateTemp() {
 		data.lpEff = data2.eff()
 		data.lbUnl = data2.unl()
 		for (let i=1;i<=data2.max;i++) {
-			data.lb[i] = fixValue(player.l.boosters[i])
+			data.lb[i] = new Decimal(fixValue(player.l.boosters[i]))
 			data.lbEff[i] = data2[i].eff(data.lb[i].times(data.lpEff))
 		}
 	}
