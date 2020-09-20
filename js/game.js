@@ -338,7 +338,7 @@ const LAYER_EXP = {
 	l: new Decimal(0.012),
 	hs: new Decimal(40),
 	i: new Decimal(1),
-	mb: new Decimal(1.075),
+	mb: new Decimal(1.07),
 	ge: new Decimal(0.05),
 	ma: new Decimal(0.0075),
 }
@@ -354,7 +354,7 @@ const LAYER_BASE = {
 	ss: new Decimal(1.15),
 	ps: new Decimal("1e250"),
 	i: new Decimal("1e20"),
-	mb: new Decimal(1.033),
+	mb: new Decimal(1.03),
 }
 
 const LAYER_USE_TOTAL = ["mb"]
@@ -2110,7 +2110,7 @@ function sumValues(x) {
 	return x.reduce((a, b) => Decimal.add(a, b))
 }
 
-function format(decimal, precision=3) {
+function format(decimal, precision=2) {
 	decimal = new Decimal(decimal)
 	if (isNaN(decimal.sign)||isNaN(decimal.layer)||isNaN(decimal.mag)) {
 		player.hasNaN = true;
@@ -2122,7 +2122,7 @@ function format(decimal, precision=3) {
 		var slog = decimal.slog()
 		if (slog.gte(1e9)) return "10^^" + format(slog.floor())
 		else if (slog.gte(1000)) return "10^^"+commaFormat(slog, 0)
-		else return "10^^" + commaFormat(slog, 3)
+		else return "10^^" + commaFormat(slog, precision)
 	} else if (decimal.gte("1e1000")) return "e"+formatWhole(decimal.log10())
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
@@ -4212,7 +4212,7 @@ let HYPERSPACE = {
 }
 
 let VERSION = {
-	beta: 2,
+	beta: 3,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -4275,15 +4275,13 @@ let IMPERIUM = {
 
 const MASTERY = {
 	spellCost() {
-		let bought = player.mb.extraSpells.plus(player.mb.extraBoosters.times(0.5));
-		if (bought.gte(6)) bought = player.mb.extraSpells.times(1.5)
-		let cost = bought.pow(2).plus(1);
+		let bought = player.mb.extraSpells;
+		let cost = bought.pow(2).plus(1).plus(player.mb.extraBoosters);
 		return cost.floor();
 	},
 	boosterCost() {
-		let bought = player.mb.extraBoosters.plus(player.mb.extraSpells.times(0.5));
-		if (bought.gte(5)) bought = player.mb.extraBoosters.times(1.5)
-		let cost = bought.pow(3).plus(1).times(2);
+		let bought = player.mb.extraBoosters;
+		let cost = bought.pow(3).plus(1).times(2).plus(player.mb.extraSpells);
 		return cost.floor();
 	},
 	respec() {
