@@ -97,7 +97,7 @@ function drawTree() {
 		drawTreeBranch("ps", "mb", 2)
 	}
 	if (layerShown('ge')) {
-		drawTreeBranch("sp", "ge")
+		drawTreeBranch("sp", "ge", 2)
 	}
 	if (layerShown('ma')) {
 		drawTreeBranch("hs", "ma")

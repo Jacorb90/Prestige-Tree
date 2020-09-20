@@ -124,6 +124,7 @@ function updateTemp() {
 
 		data.work = new Decimal(1)
 		if (player.i.building) data.work = data.work.add(player.i.extraBuildings.add(1).sqrt().add(1).div(5))
+		if (tmp.challActive ? tmp.challActive.ge[21] : true) data.work = data.work.add(0.75)
 		data.workEff = Decimal.pow(2, data.work.sub(1))
 
 		data.collapse = {}
@@ -147,10 +148,30 @@ function updateChallTemp(layer) {
 	let data = tmp.challActive[layer]
 	let data2 = LAYER_CHALLS[layer]
 	let customActive = data2.active !== undefined
+	let otherChoices = data2.choose>1
+	if (!data.combos) data.combos = {}
+	let comboData = player[layer].challs.reduce(function (acc, curr) {
+		if (acc[curr] === undefined) acc[curr] = 1;
+		else acc[curr] += 1;
+		return acc;
+	}, {})
+	
+	let goalToFind = player[layer].active||player[layer].choices
+	if (goalToFind==0||goalToFind==[]||goalToFind==""||goalToFind===undefined) data.goal = new Decimal(0)
+	else data.goal = calcChallGoal(layer, goalToFind)
 	for (let row = 1; row <= data2.rows; row++) {
 		for (let col = 1; col <= data2.cols; col++) {
 			let id = row * 10 + col
-			if (customActive ? data2.active(id) : player[layer].active == id) data[id] = 1
+			if (otherChoices && player[layer].challs.length>0) {
+				let total = 0
+				Object.keys(comboData).forEach(key => {
+					if (key.split(",").includes(id.toString())) total += comboData[key]
+				})
+				data.combos[id] = total;
+			}
+			
+			if (player[layer].active===undefined) delete data[id]
+			else if (customActive ? data2.active(id) : (otherChoices ? player[layer].active.includes(id) : (player[layer].active == id))) data[id] = 1
 			else delete data[id]
 		}
 	}
