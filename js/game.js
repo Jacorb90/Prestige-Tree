@@ -3533,6 +3533,9 @@ const LAYER_CHALLS = {
 		res() { return player.p.points },
 		resDisp: "Prestige Points",
 		choose: 2,
+		active(x) {
+			return player.ge.active.includes(x);
+		},
 		11: {
 			name: "Unique Gameplay",
 			desc: "All Super & Hyper layers do nothing (but their upgrades still work).",
