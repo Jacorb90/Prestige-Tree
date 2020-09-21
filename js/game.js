@@ -2349,8 +2349,9 @@ function getLayerGainExp(layer) {
 function getResetGain(layer) {
 	if (tmp.gainMults[layer].eq(0) || tmp.gainExp[layer].eq(0)) return new Decimal(0)
 	if (LAYER_TYPE[layer]=="static") {
-		if ((!canBuyMax(layer)) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
+		if ((!canBuyMax(layer)) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer]) || tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return new Decimal(1)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(LAYER_BASE[layer]).times(tmp.gainExp[layer]).pow(Decimal.pow(LAYER_EXP[layer], -1))
+		if (layer=="sg" && gain.gte(16)) gain = gain.times(16).sqrt()
 		if ((LAYER_ROW[layer] < 4 && layer != "hb") || layer == "ps") {
 			if (gain.gte(12)) {
 				if (LAYER_ROW[layer] < 4 && fixValue(tmp.scaling12b).gt(1)) gain = gain.times(tmp.scaling12b).add(tmp.scaling12b.sub(1).times(12))
@@ -4663,6 +4664,7 @@ function changeTheme() {
 	document.body.style.setProperty('--background_tooltip', aqua ? "rgba(0, 15, 31, 0.75)" : "rgba(0, 0, 0, 0.75)")
 	document.body.style.setProperty('--color', aqua ? "#bfdfff" : "#dfdfdf")
 	document.body.style.setProperty('--points', aqua ? "#dfefff" : "#ffffff")
+	document.body.style.setProperty("--locked", aqua ? "#c4a7b3" : "#bf8f8f")
 }
 
 function getThemeName() {
