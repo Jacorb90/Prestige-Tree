@@ -12,6 +12,7 @@ function getStartPlayer() {
 		notify: {},
 		msDisplay: "always",
 		offlineProd: true,
+		hideHindrances: false,
 		versionType: "real",
 		version: VERSION.num,
 		beta: VERSION.beta,
@@ -2029,6 +2030,7 @@ function checkForVars() {
 	}
 	if (player.mb.spent === undefined) player.mb.spent = new Decimal(0);
 	if (player.i.auto === undefined) player.i.auto = false
+	if (player.hideHindrances === undefined) player.hideHindrances = false
 }
 
 function convertToDecimal() {
@@ -2106,6 +2108,7 @@ function sumValues(x) {
 }
 
 function format(decimal, precision=2) {
+	if (decimal=="X") return "X"
 	decimal = new Decimal(decimal)
 	if (isNaN(decimal.sign)||isNaN(decimal.layer)||isNaN(decimal.mag)) {
 		player.hasNaN = true;
@@ -3129,7 +3132,7 @@ let SPACE_BUILDINGS = {
 			return x.max(1).log10().div(3).max(1).cbrt()
 		},
 		effDesc(x) {
-			return "Reduce the cost scaling of Hyperspace by " + format(Decimal.sub(1, x.recip()).times(100)) + "%"
+			return "Reduce the cost scaling of Hyperspace by " + (x=="X"?"X":format(Decimal.sub(1, x.recip()).times(100))) + "%"
 		}
 	},
 	10: {
@@ -3138,7 +3141,7 @@ let SPACE_BUILDINGS = {
 			return x.max(1).log10().div(5).max(1)
 		},
 		effDesc(x) {
-			return "Super-Upgrades are " + format(x.sub(1).times(100)) + "% stronger"
+			return "Super-Upgrades are " + (x=="X"?"X":format(x.sub(1).times(100))) + "% stronger"
 		}
 	},
 }
@@ -4094,7 +4097,7 @@ let LIFE_BOOSTERS = {
 			return str.plus(1).log10().plus(1).log10().div(4).plus(1);
 		},
 		effDesc(x) {
-			return "All Spells are "+format(x.sub(1).times(100))+"% stronger"
+			return "All Spells are "+(x=="X"?"X":format(x.sub(1).times(100)))+"% stronger"
 		},
 	},
 	7: {
@@ -4125,7 +4128,7 @@ let LIFE_BOOSTERS = {
 			return Decimal.sub(1, Decimal.div(1, str.plus(1).log10().plus(1)));
 		},
 		effDesc(x) {
-			return "All previous Life Booster costs scale "+format(x.times(100))+"% slower"
+			return "All previous Life Booster costs scale "+(x=="X"?"X":format(x.times(100)))+"% slower"
 		},
 	},
 	10: {
@@ -4135,7 +4138,7 @@ let LIFE_BOOSTERS = {
 			return str.plus(1).log10().sqrt().plus(1);
 		},
 		effDesc(x) {
-			return "The post-12 Phantom Soul cost scaling is "+format(x.sub(1).times(100))+"% weaker"
+			return "The post-12 Phantom Soul cost scaling is "+(x=="X"?"X":format(x.sub(1).times(100)))+"% weaker"
 		},
 	},
 }
@@ -4362,6 +4365,22 @@ const MASTERY = {
 		player.mb.spent = new Decimal(0)
 		doReset("mb", true)
 	},
+	tooltip(x) {
+		switch(x) {
+			case 1: 
+				if (player.mb.extraSpells.lt(MAX_SPELLS-4)) return "Next Effect: "+SPELL_DESCS[player.mb.extraSpells.plus(5).toNumber()]
+				else return "Currently: "+format(tmp.mb.spellBoost.sub(1).times(100))+"% stronger"
+				break;
+			case 2: 
+				if (player.mb.extraBoosters.lt(LIFE_BOOSTERS.max-5)) return "Next Effect: "+LIFE_BOOSTERS[player.mb.extraBoosters.plus(6).toNumber()].effDesc("X")
+				else return "Currently: "+format(tmp.mb.lbBoost.sub(1).times(100))+"% stronger"
+				break;
+			case 3: 
+				if (player.ma.built.lt(MACHINES.maxBuild)) return "Next Effect: "+MACHINES[player.ma.built.plus(1).toNumber()].reward
+				else return "Currently: "+format(tmp.mb.machBoost.sub(1).times(100))+"% stronger"
+				break;
+		}
+	},
 }
 
 function unlockNewSpell() {
@@ -4398,20 +4417,20 @@ const MACHINES = {
 	1: {
 		unl() { return player.ma.built.gte(1) },
 		reward: "Unused Space adds extra levels to all Space Buildings.",
-		currently() { return getSpace().sqrt().times(player.ma.enhancements.sqrt().plus(1).pow(2)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)) },
+		currently() { return getSpace().sqrt().times(player.ma.enhancements.sqrt().plus(1).pow(2)).times(tmp.mb ? tmp.mb.machBoost : 1) },
 		effDisp(x) { return "+"+format(x) },
 	},
 	2: {
 		unl() { return player.ma.built.gte(2) },
 		reward: "The requirement to increase the cap of Super-Upgrades is lower based on your Total Hyperspace.",
-		currently() { return player.hs.space.plus(1).times(player.ma.enhancements.sqrt().plus(1)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).log10().times(105).floor() },
+		currently() { return player.hs.space.plus(1).times(player.ma.enhancements.sqrt().plus(1)).times(tmp.mb ? tmp.mb.machBoost : 1).log10().times(105).floor() },
 		effDisp(x) { return "-"+formatWhole(x) },
 	},
 	3: {
 		unl() { return player.ma.built.gte(3) },
 		reward: "All Life Boosters are stronger based on your Best Machine Power.",
 		currently() { 
-			let ret = player.ma.best.plus(1).log10().times(player.ma.enhancements.sqrt().plus(1)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).plus(1) 
+			let ret = player.ma.best.plus(1).log10().times(player.ma.enhancements.sqrt().plus(1)).times(tmp.mb ? tmp.mb.machBoost : 1).plus(1) 
 			if (ret.gte(26)) ret = ret.log10().times(26/Math.log10(26)).min(ret)
 			return ret;
 		},
@@ -4420,19 +4439,19 @@ const MACHINES = {
 	4: {
 		unl() { return player.ma.built.gte(4) },
 		reward: "Gears make Mastery Bricks cheaper.",
-		currently() { return player.ge.points.plus(1).log10().plus(1).log10().times(player.ma.enhancements.sqrt().plus(1).times(10)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).plus(1).log10().plus(1) },
+		currently() { return player.ge.points.plus(1).log10().plus(1).log10().times(player.ma.enhancements.sqrt().plus(1).times(10)).times(tmp.mb ? tmp.mb.machBoost : 1).plus(1).log10().plus(1) },
 		effDisp(x) { return "/"+format(x) },
 	},
 	5: {
 		unl() { return player.ma.built.gte(5) },
 		reward: "All Super-Upgrades are stronger based on your Imperium Bricks & Life Bricks.",
-		currently() { return player.i.points.plus(player.i.lifeBricks).plus(1).log10().times(player.ma.enhancements.sqrt().plus(1)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).plus(1).log10().plus(1) },
+		currently() { return player.i.points.plus(player.i.lifeBricks).plus(1).log10().times(player.ma.enhancements.sqrt().plus(1)).times(tmp.mb ? tmp.mb.machBoost : 1).plus(1).log10().plus(1) },
 		effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
 	},
 	6: {
 		unl() { return player.ma.enhancements.gte(2) },
 		reward: "Best Machine Power boosts Hyperspace Energy gain.",
-		currently() { return player.ma.best.plus(1).log10().plus(1).pow(player.ma.enhancements.sqrt().plus(1)).pow(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).pow(15) },
+		currently() { return player.ma.best.plus(1).log10().plus(1).pow(player.ma.enhancements.sqrt().plus(1)).pow(tmp.mb ? tmp.mb.machBoost : 1).pow(15) },
 		effDisp(x) { return format(x)+"x" },
 	},
 	

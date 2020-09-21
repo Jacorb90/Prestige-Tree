@@ -139,6 +139,7 @@ function updateTemp() {
 		
 		data.spellBoost = player.mb.extraSpells.sub(MAX_SPELLS-4).max(0).plus(1).log10().div(2).plus(1).sqrt()
 		data.lbBoost = player.mb.extraBoosters.sub(LIFE_BOOSTERS.max-5).max(0).plus(1).log10().div(2).plus(1).sqrt()
+		data.machBoost = player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)
 	}
 }
 

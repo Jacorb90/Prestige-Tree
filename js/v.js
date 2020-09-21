@@ -24,6 +24,7 @@ function loadVue() {
 		</button>
 		`
 	})
+	
 	app = new Vue({
 		el: "#app",
 		data: {
