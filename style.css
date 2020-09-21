@@ -610,6 +610,17 @@ ul {
 	transition-duration: 0s
 }
 
+.machine {
+	background-color: #c9c9c9;
+	border: 4px solid;
+	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	color: rgba(0, 0, 0, 0.5);
+	width: 200px;
+	height: 200px;
+	font-size: 15px;
+	border-radius: 33.33%;
+}
+
 [tooltip] {
 	position: relative;
 	z-index: 2

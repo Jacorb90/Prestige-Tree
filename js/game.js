@@ -187,6 +187,7 @@ function getStartPlayer() {
 		},
 		hs: {
 			unl: false,
+			auto: false,
 			order: 0,
 			points: new Decimal(0),
 			best: new Decimal(0),
@@ -198,6 +199,7 @@ function getStartPlayer() {
 		i: {
 			unl: false,
 			auto: false,
+			autoBuild: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
 			total: new Decimal(0),
@@ -227,13 +229,6 @@ function getStartPlayer() {
 			points: new Decimal(0),
 			best: new Decimal(0),
 			built: new Decimal(0),
-			active: {
-				1: false, 
-				2: false, 
-				3: false, 
-				4: false, 
-				5: false
-			},
 			enhancements: new Decimal(0),
 		},
 	}
@@ -263,7 +258,7 @@ const LAYER_REQS = {
 	i: new Decimal("1e285"),
 	mb: new Decimal(29),
 	ge: new Decimal(1e50),
-	ma: new Decimal(1/0),
+	ma: new Decimal(1e160),
 }
 
 const LAYER_RES = {
@@ -2191,6 +2186,9 @@ function canBuyMax(layer) {
 		case "i": 
 			return player.i.best.gte(3)
 			break;
+		case "mb":
+			return player.mb.best.gte(32)
+			break;
 	}
 	return false;
 }
@@ -2317,6 +2315,10 @@ function getLayerGainMult(layer) {
 		case "hs": 
 			if (player.sp.upgrades.includes(43)) mult = mult.times(LAYER_UPGS.sp[43].currently())
 			if (player.l.unl && tmp.l !== undefined && tmp.l.lbUnl >= 5) mult = mult.times(tmp.l.lbEff[5])
+			if (player.ma.unl && MACHINES[6].unl()) mult = mult.times(MACHINES[6].currently());
+			break;
+		case "mb":
+			if (player.ma.unl && MACHINES[4].unl()) mult = mult.div(MACHINES[4].currently());
 			break;
 	}
 	return mult
@@ -2669,6 +2671,7 @@ function rowReset(row, layer) {
 			}
 			player.hs = {
 				unl: player.hs.unl,
+				auto: player.hs.auto,
 				order: 0,
 				points: new Decimal(0),
 				best: (keepRow6Milestones||keepRow6) ? player.hs.best : new Decimal(0),
@@ -2680,6 +2683,7 @@ function rowReset(row, layer) {
 			player.i = {
 				unl: player.i.unl,
 				auto: player.i.auto,
+				autoBuild: player.i.autoBuild,
 				points: new Decimal(0),
 				best: (keepRow6Milestones||keepRow6) ? player.i.best : new Decimal(0),
 				lifeBricks: new Decimal(0),
@@ -2883,21 +2887,6 @@ function getGenPowerEff() {
 	return eff
 }
 
-function resetRow(row) {
-	if (prompt('Are you sure you want to reset this row? It is highly recommended that you wait until the end of your current run before doing this! Type "I WANT TO RESET THIS" to confirm')!="I WANT TO RESET THIS") return
-	let pre_layers = ROW_LAYERS[row-1]
-	let layers = ROW_LAYERS[row]
-	let post_layers = ROW_LAYERS[row+1]
-	rowReset(row+1, post_layers[0])
-	doReset(pre_layers[0], true)
-	for (let layer in layers) {
-		player[layers[layer]].unl = false
-		if (player[layers[layer]].order) player[layers[layer]].order = 0
-	}
-	updateTemp();
-	resizeCanvas();
-}
-
 function getEnhancerPow() {
 	if (tmp.challActive ? tmp.challActive.h[22] : true) return new Decimal(0);
 	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0);
@@ -2912,6 +2901,7 @@ function getEnhancerPow() {
 
 function getEnhancerEff() {
 	if (!player.e.unl) return new Decimal(1)
+	if (tmp.challActive ? tmp.challActive.ge[31] : true) return new Decimal(1)
 	let e = player.e.enhancers.sub(tmp.subbedEnh).times(tmp.enhPow)
 	let eff;
 	if (e.gte(0)) eff = Decimal.pow(25, e.pow(1.1))
@@ -2921,6 +2911,7 @@ function getEnhancerEff() {
 
 function getEnhancerEff2() {
 	if (!player.e.unl) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.ge[31] : true) return new Decimal(1)
 	let e = player.e.enhancers.sub(tmp.subbedEnh).times(tmp.enhPow)
 	let eff;
 	if (e.gte(0)) eff = e.pow(0.8)
@@ -2959,6 +2950,7 @@ function getFreeExtCapsules() {
 
 function getCapPow() {
 	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.ge[31] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	if (player.q.upgrades.includes(33)) pow = pow.times(LAYER_UPGS.q[33].currently())
 	if (spellActive(2)) pow = pow.times(tmp.spellEffs[2])
@@ -3043,7 +3035,7 @@ function getSpace() {
 	if (player.s.upgrades.includes(24)&&!(tmp.challActive?tmp.challActive.h[12]:true)) baseSpace = baseSpace.add(3);
 	if (player.ss.unl) baseSpace = baseSpace.add(tmp.ssEff1)
 	if (player.ss.upgrades.includes(11)) baseSpace = baseSpace.add(LAYER_UPGS.ss[11].currently())
-	return baseSpace.sub(player.s.spent).max(0)
+	return baseSpace.sub((player.hs.best.gte(1e150)) ? 0 : player.s.spent).max(0)
 }
 
 let SPACE_BUILDINGS = {
@@ -3185,6 +3177,7 @@ function getSpaceBuildingPow() {
 	if (!player.s.unl) return new Decimal(0)
 	if (tmp.challActive ? tmp.challActive.h[22] : true) return new Decimal(0)
 	if (tmp.challActive ? tmp.challActive.h[41] : true) return new Decimal(0)
+	if (tmp.challActive ? tmp.challActive.ge[31] : true) return new Decimal(0)
 	let pow = new Decimal(1)
 	if (player.s.upgrades.includes(21)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.s[21].currently())
 	if (player.s.upgrades.includes(22)&&!(tmp.challActive?tmp.challActive.h[12]:true)) pow = pow.times(LAYER_UPGS.s[22].currently())
@@ -3202,6 +3195,7 @@ function getExtraBuildingLevels() {
 	if (player.s.upgrades.includes(14)&&!(tmp.challActive?tmp.challActive.h[12]:true)) lvl = lvl.add(1);
 	if (player.q.upgrades.includes(31)) lvl = lvl.add(1);
 	if (player.m.upgrades.includes(32)) lvl = lvl.add(LAYER_UPGS.m[32].currently())
+	if (player.ma.unl && MACHINES[1].unl()) lvl = lvl.add(MACHINES[1].currently())
 	return lvl
 }
 
@@ -3322,7 +3316,7 @@ function getQuirkLayerCostBase() {
 
 function getQuirkLayerCost(layers) {
 	if (layers === undefined) layers = player.q.layers
-	if (layers.gte(20)) layers = Decimal.pow(1.05, layers.sub(20)).times(20)
+	if (layers.gte(20)) layers = Decimal.pow(player.h.challs.includes(72)?1.025:1.05, layers.sub(20)).times(20)
 	if (player.ba.upgrades.includes(55)) layers = layers.sub(LAYER_UPGS.ba[55].currently())
 	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, layers).sub(1))
 	return cost.max(1);
@@ -3331,7 +3325,7 @@ function getQuirkLayerCost(layers) {
 function getQuirkLayerTarg() {
 	let targ = player.q.points.log(tmp.qCB).add(1).log(tmp.qCB)
 	if (player.ba.upgrades.includes(55)) targ = targ.add(LAYER_UPGS.ba[55].currently())
-	if (targ.gte(20)) targ = targ.div(20).log(1.05).add(20)
+	if (targ.gte(20)) targ = targ.div(20).log(player.h.challs.includes(72)?1.025:1.05).add(20)
 	return targ.add(1).floor()
 }
 
@@ -3343,6 +3337,7 @@ function getQuirkLayerMult() {
 	if (player.q.upgrades.includes(52)) mult = mult.times(LAYER_UPGS.q[52].currently())
 	if (player.h.challs.includes(52)) mult = mult.times(LAYER_CHALLS.h[52].currently())
 	if (player.ba.upgrades.includes(13)) mult = mult.times(LAYER_UPGS.ba[13].currently())
+	if (player.ge.unl) mult = mult.times(LAYER_CHALLS.ge[31].currently());
 	return mult
 }
 
@@ -3405,6 +3400,8 @@ const LAYER_CHALLS = {
 		resDisp: "Points",
 		choose: 1,
 		active(x) {
+			if (x==12) if (LAYER_CHALLS.ge.active(31)) return true;
+			if (x<72) if (this.active(72)) return true;
 			if (x<71&&x!=42&&x!=52) if (this.active(71)) return true
 			if (x==11||x==41) if (this.active(51)) return true
 			if (x==31||x==32) if (this.active(61)) return true
@@ -3523,15 +3520,15 @@ const LAYER_CHALLS = {
 			effDisp(x) { return format(x)+"x" },
 		},
 		72: {
-			name: "You shouldn't be seeing this",
-			desc: "Never gonna give you up, never gonna let you down, never gonna run around and dessert you",
-			unl() { return false },
-			goal: new Decimal(1/0),
-			reward: "???",
+			name: "The Truly Final Stockade",
+			desc: "All previous Hindrances are applied at once.",
+			unl() { return player.ma.enhancements.gte(1) },
+			goal: new Decimal("1e350000"),
+			reward: "The post-20 Quirk Layer cost scaling is 50% weaker.",
 		},
 	},
 	ge: {
-		rows: 2,
+		rows: 3,
 		cols: 2,
 		res() { return player.p.points },
 		resDisp: "Prestige Points",
@@ -3542,7 +3539,7 @@ const LAYER_CHALLS = {
 			unl() { return true },
 			goal: new Decimal("1e10000"),
 			reward: "Gears boost the efficiency of all Super & Hyper layers.",
-			currently() { return player.ge.points.plus(1).log2().plus(1).log10().plus(1).log10().div(2).times(tmp.challActive?tmp.challActive.ge.combos[11]:0).plus(1) },
+			currently() { return player.ge.points.plus(1).log2().plus(1).log10().plus(1).log10().div(2).times(Decimal.cbrt(tmp.challActive?tmp.challActive.ge.combos[11]:0)).plus(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"% more efficient" },
 		},
 		12: {
@@ -3569,8 +3566,24 @@ const LAYER_CHALLS = {
 			unl() { return true },
 			goal: new Decimal("1e3875"),
 			reward: "Gears boost Super-Prestige Point gain.",
-			currently() { return player.ge.points.plus(1).pow(tmp.challActive?tmp.challActive.ge.combos[21]:0).pow(1.25) },
+			currently() { return player.ge.points.plus(1).pow(tmp.challActive?Math.pow(tmp.challActive.ge.combos[22], 0.8):0).pow(1.25) },
 			effDisp(x) { return format(x)+"x" },
+		},
+		31: {
+			name: "Crank of the Dead",
+			desc: "All row 3 layers other than Super-Boosters and Super-Generators do nothing (including upgrades).",
+			unl() { return player.ma.enhancements.gte(3) },
+			goal: new Decimal("1e8325"),
+			reward: "Gears & Best Machine Power multiply all Quirk Layers.",
+			currently() { return player.ge.points.plus(1).times(player.ma.best.plus(1)).log10().plus(1).pow(tmp.challActive?tmp.challActive.ge.combos[31]:0).pow(150) },
+			effDisp(x) { return format(x)+"x" },
+		},
+		32: {
+			name: "???",
+			desc: "You aren't supposed to see this...",
+			unl() { return false },
+			goal: new Decimal("10^^69"),
+			reward: "???",
 		},
 	},
 }
@@ -3588,8 +3601,10 @@ function startChall(layer, x) {
 		if (!player[layer].choices) {
 			player[layer].choices = [x]
 			return;
-		} else if (player[layer].choices.includes(x)&&player[layer].choices.length<LAYER_CHALLS[layer].choose) return;
-		else if (player[layer].choices.length<LAYER_CHALLS[layer].choose) {
+		} else if (player[layer].choices.includes(x)&&player[layer].choices.length<LAYER_CHALLS[layer].choose) {
+			delete player[layer].choices
+			return;
+		} else if (player[layer].choices.length<LAYER_CHALLS[layer].choose) {
 			player[layer].choices.push(x)
 			return;
 		} else {
@@ -4003,6 +4018,7 @@ let LIFE_BOOSTERS = {
 		
 		let eff = player.l.power.add(1).log10();
 		if (tmp.mb) eff = eff.times(tmp.mb.lbBoost)
+		if (player.ma.unl && MACHINES[3].unl()) eff = eff.times(MACHINES[3].currently())
 		return eff;
 	},
 	req(x) {
@@ -4130,6 +4146,13 @@ let HYPERSPACE = {
 			ba: Decimal.pow(10, x.max(x.div(2).sqr()).times(20).add(150)).div(reduction).floor()
 		}
 	},
+	target() {
+		let reduction = this.costReduction()
+		let targetHS = player.hs.points.times(reduction).max(1).log2().sqrt().plus(1).floor()
+		let targetBA = player.ba.points.times(reduction).max(1).log10().sub(150).div(20).plus(1).floor()
+		let target = targetHS.min(targetBA)
+		return target;
+	},
 	costReduction() {
 		let r = new Decimal(1)
 		if (player.ba.upgrades.includes(45)) r = LAYER_UPGS.ba[45].currently()
@@ -4167,14 +4190,19 @@ let HYPERSPACE = {
 		let r = new Decimal(1)
 		if (player.ba.upgrades.includes(35)) r = r.times(1.25)
 		if (tmp.s !== undefined && tmp.s.trueSbUnl >= 10) r = r.times(tmp.s.sbEff[10])
+		if (player.ma.unl && MACHINES[5].unl()) r = r.times(MACHINES[5].currently())
 		return r
 	},
 	nextCapReq(x) {
 		if (x === undefined) x = player.hs.superUpgradeCap
-		return Decimal.times(x, 200).add(1300)
+		let req = Decimal.times(x, 200).add(1300)
+		if (player.ma.unl && MACHINES[2].unl()) req = req.sub(MACHINES[2].currently()).max(0)
+		return req;
 	},
 	nextCapTarget() {
-		let x = player.g.points.sub(1300).div(200)
+		let x = new Decimal(0)
+		if (player.ma.unl && MACHINES[2].unl()) x = x.plus(MACHINES[2].currently())
+		x = x.plus(player.g.points).sub(1300).div(200)
 		return x.floor().add(1)
 	},
 	effs: {
@@ -4211,8 +4239,15 @@ let HYPERSPACE = {
 	}
 }
 
+function maxHyperspace() {
+	if (!HYPERSPACE.canBuy()) return;
+	let target = HYPERSPACE.target();
+	if (target.lte(player.hs.space)) return;
+	player.hs.space = player.hs.space.max(target)
+}
+
 let VERSION = {
-	beta: 3,
+	beta: 4,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -4222,10 +4257,14 @@ VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "
 
 let IMPERIUM = {
 	lifeReq() {
-		return Decimal.pow(10, player.i.lifeBricks.times(2).sqr().add(15))
+		let bricks = player.i.lifeBricks
+		if (bricks.gte(50)) bricks = Decimal.pow(1.02, bricks.sub(50)).times(50)
+		return Decimal.pow(10, bricks.times(2).sqr().add(15))
 	},
 	lifeTarget() {
-		return player.l.power.max(1).log10().sub(15).sqrt().div(2).add(1).floor()
+		let target = player.l.power.max(1).log10().sub(15).sqrt().div(2).add(1).floor()
+		if (target.gte(50)) target = target.div(50).log(1.02).plus(50)
+		return target;
 	},
 	canBuild() {
 		let cost = this.cost()
@@ -4248,10 +4287,23 @@ let IMPERIUM = {
 	cost(x) {
 		if (x === undefined) x = player.i.extraBuildings
 		let sub = player.sp.upgrades.includes(45) ? 3 : 0
+		if (x.gte(20)) x = Decimal.pow(1.05, x.sub(19)).times(20)
 		return {
 			i: x.times(1.75).add(0.5).sub(sub).ceil().max(0),
 			l: x.times(1.5).add(1).sub(sub).ceil().max(0)
 		}
+	},
+	target() {
+		let sub = player.sp.upgrades.includes(45) ? 3 : 0
+		let i = player.i.points.plus(sub).sub(0.5).div(1.75)
+		if (i.gte(20)) i = i.div(20).log(1.05).plus(19)
+		let targetI = i.plus(1).floor()
+	
+		let l = player.i.lifeBricks.plus(sub).sub(1).div(1.5)
+		if (l.gte(20)) l = l.div(20).log(1.05).plus(19)
+		let targetL = l.plus(1).floor()
+	
+		return targetI.min(targetL)
 	},
 	speed() {
 		let x = Decimal.pow(3.75, player.i.extraBuildings.add(5)).recip()
@@ -4273,21 +4325,34 @@ let IMPERIUM = {
 	minSB: 5,
 }
 
+function maxImperiumBuildings() {
+	if (!IMPERIUM.canBuild()) return
+	let target = IMPERIUM.target()
+	if (target.lte(player.i.extraBuildings)) return;
+	player.i.extraBuildings = player.i.extraBuildings.max(target);
+}
+
 const MASTERY = {
 	spellCost() {
 		let bought = player.mb.extraSpells;
-		let cost = bought.pow(2).plus(1).plus(player.mb.extraBoosters);
+		let cost = bought.pow(2).plus(1).plus(player.mb.extraBoosters).plus(player.ma.built);
 		return cost.floor();
 	},
 	boosterCost() {
 		let bought = player.mb.extraBoosters;
-		let cost = bought.pow(3).plus(1).times(2).plus(player.mb.extraSpells);
+		let cost = bought.pow(3).plus(1).times(2).plus(player.mb.extraSpells).plus(player.ma.built);
+		return cost.floor();
+	},
+	machineCost() {
+		let bought = player.ma.built;
+		let cost = bought.plus(1).pow(1.5).times(2).plus(player.mb.extraSpells).plus(player.mb.extraBoosters);
 		return cost.floor();
 	},
 	respec() {
 		if (!player.mb.unl || !confirm("Are you sure? This will perform a Row 7 reset and will reset your Mastery Buildings!")) return
 		player.mb.extraSpells = new Decimal(0)
 		player.mb.extraBoosters = new Decimal(0)
+		player.ma.built = new Decimal(0)
 		player.mb.points = player.mb.points.plus(player.mb.spent)
 		player.mb.best = player.mb.best.max(player.mb.points)
 		player.mb.spent = new Decimal(0)
@@ -4311,6 +4376,96 @@ function unlockNewLB() {
 	player.mb.points = player.mb.points.sub(cost);
 	player.mb.spent = player.mb.spent.plus(cost);
 	player.mb.extraBoosters = player.mb.extraBoosters.plus(1);
+}
+
+function unlockNewMachine() {
+	if (!player.mb.unl) return;
+	if (!player.ma.unl) return;
+	let cost = MASTERY.machineCost()
+	if (player.mb.points.lt(cost)) return;
+	player.mb.points = player.mb.points.sub(cost);
+	player.mb.spent = player.mb.spent.plus(cost);
+	player.ma.built = player.ma.built.plus(1);
+}
+
+const MACHINES = {
+	maxBuild: 5,
+	max: 6,
+	1: {
+		unl() { return player.ma.built.gte(1) },
+		reward: "Unused Space adds extra levels to all Space Buildings.",
+		currently() { return getSpace().sqrt().times(player.ma.enhancements.sqrt().plus(1).pow(2)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)) },
+		effDisp(x) { return "+"+format(x) },
+	},
+	2: {
+		unl() { return player.ma.built.gte(2) },
+		reward: "The requirement to increase the cap of Super-Upgrades is lower based on your Total Hyperspace.",
+		currently() { return player.hs.space.plus(1).times(player.ma.enhancements.sqrt().plus(1)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).log10().times(105).floor() },
+		effDisp(x) { return "-"+formatWhole(x) },
+	},
+	3: {
+		unl() { return player.ma.built.gte(3) },
+		reward: "All Life Boosters are stronger based on your Best Machine Power.",
+		currently() { 
+			let ret = player.ma.best.plus(1).log10().times(player.ma.enhancements.sqrt().plus(1)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).plus(1) 
+			if (ret.gte(26)) ret = ret.log10().times(26/Math.log10(26)).min(ret)
+			return ret;
+		},
+		effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
+	},
+	4: {
+		unl() { return player.ma.built.gte(4) },
+		reward: "Gears make Mastery Bricks cheaper.",
+		currently() { return player.ge.points.plus(1).log10().plus(1).log10().times(player.ma.enhancements.sqrt().plus(1).times(10)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).plus(1).log10().plus(1) },
+		effDisp(x) { return "/"+format(x) },
+	},
+	5: {
+		unl() { return player.ma.built.gte(5) },
+		reward: "All Super-Upgrades are stronger based on your Imperium Bricks & Life Bricks.",
+		currently() { return player.i.points.plus(player.i.lifeBricks).plus(1).log10().times(player.ma.enhancements.sqrt().plus(1)).times(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).plus(1).log10().plus(1) },
+		effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
+	},
+	6: {
+		unl() { return player.ma.enhancements.gte(2) },
+		reward: "Best Machine Power boosts Hyperspace Energy gain.",
+		currently() { return player.ma.best.plus(1).log10().plus(1).pow(player.ma.enhancements.sqrt().plus(1)).pow(player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)).pow(15) },
+		effDisp(x) { return format(x)+"x" },
+	},
+	
+	lvlCost(res) {
+		let e = player.ma.enhancements
+		if (e.gte(4)) e = Decimal.pow(1.3, e.sub(4)).times(4)
+		if (res=="ma") return Decimal.pow(10, e.pow(2).plus(1))
+		else return e.plus(1).pow(2).plus(14)
+	},
+	lvlUpDesc() { 
+		let desc = "Power up all Machines"
+		let x = player.ma.enhancements;
+		if (x.lte(2)) {
+			desc += " and "
+			let y = x.toNumber()+1;
+			switch(y) {
+				case 1: 
+					desc += "unlock a new Hindrance";
+					break;
+				case 2: 
+					desc += "unlock a new Machine";
+					break;
+				case 3: 
+					desc += "unlock a new Mechanical Challenge";
+					break;
+			}
+		}
+		return desc;
+	},
+	canLvlUp() { return player.ma.points.gte(this.lvlCost("ma")) && player.i.points.gte(this.lvlCost("i")) },
+}
+
+function lvlUpMachines() {
+	if (!MACHINES.canLvlUp()) return;
+	player.ma.points = player.ma.points.sub(MACHINES.lvlCost("ma"))
+	player.i.points = player.i.points.sub(MACHINES.lvlCost("i"))
+	player.ma.enhancements = player.ma.enhancements.plus(1);
 }
 
 const ENDGAME = new Decimal(1/0); // Previously e280,000,000
@@ -4413,7 +4568,7 @@ function gameLoop(diff) {
 	if (player.i.unl) {
 		player.i.lifeBricks = player.i.lifeBricks.max(IMPERIUM.lifeTarget())
 		if (player.i.building) player.i.progress += IMPERIUM.speed().times(diff).toNumber()
-		if (player.i.progress >= 1) {
+		if ((player.i.progress >= 1)||(player.ma.best.gte(5)&&player.i.building)) {
 			player.i.progress = 0
 			player.i.extraBuildings = player.i.extraBuildings.add(1)
 			delete player.i.building
@@ -4442,6 +4597,8 @@ function gameLoop(diff) {
 	if (player.m.auto&&player.m.total.gte(50)) for (let i=1;i<=tmp.spellsUnl;i++) activateSpell(i)
 	if (player.ps.auto&&player.ps.best.gte(2)) doReset("ps")
 	if (player.i.auto&&player.mb.total.gte(10)) doReset("i")
+	if (player.hs.auto&&player.ma.best.gte(1e15)) maxHyperspace()
+	if (player.i.autoBuild&&player.ma.best.gte(1e15)) maxImperiumBuildings()
 
 	if (player.hasNaN&&!NaNalert) {
 		clearInterval(interval);
