@@ -162,7 +162,7 @@ function updateChallTemp(layer) {
 	for (let row = 1; row <= data2.rows; row++) {
 		for (let col = 1; col <= data2.cols; col++) {
 			let id = row * 10 + col
-			if (otherChoices && player[layer].challs.length>0) {
+			if (otherChoices) {
 				let total = 0
 				Object.keys(comboData).forEach(key => {
 					if (key.split(",").includes(id.toString())) total += comboData[key]

@@ -3542,7 +3542,7 @@ const LAYER_CHALLS = {
 			unl() { return true },
 			goal: new Decimal("1e10000"),
 			reward: "Gears boost the efficiency of all Super & Hyper layers.",
-			currently() { return player.ge.points.plus(1).log2().plus(1).log10().plus(1).log10().div(2).times(Decimal.cbrt(tmp.challActive?tmp.challActive.ge.combos[11]:0)).plus(1) },
+			currently() { return player.ge.points.plus(1).log2().plus(1).log10().plus(1).log10().div(2).times(Decimal.cbrt(tmp.challActive?(tmp.challActive.ge.combos[11]||0):0)).plus(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"% more efficient" },
 		},
 		12: {
@@ -3551,7 +3551,7 @@ const LAYER_CHALLS = {
 			unl() { return true },
 			goal: new Decimal("1e1930"),
 			reward: "Gears make Quirk Layers more efficient.",
-			currently() { return player.ge.points.plus(1).log2().plus(1).log2().plus(1).log10().div(5).times(tmp.challActive?tmp.challActive.ge.combos[12]:0).plus(1) },
+			currently() { return player.ge.points.plus(1).log2().plus(1).log2().plus(1).log10().div(5).times(tmp.challActive?(tmp.challActive.ge.combos[12]||0):0).plus(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"% more efficient" },
 		},
 		21: {
@@ -3560,7 +3560,7 @@ const LAYER_CHALLS = {
 			unl() { return true },
 			goal: new Decimal("1e2750"),
 			reward: "Gears raise Life Power to an exponent.",
-			currently() { return player.ge.points.plus(1).log10().plus(1).log10().times(tmp.challActive?tmp.challActive.ge.combos[21]:0).plus(1) },
+			currently() { return player.ge.points.plus(1).log10().plus(1).log10().times(tmp.challActive?(tmp.challActive.ge.combos[21]||0):0).plus(1) },
 			effDisp(x) { return "^"+format(x) },
 		},
 		22: {
@@ -3569,7 +3569,7 @@ const LAYER_CHALLS = {
 			unl() { return true },
 			goal: new Decimal("1e3875"),
 			reward: "Gears boost Super-Prestige Point gain.",
-			currently() { return player.ge.points.plus(1).pow(tmp.challActive?Math.pow(tmp.challActive.ge.combos[22], 0.8):0).pow(1.25) },
+			currently() { return player.ge.points.plus(1).pow(tmp.challActive?Math.pow(tmp.challActive.ge.combos[22]||0, 0.8):0).pow(1.25) },
 			effDisp(x) { return format(x)+"x" },
 		},
 		31: {
@@ -3578,7 +3578,7 @@ const LAYER_CHALLS = {
 			unl() { return player.ma.enhancements.gte(3) },
 			goal: new Decimal("1e8325"),
 			reward: "Gears & Best Machine Power multiply all Quirk Layers.",
-			currently() { return player.ge.points.plus(1).times(player.ma.best.plus(1)).log10().plus(1).pow(tmp.challActive?tmp.challActive.ge.combos[31]:0).pow(150) },
+			currently() { return player.ge.points.plus(1).times(player.ma.best.plus(1)).log10().plus(1).pow(tmp.challActive?(tmp.challActive.ge.combos[31]||0):0).pow(150) },
 			effDisp(x) { return format(x)+"x" },
 		},
 		32: {
