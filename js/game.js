@@ -3534,7 +3534,7 @@ const LAYER_CHALLS = {
 		resDisp: "Prestige Points",
 		choose: 2,
 		active(x) {
-			return player.ge.active.includes(x);
+			return (player.ge.active||[]).includes(x);
 		},
 		11: {
 			name: "Unique Gameplay",
