@@ -2190,7 +2190,7 @@ function canBuyMax(layer) {
 			return player.i.best.gte(3)
 			break;
 		case "mb":
-			return player.mb.best.gte(32)
+			return player.mb.total.gte(32)
 			break;
 	}
 	return false;
@@ -3582,7 +3582,7 @@ const LAYER_CHALLS = {
 			unl() { return player.ma.enhancements.gte(3) },
 			goal: new Decimal("1e8325"),
 			reward: "Gears & Best Machine Power multiply all Quirk Layers.",
-			currently() { return player.ge.points.plus(1).times(player.ma.best.plus(1)).log10().plus(1).pow(tmp.challActive?(tmp.challActive.ge.combos[31]||0):0).pow(150) },
+			currently() { return player.ge.points.plus(1).times(player.ma.best.plus(1)).log10().plus(1).pow(tmp.challActive?(tmp.challActive.ge.combos[31]||0):0).pow(150).pow(player.ma.enhancements.sub(3).max(1).pow(1.25)) },
 			effDisp(x) { return format(x)+"x" },
 		},
 		32: {
@@ -4254,7 +4254,7 @@ function maxHyperspace() {
 }
 
 let VERSION = {
-	beta: 4,
+	beta: 6,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -4294,20 +4294,22 @@ let IMPERIUM = {
 	cost(x) {
 		if (x === undefined) x = player.i.extraBuildings
 		let sub = player.sp.upgrades.includes(45) ? 3 : 0
-		if (x.gte(20)) x = Decimal.pow(1.05, x.sub(19)).times(20)
-		return {
+		if (x.gte(20)) x = Decimal.pow(1.05, x.sub(20)).times(20)
+		let ret = {
 			i: x.times(1.75).add(0.5).sub(sub).ceil().max(0),
 			l: x.times(1.5).add(1).sub(sub).ceil().max(0)
 		}
+		if (ret.l.gte(32)) ret.l = ret.l.pow(3).div(Math.pow(32, 2)).ceil()
+		return ret;
 	},
 	target() {
 		let sub = player.sp.upgrades.includes(45) ? 3 : 0
 		let i = player.i.points.plus(sub).sub(0.5).div(1.75)
-		if (i.gte(20)) i = i.div(20).log(1.05).plus(19)
+		if (i.gte(20)) i = i.div(20).log(1.05).plus(20)
 		let targetI = i.plus(1).floor()
 	
 		let l = player.i.lifeBricks.plus(sub).sub(1).div(1.5)
-		if (l.gte(20)) l = l.div(20).log(1.05).plus(19)
+		if (l.gte(20)) l = l.div(20).log(1.05).plus(20)
 		let targetL = l.plus(1).floor()
 	
 		return targetI.min(targetL)
@@ -4457,9 +4459,13 @@ const MACHINES = {
 	
 	lvlCost(res) {
 		let e = player.ma.enhancements
-		if (e.gte(4)) e = Decimal.pow(1.3, e.sub(4)).times(4)
-		if (res=="ma") return Decimal.pow(10, e.pow(2).plus(1))
-		else return e.plus(1).pow(2).plus(14)
+		if (e.gte(4)) e = e.times(0.8)
+		if (e.gte(4)) e = Decimal.pow(2, e.sub(4)).times(3.7)
+		if (res=="ma") {
+			if (e.gte(3.5)) e = e.pow(1.5).div(Math.sqrt(3.5)).times(1.3)
+			else if (e.gte(3)) e = e.pow(2).div(2.5)
+			return Decimal.pow(10, e.pow(2).plus(1))
+		} else return e.plus(1).pow(2).plus(14).floor()
 	},
 	lvlUpDesc() { 
 		let desc = "Power up all Machines"
