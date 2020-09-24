@@ -37,6 +37,9 @@ var layers = {
             eff = layer.c.effect();
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
+        doReset(layer){
+            if(layers[layer].row > layers["c"].row) fullLayerReset('c') // This is actually the default behavior
+        },
         upgrades: {
             rows: 1,
             cols: 3,
