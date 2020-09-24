@@ -5,6 +5,8 @@ var layers = {
 			points: new Decimal(0),
 			best: new Decimal(0),
             upgrades: [],
+            milestones: [],
+            beep: false,
         }},
         color: "#4BEC13",
         requires() {return new Decimal(10)}, // Can be a function that takes requirement increases into account
@@ -33,6 +35,19 @@ var layers = {
         effectDescription() {
             eff = layer.c.effect();
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
+        },
+        milestones: {
+            0: {requirementDesc: "3 Lollipops",
+            done() {return player.c.best.gte(3)},
+            effectDesc: "Makes this green",
+            },
+            1: {requirementDesc: "4 Lollipops",
+            done() {return player.c.best.gte(4)},
+            effectDesc: "You can toggle beep and boop (which do nothing)",
+            toggles: [
+                ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
+                ["f", "boop"]],
+            }
         },
         upgrades: {
             rows: 1,
@@ -65,6 +80,9 @@ var layers = {
                 }
             },
         },
+        doReset(layer){
+            if(layers[layer].row > layers["c"].row) fullLayerReset('c') // This is actually the default behavior
+        },
         convertToDecimal() {
             // Convert any layer-specific values (besides points, total, and best) to Decimal
         },
@@ -79,29 +97,31 @@ var layers = {
         resetsNothing() {return false},
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
     }, 
+
     f: {
         startData() { return {
             unl: false,
 			points: new Decimal(0),
-			best: new Decimal(0),
+            best: new Decimal(0),
+            boop: false,
         }},
         color: "#FE0102",
-        requires() {return new Decimal(200)}, // Can be a function that takes requirement increases into account
-        resource: "butts", // Name of prestige currency
-        baseResource: "points", // Name of resource prestige is based on
+        requires() {return new Decimal(200)}, 
+        resource: "things", 
+        baseResource: "points", 
         baseAmount() {return player.points},
-        type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-        exponent: 0.5, // Prestige currency exponent
-        resCeil: false, // True if the resource needs to be rounded up
+        type: "normal", 
+        exponent: 0.5, 
+        resCeil: false, 
         gainMult() {
-            mult = new Decimal(1)
+            return new Decimal(1)
         },
         gainExp() {
             return new Decimal(1)
         },
         row: 1,
         effect() {return},
-        layerShown() {return true}, // Condition for when layer appears
+        layerShown() {return true}, 
         resetsNothing() {return false},
         branches: [["c", 1]] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
     }, 
@@ -111,7 +131,7 @@ function layerShown(layer){
     return layers[layer].layerShown();
 }
 
-const LAYERS = Object.keys(layers);
+var LAYERS = Object.keys(layers);
 
 var ROW_LAYERS = {}
 for (layer in layers){
@@ -121,3 +141,14 @@ for (layer in layers){
     ROW_LAYERS[row][layer]=layer;
 }
 
+function addLayer(layerName, layerData){ // Call this to add layers from a different file!
+    layers[name] = layerData
+    LAYERS = Object.keys(layers);
+    ROW_LAYERS = {}
+    for (layer in layers){
+        row = layers[layer].row
+        if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}
+    
+        ROW_LAYERS[row][layer]=layer;
+    }
+}

@@ -132,10 +132,11 @@
 				<br><br>
 				<span v-if="layer!='c'">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
 				<span v-if="player[layer].total">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
-				<div v-if="layer=='aefaf'">
+				<div v-if="layers[layer].milestones">
 					<table>
-						<tr v-if="milestoneShown(player.c.best.gte(8))"><td v-bind:class="{ milestone: player.c.best.lt(8)&&player.c.best.lt(1)&&player.c.best.lt(1), milestoneDone: player.c.best.gte(8)||player.c.best.gte(1)||player.c.best.gte(1) }"><h3>8 Boosters</h3><br>Keep Prestige Upgrades on reset</td></tr>
-						<tr v-if="milestoneShown(player.c.best.gte(15))"><td v-bind:class="{ milestone: player.c.best.lt(15), milestoneDone: player.c.best.gte(15) }"><h3>15 Boosters</h3><br>You can buy max Boosters</td></tr>
+						<tr v-for="id in Object.keys(layers[layer].milestones)">
+							<div><td v-if="milestoneShown(layer, id)" v-bind:class="{milestone: !player[layer].milestones.includes(id), milestoneDone: player[layer].milestones.includes(id)}"><h3>{{layers[layer].milestones[id].requirementDesc}}</h3><br>{{layers[layer].milestones[id].effectDesc}}<br><span v-if="(layers[layer].milestones[id].toggles)&&(player[layer].milestones.includes(id))" v-for="toggle in layers[layer].milestones[id].toggles"><button class="smallUpg can" v-bind:style="{'background-color': layers[toggle[0]].color}" v-on:click="toggleAuto(toggle)">{{player[toggle[0]][toggle[1]]?"ON":"OFF"}}</button>&nbsp;</span></td></tr>
+						</tr>
 					</table>
 				</div>
 				<br><br>

@@ -5,7 +5,9 @@ var layers = {
 			points: new Decimal(0),
 			best: new Decimal(0),
             upgrades: [],
+            milestones: [],
             challs: [],
+            beep:false,
         }},
         color: "#4BEC13",
         requires() {return new Decimal(10)}, // Can be a function that takes requirement increases into account
@@ -66,6 +68,20 @@ var layers = {
                 }
             },
         },
+        milestones: {
+            0: {requirementDesc: "3 Lollipops",
+            done() {return player.c.best.gte(3)},
+            effectDesc: "Makes this green",
+            },
+            1: {requirementDesc: "4 Lollipops",
+            done() {return player.c.best.gte(4)},
+            effectDesc: "You can toggle beep and boop (which do nothing)",
+            toggles: [
+                ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
+                ["f", "boop"]
+            ],
+            }
+        },
         challs: {
             rows: 1,
     		cols: 1,
@@ -100,7 +116,8 @@ var layers = {
         startData() { return {
             unl: false,
 			points: new Decimal(0),
-			best: new Decimal(0),
+            best: new Decimal(0),
+            boop: false,
         }},
         color: "#FE0102",
         requires() {return new Decimal(200)}, 
@@ -111,7 +128,7 @@ var layers = {
         exponent: 0.5,
         resCeil: false,
         gainMult() {
-            mult = new Decimal(1)
+            return new Decimal(1)
         },
         gainExp() {
             return new Decimal(1)

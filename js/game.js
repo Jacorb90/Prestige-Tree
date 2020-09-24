@@ -171,7 +171,7 @@ function format(decimal, precision=3) {
 		var slog = decimal.slog()
 		if (slog.gte(1e6)) return "F" + format(slog.floor())
 		else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-	} else if (decimal.gte("1e1000")) return "e"+formatWhole(decimal.log10())
+	} else if (decimal.gte("1e1000")) return (Math.floor(decimal.mantissa) + formatWhole("e"+formatWhole(decimal.log10())))
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
@@ -253,12 +253,17 @@ function layerUnl(layer) {
 }
 
 function rowReset(row, layer) {
-	switch(row) {
-		case 0: 
-			player.points = new Decimal(0);
-			break;
-		
+	for (lr in ROW_LAYERS[row]){
+		console.log(lr)
+		if(layers[lr].doReset)
+			layers[lr].doReset(layer)
+		else
+			if(layers[layer].row > layers[lr].row) fullLayerReset(lr)
 	}
+}
+
+function fullLayerReset(layer) {
+	player[layer] = layers[layer].startData();
 }
 
 function addPoints(layer, gain) {
@@ -303,8 +308,9 @@ function doReset(layer, force=false) {
 	}
 
 	prevOnReset = {...player} //Deep Copy
-	if (row == 0) rowReset(0, layer)
-	else for (let x = row; x >= 1; x--) rowReset(x, layer)
+	player.points = (row == 0 ? new Decimal(0) : new Decimal(10))
+
+	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	prevOnReset = undefined
 
 	updateTemp()
@@ -368,13 +374,14 @@ function resetRow(row) {
 		player[layers[layer]].unl = false
 		if (player[layers[layer]].order) player[layers[layer]].order = 0
 	}
+	player.points = new Decimal(10)
 	updateTemp();
 	resizeCanvas();
 }
 
 
-function toggleAuto(layer, end="") {
-	player[layer]["auto"+end] = !player[layer]["auto"+end]
+function toggleAuto(toggle) {
+	player[toggle[0]][toggle[1]] = !player[toggle[0]][toggle[1]] 
 }
 
 
@@ -407,13 +414,16 @@ function adjustMSDisp() {
 	player.msDisplay = displays[(displays.indexOf(player.msDisplay)+1)%4]
 }
 
-function milestoneShown(complete, auto=false) {
+function milestoneShown(layer, id) {
+	complete = player[layer].milestones.includes(id)
+	auto = layers[layer].milestones[id].toggles
+
 	switch(player.msDisplay) {
 		case "always": 
 			return true;
 			break;
 		case "automation": 
-			return auto||!complete
+			return (auto)||!complete
 			break;
 		case "incomplete":
 			return !complete
@@ -446,6 +456,13 @@ function toNumber(x) {
 	if (x.mag !== undefined) return x.toNumber()
 	if (x + 0 !== x) return parseFloat(x)
 	return x
+}
+
+function updateMilestones(layer){
+	for (id in layers[layer].milestones){
+		if (!(player[layer].milestones.includes(id)) && layers[layer].milestones[id].done())
+			player[layer].milestones.push(id)
+	}
 }
 
 function addTime(diff, layer) {
@@ -490,7 +507,10 @@ function gameLoop(diff) {
 
 	for (layer in layers){
 		if (layers[layer].automate) layers[layer].automate();
+	}
 
+	for (layer in layers){
+		if (layers[layer].milestones) updateMilestones(layer);
 	}
 
 	if (player.hasNaN&&!NaNalert) {
