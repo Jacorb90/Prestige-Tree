@@ -10,15 +10,18 @@ function loadVue() {
 				showTab(layer)
 			}"
 			v-bind:tooltip="
-				layerUnl(layer) ? formatWhole(player[layer].points) + ' ' + LAYER_RES[layer]
-				: 'Reach ' + formatWhole(tmp.layerReqs[layer]) + ' ' + LAYER_AMT_NAMES[layer] + ' to unlock (You have ' + formatWhole(tmp.layerAmt[layer]) + ' ' + LAYER_AMT_NAMES[layer] + ')'
+				player[layer].unl ? formatWhole(player[layer].points) + ' ' + layers[layer].resource
+				: 'Reach ' + formatWhole(tmp.layerReqs[layer]) + ' ' + layers[layer].baseResource + ' to unlock (You have ' + formatWhole(tmp.layerAmt[layer]) + ' ' + layers[layer].baseResource + ')'
 			"
 			v-bind:class="{
 				treeNode: true,
 				[layer]: true,
-				hidden: !layerShown(layer),
-				locked: !layerUnl(layer),
-				can: layerUnl(layer)
+				hidden: !layers[layer].layerShown(),
+				locked: !player[layer].unl,
+				can: layerUnl(layer),
+			}"
+			v-bind:style="{
+				'background-color': layers[layer].color,
 			}">
 			{{abb}}
 		</button>
@@ -29,6 +32,7 @@ function loadVue() {
 		data: {
 			player,
 			tmp,
+			layers,
 			Decimal,
 			format,
 			formatWhole,
@@ -36,41 +40,14 @@ function loadVue() {
 			focused,
 			getThemeName,
 			layerUnl,
-			getLayerEffDesc,
 			doReset,
 			buyUpg,
-			getEnhancerCost,
-			getExtCapsuleCost,
-			getSpace,
-			getSpaceBuildingsUnl,
-			getSpaceBuildingCost,
-			getSpaceBuildingEffDesc,
-			buyBuilding,
-			getQuirkLayerCost,
-			buyQuirkLayer,
 			startChall,
 			milestoneShown,
-			destroyBuilding,
-			getSpellDesc,
-			activateSpell,
-			spellActive,
-			updateToCast,
 			keepGoing,
 			VERSION,
 			ENDGAME,
-			LAYERS,
-			LAYER_RES,
-			LAYER_TYPE,
-			LAYER_UPGS,
-			LAYER_EFFS,
-			LAYER_AMT_NAMES,
-			LAYER_RES_CEIL,
-			LAYER_CHALLS,
-			SPACE_BUILDINGS,
-			SPELL_NAMES,
-			LIFE_BOOSTERS,
-			HYPERSPACE,
-			IMPERIUM
+			LAYERS
 		},
 	})
 }
