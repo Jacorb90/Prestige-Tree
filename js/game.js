@@ -118,7 +118,7 @@ function convertToDecimal() {
 	player.points = new Decimal(player.points)
 	for (layer in layers) {
 		player[layer].points = new Decimal(player[layer].points)
-		player[layer].best = new Decimal(player[layer].best)
+		if (player[layer].best != undefined) player[layer].best = new Decimal(player[layer].best)
 		if (player[layer].total !== undefined) player[layer].total = new Decimal(player[layer].total)
 		if (layers[layer].convertToDecimal) layers[layer].convertToDecimal();
 	}
@@ -298,14 +298,14 @@ function doReset(layer, force=false) {
 
 			if (layers[layer].incr_order){
 				for (lr in layers[layer].incr_order)
-					player.lr.order++
+					if (!player[lr].unl) player[lr].order++
 			}
 		}
 	
 		tmp.layerAmt[layer] = new Decimal(0) // quick fix
 	}
 
-	if (layers[layer].resetsNothing()) return
+	if (layers[layer].resetsNothing && layers[layer].resetsNothing()) return
 
 
 	for (layerResetting in layers) {

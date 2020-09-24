@@ -3,7 +3,9 @@ var layers = {
         startData() { return {
             unl: true,
 			points: new Decimal(0),
-			best: new Decimal(0),
+            best: new Decimal(0),
+            total: new Decimal(0),
+            order: 0, // Used for tracking other relevant layers unlocked before this one
             upgrades: [],
             milestones: [],
             challs: [],
@@ -103,7 +105,7 @@ var layers = {
             },
         }, 
         convertToDecimal() {
-            // Convert any layer-specific values (besides points, total, and best) to Decimal
+            // Convert any layer-specific values (besides points, total, and best) to Decimal after loading
         },
         layerShown() {return true}, // Condition for when layer appears
         update(diff) {
@@ -118,11 +120,10 @@ var layers = {
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
         branches: [] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
     }, 
-    f: { // This layer contains a more minimal set of things, besides a branch
+    f: { // This layer contains a more minimal set of things, besides a branch and "boop"
         startData() { return {
             unl: false,
 			points: new Decimal(0),
-            best: new Decimal(0),
             boop: false,
         }},
         color: "#FE0102",
@@ -141,7 +142,6 @@ var layers = {
         },
         row: 1,
         layerShown() {return true}, // Condition for when layer appears
-        resetsNothing() {return false},
         branches: [["c", 1]] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
     }, 
 } 

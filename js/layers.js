@@ -3,7 +3,8 @@ var layers = {
         startData() { return {
             unl: true,
 			points: new Decimal(0),
-			best: new Decimal(0),
+            best: new Decimal(0),
+            total: new Decimal(0),
             upgrades: [],
             milestones: [],
             beep: false,
@@ -102,7 +103,6 @@ var layers = {
         startData() { return {
             unl: false,
 			points: new Decimal(0),
-            best: new Decimal(0),
             boop: false,
         }},
         color: "#FE0102",
@@ -121,7 +121,6 @@ var layers = {
         },
         row: 1,
         layerShown() {return true}, 
-        resetsNothing() {return false},
         branches: [["c", 1]] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
     }, 
 } 
