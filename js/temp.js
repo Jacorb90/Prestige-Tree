@@ -10,7 +10,7 @@ function updateTemp() {
 
 	
 	if (!tmp.layerEffs) tmp.layerEffs = {}
-	for (layer in layers) tmp.layerEffs[layer] = layers[layer].effect()
+	for (layer in layers) if (layers[layer].effect) tmp.layerEffs[layer] = layers[layer].effect()
 
 	if (!tmp.layerReqs) tmp.layerReqs = {}
 	for (layer in layers) tmp.layerReqs[layer] = layers[layer].requires()

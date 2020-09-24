@@ -33,7 +33,7 @@ var layers = {
             icecreamCap: (player.c.points * 10)
         }},
         effectDescription() {
-            eff = layer.c.effect();
+            eff = layers.c.effect();
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
         milestones: {
@@ -107,8 +107,8 @@ var layers = {
         }},
         color: "#FE0102",
         requires() {return new Decimal(200)}, 
-        resource: "things", 
-        baseResource: "points", 
+        resource: "farm points", 
+        baseResource: "candies", 
         baseAmount() {return player.points},
         type: "normal", 
         exponent: 0.5, 
@@ -120,7 +120,6 @@ var layers = {
             return new Decimal(1)
         },
         row: 1,
-        effect() {return},
         layerShown() {return true}, 
         resetsNothing() {return false},
         branches: [["c", 1]] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default

@@ -34,7 +34,7 @@ var layers = {
             icecreamCap: (player.c.points * 10)
         }},
         effectDescription() {
-            eff = layer.c.effect();
+            eff = layers.c.effect();
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
         doReset(layer){
@@ -112,6 +112,9 @@ var layers = {
         automate() {}, // Do any automation inherent to this layer if appropriate
         updateTemp() {}, // Do any necessary temp updating
         resetsNothing() {return false},
+        onPrestige(gain) {
+            return
+        }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
         branches: [] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
     }, 
@@ -137,7 +140,6 @@ var layers = {
             return new Decimal(1)
         },
         row: 1,
-        effect() {return},
         layerShown() {return true}, // Condition for when layer appears
         resetsNothing() {return false},
         branches: [["c", 1]] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default

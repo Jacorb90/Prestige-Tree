@@ -284,9 +284,14 @@ function doReset(layer, force=false) {
 		let gain = tmp.resetGain[layer]
 		if (layers[layer].type=="static") {
 			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
-			addPoints(layer, canBuyMax(layer) ? gain : 1)
-		} else addPoints(layer, gain)
-
+			gain =(canBuyMax(layer) ? gain : 1)
+		} 
+		
+		if (layers[layer].onPrestige)
+			layers[layer].onPrestige(gain)
+		
+		addPoints(layer, gain)
+	
 		if (!player[layer].unl) {
 			player[layer].unl = true;
 			needCanvasUpdate = true;
