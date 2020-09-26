@@ -36,8 +36,9 @@ const LAYER_UPGS = {
 			currently() {
 				if (tmp.challActive ? tmp.challActive.h[32] : true) return new Decimal(1)
 				let ret = player.p.points.add(1).pow(player.g.upgrades.includes(24)?1.1:(player.g.upgrades.includes(14)?0.75:0.5)) 
-				if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
-				if (ret.gte("1e75000000")) ret = ret.log10().pow(8e6).times(Decimal.div("1e75000000", Decimal.pow(75e6, 8e6))).min(ret)
+				let ssPow = getPUpg2SS()
+				if (ret.gte(Decimal.pow("1e20000000", ssPow))) ret = ret.sqrt().times(Decimal.pow("1e10000000", ssPow))
+				if (ret.gte(Decimal.pow("1e75000000", ssPow))) ret = ret.log10().pow(8e6).times(Decimal.div(Decimal.pow("1e75000000", ssPow), Decimal.pow(Decimal.mul(75e6, ssPow), 8e6))).min(ret)
 				if (IMPERIUM.collapsed(1)) ret = ret.pow(Decimal.sub(1, tmp.i.collapse[1]))
 				return ret;
 			},
@@ -610,6 +611,36 @@ const LAYER_UPGS = {
 			unl() { return player.h.challs.includes(32) },
 			currently() { return player.sb.points.add(1).log10().div(3) },
 			effDisp(x) { return "+"+format(x) },
+		},
+	},
+	sg: {
+		res: "super-generator power",
+		varType: "power",
+		rows: 1,
+		cols: 3,
+		11: {
+			desc: "Multiply the Super-Generator base based on your Super-Generator Power.",
+			cost: new Decimal("1e750"),
+			unl() { return player.ge.upgrades.includes(15) },
+			currently() { return player.sg.power.plus(1).log10().plus(1).log10().times(2.5).plus(1).root(1.2) },
+			effDisp(x) { return format(x)+"x" },
+		},
+		12: {
+			desc: "Super-Boosters & Super-Generators provide free versions of each other.",
+			cost: new Decimal("1e810"),
+			unl() { return player.ge.upgrades.includes(15) },
+			currently() { return {
+				sb: player.sg.points.div(10),
+				sg: player.sb.points.div(5),
+			}},
+			effDisp(x) { return "+"+format(x.sb)+" SB, +"+format(x.sg)+" SG" },
+		},
+		13: {
+			desc: "Generators are stronger based on your Super-Generators.",
+			cost: new Decimal("1e917"),
+			unl() { return player.ge.upgrades.includes(15) },
+			currently() { return player.sg.points.plus(1).log10().times(1.065).plus(1) },
+			effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 	},
 	q: {
@@ -1329,12 +1360,12 @@ const LAYER_UPGS = {
 		},
 	},
 	ge: {
-		rows: 1,
-		cols: 3,
+		rows: 2,
+		cols: 5,
 		11: {
 			desc: "All Machines are stronger based on your Best Gears.",
 			cost: new Decimal(1e96),
-			unl() { return player.ge.total.gte(1e95) },
+			unl() { return player.ge.total.gte(1e90) },
 			currently() { return player.ge.best.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
@@ -1351,6 +1382,43 @@ const LAYER_UPGS = {
 			unl() { return player.ge.upgrades.includes(12) },
 			currently() { return Decimal.pow(1.14, player.e.enhancers) },
 			effDisp(x) { return "/"+format(x) },
+		},
+		14: {
+			desc: "Super-Prestige Points make Prestige Upgrade 2 softcap later.",
+			cost: new Decimal(3e292),
+			unl() { return player.ge.upgrades.includes(13) },
+			currently() { return Decimal.pow(10, player.sp.points.plus(1).log10().plus(1).log10().root(4)) },
+			effDisp(x) { return format(x.sub(1).times(100))+"% later" },
+		},
+		15: {
+			desc: "Unlock Super-Generator Upgrades.",
+			cost: new Decimal("4e317"),
+			unl() { return player.ge.upgrades.includes(14) },
+		},
+		21: {
+			desc: "Boosters are 2% stronger & Generators are 50% stronger.",
+			cost: new Decimal("2.5e340"),
+			unl() { return player.ge.upgrades.includes(15) },
+		},
+		22: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl() { return false },
+		},
+		23: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl() { return false },
+		},
+		24: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl() { return false },
+		},
+		25: {
+			desc: "???",
+			cost: new Decimal(1/0),
+			unl() { return false },
 		},
 	},
 	ma: {

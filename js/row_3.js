@@ -415,6 +415,12 @@ function addToSBBase() {
 	return toAdd
 }
 
+function getExtraSB() {
+	let amt = new Decimal(0)
+	if (player.sg.upgrades.includes(12)) amt = amt.plus(LAYER_UPGS.sg[12].currently().sb)
+	return amt
+}
+
 function getSGenPowEff() {
 	if (!player.sg.unl) return new Decimal(1)
 	let power = player.sg.power
@@ -437,6 +443,7 @@ function addToSGBase() {
 	if (player.sp.upgrades.includes(21)) toAdd = toAdd.add(LAYER_UPGS.sp[21].currently())
 	
 	if (spellActive(6)) toAdd = toAdd.times(tmp.spellEffs[6])
+	if (player.sg.upgrades.includes(11)) toAdd = toAdd.times(LAYER_UPGS.sg[11].currently())
 	return toAdd
 }
 
@@ -444,4 +451,10 @@ function getSuperGenPow() {
 	let pow = new Decimal(1)
 	if (player.ge.unl) pow = pow.times(LAYER_CHALLS.ge[11].currently())
 	return pow
+}
+
+function getExtraSG() {
+	let amt = new Decimal(0)
+	if (player.sg.upgrades.includes(12)) amt = amt.plus(LAYER_UPGS.sg[12].currently().sg)
+	return amt;
 }

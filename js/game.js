@@ -3,16 +3,17 @@ var tmp = {};
 var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
+var styleCooldown = 0;
 let VERSION = {
-	beta: 7,
+	beta: 8,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
 
-VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.beta ? " Beta " + VERSION.beta : "")
+VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.beta ? " Beta " + VERSION.beta : "") + (VERSION.patch ? (" Patch " + VERSION.patch) : "")
 VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "")
 
-const ENDGAME = new Decimal(1/0); // Previously e280,000,000
+const ENDGAME = new Decimal("e1e11");
 
 function getStartPlayer() {
 	return {
@@ -23,6 +24,7 @@ function getStartPlayer() {
 		msDisplay: "always",
 		offlineProd: true,
 		hideHindrances: false,
+		oldStyle: false,
 		versionType: "real",
 		version: VERSION.num,
 		beta: VERSION.beta,
@@ -102,6 +104,7 @@ function getStartPlayer() {
 			points: new Decimal(0),
 			best: new Decimal(0),
 			power: new Decimal(0),
+			upgrades: [],
 		},
 		h: {
 			unl: false,
@@ -264,6 +267,7 @@ function load() {
 	versionCheck();
 	changeTheme();
 	changeTreeQuality();
+	updateStyle();
 	updateTemp();
 	updateTemp();
 	loadVue();
@@ -426,8 +430,11 @@ function convertToDecimal() {
 }
 
 function toggleOpt(name) {
+	if (name == "oldStyle" && styleCooldown>0) return;
+	
 	player[name] = !player[name]
 	if (name == "hqTree") changeTreeQuality()
+	if (name == "oldStyle") updateStyle()
 }
 
 function changeTreeQuality() {
@@ -436,6 +443,12 @@ function changeTreeQuality() {
 	document.body.style.setProperty('--hqProperty2a', on ? "-4px -4px 4px rgba(0, 0, 0, 0.25) inset" : "-4px -4px 4px rgba(0, 0, 0, 0) inset")
 	document.body.style.setProperty('--hqProperty2b', on ? "0px 0px 20px var(--background)" : "")
 	document.body.style.setProperty('--hqProperty3', on ? "2px 2px 4px rgba(0, 0, 0, 0.25)" : "none")
+}
+
+function updateStyle() {
+	styleCooldown = 1;
+	let css = document.getElementById("styleStuff")
+	css.href = player.oldStyle?"oldStyle.css":"style.css"
 }
 
 function exponentialFormat(num, precision) {
@@ -544,6 +557,7 @@ function toggleAuto(layer, end="") {
 
 function keepGoing() {
 	player.keepGoing = true;
+	needCanvasUpdate = true;
 	showTab("tree")
 }
 
@@ -561,6 +575,7 @@ function gameLoop(diff) {
 		diff = 0
 		player.tab = "gameEnded"
 	}
+	styleCooldown = Math.max(styleCooldown-diff, 0)
 	if (player.devSpeed) diff *= player.devSpeed
 
 	addTime(diff)

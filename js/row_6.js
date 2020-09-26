@@ -287,9 +287,9 @@ let IMPERIUM = {
 		return Decimal.pow(10, bricks.times(2).sqr().add(15))
 	},
 	lifeTarget() {
-		let target = player.l.power.max(1).log10().sub(15).sqrt().div(2).add(1).floor()
+		let target = player.l.power.max(1).log10().sub(15).sqrt().div(2)
 		if (target.gte(50)) target = target.div(50).log(1.02).plus(50)
-		return target;
+		return target.add(1).floor();
 	},
 	canBuild() {
 		let cost = this.cost()

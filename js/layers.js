@@ -117,7 +117,7 @@ const LAYER_DATA = {
 		exp: new Decimal(1.25),
 		base: new Decimal(1.05),
 		row: 3,
-		eff() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.times(getSuperBoosterPow())) },
+		eff() { return Decimal.pow(Decimal.add(1.5, addToSBBase()), player.sb.points.plus(getExtraSB()).times(getSuperBoosterPow())) },
 		effDesc(eff) { return "which are multiplying the Booster effect base by "+format(eff) },
 		amtName: "boosters",
 		getAmt() { return player.b.points },
@@ -133,7 +133,7 @@ const LAYER_DATA = {
 		exp: new Decimal(1.4),
 		base: new Decimal(1.2),
 		row: 3,
-		eff() { return Decimal.pow(Decimal.add(2, addToSGBase()), player.sg.points.times(getSuperGenPow())).sub(1).times(getSuperGenPowerGainMult()).max(0) },
+		eff() { return Decimal.pow(Decimal.add(2, addToSGBase()), player.sg.points.plus(getExtraSG()).times(getSuperGenPow())).sub(1).times(getSuperGenPowerGainMult()).max(0) },
 		effDesc(eff) { return "which are generating "+format(eff)+" Super-Generator Power/sec" },
 		amtName: "generators",
 		getAmt() { return player.g.points },
@@ -302,7 +302,7 @@ const LAYER_DATA = {
 		branches: ["ss","ba"],
 		getReq() { 
 			let req = new Decimal(725) 
-			if (player.hs.order>0) req = new Decimal("1e345")
+			if (player.hs.order>0) req = new Decimal(910)
 			return req;
 		},
 		orderUp: true,
@@ -382,6 +382,7 @@ function rowReset(row, layer) {
 		case 1: 
 			var keepUpgrades = 0
 			if (player.mb.total.gte(1) && keepRows1to4) keepUpgrades = 1
+			else if (player.s.best.gte(4)) keepUpgrades = 1
 			else if (player.h.best.gte(1) || player.q.total.gte(1)) keepUpgrades = 1
 			else if (LAYER_DATA[layer].row == 3 && player[layer].best.gte(layer == "e" ? 10 : 3)) keepUpgrades = 1
 			else if (LAYER_DATA[layer].row == 2 && player[layer].best.gte(8)) keepUpgrades = 1

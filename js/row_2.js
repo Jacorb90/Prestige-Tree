@@ -28,6 +28,7 @@ function getBoosterPower() {
 	let power = new Decimal(1)
 	if (spellActive(1)) power = power.times(tmp.spellEffs[1])
 	if (player.sp.upgrades.includes(34)) power = power.times(1.25)
+	if (player.ge.upgrades.includes(21)) power = power.times(1.02)
 	return power
 }
 
@@ -55,6 +56,8 @@ function getGenPow() {
 	let pow = new Decimal(1)
 	if (player.g.upgrades.includes(34)) pow = pow.times(LAYER_UPGS.g[34].currently())
 	if (player.sp.upgrades.includes(34)) pow = pow.times(1.25)
+	if (player.ge.upgrades.includes(21)) pow = pow.times(1.5)
+	if (player.sg.upgrades.includes(13)) pow = pow.times(LAYER_UPGS.sg[13].currently())
 	return pow
 }
 
