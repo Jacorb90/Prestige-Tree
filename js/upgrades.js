@@ -1333,8 +1333,8 @@ const LAYER_UPGS = {
 		cols: 3,
 		11: {
 			desc: "All Machines are stronger based on your Best Gears.",
-			cost: new Decimal(1e100),
-			unl() { return player.ge.total.gte(1e100) },
+			cost: new Decimal(1e96),
+			unl() { return player.ge.total.gte(1e95) },
 			currently() { return player.ge.best.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
