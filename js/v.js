@@ -10,13 +10,13 @@ function loadVue() {
 				showTab(layer)
 			}"
 			v-bind:tooltip="
-				layerUnl(layer) ? formatWhole(player[layer].points) + ' ' + LAYER_RES[layer]
-				: 'Reach ' + formatWhole(tmp.layerReqs[layer]) + ' ' + LAYER_AMT_NAMES[layer] + ' to unlock (You have ' + formatWhole(tmp.layerAmt[layer]) + ' ' + LAYER_AMT_NAMES[layer] + ')'
+				layerUnl(layer) ? formatWhole(player[layer].points) + ' ' + LAYER_DATA[layer].res
+				: 'Reach ' + formatWhole(tmp.layerReqs[layer]) + ' ' + LAYER_DATA[layer].amtName + ' to unlock (You have ' + formatWhole(tmp.layerAmt[layer]) + ' ' + LAYER_DATA[layer].amtName + ')'
 			"
 			v-bind:class="{
 				treeNode: true,
 				[layer]: true,
-				hidden: !layerShown(layer),
+				hidden: !LAYER_DATA[layer].shown(),
 				locked: !layerUnl(layer),
 				can: layerUnl(layer)
 			}">
@@ -37,7 +37,6 @@ function loadVue() {
 			focused,
 			getThemeName,
 			layerUnl,
-			getLayerEffDesc,
 			doReset,
 			buyUpg,
 			getEnhancerCost,
@@ -59,13 +58,8 @@ function loadVue() {
 			keepGoing,
 			VERSION,
 			ENDGAME,
-			LAYERS,
-			LAYER_RES,
-			LAYER_TYPE,
+			LAYER_DATA,
 			LAYER_UPGS,
-			LAYER_EFFS,
-			LAYER_AMT_NAMES,
-			LAYER_RES_CEIL,
 			LAYER_CHALLS,
 			SPACE_BUILDINGS,
 			SPELL_NAMES,

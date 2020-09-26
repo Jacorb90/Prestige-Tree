@@ -14,6 +14,15 @@
 	<script defer src="js/break_eternity.js"></script>
 	<script defer src="js/temp.js"></script>
 	<script defer src="js/saves.js"></script>
+	<script defer src="js/layers.js"></script>
+	<script defer src="js/upgrades.js"></script>
+	<script defer src="js/challs.js"></script>
+	<script defer src="js/row_2.js"></script>
+	<script defer src="js/row_3.js"></script>
+	<script defer src="js/row_4.js"></script>
+	<script defer src="js/row_5.js"></script>
+	<script defer src="js/row_6.js"></script>
+	<script defer src="js/row_7.js"></script>
 	<script defer src="js/game.js"></script>
 	<script defer src="js/v.js"></script>
 	<script defer src="js/canvas.js"></script>
@@ -48,8 +57,9 @@
 			<h3>v1.2: The Mechanical Update</h3>
 			<ul>
 				<li>Added a new row with 3 new layers (only 1 is made so far)</li>
-				<li>Balanced up to e2e10</li>
+				<li>Balanced up to e5.6e10</li>
 				<li>Rebalanced the early parts of row 4 (again)</li>
+				<li>Reorganized some of the code-y stuff</li>
 				<li>Fixed some more bugs</li>
 			</ul><br>
 			<h3>v1.1: The Life Update</h3>
@@ -451,7 +461,6 @@
 				<td><layer-node layer='h' abb='H'></layer-node></td>
 				<td><layer-node layer='q' abb='Q'></layer-node></td>
 				<td><layer-node layer='ss' abb='SS'></layer-node></td>
-				<td><layer-node layer='hg' abb='HG'></layer-node></td>
 			</table><table>
 				<td><button class="treeNode hidden"></button></td>
 			</table><table>
@@ -474,17 +483,17 @@
 			</table>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
-		<div v-for="layer in LAYERS">
+		<div v-for="layer in Object.keys(LAYER_DATA)">
 			<div v-if="player.tab==layer" class="col right">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_RES[layer]}}<span v-if="Object.keys(LAYER_EFFS).includes(layer)">, {{getLayerEffDesc(layer)}}</span>
+				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_DATA[layer].res}}<span v-if="LAYER_DATA[layer].eff">, {{tmp.layerEffs[layer]?LAYER_DATA[layer].effDesc(tmp.layerEffs[layer]):"???"}}</span>
 				<br><br>
-				<button v-if="LAYER_TYPE[layer]=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer])) }} {{ LAYER_AMT_NAMES[layer] }}</span></button>
-				<button v-if="LAYER_TYPE[layer]=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_RES[layer]}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(LAYER_RES_CEIL.includes(layer) ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer]))}} {{ LAYER_AMT_NAMES[layer] }}</button>
-				<span v-if="LAYER_TYPE[layer]=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{LAYER_AMT_NAMES[layer]}}</span>
+				<button v-if="LAYER_DATA[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_DATA[layer].res}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (LAYER_DATA[layer].ceilAmt ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer])) }} {{ LAYER_DATA[layer].amtName }}</span></button>
+				<button v-if="LAYER_DATA[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_DATA[layer].res}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(LAYER_DATA[layer].ceilAmt ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer]))}} {{ LAYER_DATA[layer].amtName }}</button>
+				<span v-if="LAYER_DATA[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{LAYER_DATA[layer].amtName}}</span>
 				<br><br>
-				<span v-if="layer!='p'">Your best {{LAYER_RES[layer]}} is {{formatWhole(player[layer].best)}}<br></span>
-				<span v-if="player[layer].total">You have made a total of {{formatWhole(player[layer].total)}} {{LAYER_RES[layer]}}<br></span>
+				<span v-if="layer!='p'">Your best {{LAYER_DATA[layer].res}} is {{formatWhole(player[layer].best)}}<br></span>
+				<span v-if="player[layer].total">You have made a total of {{formatWhole(player[layer].total)}} {{LAYER_DATA[layer].res}}<br></span>
 				<div v-if="layer=='b'">
 					<table>
 						<tr v-if="milestoneShown(player.b.best.gte(8))"><td v-bind:class="{ milestone: player.b.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.b.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>8 Boosters</h3><br>Keep Prestige Upgrades on reset</td></tr>
@@ -637,7 +646,7 @@
 							<button v-bind:class="{ upgBig: true, l: true }"><h3>Life Booster {{i}}</h3><br>{{LIFE_BOOSTERS[i].effDesc(tmp.l.lbEff[i])}}<br><br>Boosters: {{formatWhole(tmp.l.lb[i])}}<br>Next at: {{formatWhole(LIFE_BOOSTERS.req(i).ceil())}} Phantom Souls</button>
 						</div>
 					</div>
-					You have {{formatWhole(player.ps.points)}} Phantom Souls, {{getLayerEffDesc("ps")}}
+					You have {{formatWhole(player.ps.points)}} Phantom Souls, {{tmp.layerEffs["ps"]?LAYER_DATA["ps"].effDesc(tmp.layerEffs["ps"]):"???"}}
 				</div>
 				<div v-if="layer=='hs'">
 					<table>
@@ -700,8 +709,9 @@
 					</div>
 				</div>
 				<div v-if="layer=='ge'">
-					<div v-if="player.ge.unl"><br><br><h2>Mechanical Challenges</h2><br>
-					Note: Complete unique combinations of challenges to boost the challenge rewards!<br></div>
+					<table>
+						<tr v-if="milestoneShown(player.ge.best.gte(1e200))"><td v-bind:class="{ milestone: player.ge.best.lt(1e200), milestoneDone: player.ge.best.gte(1e200) }"><h3>1e200 Gears</h3><br>Gain 1% of Machine Power & Gear gain every second</td></tr>
+					</table>
 				</div>
 				<div v-if="layer=='ma'">
 					<table>
@@ -724,11 +734,13 @@
 				<div v-if="LAYER_UPGS[layer]" class="upgTable">
 					<div v-for="row in LAYER_UPGS[layer].rows" class="upgRow">
 						<div v-for="col in LAYER_UPGS[layer].cols" class="upgAlign">
-							<button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span><br><br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_RES[layer]}}</button>
+							<button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer].points.lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer].points.gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span><br><br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_UPGS[layer].res?LAYER_UPGS[layer].res:LAYER_DATA[layer].res}}</button>
 						</div>
 					</div>
 				</div>
 				<div v-if="LAYER_CHALLS[layer]&&player[layer].unl" class="upgTable">
+					<div v-if="player.ge.unl&&layer=='ge'"><br><br><h2>Mechanical Challenges</h2><br>
+					Note: Complete unique combinations of challenges to boost the challenge rewards!<br><br><br></div>
 					<div v-if="LAYER_CHALLS[layer].choose>1&&(player.ge.active!=''&&player.ge.active!==undefined&&player.ge.active!=[])"><br>{{format(LAYER_CHALLS[layer].res())}} / {{format(tmp.challActive[layer].goal||0)}} {{ LAYER_CHALLS[layer].resDisp }}<br><br></div>
 					<div v-for="row in LAYER_CHALLS[layer].rows" class="upgRow">
 						<div v-for="col in LAYER_CHALLS[layer].cols">

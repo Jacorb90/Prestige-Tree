@@ -9,10 +9,10 @@ function updateTemp() {
 	}
 	
 	if (!tmp.layerEffs) tmp.layerEffs = {}
-	for (let name in LAYER_EFFS) tmp.layerEffs[name] = LAYER_EFFS[name]()
+	for (let name in LAYER_DATA) if (LAYER_DATA[name].eff) tmp.layerEffs[name] = LAYER_DATA[name].eff()
 
 	if (!tmp.layerReqs) tmp.layerReqs = {}
-	for (let name in LAYER_REQS) tmp.layerReqs[name] = getLayerReq(name)
+	for (let name in LAYER_DATA) tmp.layerReqs[name] = LAYER_DATA[name].getReq()
 
 	if (!tmp.gainMults) tmp.gainMults = {}
 	if (!tmp.gainExp) tmp.gainExp = {}
@@ -20,13 +20,13 @@ function updateTemp() {
 	if (!tmp.nextAt) tmp.nextAt = {}
 	if (!tmp.nextAtDisp) tmp.nextAtDisp = {}
 	if (!tmp.layerAmt) tmp.layerAmt = {}
-	for (let i in LAYERS) {
-		tmp.layerAmt[LAYERS[i]] = getLayerAmt(LAYERS[i])
-		tmp.gainMults[LAYERS[i]] = getLayerGainMult(LAYERS[i])
-		tmp.gainExp[LAYERS[i]] = getLayerGainExp(LAYERS[i])
-		tmp.resetGain[LAYERS[i]] = getResetGain(LAYERS[i])
-		tmp.nextAt[LAYERS[i]] = getNextAt(LAYERS[i])
-		tmp.nextAtDisp[LAYERS[i]] = getNextAt(LAYERS[i], true)
+	for (let layer in LAYER_DATA) {
+		tmp.layerAmt[layer] = LAYER_DATA[layer].getAmt()
+		tmp.gainMults[layer] = getLayerGainMult(layer)
+		tmp.gainExp[layer] = getLayerGainExp(layer)
+		tmp.resetGain[layer] = getResetGain(layer)
+		tmp.nextAt[layer] = getNextAt(layer)
+		tmp.nextAtDisp[layer] = getNextAt(layer, true)
 	}
 
 	tmp.pointGen = getPointGen()
@@ -133,6 +133,13 @@ function updateTemp() {
 		data.compressed = tmp.s.sbUnl.sub(SPACE_BUILDINGS.max).max(0).floor().toNumber()
 	}
 	
+	if (layerUnl("ge")) {
+		if (!tmp.ge) tmp.ge = {}
+		var data = tmp.ge 
+		
+		data.pow = getMechChallPow()
+	}
+	
 	if (layerUnl("mb")) {
 		if (!tmp.mb) tmp.mb = {}
 		var data = tmp.mb
@@ -140,6 +147,13 @@ function updateTemp() {
 		data.spellBoost = player.mb.extraSpells.sub(MAX_SPELLS-4).max(0).plus(1).log10().div(2).plus(1).sqrt()
 		data.lbBoost = player.mb.extraBoosters.sub(LIFE_BOOSTERS.max-5).max(0).plus(1).log10().div(2).plus(1).sqrt()
 		data.machBoost = player.ma.built.sub(MACHINES.maxBuild).max(0).plus(1)
+	}
+	
+	if (layerUnl("ma")) {
+		if (!tmp.ma) tmp.ma = {}
+		var data = tmp.ma
+		
+		data.pow = getMachinePower()
 	}
 }
 
