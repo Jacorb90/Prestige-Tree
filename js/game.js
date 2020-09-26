@@ -513,7 +513,7 @@ function notifyLayer(name) {
 function addPoints(layer, gain) {
 	player[layer].points = player[layer].points.add(gain).max(0)
 	player[layer].best = player[layer].best.max(player[layer].points)
-	if (player[layer].total) player[layer].total = player[layer].total.add(gain.max(0)).max(0)
+	if (player[layer].total) player[layer].total = player[layer].total.add(new Decimal(gain).max(0)).max(0)
 }
 
 function generatePoints(layer, diff) {
