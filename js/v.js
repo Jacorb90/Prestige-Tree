@@ -17,7 +17,7 @@ function loadVue() {
 				treeNode: true,
 				[layer]: true,
 				hidden: !layers[layer].layerShown(),
-				locked: !player[layer].unl,
+				locked: !player[layer].unl && !tmp.layerAmt[layer].gte(tmp.layerReqs[layer]),
 				can: layerUnl(layer),
 			}"
 			v-bind:style="{

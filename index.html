@@ -106,8 +106,8 @@
 			</span>
 			<br>
 			<span v-if="player.points.lt('1e1000')">You have </span>
-			<h2 id="candies">{{format(player.points)}}</h2>
-			<span v-if="player.points.lt('1e1e6')"> candies</span>
+			<h2 id="points">{{format(player.points)}}</h2>
+			<span v-if="player.points.lt('1e1e6')"> points</span>
 			<br><br><br><br><br>
 			<table>
 				<td><layer-node layer='c' abb='C'></layer-node></td>
