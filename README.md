@@ -60,7 +60,7 @@ convertToDecimal() - Only needed if you have non-standard Decimal values in star
 
 layerShown() - Returns a bool determining if this layer's node should be visible on the tree.
 
-update(diff) - Optional, part of the main loop, use it for any passive resource production or time-based things. diff is the time since the last update.
+update(diff) - Optional, part of the main loop, use it for any passive resource production or time-based things. diff is the time since the last update. Suggestion: use addPoints(layer, gain) when generating points to automatically update the best and total amounts.
 
 automate() - Optional, use it to activate any autobuyers or auto-resets or similar on this layer, if appropriate. 
 
@@ -74,5 +74,56 @@ branches: Optional, an array of pairs consisting of a layer name and a number fr
 
 
 -----Upgrades-----
+
+Upgrades are stored in the following format:
+
+upgrades: {
+  rows: # of rows
+  cols: # of columns
+  11: {
+    [insert upgrade info here]
+  }
+  etc
+}
+
+Each upgrade should have an id where the first digit is the row and the second digit is the column. Individual upgrades can have these features:
+
+desc: A description of the upgrade's effect
+
+effect() - Optional, calculate and return the values of this upgrade's effects or effects.
+
+effectDisp() - Optional, returns a display of the current effects of the upgrade with formatting. Default behavior is to just display the number appropriately formatted.
+
+cost: A Decimal for the cost of the upgrade.
+
+currencyDisplayName: Optional, if using a currency other than the main one for this layer, the name to display for that currency
+currencyInternalName: The internal name for that currency
+currencyLayer: The internal name of the layer for that currency. If it's not in a layer, omit.
+
+unl() - Return a bool to determine if the upgrade is unlocked or not.
+
+onPurchase() - Optional, this function will be called when the upgrade is purchased. Good for upgrades like "makes this layer act like it was unlocked first".
+
 -----Milestones-----
+
+Milestones should be formatted like this:
+
+milestones: {
+  0: {
+      [insert milestone info here]
+  }
+  etc
+}
+
+Milestone features:
+
+requirementDesc: A string describing the requirement
+
+effectDesc: A string describing the reward for having the milestone
+
+done() - A function to determine if the milestone has been fulfilled.
+
+toggles: Creates toggle buttons on the milestone when it is unlocked. An array of paired items, one pair per toggle. The first is the internal name of the layer the value being toggled is stored in, and the second is the internal name of the variable to toggle. (e.g. [["b", "auto"], ["g", "auto"])
+
 -----Challenges-----
+
