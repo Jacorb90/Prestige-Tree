@@ -229,6 +229,7 @@ let HYPERSPACE = {
 	},
 	nextCapReq(x) {
 		if (x === undefined) x = player.hs.superUpgradeCap
+		if (x.gte(5)) x = x.pow(2).div(5)
 		let req = Decimal.times(x, 200).add(1300)
 		if (player.ma.unl && MACHINES[2].unl()) req = req.sub(MACHINES[2].currently()).max(0)
 		return req;

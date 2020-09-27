@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 var styleCooldown = 0;
 let VERSION = {
-	beta: 8,
+	pre: 1,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -558,6 +558,7 @@ function toggleAuto(layer, end="") {
 function keepGoing() {
 	player.keepGoing = true;
 	needCanvasUpdate = true;
+	onTreeTab = true;
 	showTab("tree")
 }
 

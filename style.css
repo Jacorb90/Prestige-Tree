@@ -71,6 +71,7 @@ h1, h2, h3, b, input {
 }
 
 .locked {
+	background: none !important;
 	background-color: var(--locked) !important;
 	cursor: not-allowed;
 }
@@ -98,6 +99,7 @@ h1, h2, h3, b, input {
 }
 
 .bought {
+	background: none !important;
 	background-color: #77bf5f !important;
 	cursor: default;
 }
@@ -377,7 +379,8 @@ h1, h2, h3, b, input {
 }
 
 .ge {
-	background-color: #bfbfbf;
+	background-color: rgba(191,191,191,1);
+	background: radial-gradient(circle, rgba(191,191,191,1) 0%, rgba(131,133,134,1) 100%);
 	color: rgba(0, 0, 0, 0.5);
 }
 
@@ -512,6 +515,7 @@ a {
 .milestone {
 	width: 100%;
 	height: 75px;
+	background: none;
 	background-color: #bf8f8f;
 	border: 4px solid;
 	border-radius: 4px;
@@ -522,6 +526,7 @@ a {
 .milestoneDone {
 	width: 100%;
 	height: 75px;
+	background: none;
 	background-color: #77bf5f;
 	border: 4px solid;
 	border-radius: 4px;
@@ -582,6 +587,7 @@ ul {
 }
 
 .hChall {
+	background: none;
 	background-color: #bf8f8f;
 	border: 4px solid;
 	border-color: rgba(0, 0, 0, 0.125);
@@ -611,6 +617,7 @@ ul {
 }
 
 .machine {
+	background: none;
 	background-color: #c9c9c9;
 	border: 4px solid;
 	border-color: rgba(0, 0, 0, 0.125);
