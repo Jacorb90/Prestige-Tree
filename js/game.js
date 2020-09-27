@@ -4,8 +4,8 @@ var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
 
-function getStartPlayer() {
-	playerdata = {
+function startPlayerBase() {
+	return {
 		tab: "tree",
 		time: Date.now(),
 		autosave: true,
@@ -20,6 +20,10 @@ function getStartPlayer() {
 		hasNaN: false,
 		points: new Decimal(10),
 	}
+}
+
+function getStartPlayer() {
+	playerdata = startPlayerBase()
 	for (layer in layers){
 		playerdata[layer] = layers[layer].startData()
 	}
@@ -37,12 +41,17 @@ function save() {
 }
 
 function fixSave() {
+	defaultData = startPlayerBase()
+	for (datum in defaultData){
+		if (player[datum] == undefined){
+			player[datum] = defaultData[datum]
+		}
+	}
 	for (layer in layers) {
 		defaultData = layers[layer].startData()
 
 		for (datum in defaultData){
 			if (player[layer][datum] == undefined){
-				console.log(datum)
 				player[layer][datum] = defaultData[datum]
 			}
 		}
