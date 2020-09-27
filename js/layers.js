@@ -140,7 +140,7 @@ for (layer in layers){
 }
 
 function addLayer(layerName, layerData){ // Call this to add layers from a different file!
-    layers[name] = layerData
+    layers[layerName] = layerData
     LAYERS = Object.keys(layers);
     ROW_LAYERS = {}
     for (layer in layers){

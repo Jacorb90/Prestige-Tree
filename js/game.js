@@ -300,7 +300,8 @@ function doReset(layer, force=false) {
 			layers[layer].onPrestige(gain)
 		
 		addPoints(layer, gain)
-	
+		updateMilestones(layer)
+
 		if (!player[layer].unl) {
 			player[layer].unl = true;
 			needCanvasUpdate = true;
