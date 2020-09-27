@@ -16,6 +16,7 @@ function loadVue() {
 			v-bind:class="{
 				treeNode: true,
 				[layer]: true,
+				notify: player.notify[layer],
 				hidden: !LAYER_DATA[layer].shown(),
 				locked: !layerUnl(layer),
 				can: layerUnl(layer)

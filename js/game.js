@@ -5,8 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 var styleCooldown = 0;
 let VERSION = {
-	pre: 1,
-	patch: 4,
+	pre: 2,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -327,6 +326,7 @@ function versionCheck() {
 
 function checkForVars() {
 	let start = getStartPlayer()
+	if (player.notify === undefined) player.notify = {}
 	for (var i=0; i<Object.keys(LAYER_DATA).length; i++) {
 		var layer = Object.keys(LAYER_DATA)[i]
 
@@ -338,6 +338,8 @@ function checkForVars() {
 
 		if (LAYER_CHALLS[layer] !== undefined && player[layer].challs === undefined) player[layer].challs = []
 		if (LAYER_CHALLS[layer] === undefined && player[layer].challs !== undefined) delete player[layer].challs
+		
+		if (player.notify[layer] === undefined) player.notify[layer] = 0
 	}
 	if (player.autosave===undefined) player.autosave = true;
 	if (player.p.best===undefined) player.p.best = player.p.points
@@ -374,7 +376,6 @@ function checkForVars() {
 		if (player.m.casted[i]===undefined) player.m.casted[i] = new Decimal(1)
 	}
 	if (player.offlineProd === undefined) player.offlineProd = true
-	if (player.notify === undefined) player.notify = {}
 	if (player.keepGoing === undefined) player.keepGoing = false
 	if (player.i.lifeBricks === undefined) {
 		player.l = start.l
@@ -453,16 +454,25 @@ function updateStyle() {
 	needCanvasUpdate = true;
 }
 
+function toPlaces(x, precision, maxAccepted) {
+	x = new Decimal(x)
+	let result = x.toStringWithDecimalPlaces(precision)
+	if (new Decimal(result).gte(maxAccepted)) {
+		result = new Decimal(maxAccepted-Math.pow(0.1, precision-1)).toStringWithDecimalPlaces(precision)
+	}
+	return result
+}
+
 function exponentialFormat(num, precision) {
 	let e = num.log10().floor()
 	let m = num.div(Decimal.pow(10, e))
-	return m.toStringWithDecimalPlaces(3)+"e"+e.toStringWithDecimalPlaces(0)
+	return toPlaces(m, precision, 10)+"e"+formatWhole(e)
 }
 
 function commaFormat(num, precision) {
 	if (num === null || num === undefined) return "NaN"
 	if (num.mag < 0.001) return (0).toFixed(precision)
-	return num.toStringWithDecimalPlaces(precision).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+	return toPlaces(num, precision, 1e9).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
 function fixValue(x, y = 0) {
@@ -488,9 +498,10 @@ function format(decimal, precision=2) {
 		var slog = decimal.slog()
 		if (slog.gte(1e9)) return "10^^" + format(slog.floor())
 		else if (slog.gte(1000)) return "10^^"+commaFormat(slog, 0)
-		else return "10^^" + commaFormat(slog, precision)
-	} else if (decimal.gte("1e1000")) return "e"+formatWhole(decimal.log10())
-	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
+		else return "10^^" + commaFormat(slog, 2)
+	} else if (decimal.gte("e1e6")) return "e"+formatWhole(decimal.log10(), 2)
+	else if (decimal.gte("1e1000")) return exponentialFormat(decimal, Math.max(3-(decimal.log10().log10().toNumber()-3), 0))
+	else if (decimal.gte(1e9)) return exponentialFormat(decimal, 3)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
 }
@@ -517,7 +528,7 @@ function showTab(name) {
 		onTreeTab = toTreeTab
 		resizeCanvas()
 	}
-	delete player.notify[name]
+	player.notify[name] = 0
 }
 
 function notifyLayer(name) {
@@ -669,6 +680,8 @@ function gameLoop(diff) {
 	if (player.i.auto&&player.mb.total.gte(10)) doReset("i")
 	if (player.hs.auto&&player.ma.best.gte(1e15)) maxHyperspace()
 	if (player.i.autoBuild&&player.ma.best.gte(1e15)) maxImperiumBuildings()
+
+	for (let layer in LAYER_DATA) if (LAYER_UPGS[layer]) for (let r=1;r<=LAYER_UPGS[layer].rows;r++) for (let c=1;c<=LAYER_UPGS[layer].cols;c++) if (player[layer][LAYER_UPGS[layer].varType||'points'].gte(LAYER_UPGS[layer][r*10+c].cost)&&!player[layer].upgrades.includes(r*10+c)&&LAYER_UPGS[layer][r*10+c].unl()) notifyLayer(layer)
 
 	if (player.hasNaN&&!NaNalert) {
 		clearInterval(interval);
