@@ -12,7 +12,7 @@ function getStartPlayer() {
 		notify: {},
 		msDisplay: "always",
 		offlineProd: true,
-		versionType: "candy",
+		versionType: "Modding",
 		version: VERSION.num,
 		beta: VERSION.beta,
 		timePlayed: 0,
@@ -86,7 +86,7 @@ function importSave(imported=undefined) {
 	if (imported===undefined) imported = prompt("Paste your save here")
 	try {
 		tempPlr = Object.assign(getStartPlayer(), JSON.parse(atob(imported)))
-		if(tempPlr.versionType != "candy") // Wrong save
+		if(tempPlr.versionType != "Modding") // Wrong save
 			return
 		player = tempPlr;
 		fixSave()	
@@ -101,12 +101,12 @@ function versionCheck() {
 	let setVersion = true
 	
 	if (player.versionType===undefined||player.version===undefined) {
-		player.versionType = "candy"
+		player.versionType = "Modding"
 		player.version = 0
 	}
 	
 	if (setVersion) {
-		if (player.versionType == "candy" && VERSION.num > player.version) player.keepGoing = false
+		if (player.versionType == "Modding" && VERSION.num > player.version) player.keepGoing = false
 		player.versionType = getStartPlayer().versionType
 		player.version = VERSION.num
 		player.beta = VERSION.beta
@@ -171,7 +171,7 @@ function format(decimal, precision=3) {
 		var slog = decimal.slog()
 		if (slog.gte(1e6)) return "F" + format(slog.floor())
 		else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-	} else if (decimal.gte("1e1000")) return (Math.floor(decimal.mantissa) + formatWhole("e"+formatWhole(decimal.log10())))
+	} else if (decimal.gte("1e1000")) return (Math.floor(decimal.mantissa + 0.01) + ("e"+formatWhole(decimal.log10())))
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
