@@ -6,7 +6,7 @@ var gameEnded = false;
 var styleCooldown = 0;
 let VERSION = {
 	pre: 1,
-	patch: 3,
+	patch: 4,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -450,6 +450,7 @@ function updateStyle() {
 	styleCooldown = 1;
 	let css = document.getElementById("styleStuff")
 	css.href = player.oldStyle?"oldStyle.css":"style.css"
+	needCanvasUpdate = true;
 }
 
 function exponentialFormat(num, precision) {
