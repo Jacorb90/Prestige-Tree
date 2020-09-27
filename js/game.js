@@ -277,7 +277,7 @@ function fullLayerReset(layer) {
 
 function addPoints(layer, gain) {
 	player[layer].points = player[layer].points.add(gain).max(0)
-	player[layer].best = player[layer].best.max(player[layer].points)
+	if (player[layer].best) player[layer].best = player[layer].best.max(player[layer].points)
 	if (player[layer].total) player[layer].total = player[layer].total.add(gain)
 }
 
