@@ -2,7 +2,7 @@
 	transition-duration: 0.5s;
 	text-align: center;
 	font-family: "Inconsolata", monospace;
-	font-weight: bold;
+	font-weight: 700;
 	table-align: center;
 	margin: auto;
 }
@@ -71,7 +71,7 @@ h1, h2, h3, b, input {
 }
 
 .locked {
-	background: none !important;
+	background: var(--locked) !important;
 	background-color: var(--locked) !important;
 	cursor: not-allowed;
 }
@@ -99,7 +99,7 @@ h1, h2, h3, b, input {
 }
 
 .bought {
-	background: none !important;
+	background: #77bf5f !important;
 	background-color: #77bf5f !important;
 	cursor: default;
 }
@@ -498,6 +498,8 @@ a {
 	transform: scale(1.2, 1.2);
 	text-shadow: 5px 0px 10px #02f2f2,
               -3px 0px 12px #02f2f2;
+	width: 80%;
+	min-width: 80%;
 }
 
 .opt {
@@ -530,7 +532,7 @@ a {
 .milestone {
 	width: 100%;
 	height: 75px;
-	background: none;
+	background: #bf8f8f;
 	background-color: #bf8f8f;
 	border: 4px solid;
 	border-radius: 4px;
@@ -541,7 +543,7 @@ a {
 .milestoneDone {
 	width: 100%;
 	height: 75px;
-	background: none;
+	background: #77bf5f;
 	background-color: #77bf5f;
 	border: 4px solid;
 	border-radius: 4px;
@@ -602,7 +604,7 @@ ul {
 }
 
 .hChall {
-	background: none;
+	background: #bf8f8f;
 	background-color: #bf8f8f;
 	border: 4px solid;
 	border-color: rgba(0, 0, 0, 0.125);
@@ -632,7 +634,7 @@ ul {
 }
 
 .machine {
-	background: none;
+	background: #c9c9c9;
 	background-color: #c9c9c9;
 	border: 10px solid;
 	border-color: rgba(0, 0, 0, 0.125);

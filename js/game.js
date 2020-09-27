@@ -5,8 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 var styleCooldown = 0;
 let VERSION = {
-	pre: 2,
-	patch: 1,
+	pre: 3,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
@@ -459,7 +458,7 @@ function toPlaces(x, precision, maxAccepted) {
 	x = new Decimal(x)
 	let result = x.toStringWithDecimalPlaces(precision)
 	if (new Decimal(result).gte(maxAccepted)) {
-		result = new Decimal(maxAccepted-Math.pow(0.1, precision-1)).toStringWithDecimalPlaces(precision)
+		result = new Decimal(maxAccepted-Math.pow(0.1, precision)).toStringWithDecimalPlaces(precision)
 	}
 	return result
 }
@@ -535,6 +534,13 @@ function showTab(name) {
 function notifyLayer(name) {
 	if (player.tab == name || !layerUnl(name)) return
 	player.notify[name] = 1
+}
+
+function updateNotifies() {
+	// Excuse my gross spaghetti code
+	for (let layer in LAYER_DATA) if (LAYER_UPGS[layer]) for (let r=1;r<=LAYER_UPGS[layer].rows;r++) for (let c=1;c<=LAYER_UPGS[layer].cols;c++) if (player[layer][LAYER_UPGS[layer].varType||'points'].gte(LAYER_UPGS[layer][r*10+c].cost)&&!player[layer].upgrades.includes(r*10+c)&&LAYER_UPGS[layer][r*10+c].unl()) notifyLayer(layer)
+	
+	for (let i=1;i<=SPACE_BUILDINGS.max;i++) if (HYPERSPACE.canSuperUpg(i)) notifyLayer("hs")
 }
 
 function addPoints(layer, gain) {
@@ -682,8 +688,6 @@ function gameLoop(diff) {
 	if (player.hs.auto&&player.ma.best.gte(1e15)) maxHyperspace()
 	if (player.i.autoBuild&&player.ma.best.gte(1e15)) maxImperiumBuildings()
 
-	for (let layer in LAYER_DATA) if (LAYER_UPGS[layer]) for (let r=1;r<=LAYER_UPGS[layer].rows;r++) for (let c=1;c<=LAYER_UPGS[layer].cols;c++) if (player[layer][LAYER_UPGS[layer].varType||'points'].gte(LAYER_UPGS[layer][r*10+c].cost)&&!player[layer].upgrades.includes(r*10+c)&&LAYER_UPGS[layer][r*10+c].unl()) notifyLayer(layer)
-
 	if (player.hasNaN&&!NaNalert) {
 		clearInterval(interval);
 		player.autosave = false;
@@ -729,6 +733,10 @@ var interval = setInterval(function() {
 	gameLoop(diff)
 	ticking = false
 }, 50)
+
+var notifyInterval = setInterval(function() {
+	updateNotifies();
+}, 1000)
 
 const themes = {
 	1: "aqua"

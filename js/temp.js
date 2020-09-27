@@ -73,7 +73,6 @@ function updateTemp() {
 	}
 
 	tmp.quirkEff = getQuirkEnergyEff()
-	tmp.qCB = getQuirkLayerCostBase()
 
 	tmp.ssEff1 = getSubspaceEff1()
 	tmp.ssEff2 = getSubspaceEff2()

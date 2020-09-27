@@ -444,6 +444,8 @@ a {
 	transform: scale(1.2, 1.2);
 	text-shadow: 5px 0px 10px #02f2f2,
               -3px 0px 12px #02f2f2;
+	width: 80%;
+	min-width: 80%;
 }
 
 .opt {

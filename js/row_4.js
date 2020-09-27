@@ -8,12 +8,14 @@ function getQuirkLayerCost(layers) {
 	if (layers === undefined) layers = player.q.layers
 	if (layers.gte(20)) layers = Decimal.pow(player.h.challs.includes(72)?1.025:1.05, layers.sub(20)).times(20)
 	if (player.ba.upgrades.includes(55)) layers = layers.sub(LAYER_UPGS.ba[55].currently())
-	let cost = Decimal.pow(tmp.qCB, Decimal.pow(tmp.qCB, layers).sub(1))
+	let base = getQuirkLayerCostBase()
+	let cost = Decimal.pow(base, Decimal.pow(base, layers).sub(1))
 	return cost.max(1);
 }
 
 function getQuirkLayerTarg() {
-	let targ = player.q.points.log(tmp.qCB).add(1).log(tmp.qCB)
+	let base = getQuirkLayerCostBase()
+	let targ = player.q.points.log(base).add(1).log(base)
 	if (player.ba.upgrades.includes(55)) targ = targ.add(LAYER_UPGS.ba[55].currently())
 	if (targ.gte(20)) targ = targ.div(20).log(player.h.challs.includes(72)?1.025:1.05).add(20)
 	return targ.add(1).floor()
