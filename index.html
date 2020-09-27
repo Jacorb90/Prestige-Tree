@@ -150,13 +150,13 @@
 				<div v-if="layers[layer].challs" class="upgTable">
 					<div v-for="row in layers[layer].challs.rows" class="upgRow">
 						<div v-for="col in layers[layer].challs.cols">
-							<div v-if="layers[layer].challs[row*10+col].unl()" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: (player.points.gte(layers[layer].challs[row*10+col].goal)&&tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col))}">
+							<div v-if="layers[layer].challs[row*10+col].unl()" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col)&&canCompleteChall(layer, row*10+col)}">
 								<br><h3>{{layers[layer].challs[row*10+col].name}}</h3><br><br>
-								<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-on:click="startChall(layer, row*10+col)">{{player[layer].active==(row*10+col)?(player.points.gte(layers[layer].challs[row*10+col].goal)?"Finish":"Exit Early"):(player[layer].challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
+								<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="startChall(layer, row*10+col)">{{player[layer].active==(row*10+col)?(canCompleteChall(layer, row*10+col)?"Finish":"Exit Early"):(player[layer].challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
 								{{layers[layer].challs[row*10+col].desc}}<br>
-								Goal: {{format(layers[layer].challs[row*10+col].goal)}} Points<br>
+								Goal: {{format(layers[layer].challs[row*10+col].goal)}} {{layers[layer].challs[row*10+col].currencyDisplayName ? layers[layer].challs[row*10+col].currencyDisplayName : "points"}}<br>
 								Reward: {{layers[layer].challs[row*10+col].reward}}<br>
-								<span v-if="layers[layer].challs[row*10+col].effDisp!==undefined">Currently: {{layers[layer].challs[row*10+col].effDisp(layers[layer].challs[row*10+col].effect())}}</span>
+								<span v-if="layers[layer].challs[row*10+col].effDisp!==undefined">Currently: {{(layers[layer].challs[row*10+col].effDisp) ? (layers[layer].challs[row*10+col].effDisp(layers[layer].challs[row*10+col].effect())) : format(layers[layer].challs[row*10+col].effect())}}</span>
 							</div>
 						</div>
 					</div>

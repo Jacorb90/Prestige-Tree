@@ -36,6 +36,14 @@ function getPointGen() {
 	return gain
 }
 
+// Function to determine if the player is in a challenge
+function inChallenge(layer, id){
+	if (player.c.active==x) return true
+
+	if (layers[layer].challs[id].countsAs)
+		return layers[layer].challs[id].countsAs.includes(id)
+}
+
 function save() {
 	localStorage.setItem("prestige-tree", btoa(JSON.stringify(player)))
 }
@@ -263,7 +271,6 @@ function layerUnl(layer) {
 
 function rowReset(row, layer) {
 	for (lr in ROW_LAYERS[row]){
-		console.log(lr)
 		if(layers[lr].doReset)
 			layers[lr].doReset(layer)
 		else
@@ -412,13 +419,36 @@ function startChall(layer, x) {
 	updateChallTemp(layer)
 }
 
+function canCompleteChall(layer, x)
+{
+	if (x != player[layer].active) return
+
+	let chall = layers[layer].challs[x]
+
+	if (chall.currencyInternalName){
+		let name = chall.currencyInternalName
+		if (chall.currencyLayer){
+			let lr = chall.currencyLayer
+			return !(player[lr][name].lt(chall.goal)) 
+		}
+		else {
+			return !(player[name].lt(chall.cost))
+		}
+	}
+	else {
+		return !(player[layer].points.lt(chall.cost))
+	}
+
+}
+
 function completeChall(layer, x) {
 	var x = player[layer].active
 	if (!x) return
-	if (!player.points.gte(layers[layer].challs[x].goal)) return
+	if (! canCompleteChall(layer, x)) return
 	if (!player[layer].challs.includes(x)) {
-		//if (layer == "h" && x == 62) needCanvasUpdate = true
+		needCanvasUpdate = true
 		player[layer].challs.push(x);
+		if (layers[layer].challs[x].onComplete) layers[layer].challs[x].onComplete()
 	}
 	delete player[layer].active
 	updateChallTemp(layer)
