@@ -639,7 +639,7 @@ const LAYER_UPGS = {
 			desc: "Generators are stronger based on your Super-Generators.",
 			cost: new Decimal("1e917"),
 			unl() { return player.ge.upgrades.includes(15) },
-			currently() { return player.sg.points.plus(1).log10().times(1.065).plus(1) },
+			currently() { return player.sg.points.plus(1).log10().times(1.085).plus(1) },
 			effDisp(x) { return format(x.sub(1).times(100))+"% stronger" },
 		},
 	},

@@ -318,7 +318,7 @@ let IMPERIUM = {
 			i: x.times(1.75).add(0.5).sub(sub).ceil().max(0),
 			l: x.times(1.5).add(1).sub(sub).ceil().max(0)
 		}
-		if (ret.l.gte(32)) ret.l = ret.l.pow(3).div(Math.pow(32, 2)).ceil()
+		if (ret.l.gte(35)) ret.l = ret.l.pow(3).div(Math.pow(35, 2)).ceil()
 		return ret;
 	},
 	target() {
@@ -328,7 +328,7 @@ let IMPERIUM = {
 		let targetI = i.plus(1).floor()
 	
 		let l = player.i.lifeBricks
-		if (l.gte(32)) l = l.times(Math.pow(32, 2)).cbrt();
+		if (l.gte(35)) l = l.times(Math.pow(35, 2)).cbrt();
 		l = l.plus(sub).sub(1).div(1.5)
 		if (l.gte(20)) l = l.div(20).log(1.05).plus(20)
 		let targetL = l.plus(1).floor()
