@@ -6,7 +6,7 @@ var gameEnded = false;
 var styleCooldown = 0;
 let VERSION = {
 	pre: 1,
-	patch: 2,
+	patch: 3,
 	num: 1.2,
 	name: "The Mechanical Update"
 }

@@ -1392,7 +1392,7 @@ const LAYER_UPGS = {
 		},
 		15: {
 			desc: "Unlock Super-Generator Upgrades.",
-			cost: new Decimal("4e317"),
+			cost: new Decimal("2e316"),
 			unl() { return player.ge.upgrades.includes(14) },
 		},
 		21: {
