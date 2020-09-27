@@ -382,7 +382,7 @@ function rowReset(row, layer) {
 		case 1: 
 			var keepUpgrades = 0
 			if (player.mb.total.gte(1) && keepRows1to4) keepUpgrades = 1
-			else if (player.s.best.gte(4)) keepUpgrades = 1
+			else if (player.sp.total.gte(1)) keepUpgrades = 1
 			else if (player.h.best.gte(1) || player.q.total.gte(1)) keepUpgrades = 1
 			else if (LAYER_DATA[layer].row == 3 && player[layer].best.gte(layer == "e" ? 10 : 3)) keepUpgrades = 1
 			else if (LAYER_DATA[layer].row == 2 && player[layer].best.gte(8)) keepUpgrades = 1
