@@ -327,7 +327,9 @@ let IMPERIUM = {
 		if (i.gte(20)) i = i.div(20).log(1.05).plus(20)
 		let targetI = i.plus(1).floor()
 	
-		let l = player.i.lifeBricks.plus(sub).sub(1).div(1.5)
+		let l = player.i.lifeBricks
+		if (l.gte(32)) l = l.times(Math.pow(32, 2)).cbrt();
+		l = l.plus(sub).sub(1).div(1.5)
 		if (l.gte(20)) l = l.div(20).log(1.05).plus(20)
 		let targetL = l.plus(1).floor()
 	
