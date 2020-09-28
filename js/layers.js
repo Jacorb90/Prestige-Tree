@@ -7,7 +7,6 @@ var layers = {
             total: new Decimal(0),
             upgrades: [],
             milestones: [],
-            challs: [],
             beep: false,
         }},
         color: "#4BEC13",
@@ -82,28 +81,6 @@ var layers = {
                 }
             },
         },
-
-        challs: {
-            rows: 1,
-    		cols: 1,
-		    11: {
-			    name: "Fun",
-			    desc: "Makes the game 0% harder",
-			    unl() { return player.c.best.gt(0) },
-                goal: new Decimal("20"),
-                currencyDisplayName: "lollipops", // Use if using a nonstandard currency
-                currencyInternalName: "points", // Use if using a nonstandard currency
-                currencyLayer: "c", // Leave empty if not in a layer
-                effect() {
-                    let ret = player.c.points.add(1).tetrate(0.02)
-                    return ret;
-                },
-                effDisp(x) { return format(x)+"x" },
-                countsAs: [12, 21], // Use this for if a challenge includes the effects of other challenges. Being in this challenge "counts as" being in these.
-                reward: "Says hi",
-                onComplete() {console.log("hiii")} // Called when you complete the challenge
-            },
-        }, 
         doReset(layer){
             if(layers[layer].row > layers["c"].row) fullLayerReset('c') // This is actually the default behavior
         },
@@ -120,6 +97,9 @@ var layers = {
         }, // Do any necessary temp updating
         resetsNothing() {return false},
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
+        
+        // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
+        tabFormat: [["colored-text", function() {return 'I have ' + format(player.points) + ' pointy points!'}, "red"], "blank", ["toggle", ["c", "beep"]], "milestones", "blank", "blank", "upgrades"]
     }, 
 
     f: {

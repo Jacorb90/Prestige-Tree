@@ -90,18 +90,22 @@ var layers = {
         challs: {
             rows: 1,
     		cols: 1,
-	    	active(x) {
-		    	if (x<71&&x!=42&&x!=52) if (this.active(71)) return true
-			    if (x==11||x==41) if (this.active(51)) return true
-    			if (x==31||x==32) if (this.active(61)) return true
-	    		return player.c.active==x;
-		    },
 		    11: {
-			    name: "Skip the Second",
-			    desc: "Boosters and Generator Power do nothing",
+			    name: "Fun",
+			    desc: "Makes the game 0% harder",
 			    unl() { return player.c.best.gt(0) },
-			    goal: new Decimal("1e2400"),
-			    reward: "The generator power effect is raised to the power of 1.25",
+                goal: new Decimal("20"),
+                currencyDisplayName: "lollipops", // Use if using a nonstandard currency
+                currencyInternalName: "points", // Use if using a nonstandard currency
+                currencyLayer: "c", // Leave empty if not in a layer
+                effect() {
+                    let ret = player.c.points.add(1).tetrate(0.02)
+                    return ret;
+                },
+                effDisp(x) { return format(x)+"x" },
+                countsAs: [12, 21], // Use this for if a challenge includes the effects of other challenges. Being in this challenge "counts as" being in these.
+                reward: "Says hi",
+                onComplete() {console.log("hiii")} // Called when you complete the challenge
             },
         }, 
         convertToDecimal() {
@@ -118,7 +122,10 @@ var layers = {
             return
         }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
-        branches: [] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+        branches: [], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+        
+        // Optional, lets you format the tab yourself by listing components. You can create more in v.js.
+        tabFormat: [["colored-text", function() {return 'I have ' + format(player.points) + ' pointy points!'}, "red"], "blank", ["toggle", ["c", "beep"]], "milestones", "blank", "blank", "upgrades"]
     }, 
     f: { // This layer contains a more minimal set of things, besides a branch and "boop"
         startData() { return {

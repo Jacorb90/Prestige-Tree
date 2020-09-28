@@ -122,46 +122,31 @@
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
 		<div v-for="layer in LAYERS">
-			<div v-if="player.tab==layer" class="col right">
+			<div v-if="player.tab==layer && !layers[layer].tabFormat" class="col right">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:style="{'color': layers[layer].color, 'text-shadow': '0px 0px 10px' + layers[layer].color}">{{formatWhole(player[layer].points)}}</h2> {{layers[layer].resource}}<span v-if="layers[layer].effectDescription">, {{layers[layer].effectDescription()}}</span>
 				<br><br>
-				<button v-if="layers[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ layers[layer].baseResource }}</span></button>
-				<button v-if="layers[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ layers[layer].baseResource }}</button>
+				<prestige-button :layer="layer"></prestige-button>
 				<span v-if="layers[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{layers[layer].baseResource}}</span>
 				<br><br>
 				<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
 				<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
-				<div v-if="layers[layer].milestones">
-					<table>
-						<tr v-for="id in Object.keys(layers[layer].milestones)">
-							<div><td v-if="milestoneShown(layer, id)" v-bind:class="{milestone: !player[layer].milestones.includes(id), milestoneDone: player[layer].milestones.includes(id)}"><h3>{{layers[layer].milestones[id].requirementDesc}}</h3><br>{{layers[layer].milestones[id].effectDesc}}<br><span v-if="(layers[layer].milestones[id].toggles)&&(player[layer].milestones.includes(id))" v-for="toggle in layers[layer].milestones[id].toggles"><button class="smallUpg can" v-bind:style="{'background-color': layers[toggle[0]].color}" v-on:click="toggleAuto(toggle)">{{player[toggle[0]][toggle[1]]?"ON":"OFF"}}</button>&nbsp;</span></td></tr>
-						</tr>
-					</table>
-				</div>
+				<milestones :layer="layer"></milestones>
 				<br><br>
-				<div v-if="layers[layer].upgrades != undefined" class="upgTable">
-					<div v-for="row in layers[layer].upgrades.rows" class="upgRow">
-						<div v-for="col in layers[layer].upgrades.cols" class="upgAlign">
-							<button v-if="layers[layer].upgrades[row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (!(canAffordUpg(layer, row*10+col))&&!player[layer].upgrades.includes(row*10+col)), can: (canAffordUpg(layer, row*10+col)&&!player[layer].upgrades.includes(row*10+col))}" v-bind:style="{'background-color': layers[layer].color}">{{ layers[layer].upgrades[row*10+col].desc }}<span v-if="layers[layer].upgrades[row*10+col].effect"><br>Currently: {{(layers[layer].upgrades[row*10+col].effDisp) ? (layers[layer].upgrades[row*10+col].effDisp(layers[layer].upgrades[row*10+col].effect())) : format(layers[layer].upgrades[row*10+col].effect())}}</span><br><br>Cost: {{ formatWhole(layers[layer].upgrades[row*10+col].cost) }} {{(layers[layer].upgrades[row*10+col].currencyDisplayName ? layers[layer].upgrades[row*10+col].currencyDisplayName : layers[layer].resource)}}</button>
-						</div>
-					</div>
-				</div>
-				<div v-if="layers[layer].challs" class="upgTable">
-					<div v-for="row in layers[layer].challs.rows" class="upgRow">
-						<div v-for="col in layers[layer].challs.cols">
-							<div v-if="layers[layer].challs[row*10+col].unl()" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col)&&canCompleteChall(layer, row*10+col)}">
-								<br><h3>{{layers[layer].challs[row*10+col].name}}</h3><br><br>
-								<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="startChall(layer, row*10+col)">{{player[layer].active==(row*10+col)?(canCompleteChall(layer, row*10+col)?"Finish":"Exit Early"):(player[layer].challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
-								{{layers[layer].challs[row*10+col].desc}}<br>
-								Goal: {{format(layers[layer].challs[row*10+col].goal)}} {{layers[layer].challs[row*10+col].currencyDisplayName ? layers[layer].challs[row*10+col].currencyDisplayName : "points"}}<br>
-								Reward: {{layers[layer].challs[row*10+col].reward}}<br>
-								<span v-if="layers[layer].challs[row*10+col].effDisp!==undefined">Currently: {{(layers[layer].challs[row*10+col].effDisp) ? (layers[layer].challs[row*10+col].effDisp(layers[layer].challs[row*10+col].effect())) : format(layers[layer].challs[row*10+col].effect())}}</span>
-							</div>
-						</div>
-					</div>
-				</div>
+				<upgrades :layer="layer"></upgrades>
+				<challs :layer="layer"></challs>
 				<br><br>
+			</div>
+			<div v-if="player.tab==layer && layers[layer].tabFormat" class="col right">
+				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
+				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:style="{'color': layers[layer].color, 'text-shadow': '0px 0px 10px' + layers[layer].color}">{{formatWhole(player[layer].points)}}</h2> {{layers[layer].resource}}<span v-if="layers[layer].effectDescription">, {{layers[layer].effectDescription()}}</span>
+				<br><br>
+				<div v-for="data in layers[layer].tabFormat">
+					<div v-if="!Array.isArray(data)" v-bind:is="data" :layer= "layer"></div>
+					<div v-else-if="data.length==3" v-bind:is="data[0]" :layer= "layer" :data= "data[1]" :data2="data[2]"></div>
+					<div v-else-if="data.length==2" v-bind:is="data[0]" :layer= "layer" :data= "data[1]"></div>
+
+				</div>
 			</div>
 		</div>
 	</div>

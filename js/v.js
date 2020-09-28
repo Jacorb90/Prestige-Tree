@@ -27,6 +27,93 @@ function loadVue() {
 		</button>
 		`
 	})
+
+	Vue.component('challs', {
+		props: ['layer'],
+		template: `
+		<div v-if="layers[layer].challs" class="upgTable">
+			<div v-for="row in layers[layer].challs.rows" class="upgRow">
+				<div v-for="col in layers[layer].challs.cols">
+					<div v-if="layers[layer].challs[row*10+col].unl()" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col)&&canCompleteChall(layer, row*10+col)}">
+						<br><h3>{{layers[layer].challs[row*10+col].name}}</h3><br><br>
+						<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="startChall(layer, row*10+col)">{{player[layer].active==(row*10+col)?(canCompleteChall(layer, row*10+col)?"Finish":"Exit Early"):(player[layer].challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
+						{{layers[layer].challs[row*10+col].desc}}<br>
+						Goal: {{format(layers[layer].challs[row*10+col].goal)}} {{layers[layer].challs[row*10+col].currencyDisplayName ? layers[layer].challs[row*10+col].currencyDisplayName : "points"}}<br>
+						Reward: {{layers[layer].challs[row*10+col].reward}}<br>
+						<span v-if="layers[layer].challs[row*10+col].effDisp!==undefined">Currently: {{(layers[layer].challs[row*10+col].effDisp) ? (layers[layer].challs[row*10+col].effDisp(layers[layer].challs[row*10+col].effect())) : format(layers[layer].challs[row*10+col].effect())}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		`
+	})
+
+	Vue.component('upgrades', {
+		props: ['layer'],
+		template: `
+		<div v-if="layers[layer].upgrades" class="upgTable">
+			<div v-for="row in layers[layer].upgrades.rows" class="upgRow">
+				<div v-for="col in layers[layer].upgrades.cols" class="upgAlign">
+					<button v-if="layers[layer].upgrades[row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (!(canAffordUpg(layer, row*10+col))&&!player[layer].upgrades.includes(row*10+col)), can: (canAffordUpg(layer, row*10+col)&&!player[layer].upgrades.includes(row*10+col))}" v-bind:style="{'background-color': layers[layer].color}">{{ layers[layer].upgrades[row*10+col].desc }}<span v-if="layers[layer].upgrades[row*10+col].effect"><br>Currently: {{(layers[layer].upgrades[row*10+col].effDisp) ? (layers[layer].upgrades[row*10+col].effDisp(layers[layer].upgrades[row*10+col].effect())) : format(layers[layer].upgrades[row*10+col].effect())}}</span><br><br>Cost: {{ formatWhole(layers[layer].upgrades[row*10+col].cost) }} {{(layers[layer].upgrades[row*10+col].currencyDisplayName ? layers[layer].upgrades[row*10+col].currencyDisplayName : layers[layer].resource)}}</button>
+				</div>
+			</div>
+		</div>
+		`
+	})
+
+	Vue.component('milestones', {
+		props: ['layer'],
+		template: `
+		<div v-if="layers[layer].milestones">
+			<table>
+				<tr v-for="id in Object.keys(layers[layer].milestones)">
+					<td v-if="milestoneShown(layer, id)" v-bind:class="{milestone: !player[layer].milestones.includes(id), milestoneDone: player[layer].milestones.includes(id)}"><h3>{{layers[layer].milestones[id].requirementDesc}}</h3><br>{{layers[layer].milestones[id].effectDesc}}<br><span v-if="(layers[layer].milestones[id].toggles)&&(player[layer].milestones.includes(id))" v-for="toggle in layers[layer].milestones[id].toggles"><toggle :layer= "layer" :data= "toggle"></toggle>&nbsp;</span></td></tr>
+				</tr>
+			</table>
+		</div>
+		`
+	})
+
+	Vue.component('toggle', {
+		props: ['layer', 'data'],
+		template: `
+		<button class="smallUpg can" v-bind:style="{'background-color': layers[data[0]].color}" v-on:click="toggleAuto(data)">{{player[data[0]][data[1]]?"ON":"OFF"}}</button>
+		`
+	})
+
+
+	Vue.component('prestige-button', {
+		props: ['layer'],
+		template: `
+		<button v-if="layers[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ layers[layer].baseResource }}</span></button>
+		<button v-if="layers[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ layers[layer].baseResource }}</button>
+		`
+	})
+
+	// data = content
+	Vue.component('display-text', {
+		props: ['layer', 'data'],
+		template: `
+		<span>{{data()}}</span>
+		`
+	})
+
+	// text, colorful and with the shadowy effect. You can probably do other custom text effects if you want.
+	Vue.component('colored-text', {
+		props: ['layer', 'data', 'data2'],
+		template: `
+		<span v-bind:style="{'color': data2, 'text-shadow': '0px 0px 10px' + data2}">{{data()}}</span>
+		`
+	})
+
+	// Blank lines
+	Vue.component('blank', {
+		props: ['layer', 'data'],
+		template: `
+		<br>
+		`
+	})
+
 	app = new Vue({
 		el: "#app",
 		data: {
