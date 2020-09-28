@@ -29,6 +29,8 @@ effect() - Optional, returns the current strength of any effects derived from th
 
 effectDescription() - Optional, returns a description of the effect this layer has
 
+tabFormat: Optional. If you use this, you can make a custom layout for your tab, using any components defined in vue.js.
+
 -----Prestige formula features-----
 
 baseResource: The resource that determines how much of the main currency you gain on reset.
