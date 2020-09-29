@@ -99,7 +99,7 @@ var layers = {
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
         
         // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
-        tabFormat: [["colored-text", function() {return 'I have ' + format(player.points) + ' pointy points!'}, "red"], "blank", ["toggle", ["c", "beep"]], "milestones", "blank", "blank", "upgrades"]
+        tabFormat: ["main-display", ["prestige-button", function(){return "Melt your points into "}], ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}], ["display-text", function() {return 'I have ' + format(player.points) + ' pointy points!'}, {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}], "blank", ["toggle", ["c", "beep"]], "milestones", "blank", "blank", "upgrades"]
     }, 
 
     f: {

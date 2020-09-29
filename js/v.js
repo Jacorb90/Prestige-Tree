@@ -81,30 +81,40 @@ function loadVue() {
 		`
 	})
 
-
+	// data = function to return the text describing the reset before the amount gained (optional)
 	Vue.component('prestige-button', {
-		props: ['layer'],
-		template: `
-		<button v-if="layers[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ layers[layer].baseResource }}</span></button>
-		<button v-if="layers[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ layers[layer].baseResource }}</button>
-		`
-	})
-
-	// data = content
-	Vue.component('display-text', {
 		props: ['layer', 'data'],
 		template: `
-		<span>{{data()}}</span>
+		<span>
+			<button v-if="layers[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">{{data ? data() : "Reset for "}}</span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ layers[layer].baseResource }}</span></button>
+			<button v-if="layers[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-bind:style="{'background-color': layers[layer].color}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">{{data ? data() : "Reset for "}}</span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<br><br><span v-if="player[layer].points.lt(10)">Req: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer]))}} {{ layers[layer].baseResource }}</button>
+		</span>
 		`
 	})
 
-	// text, colorful and with the shadowy effect. You can probably do other custom text effects if you want.
-	Vue.component('colored-text', {
-		props: ['layer', 'data', 'data2'],
+	// Displays the main resource for the layer
+	Vue.component('main-display', {
+		props: ['layer'],
 		template: `
-		<span v-bind:style="{'color': data2, 'text-shadow': '0px 0px 10px' + data2}">{{data()}}</span>
+		<div><span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:style="{'color': layers[layer].color, 'text-shadow': '0px 0px 10px' + layers[layer].color}">{{formatWhole(player[layer].points)}}</h2> {{layers[layer].resource}}<span v-if="layers[layer].effectDescription">, {{layers[layer].effectDescription()}}</span><br><br></span>
 		`
 	})
+
+	// data = a function returning the content, data2 = a CSS object with the formatting (optional)
+	Vue.component('display-text', {
+		props: ['layer', 'data' , 'data2'],
+		template: `
+		<span v-bind:style="(data2 ? data2 : {})">{{data()}}</span>
+		`
+	})
+
+	// data = a function returning html content, with some limited functionality
+		Vue.component('raw-html', {
+			props: ['layer', 'data'],
+			template: `
+			<span v-html="data()"></span>
+			`
+		})
 
 	// Blank lines
 	Vue.component('blank', {

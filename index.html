@@ -124,8 +124,7 @@
 		<div v-for="layer in LAYERS">
 			<div v-if="player.tab==layer && !layers[layer].tabFormat" class="col right">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:style="{'color': layers[layer].color, 'text-shadow': '0px 0px 10px' + layers[layer].color}">{{formatWhole(player[layer].points)}}</h2> {{layers[layer].resource}}<span v-if="layers[layer].effectDescription">, {{layers[layer].effectDescription()}}</span>
-				<br><br>
+				<main-display :layer="layer"></main-display>
 				<prestige-button :layer="layer"></prestige-button>
 				<span v-if="layers[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{layers[layer].baseResource}}</span>
 				<br><br>
@@ -139,8 +138,6 @@
 			</div>
 			<div v-if="player.tab==layer && layers[layer].tabFormat" class="col right">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:style="{'color': layers[layer].color, 'text-shadow': '0px 0px 10px' + layers[layer].color}">{{formatWhole(player[layer].points)}}</h2> {{layers[layer].resource}}<span v-if="layers[layer].effectDescription">, {{layers[layer].effectDescription()}}</span>
-				<br><br>
 				<div v-for="data in layers[layer].tabFormat">
 					<div v-if="!Array.isArray(data)" v-bind:is="data" :layer= "layer"></div>
 					<div v-else-if="data.length==3" v-bind:is="data[0]" :layer= "layer" :data= "data[1]" :data2="data[2]"></div>
