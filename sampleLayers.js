@@ -125,8 +125,15 @@ var layers = {
         branches: [], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
         
         // Optional, lets you format the tab yourself by listing components. You can create more in v.js.
-        tabFormat: [["colored-text", function() {return 'I have ' + format(player.points) + ' pointy points!'}, "red"], "blank", ["toggle", ["c", "beep"]], "milestones", "blank", "blank", "upgrades"]
-    }, 
+        tabFormat: ["main-display",
+                    ["prestige-button", function(){return "Melt your points into "}],
+                    ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
+                    ["display-text",
+                        function() {return 'I have ' + format(player.points) + ' pointy points!'},
+                        {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
+                    "blank",
+                    ["toggle", ["c", "beep"]],
+                    "milestones", "blank", "blank", "upgrades"]    }, 
     f: { // This layer contains a more minimal set of things, besides a branch and "boop"
         startData() { return {
             unl: false,
@@ -140,7 +147,6 @@ var layers = {
         baseAmount() {return player.points},
         type: "normal",
         exponent: 0.5,
-        resCeil: false,
         gainMult() {
             return new Decimal(1)
         },
