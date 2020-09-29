@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <head>
+	<script>
+		const modInfo = {
+			name: "The Modding Tree",
+			id: "modbase",
+			pointsName: "points"
+		}
+	</script>
 	<title>The Modding Tree</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
@@ -11,13 +18,14 @@
 	<script type="text/javascript" src="js/game.js"></script>
 	<script type="text/javascript" src="js/v.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
+
 </head>
 <body onload="load()">
 	<div id="app">
 		<div class="vl" v-if="player.tab!='tree'&&player.tab!='gameEnded'"></div>
 		<div v-if="player.tab=='gameEnded'" class="fullWidth">
 			<br>
-			<h2>The Modding Tree {{VERSION.withoutName}}</h2><br><br>
+			<h2>{{modInfo.name}} {{VERSION.withoutName}}</h2><br><br>
 			<h3>Congratulations! You have reached the end and beaten this game, but for now...</h3><br>
 			<h3>Please check the Discord to see there are new content updates!</h3><br><br>
 			<div v-if="!player.timePlayedReset">It took you {{formatTime(player.timePlayed)}} to beat the game.</div>
@@ -51,7 +59,7 @@
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
-			<h2>The Modding Tree</h2>
+			<h2>{{modInfo.name}}</h2>
 			<br>
 			<h3>{{VERSION.withName}}</h3>
 			<br>
@@ -107,7 +115,7 @@
 			<br>
 			<span v-if="player.points.lt('1e1000')">You have </span>
 			<h2 id="points">{{format(player.points)}}</h2>
-			<span v-if="player.points.lt('1e1e6')"> points</span>
+			<span v-if="player.points.lt('1e1e6')"> {{modInfo.pointsName}}</span>
 			<br><br><br><br><br>
 			<table>
 				<td><layer-node layer='c' abb='C'></layer-node></td>
@@ -147,11 +155,4 @@
 			</div>
 		</div>
 	</div>
-	<script>
-		// Mod Identifier, for ~~btpt~~ any userscripts. Consider adding this to your mod!
-		const modInfo = {
-			name: "The Modding Tree",
-			id: "modbase"
-		}
-	</script>
 </body>

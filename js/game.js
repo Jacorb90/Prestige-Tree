@@ -99,13 +99,14 @@ function exportSave() {
 	document.body.removeChild(el);
 }
 
-function importSave(imported=undefined) {
+function importSave(imported=undefined, forced=false) {
 	if (imported===undefined) imported = prompt("Paste your save here")
 	try {
 		tempPlr = Object.assign(getStartPlayer(), JSON.parse(atob(imported)))
-		if(tempPlr.versionType != "Modding") // Wrong save
+		if(tempPlr.versionType != modInfo.id && !forced) // Wrong save (use "Forced" to force it to accept.)
 			return
 		player = tempPlr;
+		player.versionType = modInfo.id
 		fixSave()	
 		save()
 		window.location.reload()
