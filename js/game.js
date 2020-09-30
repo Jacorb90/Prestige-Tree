@@ -228,7 +228,7 @@ function notifyLayer(name) {
 function getResetGain(layer) {
 	if (tmp.gainExp[layer].eq(0)) return new Decimal(0)
 	if (layers[layer].type=="static") {
-		if ((!canBuyMax(layer)) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
+		if ((!layers[layer].canBuyMax()) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(layers[layer].base).times(tmp.gainExp[layer]).pow(Decimal.pow(layers[layer].exponent, -1))
 		return gain.floor().sub(player[layer].points).add(1).max(1);
 	} else {
@@ -301,7 +301,7 @@ function doReset(layer, force=false) {
 		let gain = tmp.resetGain[layer]
 		if (layers[layer].type=="static") {
 			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
-			gain =(canBuyMax(layer) ? gain : 1)
+			gain =(layers[layer].canBuyMax() ? gain : 1)
 		} 
 		
 		if (layers[layer].onPrestige)
