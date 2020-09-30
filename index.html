@@ -130,28 +130,27 @@
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
 		<div v-for="layer in LAYERS">
-			<div v-if="player.tab==layer && !layers[layer].tabFormat" class="col right">
+			<div v-if="player.tab==layer" v-bind:class="'col right'" v-bind:style="layers[layer].style ? layers[layer].style : {}">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				<main-display :layer="layer"></main-display>
-				<prestige-button :layer="layer"></prestige-button>
-				<span v-if="layers[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{layers[layer].baseResource}}</span>
-				<br><br>
-				<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
-				<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
-				<milestones :layer="layer"></milestones>
-				<br><br>
-				<upgrades :layer="layer"></upgrades>
-				<challs :layer="layer"></challs>
-				<br><br>
-			</div>
-			<div v-if="player.tab==layer && layers[layer].tabFormat" class="col right">
-				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				<div v-for="data in layers[layer].tabFormat">
+				<div v-if="!layers[layer].tabFormat">
+					<main-display :layer="layer"></main-display>
+					<prestige-button :layer="layer"></prestige-button>
+					<span v-if="layers[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{layers[layer].baseResource}}</span>
+					<br><br>
+					<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
+					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
+					<milestones :layer="layer"></milestones>
+					<br><br>
+					<upgrades :layer="layer"></upgrades>
+					<challs :layer="layer"></challs>
+					<br><br>
+				</div>
+				<div v-if="layers[layer].tabFormat">
+					<div v-for="data in layers[layer].tabFormat">
 					<div v-if="!Array.isArray(data)" v-bind:is="data" :layer= "layer"></div>
 					<div v-else-if="data.length==3" v-bind:is="data[0]" :layer= "layer" :data= "data[1]" :data2="data[2]"></div>
 					<div v-else-if="data.length==2" v-bind:is="data[0]" :layer= "layer" :data= "data[1]"></div>
-
-				</div>
+				</divs>
 			</div>
 		</div>
 	</div>

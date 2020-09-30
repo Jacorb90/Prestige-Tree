@@ -133,7 +133,11 @@ var layers = {
                         {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
                     "blank",
                     ["toggle", ["c", "beep"]],
-                    "milestones", "blank", "blank", "upgrades"]    }, 
+                    "milestones", "blank", "blank", "upgrades"] ,
+        style: {
+            'background-color': 'blue'
+        },
+   }, 
     f: { // This layer contains a more minimal set of things, besides a branch and "boop"
         startData() { return {
             unl: false,
