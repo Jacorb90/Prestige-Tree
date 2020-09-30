@@ -5,7 +5,6 @@ var NaNalert = false;
 var gameEnded = false;
 var styleCooldown = 0;
 let VERSION = {
-	pre: 3,
 	num: 1.2,
 	name: "The Mechanical Update"
 }
