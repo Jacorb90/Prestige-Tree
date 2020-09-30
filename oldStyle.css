@@ -1,8 +1,7 @@
 * {
 	transition-duration: 0.5s;
 	text-align: center;
-	font-family: "Inconsolata", monospace;
-	font-weight: 700;
+	font-family: "Lucida Console", "Courier New", monospace;
 	table-align: center;
 	margin: auto;
 }
@@ -54,25 +53,18 @@ td {
 
 h1, h2, h3, b, input {
 	display: inline;
-	font-family: "Lucida Console", "Courier New", monospace
 }
 
 .treeNode {
 	height: 100px;
 	width: 100px;
-	border: var(--hqProperty1);
-	border-color: rgba(0, 0, 0, 0.125);
+	border: 1px solid black;
 	border-radius: 50%;
-	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
 	font-size: 40px;
-	font-family: "Lucida Console", "Courier New", monospace;
-	color: rgba(0, 0, 0, 0.5);
-	text-shadow: var(--hqProperty3);
 }
 
 .locked {
-	background: var(--locked) !important;
-	background-color: var(--locked) !important;
+	background-color: #9c6e6e !important;
 	cursor: not-allowed;
 }
 
@@ -82,25 +74,16 @@ h1, h2, h3, b, input {
 
 .can:hover {
 	transform: scale(1.15, 1.15);
-	box-shadow: 0px 0px 20px var(--points)
 }
 
 .treeNode.notify {
 	transform: scale(1.1, 1.1);
-	border-color: rgba(0, 0, 0, 0.125);
 	box-shadow: var(--hqProperty2a), 0px 0px 20px #ff0000 !important;
 	z-index: 3
 }
 
-.treeNode.can:hover {
-	transform: scale(1.15, 1.15);
-	box-shadow: var(--hqProperty2a), 0px 0px 20px var(--points);
-	z-index: 4
-}
-
 .bought {
-	background: #77bf5f !important;
-	background-color: #77bf5f !important;
+	background-color: #68a66b !important;
 	cursor: default;
 }
 
@@ -121,19 +104,17 @@ h1, h2, h3, b, input {
 }
 
 .reset {
-	height: 120px;
-	width: 180px;
-	border-radius: 25%;
-	border: 4px solid;
-	border-color: rgba(0, 0, 0, 0.125);
+	height: 100px;
+	width: 150px;
+	border-radius: 50%;
+	border: 1px solid black;
 }
 
 .upg {
 	height: 120px;
 	width: 120px;
 	border-radius: 25%;
-	border: 2px solid;
-	border-color: rgba(0, 0, 0, 0.125);
+	border: 1px solid black;
 	font-size: 10px;
 }
 
@@ -141,17 +122,14 @@ h1, h2, h3, b, input {
 	height: 200px;
 	width: 200px;
 	border-radius: 25%;
-	border: 2px solid;
-	border-color: rgba(0, 0, 0, 0.125);
+	border: 1px solid black;
 }
 
 .longUpg {
 	height: 50px;
 	width: 120px;
-	background: var(--points);
 	border-radius: 50%;
-	border: 2px solid;
-	border-color: rgba(0, 0, 0, 0.125);
+	border: 1px solid black;
 	font-size: 10px;
 }
 
@@ -159,18 +137,12 @@ h1, h2, h3, b, input {
 	height: 40px;
 	width: 40px;
 	border-radius: 25%;
-	border: 2px solid;
-	border-color: rgba(0, 0, 0, 0.125);
-}
-
-#points {
-	color: var(--points);
-	text-shadow: 0px 0px 10px var(--points);
+	border: 1px solid black;
 }
 
 .p {
-	background-color: #00bfbf;
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #439ea3;
+	text-shadow: 0px 0px 10px #439ea3;
 }
 
 .p_txt {
@@ -180,7 +152,7 @@ h1, h2, h3, b, input {
 
 .b {
 	background-color: #415a9e;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .b_txt {
@@ -190,7 +162,7 @@ h1, h2, h3, b, input {
 
 .g {
 	background-color: #409c6e;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .g_txt {
@@ -200,7 +172,7 @@ h1, h2, h3, b, input {
 
 .e {
 	background-color: #9643a3;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .e_txt {
@@ -210,7 +182,7 @@ h1, h2, h3, b, input {
 
 .t {
 	background-color: #3f993d;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .t_txt {
@@ -219,28 +191,28 @@ h1, h2, h3, b, input {
 }
 
 .s {
-	background-color: #dfdfdf;
-	color: rgba(0, 0, 0, 0.5);
+	background-color: white;
+	color: black;
 }
 
 .s_txt {
-	color: #dfdfdf;
-	text-shadow: 0px 0px 10px #dfdfdf;
+	color: white;
+	text-shadow: 0px 0px 10px white;
 }
 
 .sb {
-	background-color: #494b99;
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #415a9e;
+	color: black;
 }
 
 .sb_txt {
-	color: #494b99;
-	text-shadow: 0px 0px 10px #494b99;
+	color: #415a9e;
+	text-shadow: 0px 0px 10px #415a9e;
 }
 
 .h {
 	background-color: #a14040;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .h_txt {
@@ -250,7 +222,7 @@ h1, h2, h3, b, input {
 
 .q {
 	background-color: #ff2bf2;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .q_txt {
@@ -260,7 +232,7 @@ h1, h2, h3, b, input {
 
 .hb {
 	background-color: #513d94;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .hb_txt {
@@ -269,28 +241,18 @@ h1, h2, h3, b, input {
 }
 
 .ss {
-	background-color: #eff7ff;
-	color: rgba(0, 0, 0, 0.5);
+	background-color: white;
+	color: black;
 }
 
 .ss_txt {
-	color: #eff7ff;
-	text-shadow: 0px 0px 10px #eff7ff;
-}
-
-.hg {
-	background-color: #3d9989;
-	color: rgba(0, 0, 0, 0.5);
-}
-
-.hg_txt {
-	color: #3d9989;
-	text-shadow: 0px 0px 10px #3d9989;
+	color: white;
+	text-shadow: 0px 0px 10px white;
 }
 
 .m {
 	background-color: #eb34c0;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .m_txt {
@@ -300,7 +262,7 @@ h1, h2, h3, b, input {
 
 .ba {
 	background-color: #ebc88f;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .ba_txt {
@@ -309,28 +271,28 @@ h1, h2, h3, b, input {
 }
 
 .sg {
-	background-color: #3d997a;
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #409c6e;
+	color: black;
 }
 
 .sg_txt {
-	color: #3d997a;
-	text-shadow: 0px 0px 10px #3d997a;
+	color: #409c6e;
+	text-shadow: 0px 0px 10px #409c6e;
 }
 
 .sp {
-	background-color: #00a7bf;
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #439ea3;
+	color: black;
 }
 
 .sp_txt {
-	color: #00a7bf;
-	text-shadow: 0px 0px 10px #00a7bf;
+	color: #439ea3;
+	text-shadow: 0px 0px 10px #439ea3;
 }
 
 .l {
 	background-color: #7fbf7f;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .l_txt {
@@ -340,7 +302,7 @@ h1, h2, h3, b, input {
 
 .ps {
 	background-color: #b38fbf;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .ps_txt {
@@ -350,7 +312,7 @@ h1, h2, h3, b, input {
 
 .hs {
 	background-color: #dfdfff;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .hs_txt {
@@ -360,7 +322,7 @@ h1, h2, h3, b, input {
 
 .i {
 	background-color: #e5dab7;
-	color: rgba(0, 0, 0, 0.5);
+	color: black;
 }
 
 .i_txt {
@@ -369,23 +331,8 @@ h1, h2, h3, b, input {
 }
 
 .mb {
-	background: radial-gradient(circle, rgba(255,100,100,1) 0%, rgba(255,159,127,1) 50%);
-	background-size: 200%;
-	background-position: center;
-	color: rgba(0, 0, 0, 0.5);
-	animation: mb 4s infinite;
-}
-
-@keyframes mb {
-	0% {
-		background-size: 200%;
-	}
-	50% {
-		background-size: 100%;
-	}
-	100% {
-		background-size: 200%;
-	}
+	background-color: #ff9f7f;
+	color: black;
 }
 
 .mb_txt {
@@ -394,9 +341,8 @@ h1, h2, h3, b, input {
 }
 
 .ge {
-	background-color: rgba(191,191,191,1);
-	background: radial-gradient(circle, rgba(191,191,191,1) 0%, rgba(131,133,134,1) 100%);
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #bfbfbf;
+	color: black;
 }
 
 .ge_txt {
@@ -405,8 +351,8 @@ h1, h2, h3, b, input {
 }
 
 .ma {
-	background: radial-gradient(circle, rgba(112,109,109,1) 0%, rgba(159,159,159,1) 100%);
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #9f9f9f;
+	color: black;
 }
 
 .ma_txt {
@@ -506,10 +452,10 @@ a {
 	height: 100px;
 	width: 100px;
 	border-radius: 25%;
-	border: 4px solid;
-	background-color: var(--color);
-	border-color: rgba(0, 0, 0, 0.125);
-	color: rgba(0, 0, 0, 0.5);
+	border: 1px solid black;
+	border-radius: 25%;
+	background-color: #a1a1a1;
+	color: black;
 	cursor: pointer;
 }
 
@@ -532,23 +478,14 @@ a {
 .milestone {
 	width: 100%;
 	height: 75px;
-	background: #bf8f8f;
-	background-color: #bf8f8f;
-	border: 4px solid;
-	border-radius: 4px;
-	border-color: rgba(0, 0, 0, 0.125);
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #9e6d64;
 }
 
 .milestoneDone {
 	width: 100%;
 	height: 75px;
-	background: #77bf5f;
-	background-color: #77bf5f;
-	border: 4px solid;
-	border-radius: 4px;
-	border-color: rgba(0, 0, 0, 0.125);
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #68a66b;
+	color: black;
 }
 
 .left {
@@ -604,23 +541,24 @@ ul {
 }
 
 .hChall {
-	background: #bf8f8f;
-	background-color: #bf8f8f;
-	border: 4px solid;
-	border-color: rgba(0, 0, 0, 0.125);
-	color: rgba(0, 0, 0, 0.5);
+	background-color: #fa7f8a;
+	border: 4px solid #ff0017;
+	color: #ff0017;
 	width: 300px;
 	height: 300px;
-	font-size: 15px;
 	border-radius: 33.33%;
 }
 
 .hChall.done {
-	background-color: #77bf5f;
+	background-color: #95fcb4;
+	border: 4px solid #038c2c;	
+	color: #038c2c;
 }
 
 .hChall.canComplete {
-	background-color: #ffbf00;
+	background-color: #93f0fa;
+	border: 4px solid #03858f;	
+	color: #03858f;
 }
 
 .fullWidth {
@@ -634,15 +572,14 @@ ul {
 }
 
 .machine {
-	background: #c9c9c9;
 	background-color: #c9c9c9;
-	border: 10px solid;
+	border: 4px solid;
 	border-color: rgba(0, 0, 0, 0.125);
 	color: rgba(0, 0, 0, 0.5);
 	width: 200px;
 	height: 200px;
 	font-size: 15px;
-	border-radius: 20%;
+	border-radius: 33.33%;
 }
 
 #loadingSection {

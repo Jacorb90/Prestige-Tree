@@ -39,74 +39,23 @@ var colors_theme
 function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	if (layerShown('b')) drawTreeBranch("p", "b")
-	if (layerShown('g')) drawTreeBranch("p", "g")
-	if (layerShown('e')) {
-		drawTreeBranch("b", "e")
-		drawTreeBranch("g", "e")
-	}
-	if (layerShown('t')) drawTreeBranch("b", "t")
-	if (layerShown('sb')) drawTreeBranch("b", "sb")
-	if (layerShown('sg')) drawTreeBranch("g", "sg")
-	if (layerShown('s')) drawTreeBranch("g", "s")
-	if (layerShown('h')) drawTreeBranch("t", "h")
-	if (layerShown('q')) drawTreeBranch("e", "q")
-	if (layerShown('hb')) {
-		drawTreeBranch("sb", "hb")
-		drawTreeBranch("t", "hb")
-	}
-	if (layerShown('ss')) {
-		drawTreeBranch("e", "ss")
-		drawTreeBranch("s", "ss")
-	}
-	if (layerShown('hg')) {
-		drawTreeBranch("sg", "hg")
-	}
-	if (layerShown('m')) {
-		drawTreeBranch("hb", "m")
-		drawTreeBranch("h", "m")
-		drawTreeBranch("q", "m")
-	}
-	if (layerShown('ba')) {
-		drawTreeBranch("h", "ba", 2)
-		drawTreeBranch("q", "ba")
-		drawTreeBranch("ss", "ba")
-	}
-	if (layerShown('sp')) {
-		drawTreeBranch("m", "sp")
-		drawTreeBranch("ba", "sp")
-	}
-	if (layerShown('l')) {
-		drawTreeBranch("hb", "l")
-		drawTreeBranch("m", "l")
-	}
-	if (layerShown('ps')) {
-		drawTreeBranch("h", "ps", 3)
-		drawTreeBranch("q", "ps", 3)
-	}
-	if (layerShown('hs')) {
-		drawTreeBranch("ss", "hs")
-		drawTreeBranch("ba", "hs")
-	}
-	if (layerShown('i')) {
-		drawTreeBranch("ss", "i")
-		drawTreeBranch("sg", "i")
-	}
-	if (layerShown('mb')) {
-		drawTreeBranch("l", "mb")
-		drawTreeBranch("ps", "mb", 2)
-	}
-	if (layerShown('ge')) {
-		drawTreeBranch("sp", "ge")
-	}
-	if (layerShown('ma')) {
-		drawTreeBranch("hs", "ma")
-		drawTreeBranch("i", "ma")
+	for (let layer in LAYER_DATA) {
+		let data = LAYER_DATA[layer]
+		for (let x in data.branches) {
+			let colorDefined = data.branches[x] instanceof Array
+			drawTreeBranch((colorDefined?data.branches[x][0]:data.branches[x]), layer, colorDefined?data.branches[x][1]:1)
+		}
 	}
 	needCanvasUpdate = false;
 }
 
 function drawTreeBranch(num1, num2, color_id = 1) { // taken from Antimatter Dimensions & adjusted slightly
+	if (!LAYER_DATA[num1]) return;
+	if (!LAYER_DATA[num2]) return;
+	
+	if (!LAYER_DATA[num1].shown()) return;
+	if (!LAYER_DATA[num2].shown()) return;
+	
     let start = document.getElementById(num1).getBoundingClientRect();
     let end = document.getElementById(num2).getBoundingClientRect();
     let x1 = start.left + (start.width / 2) + (document.getElementById("treeTab").scrollLeft || document.body.scrollLeft);
