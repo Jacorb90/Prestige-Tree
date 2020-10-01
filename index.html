@@ -42,6 +42,12 @@
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
+
+			
+			<h3>v1.1.1</h3>
+			<ul>
+				<li>You can define hotkeys in layer config.</li>
+			</ul><br>
 			<h3>v1.1: Enhanced Edition</h3>
 			<ul>
 				<li>Added "Buyables", which can function like Space Buildings or Enhancers.</li>
@@ -78,7 +84,7 @@
 			<br><br>
 			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
 			<h3>Hotkeys</h3><br>
-			<span v-if="player.c.unl"><br>C: Reset candies for lollipops.</span>
+			<span v-for="key in hotkeys" v-if="player[key.layer].unl"><br>{{key.desc}}</span>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>

@@ -139,8 +139,12 @@ var layers = {
         updateTemp() {
         }, // Do any necessary temp updating
         resetsNothing() {return false},
+        hotkeys: [
+            {key: "c", desc: "C: reset for lollipops or whatever", onPress(){if (player.c.unl) doReset("c")}},
+            {key: "ctrl+c", desc: "Ctrl+c: respec things", onPress(){if (player.c.unl) respecBuyables("c")}},
+        ],
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
-        
+
         // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
         tabFormat: ["main-display",
                     ["prestige-button", function(){return "Melt your points into "}],
@@ -188,6 +192,10 @@ function layerShown(layer){
 
 var LAYERS = Object.keys(layers);
 
+var hotkeys = {};
+
+
+
 var ROW_LAYERS = {}
 for (layer in layers){
     row = layers[layer].row
@@ -206,4 +214,5 @@ function addLayer(layerName, layerData){ // Call this to add layers from a diffe
     
         ROW_LAYERS[row][layer]=layer;
     }
+    updateHotkeys()
 }

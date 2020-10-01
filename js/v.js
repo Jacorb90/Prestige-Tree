@@ -179,7 +179,8 @@ function loadVue() {
 			keepGoing,
 			VERSION,
 			ENDGAME,
-			LAYERS
+			LAYERS,
+			hotkeys
 		},
 	})
 }

@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: 1.1,
+	num: "1.1.1",
 	name: "Enhanced Edition"
 }
 
@@ -694,28 +694,35 @@ function switchTheme() {
 	resizeCanvas()
 }
 
+function updateHotkeys()
+{
+    hotkeys = {};
+    for (layer in layers){
+        hk = layers[layer].hotkeys
+        if (hk){
+            for (id in hk){
+				hotkeys[hk[id].key] = hk[id]
+				hotkeys[hk[id].key].layer = layer
+            }
+        }
+    }
+}
+updateHotkeys()
+
 document.onkeydown = function(e) {
 	if (player===undefined) return;
 	if (gameEnded&&!player.keepGoing) return;
 	let shiftDown = e.shiftKey
 	let ctrlDown = e.ctrlKey
 	let key = e.key
+	if (ctrlDown) key = "ctrl+" + key
 	if (onFocused) return
 	if (ctrlDown && key != "-" && key != "_" && key != "+" && key != "=" && key != "r" && key != "R" && key != "F5") e.preventDefault()
-	if (false && key >= 0 && key <= 9) {
-		//if (key == 0) activateSpell(10)
-		//else activateSpell(key)
-		return
-	} else if ((!LAYERS.includes(key)) || ctrlDown || shiftDown) {
-		switch(key) {
-			case "???": 
-				if (player.c.unl) doReset("c")
-				return
-			case "bbbbb":
-				if (ctrlDown && player.c.unl) doReset("c")
-				return
-		}
-	} else if (player[key].unl) doReset(key)
+	console.log(key)
+	if(hotkeys[key]){
+		if (player[hotkeys[key].layer].unl)
+			hotkeys[key].onPress()
+	}
 }
 
 var onFocused = false
