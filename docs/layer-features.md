@@ -29,7 +29,8 @@ Key:
 
 - effect(): **optional**, A function that calculates and returns the current values of any bonuses
     inherent to the main currency.
-    Returns a value or an object containing multiple values.
+    Can return a value or an object containing multiple values.
+    *You will also have to implement the effect where it is applied.*
 
 - effectDescription(): **optional**, A function that returns a description of this effect
 

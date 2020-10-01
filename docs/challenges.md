@@ -2,35 +2,47 @@
 
 Challenges are stored in the following format:
 
-challs: {
+``challs: {
   rows: # of rows
   cols: # of columns
   11: {
-    [insert challenge info here]
+    name: "Ouch",
+    etc
   }
   etc
-}
+}``
 
-Each challenge should have an id where the first digit is the row and the second digit is the column. Individual upgrades can have these features:
+You can use inChall(layer, id) and hasChall(layer, id) to determine if the player is currently in a challenge,
+or has completed the challenge, respectively. These are useful for implementing effects.
 
-name: Name of the challenge
+Each challenge should have an id where the first digit is the row and the second digit is the column.
+Individual upgrades can have these features:
 
-desc: A description of what makes the challenge a challenge
+- name: Name of the challenge
 
-reward: A description of the reward's effect
+- desc: A description of what makes the challenge a challenge. *You will need to implement these elsewhere*
 
-effect() - Optional, calculate and return the values of this upgrade's effects or effects.
+- reward: A description of the reward's effect. *You will also have to implement the effect where it is applied.*
 
-effectDisp(x) - Optional, returns a display of the current effects of the upgrade with formatting. Default behavior is to just display the number appropriately formatted.
+- effect(): **optional**, A function that calculates and returns the current values of any bonuses from the reward.
+    Can return a value or an object containing multiple values.
 
-goal: A Decimal for the goal of the challenge's value.
+- effectDisp(effects): **optional**, A function that returns a display of the current effects of the reward with 
+                     formatting. Default behavior is to just display the a number appropriately formatted.
 
-currencyDisplayName: Optional, if using a goal currency other than basic Points, the name to display for that currency
-currencyInternalName: The internal name for that currency
-currencyLayer: The internal name of the layer for that currency. If it's not in a layer, omit.
+- goal: A Decimal for the cost of the upgrade. By default, the goal is in basic Points.
 
-unl() - Return a bool to determine if the challenge is unlocked or not.
+- unl(): A function returning a bool to determine if the challenge is unlocked or not.
 
-onComplete() - Optional, this function will be called when the challenge is newly completed.
+- onComplete() - **optional**, this function will be called when the challenge is completed when previously incomplete.
 
-countsAs: An array of ids of other challenges in this layer that being in this challenge "counts as" being in. 
+- countsAs: **optional**, If a challenge combines the effects of other challenges in this layer, you can use this.
+            An array of challenge ids. The player is effectively in all of those challenges when in the current one.
+
+By default, challenges use basic Points for the goal. You can change that using these features.
+- currencyDisplayName: **optional**, the name to display for the currency for the goal
+- currencyInternalName: **optional**, the internal name for that currency
+- currencyLayer: **optional**, the internal name of the layer that currency is stored in.
+                 If it's part of a layer, omit.
+
+

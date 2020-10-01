@@ -2,7 +2,7 @@
 
 This is a very minimal layer with minimal features. Most things will require additional features:
 
-```
+``
 p: {
         startData() { return {                  // startData is a function that returns default data for a layer. 
             unl: false,                         // You can add more variables here to add them to your layer.
@@ -32,4 +32,4 @@ p: {
 
         layerShown() {return true},             // Returns a bool for if this layer's node should be visible in the tree.
     }, 
-```
+``

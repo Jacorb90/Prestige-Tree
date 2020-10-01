@@ -56,7 +56,7 @@ var layers = {
                     if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
                     return ret;
                 },
-                effDisp(x) { return format(x)+"x" },
+                effDisp(fx) { return format(fx)+"x" },
             },
             13: {
                 desc: "Make this layer act like you bought it first.",

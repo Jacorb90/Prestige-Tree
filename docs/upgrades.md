@@ -2,29 +2,40 @@
 
 Upgrades are stored in the following format:
 
-upgrades: {
+``upgrades: {
   rows: # of rows
   cols: # of columns
   11: {
-    [insert upgrade info here]
+    desc: "Blah",
+    etc
   }
   etc
-}
+}``
 
-Each upgrade should have an id where the first digit is the row and the second digit is the column. Individual upgrades can have these features:
+You can use hasUpg(layer, id) to determine if the player has an upgrade. This is useful for implementing bonuses.
 
-desc: A description of the upgrade's effect
+Each upgrade should have an id where the first digit is the row and the second digit is the column.
+Individual upgrades can have these features:
 
-effect() - Optional, calculate and return the values of this upgrade's effects or effects.
+- desc: A description of the upgrade's effect. *You will also have to implement the effect where it is applied.*
 
-effectDisp() - Optional, returns a display of the current effects of the upgrade with formatting. Default behavior is to just display the number appropriately formatted.
+- effect(): **optional**, A function that calculates and returns the current values of any bonuses from the upgrade.
+    Can return a value or an object containing multiple values.
 
-cost: A Decimal for the cost of the upgrade.
+- effectDisp(effects): **optional**, A function that returns a display of the current effects of the upgrade with
+                       formatting. Default behavior is to just display the a number appropriately formatted.
 
-currencyDisplayName: Optional, if using a currency other than the main one for this layer, the name to display for that currency
-currencyInternalName: The internal name for that currency
-currencyLayer: The internal name of the layer for that currency. If it's not in a layer (like Points), omit.
+- cost: A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
 
-unl() - Return a bool to determine if the upgrade is unlocked or not.
+- unl(): A function returning a bool to determine if the upgrade is unlocked or not.
 
-onPurchase() - Optional, this function will be called when the upgrade is purchased. Good for upgrades like "makes this layer act like it was unlocked first".
+- onPurchase() - **optional**, this function will be called when the upgrade is purchased.
+                 Good for upgrades like "makes this layer act like it was unlocked first".
+
+By default, upgrades use the main prestige currency for the layer. You can include these to change them:
+- currencyDisplayName: **optional**, the name to display for the currency for the upgrade
+- currencyInternalName: **optional**, the internal name for that currency
+- currencyLayer: **optional**, the internal name of the layer that currency is stored in.
+                 If it's not in a layer (like Points), omit.
+
+
