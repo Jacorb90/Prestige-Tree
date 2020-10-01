@@ -6,7 +6,7 @@ This is a very minimal layer with minimal features. Most things will require add
 p: {
         startData() { return {                  // startData is a function that returns default data for a layer. 
             unl: false,                         // You can add more variables here to add them to your layer.
-			points: new Decimal(0),             // "points" is the internal name for the main resource you get on prestige
+            points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
         }},
 
         color: "#FE0102",                       // The color for this layer, which affects many elements
@@ -16,8 +16,9 @@ p: {
         baseResource: "points",                 // The name of the resource your prestige gain is based on
         baseAmount() {return player.points},    // A function to return the current value of that resource
 
-        requires() {return new Decimal(200)},   // A function returning the amount of the base needed to gain 1 of the prestige currency.
-                                                // Also the amount required to unlock the layer.
+        requires() {return new Decimal(200)},   // A function returning the amount of the base needed to
+                                                // gain 1 of the prestige currency. Also the amount required
+                                                // to unlock the layer.
         
         type: "normal",                         // Determines the formula used for calculating prestige currency.
         exponent: 0.5,                          // "normal" prestige gain is (currency^exponent)
