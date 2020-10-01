@@ -1,4 +1,4 @@
-#Upgrades
+# Upgrades
 
 Upgrades are stored in the following format:
 
@@ -27,7 +27,7 @@ Individual upgrades can have these features:
 
 - cost: A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
 
-- unl(): A function returning a bool to determine if the upgrade is unlocked or not.
+- unl(): A function returning a bool to determine if the upgrade is visible or not.
 
 - onPurchase() - **optional**, this function will be called when the upgrade is purchased.
                  Good for upgrades like "makes this layer act like it was unlocked first".

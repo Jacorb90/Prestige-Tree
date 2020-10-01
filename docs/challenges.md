@@ -1,4 +1,4 @@
-#Challenges
+# Challenges
 
 Challenges are stored in the following format:
 
@@ -32,7 +32,7 @@ Individual upgrades can have these features:
 
 - goal: A Decimal for the cost of the upgrade. By default, the goal is in basic Points.
 
-- unl(): A function returning a bool to determine if the challenge is unlocked or not.
+- unl(): A function returning a bool to determine if the challenge is visible or not.
 
 - onComplete() - **optional**, this function will be called when the challenge is completed when previously incomplete.
 

@@ -22,7 +22,7 @@ function updateTemp() {
 			if (!tmp.buyables[layer][id]) tmp.buyables[layer][id] = {}
 			tmp.buyables[layer][id]
 			tmp.buyables[layer][id].cost = layers[layer].buyables[id].cost(player[layer].buyables[id])
-			tmp.buyables[layer][id].effects = layers[layer].buyables[id].effects(player[layer].buyables[id])
+			tmp.buyables[layer][id].effects = layers[layer].buyables[id].effect(player[layer].buyables[id])
 		}
 	}
 

@@ -96,7 +96,7 @@ var layers = {
                     let cost = Decimal.pow(2, x.pow(1.5))
                     return cost.floor()
                 },
-                effects(x) { // Effects of owning x of the items, x is a decimal
+                effect(x) { // Effects of owning x of the items, x is a decimal
                     let eff = {}
                     if (x.gte(0)) eff.first = Decimal.pow(25, x.pow(1.1))
                     else eff.first = Decimal.pow(1/25, x.times(-1).pow(1.1))

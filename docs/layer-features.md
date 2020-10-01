@@ -1,4 +1,4 @@
-#Layer Features
+# Layer Features
 
 This is a more comprehensive list of established features to add to layers.
 You can add more freely, if you want to have other functions or values associated with your layer. These have special functionality, though.
