@@ -8,7 +8,7 @@ Key:
 - **sometimes required**: This is may be required, depending on other things in the layer.
 - **optional**: You can leave this out if you don't intend to use that feature for the layer.
 
-#Layer Definition features
+# Layer Definition features
 
 - startData(): A function to return the default save data for this layer. Add any variables you have to it.
              Any nonstandard Decimal variables need to be added to convertToDecimal as well.
@@ -48,7 +48,7 @@ Key:
 - tabFormat: Use this if you want to add extra things to your tab or change the layout.
 
 
-#Big features
+# Big features
 
 - upgrades: A grid of one-time purchases which can have unique upgrade conditions, currency costs, and bonuses.
     [Explanations are in a separate file.](upgrades.md)
@@ -64,7 +64,7 @@ Key:
     [Explanations are in a separate file.](buyables.md)
 
 
-#Prestige formula features
+# Prestige formula features
 
 - baseResource: The name of the resource that determines how much of the main currency you gain on reset.
 
@@ -96,7 +96,7 @@ Key:
                     Can be used to have secondary resource gain on prestige, or to recalculate things or whatnot.
 
 
-#Other features
+# Other features
 
 - doReset(resettingLayer): **optional**, is triggered when a layer on a row greater than or equal to this one does a reset.
                            If you use it, you can choose what to keep via milestones and such.

@@ -12,7 +12,7 @@ The Modding Tree uses break_eternity.js to store large values. This means that m
 and must be treated differently. 
 
 
-##Table of Contents:
+## Table of Contents:
 
 - [Basic layer breakdown](basic-layer-breakdown.md): Breaking down the components of a layer with minimal features.
 - [Layer features](layer-features.md): Explanations of all of the different properties that you can give a layer.
