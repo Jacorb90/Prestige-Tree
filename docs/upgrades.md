@@ -2,6 +2,7 @@
 
 Upgrades are stored in the following format:
 
+```js
     upgrades: {
         rows: # of rows
         cols: # of columns
@@ -11,6 +12,7 @@ Upgrades are stored in the following format:
         }
         etc
     }
+```
 
 You can use hasUpg(layer, id) to determine if the player has an upgrade. This is useful for implementing bonuses.
 Hint: Basic point gain is calculated in game.js's "getPointGain".

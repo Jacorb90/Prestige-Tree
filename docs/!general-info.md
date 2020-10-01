@@ -2,14 +2,15 @@
 The main way to add content is through creating layers. You can either add a layer directly in the layers object in layers.js, or declare it separately and then do "`addLayer(layername, layerdata)`" (good for breaking things up into smaller files). The existing layers are just examples and can be freely deleted. sampleLayers.js has even more features and comments in it. You can use those as references and a base for your own layers.
 
 
-**You will also need to add layer nodes to the tree in the HTML, look for where it says "Modify the tree in the table below!"**
+**You will also need to add layer nodes to the tree in the HTML, look for where it says "Modify the tree in the table below!"** While you're there, you can also edit the modInfo at the top to change the name for your mod.
 
 
 Most of the time, you won't need to dive deep into the code to create things, but you still can if you really want to.
 
 
 The Modding Tree uses break_eternity.js to store large values. This means that many numbers are Decimal objects,
-and must be treated differently. 
+and must be treated differently. For example, you have to use `new Decimal(x)` to create a Decimal value instead of a
+plain number, and perform operations on them by calling functions. e.g, instead of `x = x + y`, use `x = x.add(y)`.
 
 
 ## Table of Contents:

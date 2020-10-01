@@ -37,11 +37,13 @@ Key:
 - layerShown(): A function returning a bool which determines if this layer's node should be visible on the tree.
 
 - hotkeys: An array containing information on any hotkeys associated with this layer:
-    ```hotkeys: [
+    ```js
+    hotkeys: [
         {key: "p", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" if ctrl is.
         desc: "p: reset your points for prestige points", // The description of the hotkey used in the How To Play
         onPress(){if (player.p.unl) doReset("p")}}, // This function is called when the hotkey is pressed.
-    ],```
+    ],
+    ```
 
 - style: A CSS object containing any CSS that should affect this layer's whole tab.
 
@@ -105,6 +107,8 @@ Key:
 
 - convertToDecimal(): **sometimes required**, required if you add non-standard Decimals to startData. 
                         This function converts those values from a string to a Decimal (used when loading).
+                        Convert a value to Decimal with `value = new Decimal(value)`
+
 
 - update(diff): **optional**, this function is called every game tick. Use it for any passive resource production or
                 time-based things. diff is the time since the last tick.

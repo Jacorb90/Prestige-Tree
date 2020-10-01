@@ -2,6 +2,7 @@
 
 Challenges are stored in the following format:
 
+```js
     challs: {
         rows: # of rows
         cols: # of columns
@@ -11,6 +12,7 @@ Challenges are stored in the following format:
         }
         etc
     }
+```
 
 You can use inChall(layer, id) and hasChall(layer, id) to determine if the player is currently in a challenge,
 or has completed the challenge, respectively. These are useful for implementing effects.

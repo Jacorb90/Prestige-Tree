@@ -5,6 +5,7 @@ the player can reset the purchases to get their currency back.
 
 Buyables should be formatted like this:
 
+```js
     buyables: {
         rows: # of rows
         cols: # of columns
@@ -17,6 +18,7 @@ Buyables should be formatted like this:
         }
         etc
     }
+```
 
 Features:
 
