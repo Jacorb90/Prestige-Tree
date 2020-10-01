@@ -33,7 +33,9 @@ function getStartPlayer() {
 		playerdata[layer] = layers[layer].startData()
 		playerdata[layer].buyables = getStartBuyables(layer)
 		playerdata[layer].spentOnBuyables = new Decimal(0)
-
+		playerdata[layer].upgrades = []
+		playerdata[layer].milestones = []
+		playerdata[layer].challs = []
 	}
 	return playerdata
 }
@@ -65,6 +67,12 @@ function fixSave() {
 	}
 	for (layer in layers) {
 		defaultData = layers[layer].startData()
+		if (player[layer].upgrades == undefined)
+			player[layer].upgrades = []
+		if (player[layer].milestones == undefined)
+			player[layer].milestones = []
+		if (player[layer].challs == undefined)
+			player[layer].challs = []
 
 		for (datum in defaultData){
 			if (player[layer][datum] == undefined){
@@ -309,6 +317,9 @@ function rowReset(row, layer) {
 
 function fullLayerReset(layer) {
 	player[layer] = layers[layer].startData();
+	player[layer].upgrades = []
+	player[layer].milestones = []
+	player[layer].challs = []
 	resetBuyables(layer)
 }
 
@@ -397,6 +408,19 @@ function canAffordUpg(layer, id) {
 	cost = upg.cost
 	return canAffordPurchase(layer, upg, cost) 
 }
+
+function hasUpg(layer, id){
+	return (player[layer].upgrades.includes(id))
+}
+
+function hasMilestone(layer, id){
+	return (player[layer].milestones.includes(id))
+}
+
+function hasChall(layer, id){
+	return (player[layer].challs.includes(id))
+}
+
 
 function canAffordPurchase(layer, thing, cost) {
 	if (thing.currencyInternalName){
@@ -718,7 +742,6 @@ document.onkeydown = function(e) {
 	if (ctrlDown) key = "ctrl+" + key
 	if (onFocused) return
 	if (ctrlDown && key != "-" && key != "_" && key != "+" && key != "=" && key != "r" && key != "R" && key != "F5") e.preventDefault()
-	console.log(key)
 	if(hotkeys[key]){
 		if (player[hotkeys[key].layer].unl)
 			hotkeys[key].onPress()

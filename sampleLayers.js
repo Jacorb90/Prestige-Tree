@@ -6,9 +6,6 @@ var layers = {
             best: new Decimal(0),
             total: new Decimal(0),
             order: 0, // Used for tracking other relevant layers unlocked before this one
-            upgrades: [],
-            milestones: [],
-            challs: [],
             beep:false,
         }},
         color: "#4BEC13",

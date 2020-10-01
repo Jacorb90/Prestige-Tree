@@ -5,8 +5,6 @@ var layers = {
 			points: new Decimal(0),
             best: new Decimal(0),
             total: new Decimal(0),
-            upgrades: [],
-            milestones: [],
             buyables: {}, // You don't actually have to initialize this one
             beep: false,
         }},
@@ -173,7 +171,6 @@ var layers = {
         baseAmount() {return player.points},
         type: "normal", 
         exponent: 0.5, 
-        resCeil: false, 
         gainMult() {
             return new Decimal(1)
         },
