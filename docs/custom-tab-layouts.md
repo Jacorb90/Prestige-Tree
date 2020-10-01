@@ -2,7 +2,7 @@
 
 Custom tab layouts can be used to do basically anything in a tab window, especially combined with the "style" layer feature. The tabFormat feature is an array of things, like this:
 
-``
+
     tabFormat: ["main-display",
             ["prestige-button", function(){return "Melt your points into "}],
             ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
@@ -11,7 +11,7 @@ Custom tab layouts can be used to do basically anything in a tab window, especia
                 {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
             "blank",
             ["toggle", ["c", "beep"]],
-            "milestones", "blank", "blank", "upgrades"] ``
+            "milestones", "blank", "blank", "upgrades"]
 
 It is a list of components, which can be either just a name, or an array with arguments. If it's an array, the first item is the name of the component, the second is the data passed into it, and the third (optional) is a CSS object,
 which applies its style to the component.

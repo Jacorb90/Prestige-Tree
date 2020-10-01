@@ -5,18 +5,18 @@ the player can reset the purchases to get their currency back.
 
 Buyables should be formatted like this:
 
-``buyables: {
-    rows: # of rows
-    cols: # of columns
-    respec() {}, **optional**, implement it to reset things and give back your currency.
-                 Having this function makes a respec button appear
-    respecText: **optional**, text that appears on the respec button
-    11: {
-        desc: "Blah",
+    buyables: {
+        rows: # of rows
+        cols: # of columns
+        respec() {}, **optional**, implement it to reset things and give back your currency.
+                     Having this function makes a respec button appear
+        respecText: **optional**, text that appears on the respec button
+        11: {
+            desc: "Blah",
+            etc
+        }
         etc
     }
-    etc
-}``
 
 Features:
 
