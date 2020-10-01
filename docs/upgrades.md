@@ -3,13 +3,13 @@
 Upgrades are stored in the following format:
 
 ``upgrades: {
-  rows: # of rows
-  cols: # of columns
-  11: {
-    desc: "Blah",
+    rows: # of rows
+    cols: # of columns
+    11: {
+        desc: "Blah",
+        etc
+    }
     etc
-  }
-  etc
 }``
 
 You can use hasUpg(layer, id) to determine if the player has an upgrade. This is useful for implementing bonuses.

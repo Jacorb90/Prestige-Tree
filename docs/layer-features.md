@@ -11,7 +11,7 @@ Key:
 # Layer Definition features
 
 - startData(): A function to return the default save data for this layer. Add any variables you have to it.
-             Any nonstandard Decimal variables need to be added to convertToDecimal as well.
+            Any nonstandard Decimal variables need to be added to convertToDecimal as well.
     Standard values:
         Required:
             unl: a bool determining if this layer is unlocked or not

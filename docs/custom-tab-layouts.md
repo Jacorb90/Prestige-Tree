@@ -2,7 +2,8 @@
 
 Custom tab layouts can be used to do basically anything in a tab window, especially combined with the "style" layer feature. The tabFormat feature is an array of things, like this:
 
-`` tabFormat: ["main-display",
+``
+    tabFormat: ["main-display",
             ["prestige-button", function(){return "Melt your points into "}],
             ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
             ["display-text",

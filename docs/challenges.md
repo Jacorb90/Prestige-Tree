@@ -3,13 +3,13 @@
 Challenges are stored in the following format:
 
 ``challs: {
-  rows: # of rows
-  cols: # of columns
-  11: {
-    name: "Ouch",
+    rows: # of rows
+    cols: # of columns
+    11: {
+        name: "Ouch",
+        etc
+    }
     etc
-  }
-  etc
 }``
 
 You can use inChall(layer, id) and hasChall(layer, id) to determine if the player is currently in a challenge,
