@@ -2,12 +2,12 @@
 
 Milestones should be formatted like this:
 
-``milestones: {
-    0: {
-        requirementDesc: "123 waffles",
+    milestones: {
+        0: {
+            requirementDesc: "123 waffles",
+        }
+        etc
     }
-    etc
-}``
 
 You can use inChall(layer, id) and hasChall(layer, id) to determine if the player is currently in a challenge,
 
