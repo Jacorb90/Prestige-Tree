@@ -163,6 +163,10 @@ var layers = {
         onPrestige(gain) {
             return
         }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
+        hotkeys: [
+            {key: "c", desc: "C: reset for lollipops or whatever", onPress(){if (player.c.unl) doReset("c")}},
+            {key: "ctrl+c", desc: "Ctrl+c: respec things", onPress(){if (player.c.unl) respecBuyables("c")}},
+        ],
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
         branches: [], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
         
