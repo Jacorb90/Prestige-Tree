@@ -15,11 +15,23 @@ function updateTemp() {
 	if (!tmp.layerReqs) tmp.layerReqs = {}
 	for (layer in layers) tmp.layerReqs[layer] = layers[layer].requires()
 
+	if (!tmp.buyables) tmp.buyables = {}
+	for (layer in layers) if (layers[layer].buyables) {
+		if (!tmp.buyables[layer]) tmp.buyables[layer] = {}
+		for (id in player[layer].buyables){
+			if (!tmp.buyables[layer][id]) tmp.buyables[layer][id] = {}
+			tmp.buyables[layer][id]
+			tmp.buyables[layer][id].cost = layers[layer].buyables[id].cost(player[layer].buyables[id])
+			tmp.buyables[layer][id].effects = layers[layer].buyables[id].effects(player[layer].buyables[id])
+		}
+	}
+
 	if (!tmp.gainMults) tmp.gainMults = {}
 	if (!tmp.gainExp) tmp.gainExp = {}
 	if (!tmp.resetGain) tmp.resetGain = {}
 	if (!tmp.nextAt) tmp.nextAt = {}
 	if (!tmp.layerAmt) tmp.layerAmt = {}
+
 	for (layer in layers) {
 		tmp.layerAmt[layer] = layers[layer].baseAmount()
 		tmp.gainMults[layer] = layers[layer].gainMult()

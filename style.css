@@ -53,6 +53,11 @@ td {
 	vertical-align: 0
 }
 
+.bigUpgAlign {
+	height: 200px;
+	vertical-align: 0
+}
+
 h1, h2, h3, b, input {
 	display: inline;
 	font-family: "Lucida Console", "Courier New", monospace

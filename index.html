@@ -42,18 +42,20 @@
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
-			<h3>v0.0.1: Technically something</h3>
+			<h3>v1.1: Enhanced Edition</h3>
 			<ul>
-				<li>There is a game, but not the right game.</li>
+				<li>Added "Buyables", which can function like Space Buildings or Enhancers.</li>
+				<li>Custom CSS can now be used on any component! Make the third argument an object with the CSS parameters.</li>
+				<li>Lots of minor good things.</li>
 			</ul><br>
 		
 			<div class="link" onclick="showTab('Old Stuff')">Alpha / Beta</div><br>
 		</div>
 		<div v-if="player.tab=='changelog_beta'" class="col right">
 			<button class="back" onclick="showTab('changelog')">←</button><br>
-			<h3>v0.0 Literally nothing</h3>
+			<h3>v1.0 Something</h3>
 			<ul>
-				<li>Added nothing</li>
+				<li>The first numbered version.</li>
 			</ul><br>
 			
 		</div>
@@ -140,7 +142,7 @@
 					<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
 					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
 					<milestones :layer="layer"></milestones>
-					<br><br>
+					<buyables :layer="layer"></buyables>
 					<upgrades :layer="layer"></upgrades>
 					<challs :layer="layer"></challs>
 					<br><br>
@@ -148,7 +150,7 @@
 				<div v-if="layers[layer].tabFormat">
 					<div v-for="data in layers[layer].tabFormat">
 					<div v-if="!Array.isArray(data)" v-bind:is="data" :layer= "layer"></div>
-					<div v-else-if="data.length==3" v-bind:is="data[0]" :layer= "layer" :data= "data[1]" :data2="data[2]"></div>
+					<div v-else-if="data.length==3" v-bind:style="(data[2] ? data[2] : {})" v-bind:is="data[0]" :layer= "layer" :data= "data[1]"></div>
 					<div v-else-if="data.length==2" v-bind:is="data[0]" :layer= "layer" :data= "data[1]"></div>
 				</divs>
 			</div>

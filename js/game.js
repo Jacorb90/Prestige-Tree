@@ -4,6 +4,11 @@ var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
 
+let VERSION = {
+	num: 1.1,
+	name: "Enhanced Edition"
+}
+
 function startPlayerBase() {
 	return {
 		tab: "tree",
@@ -26,6 +31,9 @@ function getStartPlayer() {
 	playerdata = startPlayerBase()
 	for (layer in layers){
 		playerdata[layer] = layers[layer].startData()
+		playerdata[layer].buyables = getStartBuyables(layer)
+		playerdata[layer].spentOnBuyables = new Decimal(0)
+
 	}
 	return playerdata
 }
@@ -61,6 +69,18 @@ function fixSave() {
 		for (datum in defaultData){
 			if (player[layer][datum] == undefined){
 				player[layer][datum] = defaultData[datum]
+			}
+		}
+
+		if (player[layer].spentOnBuyables == undefined)
+			player[layer].spentOnBuyables = new Decimal(0)
+
+		if (layers[layer].buyables) {
+			if (player[layer].buyables == undefined) player[layer].buyables = {}
+
+			for (id in layers[layer].buyables){
+				if (player[layer].buyables[id] == undefined && !isNaN(id))
+					player[layer].buyables[id] = new Decimal(0)
 			}
 		}
 	}
@@ -138,6 +158,14 @@ function convertToDecimal() {
 		player[layer].points = new Decimal(player[layer].points)
 		if (player[layer].best != undefined) player[layer].best = new Decimal(player[layer].best)
 		if (player[layer].total !== undefined) player[layer].total = new Decimal(player[layer].total)
+		player[layer].spentOnBuyables = new Decimal(player[layer].spentOnBuyables)
+
+		if (player[layer].buyables != undefined) {
+			for (id in player[layer].buyables)
+				player[layer].buyables[id] = new Decimal(player[layer].buyables[id])
+		}
+		player[layer].best = new Decimal(player[layer].best)
+
 		if (layers[layer].convertToDecimal) layers[layer].convertToDecimal();
 	}
 }
@@ -177,7 +205,7 @@ function sumValues(x) {
 	return x.reduce((a, b) => Decimal.add(a, b))
 }
 
-function format(decimal, precision=3) {
+function format(decimal, precision=2) {
 	decimal = new Decimal(decimal)
 	if (isNaN(decimal.sign)||isNaN(decimal.layer)||isNaN(decimal.mag)) {
 		player.hasNaN = true;
@@ -281,6 +309,23 @@ function rowReset(row, layer) {
 
 function fullLayerReset(layer) {
 	player[layer] = layers[layer].startData();
+	resetBuyables(layer)
+}
+
+function resetBuyables(layer){
+	if (layers[layer].buyables) 
+		player[layer].buyables = getStartBuyables(layer)
+	player[layer].spentOnBuyables = new Decimal(0)
+}
+
+function getStartBuyables(layer){
+	let data = {}
+	if (layers[layer].buyables) {
+		for (id in layers[layer].buyables)
+			if (!isNaN(id))
+				data[id] = new Decimal(0)
+	}
+	return data
 }
 
 function addPoints(layer, gain) {
@@ -340,21 +385,32 @@ function doReset(layer, force=false) {
 	updateTemp()
 }
 
+function respecBuyables(layer) {
+	if (!layers[layer].buyables) return
+	if (!layers[layer].buyables.respec) return
+	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + layer + "\" reset as well!")) return
+	layers[layer].buyables.respec()
+}
+
 function canAffordUpg(layer, id) {
 	upg = layers[layer].upgrades[id]
+	cost = upg.cost
+	return canAffordPurchase(layer, upg, cost) 
+}
 
-	if (upg.currencyInternalName){
-		let name = upg.currencyInternalName
-		if (upg.currencyLayer){
-			let lr = upg.currencyLayer
-			return !(player[lr][name].lt(upg.cost)) 
+function canAffordPurchase(layer, thing, cost) {
+	if (thing.currencyInternalName){
+		let name = thing.currencyInternalName
+		if (thing.currencyLayer){
+			let lr = thing.currencyLayer
+			return !(player[lr][name].lt(cost)) 
 		}
 		else {
-			return !(player[name].lt(upg.cost))
+			return !(player[name].lt(cost))
 		}
 	}
 	else {
-		return !(player[layer].points.lt(upg.cost))
+		return !(player[layer].points.lt(cost))
 	}
 }
 
@@ -385,6 +441,13 @@ function buyUpg(layer, id) {
 		upg.onPurchase()
 }
 
+function buyBuyable(layer, id) {
+	if (!player[layer].unl) return
+	if (!layers[layer].buyables[id].unl()) return
+	if (!layers[layer].buyables[id].canAfford()) return
+
+	layers[layer].buyables[id].buy()
+}
 
 function resetRow(row) {
 	if (prompt('Are you sure you want to reset this row? It is highly recommended that you wait until the end of your current run before doing this! Type "I WANT TO RESET THIS" to confirm')!="I WANT TO RESET THIS") return
@@ -482,10 +545,6 @@ function milestoneShown(layer, id) {
 }
 
 
-let VERSION = {
-	num: 1.0,
-	name: "Something"
-}
 
 VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.pre ? " Beta " + VERSION.beta : "")
 VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "")
