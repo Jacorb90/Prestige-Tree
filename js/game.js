@@ -55,7 +55,7 @@ function inChallenge(layer, id){
 }
 
 function save() {
-	localStorage.setItem("prestige-tree", btoa(JSON.stringify(player)))
+	localStorage.setItem(modInfo.id, btoa(JSON.stringify(player)))
 }
 
 function fixSave() {
@@ -95,7 +95,7 @@ function fixSave() {
 }
 
 function load() {
-	let get = localStorage.getItem("prestige-tree");
+	let get = localStorage.getItem(modInfo.id);
 	if (get===null || get===undefined) player = getStartPlayer()
 	else player = Object.assign(getStartPlayer(), JSON.parse(atob(get)))
 	fixSave()
