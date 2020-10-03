@@ -10,6 +10,9 @@ Key:
 
 # Layer Definition features
 
+- layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
+      to access the save value. It makes copying code to new layers easier. It is also assigned to all upgrades and buyables and such.
+
 - startData(): A function to return the default save data for this layer. Add any variables you have to it.
             Any nonstandard Decimal variables need to be added to convertToDecimal as well.
     Standard values:
@@ -32,7 +35,8 @@ Key:
     Can return a value or an object containing multiple values.
     *You will also have to implement the effect where it is applied.*
 
-- effectDescription(): **optional**, A function that returns a description of this effect
+- effectDescription: **optional**, A function that returns a description of this effect.
+                     If the text stays constant, it can just be a string.
 
 - layerShown(): A function returning a bool which determines if this layer's node should be visible on the tree.
 
@@ -46,6 +50,7 @@ Key:
     ```
 
 - style: A CSS object containing any CSS that should affect this layer's whole tab.
+         Can also be a function returning a dynamic CSS object.
 
 - tabFormat: Use this if you want to add extra things to your tab or change the layout.
 
@@ -72,9 +77,9 @@ Key:
 
 - baseAmount(): A function that gets the current value of the base resource.
 
-- requires(): A function returning the amount of the base needed to gain 1 of the prestige currency.
+- requires: A Decimal, the amount of the base needed to gain 1 of the prestige currency.
             Also the amount required to unlock the layer.
-            You might make the value increase if another layer was unlocked first (based on "order").
+            You can instead make this a function, to make it harder if another layer was unlocked first (based on "order").
 
 - type: Determines which prestige formula you use.
     "normal": The amount of currency you gain is independent of its current amount (like Prestige).

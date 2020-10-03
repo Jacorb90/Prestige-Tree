@@ -5,8 +5,8 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.1.1",
-	name: "Enhanced Edition"
+	num: "1.2",
+	name: "This changes everything!"
 }
 
 function startPlayerBase() {
@@ -293,7 +293,7 @@ function getNextAt(layer) {
 }
 
 function nodeShown(layer) {
-	if (layers[layer].layerShown()) return true
+	if (tmp.layerShown[layer]) return true
 	switch(layer) {
 		case "idk":
 			return player.l.unl
@@ -405,7 +405,7 @@ function respecBuyables(layer) {
 
 function canAffordUpg(layer, id) {
 	upg = layers[layer].upgrades[id]
-	cost = upg.cost
+	cost = tmp.upgrades[layer][id].cost
 	return canAffordPurchase(layer, upg, cost) 
 }
 
@@ -420,7 +420,6 @@ function hasMilestone(layer, id){
 function hasChall(layer, id){
 	return (player[layer].challs.includes(id))
 }
-
 
 function canAffordPurchase(layer, thing, cost) {
 	if (thing.currencyInternalName){
@@ -443,22 +442,23 @@ function buyUpg(layer, id) {
 	if (!layers[layer].upgrades[id].unl()) return
 	if (player[layer].upgrades.includes(id)) return
 	upg = layers[layer].upgrades[id]
+	cost = tmp.upgrades[layer][id].cost
 
 	if (upg.currencyInternalName){
 		let name = upg.currencyInternalName
 		if (upg.currencyLayer){
 			let lr = upg.currencyLayer
-			if (player[lr][name].lt(upg.cost)) return
-			player[lr][name] = player[lr][name].sub(upg.cost)
+			if (player[lr][name].lt(cost)) return
+			player[lr][name] = player[lr][name].sub(cost)
 		}
 		else {
-			if (player[name].lt(upg.cost)) return
-			player[name] = player[name].sub(upg.cost)
+			if (player[name].lt(cost)) return
+			player[name] = player[name].sub(cost)
 		}
 	}
 	else {
-		if (player[layer].points.lt(upg.cost)) return
-		player[layer].points = player[layer].points.sub(upg.cost)	
+		if (player[layer].points.lt(cost)) return
+		player[layer].points = player[layer].points.sub(cost)	
 	}
 	player[layer].upgrades.push(id);
 	if (upg.onPurchase != undefined)
@@ -467,8 +467,8 @@ function buyUpg(layer, id) {
 
 function buyBuyable(layer, id) {
 	if (!player[layer].unl) return
-	if (!layers[layer].buyables[id].unl()) return
-	if (!layers[layer].buyables[id].canAfford()) return
+	if (!tmp.buyables[layer][id].unl) return
+	if (!tmp.buyables[layer][id].canAfford) return
 
 	layers[layer].buyables[id].buy()
 }
@@ -517,7 +517,7 @@ function canCompleteChall(layer, x)
 		let name = chall.currencyInternalName
 		if (chall.currencyLayer){
 			let lr = chall.currencyLayer
-			return !(player[lr][name].lt(chall.goal)) 
+			return !(player[lr][name].lt(readData(chall.goal))) 
 		}
 		else {
 			return !(player[name].lt(chall.cost))
@@ -718,21 +718,6 @@ function switchTheme() {
 	changeTheme()
 	resizeCanvas()
 }
-
-function updateHotkeys()
-{
-    hotkeys = {};
-    for (layer in layers){
-        hk = layers[layer].hotkeys
-        if (hk){
-            for (id in hk){
-				hotkeys[hk[id].key] = hk[id]
-				hotkeys[hk[id].key].layer = layer
-            }
-        }
-    }
-}
-updateHotkeys()
 
 document.onkeydown = function(e) {
 	if (player===undefined) return;
