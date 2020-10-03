@@ -46,7 +46,7 @@ addLayer("c", {
             done() {return player[this.layer].best.gte(4)},
             effectDesc:() => "You can toggle beep and boop (which do nothing)",
             toggles: [
-                [this.layer, "beep"], // Each toggle is defined by a layer and the data toggled for that layer
+                ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
                 ["f", "boop"]],
             }
         },
@@ -129,18 +129,18 @@ addLayer("c", {
                     return eff;
                 },
                 display() { // Everything else displayed in the buyable button after the title
-                    let data = tmp.buyables[this.layer]["11"]
+                    let data = tmp.buyables[this.layer][this.id]
                     return "Cost: " + format(data.cost) + " lollipops\n\
-                    Amount: " + player[this.layer].buyables["11"] + "\n\
+                    Amount: " + player[this.layer].buyables[this.id] + "\n\
                     Adds + " + format(data.effect.first) + " things and multiplies stuff by " + format(data.effect.second)
                 },
                 unl() { return player[this.layer].unl }, 
                 canAfford() {
-                    return player[this.layer].points.gte(tmp.buyables["c"][11].cost)},
+                    return player[this.layer].points.gte(tmp.buyables[this.layer][this.id].cost)},
                 buy() { 
-                    cost = tmp.buyables[this.layer][11].cost
+                    cost = tmp.buyables[this.layer][this.id].cost
                     player[this.layer].points = player[this.layer].points.sub(cost)	
-                    player[this.layer].buyables[11] = player[this.layer].buyables[11].add(1)
+                    player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
                     player[this.layer].spentOnBuyables = player[this.layer].spentOnBuyables.add(cost) // This is a built-in system that you can use for respeccing but it only works with a single Decimal value
                 },
                 buyMax() {}, // You'll have to handle this yourself if you want
@@ -179,7 +179,7 @@ addLayer("c", {
                         function() {return 'I have ' + format(player.points) + ' pointy points!'},
                         {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
                     ["buyables", "150px"],
-                    ["toggle", [this.layer, "beep"]],
+                    ["toggle", ["c", "beep"]],
                     "milestones", "upgrades", "challs"],
         style() {return {
             'background-color': 'blue'

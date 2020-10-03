@@ -93,7 +93,7 @@ function updateChallTemp(layer) {
 }
 
 function updateUpgradeTemp(layer) {
-	if (player[layer] === undefined) return
+	if (layers[layer] === undefined) return
 	if (!tmp.upgrades[layer]) tmp.upgrades[layer] = {}
 
 	let data2 = layers[layer].upgrades
@@ -114,7 +114,7 @@ function updateUpgradeTemp(layer) {
 }
 
 function updateMilestoneTemp(layer) {
-	if (player[layer] === undefined) return
+	if (layers[layer] === undefined) return
 	if (!tmp.milestones[layer]) tmp.milestones[layer] = {}
 
 	let data2 = layers[layer].milestones
@@ -127,7 +127,7 @@ function updateMilestoneTemp(layer) {
 }
 
 function updateBuyableTemp(layer) {
-	if (player[layer] === undefined) return
+	if (layers[layer] === undefined) return
 	if (!tmp.buyables[layer]) tmp.buyables[layer] = {}
 	let data2 = layers[layer].buyables
 	if(data2.respecText) tmp.buyables[layer].respecText = data2.respecText()

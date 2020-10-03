@@ -17,7 +17,7 @@ function loadVue() {
 				treeNode: true,
 				[layer]: true,
 				hidden: !tmp.layerShown[layer],
-				locked: player[layer].unl && !tmp.layerAmt[layer].gte(tmp.layerReqs[layer]),
+				locked: !player[layer].unl && !tmp.layerAmt[layer].gte(tmp.layerReqs[layer]),
 				can: layerUnl(layer),
 			}"
 			v-bind:style="{
@@ -72,7 +72,8 @@ function loadVue() {
 		<div v-if="layers[layer].milestones">
 			<table>
 				<tr v-for="id in Object.keys(layers[layer].milestones)">
-					<td v-if="milestoneShown(layer, id)" v-bind:class="{milestone: !player[layer].milestones.includes(id), milestoneDone: player[layer].milestones.includes(id)}"><h3>{{tmp.milestones[layer][id].requirementDesc}}</h3><br>{{tmp.milestones[layer][id].effectDesc}}<br><span v-if="(layers[layer].milestones[id].toggles)&&(player[layer].milestones.includes(id))" v-for="toggle in layers[layer].milestones[id].toggles"><toggle :layer= "layer" :data= "toggle"></toggle>&nbsp;</span></td></tr>
+					<td v-if="milestoneShown(layer, id)" v-bind:class="{milestone: !player[layer].milestones.includes(id), milestoneDone: player[layer].milestones.includes(id)}"><h3>{{tmp.milestones[layer][id].requirementDesc}}</h3><br>{{tmp.milestones[layer][id].effectDesc}}<br>
+					<span v-if="(layers[layer].milestones[id].toggles)&&(player[layer].milestones.includes(id))" v-for="toggle in layers[layer].milestones[id].toggles"><toggle :layer= "layer" :data= "toggle"></toggle>&nbsp;</span></td></tr>
 				</tr>
 			</table>
 			<br>
@@ -83,7 +84,7 @@ function loadVue() {
 	Vue.component('toggle', {
 		props: ['layer', 'data'],
 		template: `
-		<button class="smallUpg can" v-bind:style="{'background-color': tmp.layerColor[layer])}" v-on:click="toggleAuto(data)">{{player[data[0]][data[1]]?"ON":"OFF"}}</button>
+		<button class="smallUpg can" v-bind:style="{'background-color': tmp.layerColor[data[0]]}" v-on:click="toggleAuto(data)">{{player[data[0]][data[1]]?"ON":"OFF"}}</button>
 		`
 	})
 
