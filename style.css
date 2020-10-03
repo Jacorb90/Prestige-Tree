@@ -112,8 +112,8 @@ h1, h2, h3, b, input {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	background-color: var(--background);
-	border: 1px solid var(--background);
+	background-color: transparent;
+	border: 1px solid transparent;
 	color: var(--color);
 	font-size: 40px;
 	cursor: pointer;

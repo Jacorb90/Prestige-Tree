@@ -8,7 +8,7 @@ addLayer("c", {
             buyables: {}, // You don't actually have to initialize this one
             beep: false,
         }},
-        color:() => "#4BEC13",
+        color:() => "#4BDC13",
         requires:() => new Decimal(10), // Can be a function that takes requirement increases into account
         resource: "lollipops", // Name of prestige currency
         baseResource: "candies", // Name of resource prestige is based on
@@ -166,8 +166,8 @@ addLayer("c", {
         }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
 
         hotkeys: [
-            {key: this.layer, desc: "C: reset for lollipops or whatever", onPress(){if (player[this.layer].unl) doReset(this.layer)}},
-            {key: "ctrl+" + this.layer, desc: "Ctrl+c: respec things", onPress(){if (player[this.layer].unl) respecBuyables(this.layer)}},
+            {key: "c", desc: "C: reset for lollipops or whatever", onPress(){if (player[this.layer].unl) doReset(this.layer)}},
+            {key: "ctrl+c" + this.layer, desc: "Ctrl+c: respec things", onPress(){if (player[this.layer].unl) respecBuyables(this.layer)}},
         ],
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
 
@@ -182,7 +182,7 @@ addLayer("c", {
                     ["toggle", ["c", "beep"]],
                     "milestones", "upgrades", "challs"],
         style() {return {
-            'background-color': 'blue'
+            'background-color': '#3325CC'
         }},
 })
 
