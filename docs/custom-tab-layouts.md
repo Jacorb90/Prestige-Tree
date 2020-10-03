@@ -5,7 +5,7 @@ Custom tab layouts can be used to do basically anything in a tab window, especia
 ```js
     tabFormat: ["main-display",
             ["prestige-button", function(){return "Melt your points into "}],
-            ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
+            "blank",
             ["display-text",
                 function() {return 'I have ' + format(player.points) + ' pointy points!'},
                 {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
@@ -24,7 +24,9 @@ These are the existing components, but you can create more in v.js:
 - raw-html: Displays some HTML. The argument is the HTML as a string, or a function that returns updating HTML.
             It doesn't work with many vue things.
 
-- blank: An empty newline
+- blank: Adds empty space. The default dimensions are 8px x 17px. The argument changes the dimensions.
+         If it's a single value (e.g. "20px"), that determines the height.
+         If you have a pair of arguments, the first is width and the second is height.
 
 - main-display: The text that displays the main currency for the layer and its effects.
 
@@ -38,6 +40,7 @@ These are the existing components, but you can create more in v.js:
 
 - toggle: A toggle button that toggles a bool value. The data is a pair that identifies what bool to toggle, [layer, id]
 
+- row: Display a list of components horizontally. The argument is an array of components in the tab layout format.
 
-Tip: use readData on things you're displaying! If the data is a function, it will return the result of calling it.
-    Otherwise, it will return the data itself. This lets you use dynamic values, while keeping constant values convenient.
+- column: Display a list of components vertically. The argument is an array of components in the tab layout format.
+          This is useful to display columns within a row.

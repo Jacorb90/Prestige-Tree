@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.2.2",
+	num: "1.2.3",
 	name: "This changes everything!"
 }
 

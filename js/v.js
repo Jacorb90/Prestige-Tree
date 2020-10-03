@@ -28,6 +28,66 @@ function loadVue() {
 		`
 	})
 
+		// data = a function returning the content
+		Vue.component('display-text', {
+			props: ['layer', 'data'],
+			template: `
+			<span>{{readData(data)}}</span>
+			`
+		})
+	
+		// data = a function returning html content, with some limited functionality
+			Vue.component('raw-html', {
+				props: ['layer', 'data'],
+				template: `
+				<span v-html="readData(data)"></span>
+				`
+			})
+	
+		// Blank lines, data = optional height in px or pair with width and height in px
+		Vue.component('blank', {
+			props: ['layer', 'data'],
+			template: `
+				<div>
+				<div v-if="!data" v-bind:style="{'width': '8px', 'height': '17px'}"></div>
+				<div v-else-if="Array.isArray(data)" v-bind:style="{'width': data[0], 'height': data[1]}"></div>
+				<div v-else v-bind:style="{'width': '8px', 'height': 'data'}"><br></div>
+				</div>
+			`
+		})
+
+	// data = an array of Components to be displayed in a row
+	Vue.component('row', {
+		props: ['layer', 'data'],
+		template: `
+		<div class="upgTable">
+			<div class="upgRow">
+				<div v-for="item in data">
+				<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer"></div>
+				<div v-else-if="item.length==3" v-bind:style="(item[2] ? item[2] : {})" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+				<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+				</div>
+			</div>
+		</div>
+		`
+	})
+
+		// data = an array of Components to be displayed in a column
+		Vue.component('column', {
+			props: ['layer', 'data'],
+			template: `
+			<div class="upgTable">
+				<div class="upgCol">
+					<div v-for="item in data">
+					<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer"></div>
+					<div v-else-if="item.length==3" v-bind:style="(item[2] ? item[2] : {})" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+					<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+					</div>
+				</div>
+			</div>
+			`
+		})
+
 	Vue.component('challs', {
 		props: ['layer'],
 		template: `
@@ -137,30 +197,6 @@ function loadVue() {
 				<span v-bind:style="{'white-space': 'pre-line'}">{{tmp.buyables[layer][data].display}}</span>
 			</button>
 		</div>
-		`
-	})
-
-	// data = a function returning the content
-	Vue.component('display-text', {
-		props: ['layer', 'data'],
-		template: `
-		<span>{{readData(data)}}</span>
-		`
-	})
-
-	// data = a function returning html content, with some limited functionality
-		Vue.component('raw-html', {
-			props: ['layer', 'data'],
-			template: `
-			<span v-html="readData(data)"></span>
-			`
-		})
-
-	// Blank lines
-	Vue.component('blank', {
-		props: ['layer', 'data'],
-		template: `
-		<br>
 		`
 	})
 
