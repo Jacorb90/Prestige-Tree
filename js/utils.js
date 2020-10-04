@@ -56,6 +56,40 @@ function save() {
 	localStorage.setItem(modInfo.id, btoa(JSON.stringify(player)))
 }
 
+function startPlayerBase() {
+	return {
+		tab: "tree",
+		time: Date.now(),
+		autosave: true,
+		notify: {},
+		msDisplay: "always",
+		offlineProd: true,
+		versionType: "Modding",
+		version: VERSION.num,
+		beta: VERSION.beta,
+		timePlayed: 0,
+		keepGoing: false,
+		hasNaN: false,
+		points: new Decimal(10),
+	}
+}
+
+function getStartPlayer() {
+	playerdata = startPlayerBase()
+	for (layer in layers){
+		playerdata[layer] = layers[layer].startData()
+		playerdata[layer].buyables = getStartBuyables(layer)
+		playerdata[layer].spentOnBuyables = new Decimal(0)
+		playerdata[layer].upgrades = []
+		playerdata[layer].milestones = []
+		playerdata[layer].challs = []
+		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat))
+			playerdata[layer].subtab = Object.keys(layers[layer].tabFormat)[0]
+
+	}
+	return playerdata
+}
+
 function fixSave() {
 	defaultData = startPlayerBase()
 	for (datum in defaultData){
@@ -89,6 +123,9 @@ function fixSave() {
 					player[layer].buyables[id] = new Decimal(0)
 			}
 		}
+		
+		if (player[layer].subtab == undefined && layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat))
+			player[layer].subtab = Object.keys(layers[layer].tabFormat)[0]
 	}
 }
 
@@ -145,12 +182,12 @@ function versionCheck() {
 	let setVersion = true
 	
 	if (player.versionType===undefined||player.version===undefined) {
-		player.versionType = "Modding"
+		player.versionType = modInfo.id
 		player.version = 0
 	}
 	
 	if (setVersion) {
-		if (player.versionType == "Modding" && VERSION.num > player.version) player.keepGoing = false
+		if (player.versionType == modInfo.id && VERSION.num > player.version) player.keepGoing = false
 		player.versionType = getStartPlayer().versionType
 		player.version = VERSION.num
 		player.beta = VERSION.beta

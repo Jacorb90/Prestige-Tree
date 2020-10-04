@@ -5,39 +5,8 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.2.4",
-	name: "This changes everything!"
-}
-
-function startPlayerBase() {
-	return {
-		tab: "tree",
-		time: Date.now(),
-		autosave: true,
-		notify: {},
-		msDisplay: "always",
-		offlineProd: true,
-		versionType: "Modding",
-		version: VERSION.num,
-		beta: VERSION.beta,
-		timePlayed: 0,
-		keepGoing: false,
-		hasNaN: false,
-		points: new Decimal(10),
-	}
-}
-
-function getStartPlayer() {
-	playerdata = startPlayerBase()
-	for (layer in layers){
-		playerdata[layer] = layers[layer].startData()
-		playerdata[layer].buyables = getStartBuyables(layer)
-		playerdata[layer].spentOnBuyables = new Decimal(0)
-		playerdata[layer].upgrades = []
-		playerdata[layer].milestones = []
-		playerdata[layer].challs = []
-	}
-	return playerdata
+	num: "1.3",
+	name: "Finally some real progress!"
 }
 
 function getPointGen() {

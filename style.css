@@ -124,6 +124,20 @@ h1, h2, h3, b, input {
 	text-shadow: 0px 0px 7px var(--color);
 }
 
+.tabButton {
+	background-color: transparent;
+	border: none;
+	color: var(--color);
+	font-size: 24px;
+	cursor: pointer;
+	padding: 10px 50px 10px 50px
+}
+
+.tabButton:hover {
+	transform: scale(1.1, 1.1);
+	text-shadow: 0px 0px 7px var(--color);
+}
+
 .reset {
 	height: 120px;
 	width: 180px;

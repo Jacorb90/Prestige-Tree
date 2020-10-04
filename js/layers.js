@@ -172,23 +172,28 @@ addLayer("c", {
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
 
         // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
-        tabFormat: ["main-display",
-                    ["prestige-button", function() {return "Melt your points into "}],
-                    ["blank", "5px"], // Height
-                    ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
-                    ["display-text",
-                        function() {return 'I have ' + format(player.points) + ' pointy points!'},
-                        {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
-                    ["buyables", "150px"],
-                    ["row", [
-                        ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
-                        ["display-text", function() {return "Beep"}], "blank",
-                        ["column", [
-                            ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
-                            ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
-                        ]],
-                    ]],
-                    "milestones", "blank", "upgrades", "challs"],
+        tabFormat: {
+            main: 
+                ["main-display",
+                ["prestige-button", function() {return "Melt your points into "}],
+                ["blank", "5px"], // Height
+                ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
+                ["display-text",
+                    function() {return 'I have ' + format(player.points) + ' pointy points!'},
+                    {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
+                "milestones", "blank", "upgrades", "challs"],
+            thingies: [
+                ["buyables", "150px"], "blank",
+                ["row", [
+                    ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
+                    ["display-text", function() {return "Beep"}], "blank",
+                    ["column", [
+                        ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
+                        ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
+                ]],
+            ]],
+],
+        },
         style() {return {
             'background-color': '#3325CC'
         }},
