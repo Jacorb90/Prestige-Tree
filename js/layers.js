@@ -195,7 +195,7 @@ addLayer("c", {
 ],
         },
         style() {return {
-            'background-color': '#3325CC'
+        //    'background-color': '#3325CC'
         }},
         shouldNotify() { // Optional, layer will be highlighted on the tree if true.
                          // Layer will automatically highlight if an upgrade is purchasable.

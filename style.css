@@ -128,9 +128,9 @@ h1, h2, h3, b, input {
 	background-color: transparent;
 	border: none;
 	color: var(--color);
-	font-size: 24px;
+	font-size: 20px;
 	cursor: pointer;
-	padding: 10px 50px 10px 50px
+	padding: 10px 40px 10px 40px
 }
 
 .tabButton:hover {
