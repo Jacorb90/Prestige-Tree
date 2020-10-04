@@ -44,6 +44,7 @@ function updateTemp() {
 	if (!tmp.layerShown) tmp.layerShown = {}
 	if (!tmp.effectDescription) tmp.effectDescription = {}
 	if (!tmp.style) tmp.style = {}
+	if (!tmp.notify) tmp.notify = {}
 
 
 	for (layer in layers) {
@@ -55,6 +56,7 @@ function updateTemp() {
 		tmp.gainExp[layer] = layers[layer].gainExp()
 		tmp.resetGain[layer] = getResetGain(layer)
 		tmp.nextAt[layer] = getNextAt(layer)
+		tmp.notify[layer] = shouldNotify(layer)
 		if (layers[layer].effectDescription) tmp.effectDescription[layer] = layers[layer].effectDescription()
 
 	}

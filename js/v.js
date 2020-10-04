@@ -18,6 +18,7 @@ function loadVue() {
 				[layer]: true,
 				hidden: !tmp.layerShown[layer],
 				locked: !player[layer].unl && !tmp.layerAmt[layer].gte(tmp.layerReqs[layer]),
+				notify: tmp.notify[layer],
 				can: layerUnl(layer),
 			}"
 			v-bind:style="{

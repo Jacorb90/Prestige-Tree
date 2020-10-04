@@ -20,8 +20,8 @@ addLayer("c", {
         canBuyMax() {}, // Only needed for static layers with buy max
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
-            if (player[this.layer].upgrades.includes(21)) mult = mult.times(2)
-			if (player[this.layer].upgrades.includes(23)) mult = mult.times(this.upgrades[23].currently())
+            if (hasUpg(this.layer, 166)) mult = mult.times(2)
+			if (hasUpg(this.layer, 12)) mult = mult.times(this.upgrades[12].effect())
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -83,7 +83,7 @@ addLayer("c", {
             12: {
                 desc:() => "Candy generation is faster based on your unspent Lollipops.",
                 cost:() => new Decimal(1),
-                unl() { return player[this.layer].upgrades.includes(11) },
+                unl() { return (hasUpg(this.layer, 11))},
                 effect() { // Calculate bonuses from the upgrade. Can return a single value or an object with multiple values
                     let ret = player[this.layer].points.add(1).pow(player[this.layer].upgrades.includes(24)?1.1:(player[this.layer].upgrades.includes(14)?0.75:0.5)) 
                     if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
@@ -97,7 +97,7 @@ addLayer("c", {
                 currencyDisplayName: "candies", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
                 currencyLayer: "", // Leave empty if not in a layer "e.g. points"
-                unl() { return player[this.layer].upgrades.includes(12) },
+                unl() { return (hasUpg(this.layer, 12))},
                 onPurchase() { // This function triggers when the upgrade is purchased
                     player[this.layer].order = 0
                 }
@@ -192,6 +192,10 @@ addLayer("c", {
         style() {return {
             'background-color': '#3325CC'
         }},
+        shouldNotify() { // Optional, layer will be highlighted on the tree if true.
+                         // Layer will automatically highlight if an upgrade is purchasable.
+            return (player.c.buyables[11] == 1)
+        }
 })
 
 addLayer("f", {

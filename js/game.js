@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.2.3",
+	num: "1.2.4",
 	name: "This changes everything!"
 }
 
@@ -48,9 +48,10 @@ function getPointGen() {
 
 // Function to determine if the player is in a challenge
 function inChallenge(layer, id){
-	if (player.c.active==x) return true
+	let chall = player[layer].active
+	if (chall==toNumber(id)) return true
 
-	if (layers[layer].challs[id].countsAs)
+	if (layers[layer].challs[chall].countsAs)
 		return layers[layer].challs[id].countsAs.includes(id)
 }
 
@@ -101,6 +102,23 @@ function getNextAt(layer) {
 		if (layers[layer].resCeil) next = next.ceil()
 		return next;
 	}
+}
+
+// Return true if the layer should be highlighted. By default checks for upgrades only.
+function shouldNotify(layer){
+	for (id in layers[layer].upgrades){
+		if (!isNaN(id)){
+			if (canAffordUpg(layer, id) && !hasUpg(layer, id) && tmp.upgrades[layer][id].unl){
+				return true
+			}
+		}
+	}
+
+	if (layers[layer].shouldNotify){
+		return layers[layer].shouldNotify()
+	}
+	else 
+		return false
 }
 
 function rowReset(row, layer) {
@@ -208,15 +226,15 @@ function canAffordUpg(layer, id) {
 }
 
 function hasUpg(layer, id){
-	return (player[layer].upgrades.includes(id))
+	return (player[layer].upgrades.includes(toNumber(id)))
 }
 
 function hasMilestone(layer, id){
-	return (player[layer].milestones.includes(id))
+	return (player[layer].milestones.includes(toNumber(id)))
 }
 
 function hasChall(layer, id){
-	return (player[layer].challs.includes(id))
+	return (player[layer].challs.includes(toNumber(id)))
 }
 
 function canAffordPurchase(layer, thing, cost) {

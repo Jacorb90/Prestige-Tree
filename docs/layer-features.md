@@ -49,6 +49,11 @@ Key:
     ],
     ```
 
+- branches: **optional**, determines what lines should appear on the tree when this layer is visible.
+            An array of pairs consisting of a layer name and a number from 1 to 3.
+            A branch will appear connecting this layer to the correspodnding layer, with the color based on the number.
+            You should add the branch value to the layer that is unlocked second.
+
 - style: A CSS object containing any CSS that should affect this layer's whole tab.
          Can also be a function returning a dynamic CSS object.
 
@@ -132,8 +137,5 @@ Key:
 - incr_order: **optional**, an array of layer ids. When this layer is unlocked for the first time, the "order" value
               for any not-yet-unlocked layers in this list increases. This can be used to make them harder to unlock.
 
-- branches: **optional**, determines what lines should appear on the tree when this layer is visible.
-            An array of pairs consisting of a layer name and a number from 1 to 3.
-            A branch will appear connecting this layer to the correspodnding layer, with the color based on the number.
-            You should add the branch value to the layer that is unlocked second.
-
+- should_notify: **optional**, a function to return true if this layer should be highlighted in the tree.
+                 The layer will automatically be highlighted if you can buy an upgrade whether you have this or not.
