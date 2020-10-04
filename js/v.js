@@ -33,19 +33,19 @@ function loadVue() {
 		Vue.component('display-text', {
 			props: ['layer', 'data'],
 			template: `
-			<span>{{readData(data)}}</span>
+				<span>{{readData(data)}}</span>
 			`
 		})
 	
 		// data = a function returning html content, with some limited functionality
-			Vue.component('raw-html', {
-				props: ['layer', 'data'],
-				template: `
+		Vue.component('raw-html', {
+			props: ['layer', 'data'],
+			template: `
 				<span v-html="readData(data)"></span>
-				`
-			})
+			`
+		})
 	
-		// Blank lines, data = optional height in px or pair with width and height in px
+		// Blank space, data = optional height in px or pair with width and height in px
 		Vue.component('blank', {
 			props: ['layer', 'data'],
 			template: `
@@ -57,6 +57,20 @@ function loadVue() {
 			`
 		})
 
+		// Displays an image, data is the URL
+		Vue.component('display-image', {
+			props: ['layer', 'data'],
+			template: `
+				<span><img v-bind:src= "readData(data)" v-bind:alt= "readData(data)"></span>
+			`
+		})
+
+		Vue.component('image', {
+			props: ['layer', 'data'],
+			template: `
+			`
+		})
+		
 	// data = an array of Components to be displayed in a row
 	Vue.component('row', {
 		props: ['layer', 'data'],

@@ -34,7 +34,7 @@ addLayer("c", {
             icecreamCap: (player[this.layer].points * 10)
         }},
         effectDescription() { // Optional text to describe the effects
-            eff = this.effect;
+            eff = this.effect();
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
         milestones: {
@@ -190,9 +190,11 @@ addLayer("c", {
                     ["column", [
                         ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
                         ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
+                    ]], 
                 ]],
-            ]],
-],
+                "blank",
+                ["display-image", "discord.png"],
+            ],
         },
         style() {return {
         //    'background-color': '#3325CC'
