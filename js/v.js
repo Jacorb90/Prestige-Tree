@@ -122,7 +122,7 @@ function loadVue() {
 		<div v-if="layers[layer].challs" class="upgTable">
 			<div v-for="row in layers[layer].challs.rows" class="upgRow">
 				<div v-for="col in layers[layer].challs.cols">
-					<div v-if="tmp.challs[layer][row*10+col].unl" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col)&&canCompleteChall(layer, row*10+col)}">
+					<div v-if="tmp.challs[layer][row*10+col].unl && !(player.hideChalls && hasChall(layer, [row*10+col]))" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col)&&canCompleteChall(layer, row*10+col)}">
 						<br><h3>{{tmp.challs[layer][row*10+col].name}}</h3><br><br>
 						<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': tmp.layerColor[layer]}" v-on:click="startChall(layer, row*10+col)">{{player[layer].active==(row*10+col)?(canCompleteChall(layer, row*10+col)?"Finish":"Exit Early"):(player[layer].challs.includes(row*10+col)?"Completed":"Start")}}</button><br><br>
 						{{tmp.challs[layer][row*10+col].desc}}<br>

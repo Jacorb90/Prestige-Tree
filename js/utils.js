@@ -50,6 +50,14 @@ function formatTime(s) {
 	else return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
 }
 
+function toPlaces(x, precision, maxAccepted) {
+	x = new Decimal(x)
+	let result = x.toStringWithDecimalPlaces(precision)
+	if (new Decimal(result).gte(maxAccepted)) {
+		result = new Decimal(maxAccepted-Math.pow(0.1, precision)).toStringWithDecimalPlaces(precision)
+	}
+	return result
+}
 // ************ Save stuff ************
 
 function save() {
@@ -70,6 +78,7 @@ function startPlayerBase() {
 		timePlayed: 0,
 		keepGoing: false,
 		hasNaN: false,
+		hideChalls: false,
 		points: new Decimal(10),
 	}
 }
@@ -216,6 +225,7 @@ function changeTheme() {
 	document.body.style.setProperty('--background_tooltip', aqua ? "rgba(0, 15, 31, 0.75)" : "rgba(0, 0, 0, 0.75)")
 	document.body.style.setProperty('--color', aqua ? "#bfdfff" : "#dfdfdf")
 	document.body.style.setProperty('--points', aqua ? "#dfefff" : "#ffffff")
+	document.body.style.setProperty("--locked", aqua ? "#c4a7b3" : "#bf8f8f")
 }
 
 function getThemeName() {
@@ -235,8 +245,21 @@ function switchTheme() {
 // ************ Options ************
 
 function toggleOpt(name) {
+	if (name == "oldStyle" && styleCooldown>0) return;
+
 	player[name] = !player[name]
 	if (name == "hqTree") changeTreeQuality()
+	if (name == "oldStyle") updateStyle()
+}
+
+var styleCooldown = 0;
+
+
+function updateStyle() {
+	styleCooldown = 1;
+	let css = document.getElementById("styleStuff")
+	css.href = player.oldStyle?"oldStyle.css":"style.css"
+	needCanvasUpdate = true;
 }
 
 function changeTreeQuality() {

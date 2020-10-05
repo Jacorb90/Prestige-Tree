@@ -25,6 +25,9 @@
 </head>
 <body onload="load()">
 	<div id="app">
+		<div v-if="false" id="loadingSection" class="fullWidth">
+			<h1>Loading... (If this takes too long it means there was a serious error!)</h1>
+		</div>
 		<div class="vl" v-if="player.tab!='tree'&&player.tab!='gameEnded'"></div>
 		<div v-if="player.tab=='gameEnded'" class="fullWidth">
 			<br>
@@ -36,6 +39,7 @@
 			<br>
 			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
 			<br><br><br>
+			<a class="link" href="https://discord.gg/F3xveHV" target="_blank">The Modding Tree Discord</a><br>
 			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Main Prestige Tree Discord</a><br>
 			<br><br>
 			If you would like to speedrun this, press Play Again and record your attempt, then submit on the Discord Server in the channel #speedrun-submissions.
@@ -47,7 +51,12 @@
 			<button class="back" onclick="showTab('tree')">←</button><br>
 			<h3>v1.3: Finally some real progress!</h3>
 			<ul>
-				<li>Many layer features can now be static values or functions. (This made some notations change, which will break things)</li>
+				<li>Added subtabs! And also a ???Component</li>
+				<li>Added ???Big component</li>
+				<li>Added h-line, v-line and image-display components.</li>
+				<li>Added "hide completed challenges" setting.</li>
+				<li>Moved old changelogs to a separate place.</li>
+				<li></li>
 			</ul><br>
 			<a href="https://github.com/Acamaeda/The-Modding-Tree/blob/master/changelog.md" target="_blank" class="link" >Full history</a><br>
 		</div>
@@ -65,6 +74,7 @@
 			Original idea by papyrus (on discord)
 			<br><br>
 			<div class="link" onclick="showTab('changelog')">Changelog</div><br>
+			<a class="link" href="https://discord.gg/F3xveHV" target="_blank">The Modding Tree Discord</a><br>
 			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Main Prestige Tree server</a><br>
 			<br>
 			Note by Jacorb: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
@@ -91,6 +101,10 @@
 					<td><button class="opt" onclick="adjustMSDisp()">Show Milestones: {{ player.msDisplay.toUpperCase() }}</button></td>
 					<td><button class="opt" onclick="toggleOpt('hqTree')">High-Quality Tree: {{ player.hqTree?"ON":"OFF" }}</button></td>
 				</tr>
+					<tr>
+						<td><button class="opt" onclick="toggleOpt('hideChalls')">Completed Challenges: {{ player.hideChalls?"HIDDEN":"SHOWN" }}</button></td>
+					<!--	<td><button class="opt" onclick="toggleOpt('oldStyle')">Style: {{ player.oldStyle?"v1.0":"NEW" }}</button></td>-->
+				</tr> 
 			</table>
 		</div>
 		<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.tab == 'tree', col: player.tab != 'tree', left: player.tab != 'tree'}">

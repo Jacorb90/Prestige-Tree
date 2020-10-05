@@ -469,3 +469,9 @@ ul {
 	opacity: 1;
 	white-space: pre-wrap;
 }
+
+#loadingSection {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
