@@ -367,6 +367,15 @@ a {
 	top: 0
 }
 
+.vl2 {
+	border-left: 3px solid var(--color);
+	height: 100%;
+}
+
+.hl {
+	border-top: 3px solid var(--color);
+}
+
 ul {
 	list-style-type: none;
 }

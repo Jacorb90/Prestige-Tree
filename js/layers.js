@@ -181,17 +181,17 @@ addLayer("c", {
                 ["display-text",
                     function() {return 'I have ' + format(player.points) + ' pointy points!'},
                     {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
-                "milestones", "blank", "upgrades", "challs"],
+                "h-line", "milestones", "blank", "upgrades", "challs"],
             thingies: [
                 ["buyables", "150px"], "blank",
                 ["row", [
                     ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
-                    ["display-text", function() {return "Beep"}], "blank",
+                    ["display-text", function() {return "Beep"}], "blank", ["v-line", "200px"],
                     ["column", [
                         ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
                         ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
                     ]], 
-                ]],
+                ], {'width': '600px', 'height': '350px', 'background-color': 'green', 'border-style': 'solid'}],
                 "blank",
                 ["display-image", "discord.png"],
             ],

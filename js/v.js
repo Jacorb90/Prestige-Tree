@@ -29,47 +29,41 @@ function loadVue() {
 		`
 	})
 
-		// data = a function returning the content
-		Vue.component('display-text', {
-			props: ['layer', 'data'],
-			template: `
-				<span>{{readData(data)}}</span>
-			`
-		})
-	
-		// data = a function returning html content, with some limited functionality
-		Vue.component('raw-html', {
-			props: ['layer', 'data'],
-			template: `
-				<span v-html="readData(data)"></span>
-			`
-		})
-	
-		// Blank space, data = optional height in px or pair with width and height in px
-		Vue.component('blank', {
-			props: ['layer', 'data'],
-			template: `
-				<div>
-				<div v-if="!data" v-bind:style="{'width': '8px', 'height': '17px'}"></div>
-				<div v-else-if="Array.isArray(data)" v-bind:style="{'width': data[0], 'height': data[1]}"></div>
-				<div v-else v-bind:style="{'width': '8px', 'height': 'data'}"><br></div>
-				</div>
-			`
-		})
+	// data = a function returning the content
+	Vue.component('display-text', {
+		props: ['layer', 'data'],
+		template: `
+			<span>{{readData(data)}}</span>
+		`
+	})
 
-		// Displays an image, data is the URL
-		Vue.component('display-image', {
-			props: ['layer', 'data'],
-			template: `
-				<span><img v-bind:src= "readData(data)" v-bind:alt= "readData(data)"></span>
-			`
-		})
+	// data = a function returning html content, with some limited functionality
+	Vue.component('raw-html', {
+		props: ['layer', 'data'],
+		template: `
+			<span v-html="readData(data)"></span>
+		`
+	})
 
-		Vue.component('image', {
-			props: ['layer', 'data'],
-			template: `
-			`
-		})
+	// Blank space, data = optional height in px or pair with width and height in px
+	Vue.component('blank', {
+		props: ['layer', 'data'],
+		template: `
+			<div>
+			<div v-if="!data" v-bind:style="{'width': '8px', 'height': '17px'}"></div>
+			<div v-else-if="Array.isArray(data)" v-bind:style="{'width': data[0], 'height': data[1]}"></div>
+			<div v-else v-bind:style="{'width': '8px', 'height': 'data'}"><br></div>
+			</div>
+		`
+	})
+
+	// Displays an image, data is the URL
+	Vue.component('display-image', {
+		props: ['layer', 'data'],
+		template: `
+			<span><img v-bind:src= "readData(data)" v-bind:alt= "readData(data)"></span>
+		`
+	})
 		
 	// data = an array of Components to be displayed in a row
 	Vue.component('row', {
@@ -87,21 +81,40 @@ function loadVue() {
 		`
 	})
 
-		// data = an array of Components to be displayed in a column
-		Vue.component('column', {
-			props: ['layer', 'data'],
-			template: `
-			<div class="upgTable">
-				<div class="upgCol">
-					<div v-for="item in data">
-					<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer"></div>
-					<div v-else-if="item.length==3" v-bind:style="(item[2] ? item[2] : {})" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
-					<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
-					</div>
+	// data = an array of Components to be displayed in a column
+	Vue.component('column', {
+		props: ['layer', 'data'],
+		template: `
+		<div class="upgTable">
+			<div class="upgCol">
+				<div v-for="item in data">
+				<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer"></div>
+				<div v-else-if="item.length==3" v-bind:style="(item[2] ? item[2] : {})" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+				<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
 				</div>
 			</div>
+		</div>
+		`
+	})
+
+
+	// Data = width in px, by default fills the full area
+	Vue.component('h-line', {
+		props: ['layer', 'data'],
+			template:`
+				<hr v-bind:style="data ? {'width': data} : {}" class="hl">
 			`
 		})
+
+	// Data = height in px, by default is bad
+	Vue.component('v-line', {
+		props: ['layer', 'data'],
+		template: `
+			<div v-bind:style="data ? {'height': data} : {}" class="vl2"></div>
+		`
+	})
+
+
 
 	Vue.component('challs', {
 		props: ['layer'],
