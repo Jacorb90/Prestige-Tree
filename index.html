@@ -49,11 +49,12 @@
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
-			<h3>v1.3: Finally some real progress!</h3>
+			<h3>v1.3: Tabbing out</h3>
 			<ul>
-				<li>Added subtabs! And also a ???Component</li>
-				<li>Added ???Big component</li>
-				<li>Added h-line, v-line and image-display components.</li>
+				<li>Added subtabs! And also a Micro-tab component to let you make smaller subtab-esque areas anywhere.</li>
+				<li>Added points/sec display (can be disabled).</li>
+				<li>Added h-line, v-line and image-display components, plus components for individual upgrades, challenges, and milestones.</li>
+				<li>Added upgEffect, buyableEffect, and challEffect functions.</li>
 				<li>Added "hide completed challenges" setting.</li>
 				<li>Moved old changelogs to a separate place.</li>
 				<li></li>
@@ -67,7 +68,7 @@
 			<br>
 			<h3>{{VERSION.withName}}</h3>
 			<br>
-			The Modding Tree and code refactor by Acamaeda
+			The Modding Tree by Acamaeda
 			<br>
 			The Prestige Tree made by Jacorb and Aarex
 			<br>
@@ -125,7 +126,9 @@
 			<span v-if="player.points.lt('1e1000')">You have </span>
 			<h2 id="points">{{format(player.points)}}</h2>
 			<span v-if="player.points.lt('1e1e6')"> {{modInfo.pointsName}}</span>
-			<br><br><br><br><br>
+			<br>
+			<span v-if="showPointGen()">({{format(getPointGen())}}/sec)</span>
+			<br><br><br><br>
 			<!-- *************************** Modify the tree in the table below! *************************** -->
 			<table>
 				<td><layer-node layer='c' abb='C'></layer-node></td>

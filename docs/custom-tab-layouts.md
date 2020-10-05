@@ -38,6 +38,9 @@ These are the existing components, but you can create more in v.js:
 - buyables: Display all of the buyables for this layer, as appropriate. The argument optional, and is the size of the
             boxes in pixels.
 
+- upgrade, milestone, chall, buyable: An individual upgrade, challenge, etc. The argument is the id.
+        This can be used if you want to have upgrades split up across multiple subtabs, for example.
+
 - toggle: A toggle button that toggles a bool value. The data is a pair that identifies what bool to toggle, [layer, id]
 
 - row: Display a list of components horizontally. The argument is an array of components in the tab layout format.

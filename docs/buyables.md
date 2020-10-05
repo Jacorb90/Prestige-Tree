@@ -3,6 +3,8 @@
 Buyables are things that can be bought multiple times with scaling costs. If you set a respec function,
 the player can reset the purchases to get their currency back.
 
+You can use buyableEffect(layer, id) to get the current effects of a buyable.
+
 Buyables should be formatted like this:
 
 ```js

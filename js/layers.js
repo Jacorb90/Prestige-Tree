@@ -21,7 +21,7 @@ addLayer("c", {
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
             if (hasUpg(this.layer, 166)) mult = mult.times(2) // These upgrades don't exist
-			if (hasUpg(this.layer, 120)) mult = mult.times(this.upgrades[12].effect())
+			if (hasUpg(this.layer, 120)) mult = mult.times(upgEffect(this.layer, 120))
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses

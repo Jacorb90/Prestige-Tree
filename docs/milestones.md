@@ -11,7 +11,7 @@ Milestones should be formatted like this:
     }
 ```
 
-You can use inChall(layer, id) and hasChall(layer, id) to determine if the player is currently in a challenge,
+You can use hasMilestone(layer, id) to determine if the player has a given milestone
 
 Milestone features:
 

@@ -2,20 +2,25 @@
 
 Upgrades are stored in the following format:
 
+Useful functions for dealing with Upgrades and implementing their effects:
+
+- hasUpg(layer, id): determine if the player has the upgrade
+- ugpEffect(layer, id): Returns the current effects of the upgrade, if any
+
+Hint: Basic point gain is calculated in game.js's "getPointGain".
+
+
 ```js
     upgrades: {
         rows: # of rows
         cols: # of columns
         11: {
             desc:() => "Blah",
-            etc
+            more features
         }
         etc
     }
 ```
-
-You can use hasUpg(layer, id) to determine if the player has an upgrade. This is useful for implementing bonuses.
-Hint: Basic point gain is calculated in game.js's "getPointGain".
 
 Each upgrade should have an id where the first digit is the row and the second digit is the column.
 Individual upgrades can have these features:

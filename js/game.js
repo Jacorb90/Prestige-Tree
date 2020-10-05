@@ -6,13 +6,19 @@ var gameEnded = false;
 
 let VERSION = {
 	num: "1.3",
-	name: "Finally some real progress!"
+	name: "Tabbing Out"
 }
 
+// Calculate points/sec!
 function getPointGen() {
 	let gain = new Decimal(1)
-	if (hasUpg("c", 12)) gain = gain.times(layers.c.upgrades[12].effect())
+	if (hasUpg("c", 12)) gain = gain.times(upgEffect("c", 12))
 	return gain
+}
+
+// Determines if it should show points/sec
+function showPointGen(){
+	return (true)
 }
 
 // Function to determine if the player is in a challenge
@@ -204,6 +210,18 @@ function hasMilestone(layer, id){
 
 function hasChall(layer, id){
 	return (player[layer].challs.includes(toNumber(id)))
+}
+
+function upgEffect(layer, id){
+	return (tmp.upgrades[layer][id].effect)
+}
+
+function challEffect(layer, id){
+	return (tmp.challs[layer][id].effect)
+}
+
+function buyableEffect(layer, id){
+	return (tmp.buyables[layer][id].effect)
 }
 
 function canAffordPurchase(layer, thing, cost) {

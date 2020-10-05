@@ -1,5 +1,12 @@
 # Challenges
 
+Useful functions for dealing with Challenges and implementing their effects:
+
+- inChall(layer, id): determine if the player is in a given challenge (or another challenge on the same layer that counts as this one)
+- hasChall(layer, id): determine if the player has completed the challenge
+- challEffect(layer, id): Returns the current effects of the challenge, if any
+
+
 Challenges are stored in the following format:
 
 ```js
@@ -14,11 +21,8 @@ Challenges are stored in the following format:
     }
 ```
 
-You can use inChall(layer, id) and hasChall(layer, id) to determine if the player is currently in a challenge,
-or has completed the challenge, respectively. These are useful for implementing effects.
-
 Each challenge should have an id where the first digit is the row and the second digit is the column.
-Individual upgrades can have these features:
+Individual Challenges can have these features:
 
 - name: Name of the challenge, can be a string or a function
 
