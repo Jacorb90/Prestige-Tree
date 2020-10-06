@@ -162,8 +162,9 @@ function doReset(layer, force=false) {
 			needCanvasUpdate = true;
 
 			if (layers[layer].incr_order){
-				for (lr in layers[layer].incr_order)
-					if (!player[lr].unl) player[lr].order++
+				lrs = layers[layer].incr_order
+				for (lr in lrs)
+					if (!player[lrs[lr]].unl) player[lrs[lr]].order++
 			}
 		}
 	
@@ -205,7 +206,7 @@ function hasUpg(layer, id){
 }
 
 function hasMilestone(layer, id){
-	return (player[layer].milestones.includes(toNumber(id)))
+	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id))
 }
 
 function hasChall(layer, id){
