@@ -1,6 +1,4 @@
-function updateTemp() {
-	if (tmp.genPoints == undefined) tmp.genPoints = false
-
+function setupTemp(){
 	if (!tmp.challActive) {tmp.challActive = {}}
 	if (!tmp.challs) tmp.challs = {}
 	for (layer in layers) {
@@ -29,6 +27,11 @@ function updateTemp() {
 			setupBuyableTemp(layer)
 		}
 	}
+}
+
+function updateTemp() {
+	if (tmp.genPoints == undefined) tmp.genPoints = false
+
 
 	if (!tmp.layerReqs) tmp.layerReqs = {}
 	for (layer in layers) tmp.layerReqs[layer] = layers[layer].requires()

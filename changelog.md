@@ -1,6 +1,6 @@
 #The Modding Tree changelog:
 
-##v1.3.2: - 10/7/20
+##v1.3.3: - 10/7/20
 - Fix for the "order of operations" issue in temp.
 
 ##v1.3.1: - 10/7/20

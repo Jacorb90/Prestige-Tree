@@ -219,6 +219,7 @@ function doReset(layer, force=false) {
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	prevOnReset = undefined
 
+	setupTemp();
 	updateTemp()
 	updateTemp()
 }

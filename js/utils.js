@@ -170,6 +170,7 @@ function load() {
 	versionCheck();
 	changeTheme();
 	changeTreeQuality();
+	setupTemp();
 	updateTemp();
 	updateTemp();
 	loadVue();
