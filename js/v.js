@@ -280,7 +280,7 @@ function loadVue() {
 		template: `
 			<div class="upgRow">
 				<div v-for="tab in Object.keys(data)">
-					<button class="tabButton" v-bind:style="[{'border-color': tmp.layerColor[layer]}, readData(data[tab].buttonStyle)]" v-on:click="player[layer].subtab[name] = tab">{{tab}}</button>
+					<button v-if="!data[tab].unl || data[tab].unl()" class="tabButton" v-bind:style="[{'border-color': tmp.layerColor[layer]}, readData(data[tab].buttonStyle)]" v-on:click="player[layer].subtab[name] = tab">{{tab}}</button>
 				</div>
 			</div>
 		`

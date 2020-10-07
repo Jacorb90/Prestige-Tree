@@ -93,7 +93,7 @@ addLayer("c", {
                 effectDisplay(fx) { return format(fx)+"x" }, // Add formatting to the effect
             },
             13: {
-                desc:() => "Make this layer act like you bought it first.",
+                desc:() => "Unlock a secret subtab and make this layer act if you unlocked it first.",
                 cost:() => new Decimal(69),
                 currencyDisplayName: "candies", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
@@ -220,6 +220,7 @@ addLayer("c", {
                     ["display-image", "discord.png"],],
             },
             illuminati: {
+                unl() {return (hasUpg("c", 13))},
                 content:[
                     ["raw-html", function() {return "<h1> C O N F I R M E D </h1>"}],
                     ["microtabs", "stuff", {'width': '600px', 'height': '350px', 'background-color': 'brown', 'border-style': 'solid'}]
