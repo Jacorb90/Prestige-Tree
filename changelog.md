@@ -1,5 +1,15 @@
 #The Modding Tree changelog:
 
+
+##v1.3.1: - 10/7/20
+
+- Added custom CSS and tooltips for Layer Nodes.
+- Added custom CSS for upgrades, buyables, milestones, and challenges, both individually and layer-wide.
+- You can now use HTML in most display text!
+- You can now make milestones unlockable and not display immediately.
+- Fixed importing saves, and issue with upgrades not appearing, and probably more.
+- Optional "name" layer feature, used in confirmation messages.
+
 ##v1.3: Tabception... ception! - 10/7/20
 
 - Added subtabs! And also a Micro-tab component to let you make smaller subtab-esque areas anywhere.

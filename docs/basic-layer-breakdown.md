@@ -2,7 +2,7 @@
 
 This is a very minimal layer with minimal features. Most things will require additional features.
 If you're curious about "() =>", it's a weird notation that lets you use either a value or function in the same slot,
-and treats it like a function. If you're using an actual function there, you can replace it with the normal notation.
+and treats it like a function. You can use it to make actual functions, but it breaks things then.
 
 ```js
     p: {

@@ -41,16 +41,22 @@ addLayer("c", {
         },
         milestones: {
             0: {requirementDesc:() => "3 Lollipops",
-            done() {return player[this.layer].best.gte(3)}, // Used to determine when to give the milestone
-            effectDesc:() => "Makes this green",
+                done() {return player[this.layer].best.gte(3)}, // Used to determine when to give the milestone
+                effectDesc:() => "Unlock the next milestone",
             },
             1: {requirementDesc:() => "4 Lollipops",
-            done() {return player[this.layer].best.gte(4)},
-            effectDesc:() => "You can toggle beep and boop (which do nothing)",
-            toggles: [
-                ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
-                ["f", "boop"]],
-            }
+                unl() {return hasMilestone(this.layer, 0)},
+                done() {return player[this.layer].best.gte(4)},
+                effectDesc:() => "You can toggle beep and boop (which do nothing)",
+                toggles: [
+                    ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
+                    ["f", "boop"]],
+                style() {                     
+                    if(hasMilestone(this.layer, this.id)) return {
+                        'background-color': '#1111DD' 
+                }},
+        
+                },
         },
         challs: {
             rows: 1,
@@ -94,7 +100,7 @@ addLayer("c", {
                 effectDisplay(fx) { return format(fx)+"x" }, // Add formatting to the effect
             },
             13: {
-                desc:() => "Unlock a secret subtab and make this layer act if you unlocked it first.",
+                desc:() => "Unlock a <b>secret subtab</b> and make this layer act if you unlocked it first.",
                 cost:() => new Decimal(69),
                 currencyDisplayName: "candies", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
@@ -102,7 +108,17 @@ addLayer("c", {
                 unl() { return (hasUpg(this.layer, 12))},
                 onPurchase() { // This function triggers when the upgrade is purchased
                     player[this.layer].order = 0
-                }
+                },
+                style() {
+                    if (hasUpg(this.layer, this.id)) return {
+                    'background-color': '#1111dd' 
+                    }
+                    else if (!canAffordUpg(this.layer, this.id)) {
+                        return {
+                            'background-color': '#dd1111' 
+                        }
+                    } // Otherwise use the default
+                },
             },
         },
         buyables: {
@@ -193,7 +209,7 @@ addLayer("c", {
         // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
         tabFormat: {
             "main tab": {
-                buttonStyle: {'color': 'orange'},
+                buttonStyle() {return  {'color': 'orange'}},
                 content:
                     ["main-display",
                     ["prestige-button", function() {return "Melt your points into "}],
@@ -205,8 +221,8 @@ addLayer("c", {
                     "h-line", "milestones", "blank", "upgrades", "challs"],
             },
             thingies: {
-                style: {'background-color': '#222222'},
-                buttonStyle: {'border-color': 'orange'},
+                style() {return  {'background-color': '#222222'}},
+                buttonStyle() {return {'border-color': 'orange'}},
                 content:[
                     ["buyables", "150px"], "blank",
                     ["row", [
@@ -230,8 +246,21 @@ addLayer("c", {
 
         },
         style() {return {
-        //    'background-color': '#3325CC'
+            'background-color': '#3325CC' 
         }},
+        nodeStyle() {return { // Style on the layer node
+            'color': '#3325CC',
+            'text-decoration': 'underline' 
+        }},
+        componentStyles: {
+            "chall"() {return {'height': '200px'}},
+            "prestige-button"() {return {'color': '#AA66AA'}},
+        },
+        tooltip() { // Optional, tooltip displays when the layer is unlocked
+            let tooltip = formatWhole(player[this.layer].points) + " " + this.resource
+            if (player[this.layer].buyables[11].gt(0)) tooltip += "\n" + formatWhole(player[this.layer].buyables[11]) + " Exhancers"
+            return tooltip
+        },
         shouldNotify() { // Optional, layer will be highlighted on the tree if true.
                          // Layer will automatically highlight if an upgrade is purchasable.
             return (player.c.buyables[11] == 1)
@@ -264,6 +293,10 @@ addLayer("f", {
         row: 1,
         layerShown() {return true}, 
         branches: [["c", 1]], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+
+        tooltipLocked() { // Optional, tooltip displays when the layer is locked
+            return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
+        },
 
         // The following are only currently used for "custom" Prestige type:
         prestigeButtonText() { //Is secretly HTML

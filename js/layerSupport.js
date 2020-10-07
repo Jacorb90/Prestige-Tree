@@ -64,6 +64,9 @@ function updateLayers(){
             }  
         }
 
+        if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
+
+
         row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}
         ROW_LAYERS[row][layer]=layer;

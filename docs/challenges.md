@@ -24,16 +24,16 @@ Challenges are stored in the following format:
 Each challenge should have an id where the first digit is the row and the second digit is the column.
 Individual Challenges can have these features:
 
-- name: Name of the challenge, can be a string or a function
+- name: Name of the challenge, can be a string or a function. Can use basic HTML.
 
 - desc: A description of what makes the challenge a challenge. *You will need to implement these elsewhere*
-        It can also be a function that returns updating text.
+        It can also be a function that returns updating text. Can use basic HTML.
 
 - reward: A description of the reward's effect. *You will also have to implement the effect where it is applied.*
-          It can also be a function that returns updating text.
+          It can also be a function that returns updating text. Can use basic HTML.
 
 - effect(): **optional**, A function that calculates and returns the current values of any bonuses from the reward.
-    Can return a value or an object containing multiple values.
+    Can return a value or an object containing multiple values. Can use basic HTML.
 
 - effectDisplay(effects): **optional**, A function that returns a display of the current effects of the reward with 
                      formatting. Default behavior is to just display the a number appropriately formatted.
@@ -54,6 +54,7 @@ By default, challenges use basic Points for the goal. You can change that using 
 - currencyLayer: **optional**, the internal name of the layer that currency is stored in.
                  If it's part of a layer, omit.
 
+- style(): **Optional**, A function returning a CSS object, which affects this challenge.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 

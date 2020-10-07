@@ -51,13 +51,7 @@ Key:
     ],
     ```
 
-- branches: **optional**, determines what lines should appear on the tree when this layer is visible.
-            An array of pairs consisting of a layer name and a number from 1 to 3.
-            A branch will appear connecting this layer to the correspodnding layer, with the color based on the number.
-            You should add the branch value to the layer that is unlocked second.
-
-- style: A CSS object containing any CSS that should affect this layer's whole tab.
-         Can also be a function returning a dynamic CSS object.
+- style(): A function returning a CSS object containing any CSS that should affect this layer's whole tab.
 
 - tabFormat: Use this if you want to add extra things to your tab or change the layout.
 
@@ -81,7 +75,6 @@ Key:
     [Explanations are in a separate file.](subtabs-and-microtabs.md)
 
 
-(subtabs-and-microtabs.md):
 # Prestige formula features
 
 - baseResource: The name of the resource that determines how much of the main currency you gain on reset.
@@ -115,6 +108,19 @@ Key:
                     Can be used to have secondary resource gain on prestige, or to recalculate things or whatnot.
 
 
+# Tree/node features
+
+- branches: **optional**, determines what lines should appear on the tree when this layer is visible.
+            An array of pairs consisting of a layer name and a number from 1 to 3.
+            A branch will appear connecting this layer to the correspodnding layer, with the color based on the number.
+            You should add the branch value to the layer that is unlocked second.
+
+- nodeStyle(): **optional**, a function returning a CSS object, styles this layer's node on the tree
+
+- tooltip() / tooltipLocked(): **optional** Functions that return text, which is the tooltip for the node when the layer
+                               is unlocked or locked, respectively. By default the tooltips behave the same as in the original Prestige Tree.
+
+
 # Other features
 
 - doReset(resettingLayer): **optional**, is triggered when a layer on a row greater than or equal to this one does a reset.
@@ -146,6 +152,16 @@ Key:
 
 - should_notify: **optional**, a function to return true if this layer should be highlighted in the tree.
                  The layer will automatically be highlighted if you can buy an upgrade whether you have this or not.
+
+- componentStyles: **optional**, An object that contains a set of functions returning CSS objects.
+                   Each of these will be applied to any components on the layer with the type of its id. Example:
+
+```js
+        componentStyles: {
+            "chall"() {return {'height': '200px'}},
+            "prestige-button"() {return {'color': '#AA66AA'}},
+        },
+```
 
 
 # Custom Prestige type only 

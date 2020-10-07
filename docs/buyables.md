@@ -33,7 +33,7 @@ Features:
               for having x of this buyable. Can return a value or an object containing multiple values.
 
 - display(): A function returning everything that should be displayed on the rebuyable after the title, likely
-           including the description, amount bought, cost, and current effect.
+           including the description, amount bought, cost, and current effect. Can use basic HTML.
 
 - unl(): A function returning a bool to determine if the buyable is visible or not.
 
@@ -42,6 +42,8 @@ Features:
 - buy(): A function that implements buying one of the buyable. 
 
 - buyMax(): **optional**, A function that implements buying as many of the buyable as possible.
+
+- style(): **Optional**, A function returning a CSS object, which affects this buyable.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 

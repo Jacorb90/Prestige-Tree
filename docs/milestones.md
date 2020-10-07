@@ -16,10 +16,10 @@ You can use hasMilestone(layer, id) to determine if the player has a given miles
 Milestone features:
 
 - requirementDesc: A string describing the requirement for unlocking this milestone. Suggestion: Use a "total".
-                   It can also be a function that returns updating text.
+                   It can also be a function that returns updating text. Can use basic HTML.
 
 - effectDesc: A string describing the reward for having the milestone. *You will have to implement the reward elsewhere.*
-              It can also be a function that returns updating text.
+              It can also be a function that returns updating text. Can use basic HTML.
 
 - done(): A function returning a boolean to determine if the milestone has been fulfilled.
 
@@ -30,6 +30,10 @@ Milestone features:
            (e.g. [["b", "auto"], ["g", "auto"])
 
            **Tip:** Toggles are not de-set if the milestone becomes locked! In this case, you should also check if the player has the milestone.
+
+- style(): **Optional**, A function returning a CSS object, which affects this milestone.
+
+- unl(): A function returning a boolean to determine if the milestone should be shown. If absent, it is always shown.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 

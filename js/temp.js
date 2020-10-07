@@ -37,6 +37,39 @@ function updateTemp() {
 		}
 	}
 
+	if (!tmp.microtabs) tmp.microtabs = {}
+	for (layer in layers) {
+		if (!tmp.microtabs[layer]) tmp.microtabs[layer] = {}
+		if (layers[layer].microtabs) {
+			if(layers[layer].microtabs !== undefined){
+				updateMicrotabTemp(layer)
+			}
+		}
+		if(layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)){
+			let data2 = layers[layer].tabFormat
+			let set = "mainTabs"
+			if (!tmp.microtabs[layer][set]) tmp.microtabs[layer][set] = {}
+			for (tab in data2) {
+				if (!tmp.microtabs[layer][set][tab])
+					tmp.microtabs[layer][set][tab] = {}
+				if(data2[tab].style)
+					tmp.microtabs[layer][set][tab].style = data2[tab].style()
+				if(data2[tab].buttonStyle)
+					tmp.microtabs[layer][set][tab].buttonStyle = data2[tab].buttonStyle()
+			}
+		}	
+	}
+
+
+	if (!tmp.componentStyles) tmp.componentStyles = {}
+	for (layer in layers) if (layers[layer].componentStyles) {
+		if(layers[layer].componentStyles !== undefined){
+			tmp.componentStyles[layer] = {}
+			for (item in layers[layer].componentStyles)
+				tmp.componentStyles[layer][item] = layers[layer].componentStyles[item]()
+		}
+	}
+
 	if (!tmp.gainMults) tmp.gainMults = {}
 	if (!tmp.gainExp) tmp.gainExp = {}
 	if (!tmp.resetGain) tmp.resetGain = {}
@@ -46,10 +79,13 @@ function updateTemp() {
 	if (!tmp.layerShown) tmp.layerShown = {}
 	if (!tmp.effectDescription) tmp.effectDescription = {}
 	if (!tmp.style) tmp.style = {}
+	if (!tmp.nodeStyle) tmp.nodeStyle = {}
 	if (!tmp.notify) tmp.notify = {}
 	if (!tmp.nextAtDisp) tmp.nextAtDisp = {}
 	if (!tmp.prestigeButtonText) tmp.prestigeButtonText = {}
 	if (!tmp.canReset) tmp.canReset = {}
+	if (!tmp.tooltips) tmp.tooltips = {}
+	if (!tmp.tooltipsLocked) tmp.tooltipsLocked = {}
 
 	for (layer in layers) {
 		if (layers[layer].color) tmp.layerColor[layer] = layers[layer].color()
@@ -65,7 +101,9 @@ function updateTemp() {
 		if (layers[layer].effectDescription) tmp.effectDescription[layer] = layers[layer].effectDescription()
 		if (layers[layer].canReset) tmp.canReset[layer] = layers[layer].canReset()
 		if (layers[layer].prestigeButtonText) tmp.prestigeButtonText[layer] = layers[layer].prestigeButtonText()
-
+		if (layers[layer].tooltip) tmp.tooltips[layer] = layers[layer].tooltip()
+		if (layers[layer].tooltipLocked) tmp.tooltipsLocked[layer] = layers[layer].tooltipLocked()
+		if (layers[layer].nodeStyle) tmp.nodeStyle[layer] = layers[layer].nodeStyle()
 	}
 
 	tmp.pointGen = getPointGen()
@@ -86,6 +124,10 @@ function updateChallTemp(layer) {
 		for (let col = 1; col <= data2.cols; col++) {
 			let id = row * 10 + col
 			tmp.challs[layer][id] = {}
+
+			if (customActive ? data2.active(id) : player[layer].active == id) data[id] = 1
+			else delete data[id]
+
 			tmp.challs[layer][id].unl = data2[id].unl()
 			if(data2[id].name) tmp.challs[layer][id].name = data2[id].name()
 			if(data2[id].desc) tmp.challs[layer][id].desc = data2[id].desc()
@@ -93,10 +135,7 @@ function updateChallTemp(layer) {
 			if(data2[id].effect) tmp.challs[layer][id].effect = data2[id].effect()
 			if(data2[id].effectDisplay) tmp.challs[layer][id].effectDisplay = data2[id].effectDisplay(tmp.challs[layer][id].effect)
 			tmp.challs[layer][id].goal = data2[id].goal()
-
-
-			if (customActive ? data2.active(id) : player[layer].active == id) data[id] = 1
-			else delete data[id]
+			if(data2[id].style) tmp.challs[layer][id].style = data2[id].style()
 		}
 	}
 }
@@ -111,12 +150,14 @@ function updateUpgradeTemp(layer) {
 			let id = row * 10 + col
 			tmp.upgrades[layer][id] = {}
 			tmp.upgrades[layer][id].unl = data2[id].unl()
-			if(data2[id].title) tmp.upgrades[layer][id].title = data2[id].title()
 			if(data2[id].effect) tmp.upgrades[layer][id].effect = data2[id].effect()
+			tmp.upgrades[layer][id].cost = data2[id].cost()
 			if(data2[id].effectDisplay) tmp.upgrades[layer][id].effectDisplay = data2[id].effectDisplay(tmp.upgrades[layer][id].effect)
 			if(data2[id].desc) tmp.upgrades[layer][id].desc = data2[id].desc()
+			if(data2[id].title) tmp.upgrades[layer][id].title = data2[id].title()
 
-			tmp.upgrades[layer][id].cost = data2[id].cost()
+			if(data2[id].style) tmp.upgrades[layer][id].style = data2[id].style()
+
 
 		}
 	}
@@ -129,9 +170,12 @@ function updateMilestoneTemp(layer) {
 	let data2 = layers[layer].milestones
 	for (id in data2) {
 		tmp.milestones[layer][id] = {}
+		if(data2[id].unl) tmp.milestones[layer][id].unl = data2[id].unl()
 		tmp.milestones[layer][id].done = data2[id].done()
 		if(data2[id].requirementDesc) tmp.milestones[layer][id].requirementDesc = data2[id].requirementDesc()
-		if(data2[id].effectDesc) tmp.milestones[layer][id].effectDesc = data2[id].effectDesc()	
+		if(data2[id].effectDesc) tmp.milestones[layer][id].effectDesc = data2[id].effectDesc()
+		if(data2[id].style) tmp.milestones[layer][id].style = data2[id].style()
+	
 	}
 }
 
@@ -151,6 +195,25 @@ function updateBuyableTemp(layer) {
 			tmp.buyables[layer][id].canAfford = data2[id].canAfford()
 			if(data2[id].title) tmp.buyables[layer][id].title = data2[id].title()
 			if(data2[id].display) tmp.buyables[layer][id].display = data2[id].display()
+			if(data2[id].style) tmp.buyables[layer][id].style = data2[id].style()
+
+		}
+	}
+}
+
+function updateMicrotabTemp(layer) {
+	if (layers[layer] === undefined) return
+	let data2 = layers[layer].microtabs
+	for (set in data2) {
+		if (!tmp.microtabs[layer][set]) tmp.microtabs[layer][set] = {}
+		for (tab in data2[set]) {
+			if (!tmp.microtabs[layer][set][tab])
+				tmp.microtabs[layer][set][tab] = {}
+			if(data2[set][tab].style)
+				tmp.microtabs[layer][set][tab].style = data2[set][tab].style()
+			if(data2[set][tab].buttonStyle)
+				tmp.microtabs[layer][set][tab].buttonStyle = data2[set][tab].buttonStyle()
+
 		}
 	}
 }

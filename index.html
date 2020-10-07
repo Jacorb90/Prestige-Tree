@@ -49,6 +49,16 @@
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
+			<h3>v1.3.1</h3>
+			<ul>
+				<li>Added custom CSS and tooltips for Layer Nodes.</li>
+				<li>Added custom CSS for upgrades, buyables, milestones, and challenges, both individually and layer-wide.</li>
+				<li>You can now use HTML in most display text!</li>
+				<li>You can now make milestones unlockable and not display immediately.</li>
+				<li>Fixed importing saves, and issue with upgrades not appearing, and probably more.</li>
+				<li>Optional "name" layer feature, used in confirmation messages.</li>
+				<li></li>
+			</ul><br>
 			<h3>v1.3: Tabception... ception!</h3>
 			<ul>
 				<li>Added subtabs! And also a Micro-tab component to let you make smaller subtab-esque areas anywhere.</li>
@@ -149,16 +159,16 @@
 			<div v-if="player.tab==layer" v-bind:class="'col right'" v-bind:style="tmp.style[layer] ? tmp.style[layer] : {}">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<div v-if="!layers[layer].tabFormat">
-					<main-display :layer="layer"></main-display>
-					<prestige-button :layer="layer"></prestige-button>
+					<main-display v-bind:style="tmp.componentStyles[layer]['main-display']" :layer="layer"></main-display>
+					<prestige-button v-bind:style="tmp.componentStyles[layer]['prestige-button']" :layer="layer"></prestige-button>
 					<span v-if="layers[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{layers[layer].baseResource}}</span>
 					<br><br>
 					<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
 					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
-					<milestones :layer="layer"></milestones>
-					<buyables :layer="layer"></buyables>
-					<upgrades :layer="layer"></upgrades>
-					<challs :layer="layer"></challs>
+					<milestones v-bind:style="tmp.componentStyles[layer].milestones" :layer="layer"></milestones>
+					<buyables v-bind:style="tmp.componentStyles[layer].buyables" :layer="layer"></buyables>
+					<upgrades v-bind:style="tmp.componentStyles[layer]['upgrades']" :layer="layer"></upgrades>
+					<challs v-bind:style="tmp.componentStyles[layer]['challs']" :layer="layer"></challs>
 					<br><br>
 				</div>
 				<div v-if="layers[layer].tabFormat">
@@ -167,7 +177,7 @@
 					</div>
 					<div v-else v-bind:style="[{'margin-top': '-50px'}, readData(layers[layer].tabFormat[player.subtabs[layer].mainTabs].style)]">
 						<div class="upgTable" v-bind:style="{'padding-top': '25px', 'margin-bottom': '24px'}">
-							<tab-buttons :layer="layer" :data="layers[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
+							<tab-buttons v-bind:style="tmp.componentStyles[layer]['tab-buttons']" :layer="layer" :data="layers[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
 						</div>
 						<column :layer="layer" :data="layers[layer].tabFormat[player.subtabs[layer].mainTabs].content"></column>
 					</div>
