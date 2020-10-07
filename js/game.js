@@ -62,10 +62,12 @@ function getResetGain(layer) {
 	}
 }
 
-function getNextAt(layer) {
+function getNextAt(layer, disp=false) {
 	if (tmp.gainExp[layer].eq(0)) return new Decimal(1/0)
-	if (layers[layer].type=="static") {
-		let amt = player[layer].points
+	if (layers[layer].type=="static") 
+	{
+		if (!layers[layer].canBuyMax()) disp = false
+		let amt = player[layer].points.plus((disp&&tmp.layerAmt[layer].gte(tmp.nextAt[layer]))?tmp.resetGain[layer]:0)
 		let extraCost = Decimal.pow(layers[layer].base, amt.pow(layers[layer].exponent).div(tmp.gainExp[layer])).times(tmp.gainMults[layer])
 		let cost = extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
 		if (layers[layer].resCeil) cost = cost.ceil()
@@ -98,8 +100,10 @@ function shouldNotify(layer){
 
 function rowReset(row, layer) {
 	for (lr in ROW_LAYERS[row]){
-		if(layers[lr].doReset)
+		if(layers[lr].doReset) {
+			player[lr].active = null // Exit challenges on any row reset on an equal or higher row
 			layers[lr].doReset(layer)
+		}
 		else
 			if(layers[layer].row > layers[lr].row) fullLayerReset(lr)
 	}

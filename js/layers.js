@@ -212,12 +212,15 @@ addLayer("f", {
             boop: false,
         }},
         color:() => "#FE0102",
-        requires() {return new Decimal(200)}, 
+        requires() {return new Decimal(10)}, 
         resource: "farm points", 
         baseResource: "candies", 
         baseAmount() {return player.points},
-        type: "normal", 
-        exponent: 0.5, 
+        type: "static", 
+        exponent: 0.5,
+        base: 3,
+        resCeil: true,
+        canBuyMax:() => true,
         gainMult() {
             return new Decimal(1)
         },

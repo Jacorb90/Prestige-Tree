@@ -45,7 +45,7 @@ function updateTemp() {
 	if (!tmp.effectDescription) tmp.effectDescription = {}
 	if (!tmp.style) tmp.style = {}
 	if (!tmp.notify) tmp.notify = {}
-
+	if (!tmp.nextAtDisp) tmp.nextAtDisp = {}
 
 	for (layer in layers) {
 		if (layers[layer].color) tmp.layerColor[layer] = layers[layer].color()
@@ -57,6 +57,7 @@ function updateTemp() {
 		tmp.resetGain[layer] = getResetGain(layer)
 		tmp.nextAt[layer] = getNextAt(layer)
 		tmp.notify[layer] = shouldNotify(layer)
+		tmp.nextAtDisp[layer] = getNextAt(layer, true)
 		if (layers[layer].effectDescription) tmp.effectDescription[layer] = layers[layer].effectDescription()
 
 	}
