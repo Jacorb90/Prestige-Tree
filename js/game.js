@@ -9,6 +9,11 @@ let VERSION = {
 	name: "Tabception... ception!"
 }
 
+// Determines if it should show points/sec
+function showPointGen(){
+	return (tmp.pointGen.neq(new Decimal(0)))
+} 
+
 // Calculate points/sec!
 function getPointGen() {
 	if(!hasUpg("c", 11))
@@ -19,10 +24,7 @@ function getPointGen() {
 	return gain
 }
 
-// Determines if it should show points/sec
-function showPointGen(){
-	return (tmp.pointGen.neq(new Decimal(0)))
-}
+
 
 // Function to determine if the player is in a challenge
 function inChallenge(layer, id){
