@@ -6,68 +6,35 @@ function updateTemp() {
 	for (layer in layers) {
 		if(layers[layer].challs !== undefined){
 			tmp.challActive[layer] = {}
-			updateChallTemp(layer)
+			setupChallTemp(layer)
 		}
 	}
 
 	if (!tmp.upgrades) tmp.upgrades = {}
 	for (layer in layers) {
 		if(layers[layer].upgrades !== undefined){
-			updateUpgradeTemp(layer)
+			setupUpgradeTemp(layer)
 		}
 	}
 	
 	if (!tmp.milestones) tmp.milestones = {}
 	for (layer in layers) {
 		if(layers[layer].milestones !== undefined){
-			updateMilestoneTemp(layer)
+			setupMilestoneTemp(layer)
 		}
 	}
 	if (!tmp.buyables) tmp.buyables = {}
 	for (layer in layers) if (layers[layer].buyables) {
 		if(layers[layer].buyables !== undefined){
-			updateBuyableTemp(layer)
+			setupBuyableTemp(layer)
 		}
 	}
-
-	if (!tmp.microtabs) tmp.microtabs = {}
-	for (layer in layers) {
-		if (!tmp.microtabs[layer]) tmp.microtabs[layer] = {}
-		if (layers[layer].microtabs) {
-			if(layers[layer].microtabs !== undefined){
-				updateMicrotabTemp(layer)
-			}
-		}
-		if(layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)){
-			let data2 = layers[layer].tabFormat
-			let set = "mainTabs"
-			if (!tmp.microtabs[layer][set]) tmp.microtabs[layer][set] = {}
-			for (tab in data2) {
-				if (!tmp.microtabs[layer][set][tab])
-					tmp.microtabs[layer][set][tab] = {}
-				if(data2[tab].style)
-					tmp.microtabs[layer][set][tab].style = data2[tab].style()
-				if(data2[tab].buttonStyle)
-					tmp.microtabs[layer][set][tab].buttonStyle = data2[tab].buttonStyle()
-			}
-		}	
-	}
-
-	if (!tmp.layerEffs) tmp.layerEffs = {}
-	for (layer in layers) if (layers[layer].effect) tmp.layerEffs[layer] = layers[layer].effect()
 
 	if (!tmp.layerReqs) tmp.layerReqs = {}
 	for (layer in layers) tmp.layerReqs[layer] = layers[layer].requires()
 
-
-	if (!tmp.componentStyles) tmp.componentStyles = {}
-	for (layer in layers) if (layers[layer].componentStyles) {
-		if(layers[layer].componentStyles !== undefined){
-			tmp.componentStyles[layer] = {}
-			for (item in layers[layer].componentStyles)
-				tmp.componentStyles[layer][item] = layers[layer].componentStyles[item]()
-		}
-	}
+	if (!tmp.layerEffs) tmp.layerEffs = {}
+	for (layer in layers) if (layers[layer].effect) tmp.layerEffs[layer] = layers[layer].effect()
 
 	if (!tmp.gainMults) tmp.gainMults = {}
 	if (!tmp.gainExp) tmp.gainExp = {}
@@ -110,34 +77,71 @@ function updateTemp() {
 	for (layer in layers){
 		if (layers[layer].updateTemp) layers[layer].updateTemp()
 	}
-}
+
+	if (!tmp.componentStyles) tmp.componentStyles = {}
+	for (layer in layers) if (layers[layer].componentStyles) {
+		if(layers[layer].componentStyles !== undefined){
+			tmp.componentStyles[layer] = {}
+			for (item in layers[layer].componentStyles)
+				tmp.componentStyles[layer][item] = layers[layer].componentStyles[item]()
+		}
+	}
 
 
-function setupChallTemp(layer) {
-	if (player[layer] === undefined) return
-	if (!tmp.challs[layer]) tmp.challs[layer] = {}
+	if (!tmp.microtabs) tmp.microtabs = {}
+	for (layer in layers) {
+		if (!tmp.microtabs[layer]) tmp.microtabs[layer] = {}
+		if (layers[layer].microtabs) {
+			if(layers[layer].microtabs !== undefined){
+				updateMicrotabTemp(layer)
+			}
+		}
+		if(layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)){
+			let data2 = layers[layer].tabFormat
+			let set = "mainTabs"
+			if (!tmp.microtabs[layer][set]) tmp.microtabs[layer][set] = {}
+			for (tab in data2) {
+				if (!tmp.microtabs[layer][set][tab])
+					tmp.microtabs[layer][set][tab] = {}
+				if(data2[tab].style)
+					tmp.microtabs[layer][set][tab].style = data2[tab].style()
+				if(data2[tab].buttonStyle)
+					tmp.microtabs[layer][set][tab].buttonStyle = data2[tab].buttonStyle()
+			}
+		}	
+	}
 
-	let data = tmp.challActive[layer]
-	let data2 = layers[layer].challs
-	let customActive = data2.active !== undefined
-	for (let row = 1; row <= data2.rows; row++) {
-		for (let col = 1; col <= data2.cols; col++) {
-			tmp.challs[layer][id] = {}
 
-			if (customActive ? data2.active(id) : player[layer].active == id) data[id] = 1
-			else delete data[id]
+	if (!tmp.challActive) {tmp.challActive = {}}
+	if (!tmp.challs) tmp.challs = {}
+	for (layer in layers) {
+		if(layers[layer].challs !== undefined){
+			tmp.challActive[layer] = {}
+			updateChallTemp(layer)
+		}
+	}
 
-			tmp.challs[layer][id].unl = data2[id].unl()
-			if(data2[id].name) tmp.challs[layer][id].name = data2[id].name()
-			if(data2[id].desc) tmp.challs[layer][id].desc = data2[id].desc()
-			if(data2[id].reward) tmp.challs[layer][id].reward = data2[id].reward()
-			if(data2[id].effect) tmp.challs[layer][id].effect = data2[id].effect()
-			if(data2[id].effectDisplay) tmp.challs[layer][id].effectDisplay = data2[id].effectDisplay(tmp.challs[layer][id].effect)
-			tmp.challs[layer][id].goal = data2[id].goal()
-			if(data2[id].style) tmp.challs[layer][id].style = data2[id].style()
+	if (!tmp.upgrades) tmp.upgrades = {}
+	for (layer in layers) {
+		if(layers[layer].upgrades !== undefined){
+			updateUpgradeTemp(layer)
+		}
+	}
+	
+	if (!tmp.milestones) tmp.milestones = {}
+	for (layer in layers) {
+		if(layers[layer].milestones !== undefined){
+			updateMilestoneTemp(layer)
+		}
+	}
+	if (!tmp.buyables) tmp.buyables = {}
+	for (layer in layers) if (layers[layer].buyables) {
+		if(layers[layer].buyables !== undefined){
+			updateBuyableTemp(layer)
 		}
 	}
 }
+
 
 
 function updateChallTemp(layer) {
@@ -237,6 +241,68 @@ function updateMicrotabTemp(layer) {
 				tmp.microtabs[layer][set][tab].style = data2[set][tab].style()
 			if(data2[set][tab].buttonStyle)
 				tmp.microtabs[layer][set][tab].buttonStyle = data2[set][tab].buttonStyle()
+
+		}
+	}
+}
+
+
+function setupChallTemp(layer) {
+	if (player[layer] === undefined) return
+	if (!tmp.challs[layer]) tmp.challs[layer] = {}
+
+	let data = tmp.challActive[layer]
+	let data2 = layers[layer].challs
+	let customActive = data2.active !== undefined
+	for (let row = 1; row <= data2.rows; row++) {
+		for (let col = 1; col <= data2.cols; col++) {
+			let id = row * 10 + col
+
+			tmp.challs[layer][id] = {}
+			if(data2[id].effect) tmp.challs[layer][id].effect = {}
+			if(data2[id].style) tmp.challs[layer][id].style = {}
+		}
+	}
+}
+
+function setupUpgradeTemp(layer) {
+	if (layers[layer] === undefined) return
+	if (!tmp.upgrades[layer]) tmp.upgrades[layer] = {}
+
+	let data2 = layers[layer].upgrades
+	for (let row = 1; row <= data2.rows; row++) {
+		for (let col = 1; col <= data2.cols; col++) {
+			let id = row * 10 + col
+			tmp.upgrades[layer][id] = {}
+			if(data2[id].effect) tmp.upgrades[layer][id].effect = {}
+			if(data2[id].style) tmp.upgrades[layer][id].style = {}
+		}
+	}
+}
+
+function setupMilestoneTemp(layer) {
+	if (layers[layer] === undefined) return
+	if (!tmp.milestones[layer]) tmp.milestones[layer] = {}
+
+	let data2 = layers[layer].milestones
+	for (id in data2) {
+		tmp.milestones[layer][id] = {}
+		if(data2[id].style) tmp.milestones[layer][id].style = {}
+	}
+}
+
+function setupBuyableTemp(layer) {
+	if (layers[layer] === undefined) return
+	if (!tmp.buyables[layer]) tmp.buyables[layer] = {}
+	let data2 = layers[layer].buyables
+	for (let row = 1; row <= data2.rows; row++) {
+		for (let col = 1; col <= data2.cols; col++) {
+			let id = row * 10 + col
+			let amt = player[layer].buyables[id]
+			tmp.buyables[layer][id] = {}
+			if(data2[id].effect) tmp.buyables[layer][id].effect = {}
+			tmp.buyables[layer][id].cost = {}
+			if(data2[id].style) tmp.buyables[layer][id].style = {}
 
 		}
 	}

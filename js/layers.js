@@ -30,7 +30,6 @@ addLayer("c", {
         },
         row: 0, // Row the layer is in on the tree (0 is the first row)
         effect() {
-            console.log(tmp.buyables)
             return { // Formulas for any boosts inherent to resources in the layer. Can return a single value instead of an object if there is just one effect
             waffleBoost: (true == false ? 0 : Decimal.pow(player[this.layer].points, 0.2)),
             icecreamCap: (player[this.layer].points * 10)
