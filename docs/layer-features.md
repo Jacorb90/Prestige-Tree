@@ -13,6 +13,8 @@ Key:
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
       to access the save value. It makes copying code to new layers easier. It is also assigned to all upgrades and buyables and such.
 
+- name: **Optional**, used in reset confirmations (and maybe other places). If absent, it just uses the layer's id.
+
 - startData(): A function to return the default save data for this layer. Add any variables you have to it.
             Any nonstandard Decimal variables need to be added to convertToDecimal as well.
     Standard values:

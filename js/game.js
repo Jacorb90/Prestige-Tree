@@ -226,7 +226,7 @@ function doReset(layer, force=false) {
 function respecBuyables(layer) {
 	if (!layers[layer].buyables) return
 	if (!layers[layer].buyables.respec) return
-	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + layer + "\" reset as well!")) return
+	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + (layers[layer].name ? layers[layer].name : layer) + "\" reset as well!")) return
 	layers[layer].buyables.respec()
 }
 
