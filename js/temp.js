@@ -1,4 +1,6 @@
 function updateTemp() {
+	if (tmp.genPoints == undefined) tmp.genPoints = false
+
 	if (!tmp.challActive) {tmp.challActive = {}}
 	if (!tmp.challs) tmp.challs = {}
 	for (layer in layers) {

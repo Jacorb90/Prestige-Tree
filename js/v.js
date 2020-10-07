@@ -261,14 +261,14 @@ function loadVue() {
 	Vue.component('microtabs', {
 		props: ['layer', 'data'],
 		computed: {
-			currentTab() {return player[layer].subtab[data]}
+			currentTab() {return player.subtabs[layer][data]}
 		},
 		template: `
-		<div v-if="layers[layer].microtabs">
+		<div v-if="layers[layer].microtabs" :style="{'border-style': 'solid'}">
 			<div class="upgTable">
 				<tab-buttons :layer="layer" :data="layers[layer].microtabs[data]" :name="data"></tab-buttons>
 			</div>
-			<column v-bind:style="readData(layers[layer].microtabs[data][player[layer].subtab[data]].style)" :layer="layer" :data="layers[layer].microtabs[data][player[layer].subtab[data]].content"></column>
+			<column v-bind:style="readData(layers[layer].microtabs[data][player.subtabs[layer][data]].style)" :layer="layer" :data="layers[layer].microtabs[data][player.subtabs[layer][data]].content"></column>
 		</div>
 		`
 	})
@@ -280,7 +280,7 @@ function loadVue() {
 		template: `
 			<div class="upgRow">
 				<div v-for="tab in Object.keys(data)">
-					<button v-if="!data[tab].unl || data[tab].unl()" class="tabButton" v-bind:style="[{'border-color': tmp.layerColor[layer]}, readData(data[tab].buttonStyle)]" v-on:click="player[layer].subtab[name] = tab">{{tab}}</button>
+					<button v-if="!data[tab].unl || data[tab].unl()" class="tabButton" v-bind:style="[{'border-color': tmp.layerColor[layer]}, readData(data[tab].buttonStyle)]" v-on:click="player.subtabs[layer][name] = tab">{{tab}}</button>
 				</div>
 			</div>
 		`

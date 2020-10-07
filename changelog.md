@@ -1,5 +1,19 @@
 #The Modding Tree changelog:
 
+##v1.3: Tabception... ception! - 10/7/20
+
+- Added subtabs! And also a Micro-tab component to let you make smaller subtab-esque areas anywhere.
+- Added a "custom" prestige formula type, and a number of features to support it.
+- Added points/sec display (can be disabled).
+- Added h-line, v-line and image-display components, plus components for individual upgrades, challenges, and milestones.
+- Added upgEffect, buyableEffect, and challEffect functions.
+- Added "hide completed challenges" setting.
+- Moved old changelogs to a separate place.
+- Fixed hasMilestone and incr_order.
+- Static layers now show the currency amount needed for the next one if you can buy max.
+
+
+
 ##v1.2.4 - 10/4/20
 
 - Layers are now highlighted if you can buy an upgrade, and a new feature, shouldNotify,

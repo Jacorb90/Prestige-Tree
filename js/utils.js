@@ -80,6 +80,7 @@ function startPlayerBase() {
 		hasNaN: false,
 		hideChalls: false,
 		points: new Decimal(10),
+		subtabs: {},
 	}
 }
 
@@ -93,13 +94,13 @@ function getStartPlayer() {
 		playerdata[layer].milestones = []
 		playerdata[layer].challs = []
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
-			playerdata[layer].subtab = {}
-			playerdata[layer].subtab.mainTabs = Object.keys(layers[layer].tabFormat)[0]
+			playerdata.subtabs[layer] = {}
+			playerdata.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
 		}
 		if (layers[layer].microtabs) {
-			if (playerdata[layer].subtab == undefined) playerdata[layer].subtab = {}
+			if (playerdata.subtabs[layer] == undefined) playerdata.subtabs[layer] = {}
 			for (item in layers[layer].microtabs)
-				playerdata[layer].subtab[item] = Object.keys(layers[layer].microtabs[item])[0]
+			playerdata.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
 		}
 	}
 	return playerdata
@@ -140,14 +141,14 @@ function fixSave() {
 		}
 		
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
-			if (player[layer].subtab == undefined) player[layer].subtab = {}
-			if (player[layer].subtab.mainTabs == undefined) player[layer].subtab.mainTabs = Object.keys(layers[layer].tabFormat)[0]
+			if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
+			if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
 		}
 
 		if (layers[layer].microtabs) {
-			if (player[layer].subtab == undefined) player[layer].subtab = {}
+			if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
 			for (item in layers[layer].microtabs)
-				if (player[layer].subtab[item] == undefined) player[layer].subtab[item] = Object.keys(layers[layer].microtabs[item])[0]
+				if (player.subtabs[layer][item] == undefined) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
 		}
 	
 	}

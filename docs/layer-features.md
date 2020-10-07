@@ -75,7 +75,11 @@ Key:
 - buyables: Effectively upgrades that can be bought multiple times, and are optionally respeccable.
     [Explanations are in a separate file.](buyables.md)
 
+- microtabs: An area that functions like a set of subtabs, with buttons at the top changing the content within. (Advanced)
+    [Explanations are in a separate file.](subtabs-and-microtabs.md)
 
+
+(subtabs-and-microtabs.md):
 # Prestige formula features
 
 - baseResource: The name of the resource that determines how much of the main currency you gain on reset.

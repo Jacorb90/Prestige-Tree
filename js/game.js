@@ -6,11 +6,14 @@ var gameEnded = false;
 
 let VERSION = {
 	num: "1.3",
-	name: "Tabbing Out"
+	name: "Tabception... ception!"
 }
 
 // Calculate points/sec!
 function getPointGen() {
+	if(!hasUpg("c", 11))
+		return new Decimal(0)
+
 	let gain = new Decimal(1)
 	if (hasUpg("c", 12)) gain = gain.times(upgEffect("c", 12))
 	return gain
@@ -18,7 +21,7 @@ function getPointGen() {
 
 // Determines if it should show points/sec
 function showPointGen(){
-	return (true)
+	return (tmp.pointGen.neq(new Decimal(0)))
 }
 
 // Function to determine if the player is in a challenge
@@ -128,14 +131,14 @@ function fullLayerReset(layer) {
 	player[layer].milestones = []
 	player[layer].challs = []
 	if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
-		if (player[layer].subtab == undefined) player[layer].subtab = {}
-		if (player[layer].subtab.mainTabs == undefined) player[layer].subtab.mainTabs = Object.keys(layers[layer].tabFormat)[0]
+		if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
+		if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
 	}
 
 	if (layers[layer].microtabs) {
-		if (player[layer].subtab == undefined) player[layer].subtab = {}
+		if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
 		for (item in layers[layer].microtabs)
-			if (player[layer].subtab[item] == undefined) player[layer].subtab[item] = Object.keys(layers[layer].microtabs[item])[0]
+			if (player.subtabs[layer][item] == undefined) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
 	}
 	resetBuyables(layer)
 }

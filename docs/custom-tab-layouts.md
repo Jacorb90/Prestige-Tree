@@ -1,5 +1,8 @@
 # Custom tab layouts
 
+Note: If you are using subtabs, tabFormat is used differently, but you still use the same format within each subtabs.
+[See here for more on subtabs](subtabs-and-microtabs.md)
+
 Custom tab layouts can be used to do basically anything in a tab window, especially combined with the "style" layer feature. The tabFormat feature is an array of things, like this:
 
 ```js
@@ -37,6 +40,8 @@ These are the existing components, but you can create more in v.js:
 
 - buyables: Display all of the buyables for this layer, as appropriate. The argument optional, and is the size of the
             boxes in pixels.
+
+- microtabs: Display a set of subtabs for an area. The argument is the name of the set of microtabs in the "microtabs" feature.
 
 - upgrade, milestone, chall, buyable: An individual upgrade, challenge, etc. The argument is the id.
         This can be used if you want to have upgrades split up across multiple subtabs, for example.
