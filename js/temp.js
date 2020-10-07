@@ -23,13 +23,6 @@ function updateTemp() {
 			updateMilestoneTemp(layer)
 		}
 	}
-
-	if (!tmp.layerEffs) tmp.layerEffs = {}
-	for (layer in layers) if (layers[layer].effect) tmp.layerEffs[layer] = layers[layer].effect()
-
-	if (!tmp.layerReqs) tmp.layerReqs = {}
-	for (layer in layers) tmp.layerReqs[layer] = layers[layer].requires()
-
 	if (!tmp.buyables) tmp.buyables = {}
 	for (layer in layers) if (layers[layer].buyables) {
 		if(layers[layer].buyables !== undefined){
@@ -59,6 +52,12 @@ function updateTemp() {
 			}
 		}	
 	}
+
+	if (!tmp.layerEffs) tmp.layerEffs = {}
+	for (layer in layers) if (layers[layer].effect) tmp.layerEffs[layer] = layers[layer].effect()
+
+	if (!tmp.layerReqs) tmp.layerReqs = {}
+	for (layer in layers) tmp.layerReqs[layer] = layers[layer].requires()
 
 
 	if (!tmp.componentStyles) tmp.componentStyles = {}
@@ -113,6 +112,34 @@ function updateTemp() {
 	}
 }
 
+
+function setupChallTemp(layer) {
+	if (player[layer] === undefined) return
+	if (!tmp.challs[layer]) tmp.challs[layer] = {}
+
+	let data = tmp.challActive[layer]
+	let data2 = layers[layer].challs
+	let customActive = data2.active !== undefined
+	for (let row = 1; row <= data2.rows; row++) {
+		for (let col = 1; col <= data2.cols; col++) {
+			tmp.challs[layer][id] = {}
+
+			if (customActive ? data2.active(id) : player[layer].active == id) data[id] = 1
+			else delete data[id]
+
+			tmp.challs[layer][id].unl = data2[id].unl()
+			if(data2[id].name) tmp.challs[layer][id].name = data2[id].name()
+			if(data2[id].desc) tmp.challs[layer][id].desc = data2[id].desc()
+			if(data2[id].reward) tmp.challs[layer][id].reward = data2[id].reward()
+			if(data2[id].effect) tmp.challs[layer][id].effect = data2[id].effect()
+			if(data2[id].effectDisplay) tmp.challs[layer][id].effectDisplay = data2[id].effectDisplay(tmp.challs[layer][id].effect)
+			tmp.challs[layer][id].goal = data2[id].goal()
+			if(data2[id].style) tmp.challs[layer][id].style = data2[id].style()
+		}
+	}
+}
+
+
 function updateChallTemp(layer) {
 	if (player[layer] === undefined) return
 	if (!tmp.challs[layer]) tmp.challs[layer] = {}
@@ -155,10 +182,7 @@ function updateUpgradeTemp(layer) {
 			if(data2[id].effectDisplay) tmp.upgrades[layer][id].effectDisplay = data2[id].effectDisplay(tmp.upgrades[layer][id].effect)
 			if(data2[id].desc) tmp.upgrades[layer][id].desc = data2[id].desc()
 			if(data2[id].title) tmp.upgrades[layer][id].title = data2[id].title()
-
 			if(data2[id].style) tmp.upgrades[layer][id].style = data2[id].style()
-
-
 		}
 	}
 }
