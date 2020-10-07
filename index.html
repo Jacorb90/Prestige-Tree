@@ -52,6 +52,7 @@
 			<h3>v1.3: Tabbing out</h3>
 			<ul>
 				<li>Added subtabs! And also a Micro-tab component to let you make smaller subtab-esque areas anywhere.</li>
+				<li>Added a "custom" prestige formula type, and a number of features to support it.</li>
 				<li>Added points/sec display (can be disabled).</li>
 				<li>Added h-line, v-line and image-display components, plus components for individual upgrades, challenges, and milestones.</li>
 				<li>Added upgEffect, buyableEffect, and challEffect functions.</li>
@@ -166,15 +167,9 @@
 					</div>
 					<div v-else>
 						<div class="upgTable" v-bind:style="{'margin-top': '-30px', 'margin-bottom': '24px'}">
-							<div class="upgRow">
-								<div v-for="tab in Object.keys(layers[layer].tabFormat)">
-									<button class="tabButton" v-on:click="player[layer].subtab = tab">{{tab}}</button>
-								</div>
-							</div>
+							<tab-buttons :layer="layer" :data="layers[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
 						</div>
-						<div v-for="tab in Object.keys(layers[layer].tabFormat)">
-							<column v-if="player[layer].subtab == tab" :layer="layer" :data="layers[layer].tabFormat[tab]"></column>
-						</div>
+						<column v-bind:style="readData(layers[layer].tabFormat[player[layer].subtab.mainTabs].style)" :layer="layer" :data="layers[layer].tabFormat[player[layer].subtab.mainTabs].content"></column>
 					</div>
 				</div>
 			</div>

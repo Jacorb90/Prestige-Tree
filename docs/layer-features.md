@@ -89,8 +89,9 @@ Key:
 - type: Determines which prestige formula you use.
     "normal": The amount of currency you gain is independent of its current amount (like Prestige).
         formula before bonuses is based on `baseResource^exponent`
-    "static: The cost is dependent on your total after reset. 
+    "static": The cost is dependent on your total after reset. 
         formula before bonuses is based on `base^(x^exponent)`
+    "custom": You can define everything, from the calculations to the text on the button, yourself. (See more at the bottom)
 
 - exponent: Used as described above.
 
@@ -139,3 +140,23 @@ Key:
 
 - should_notify: **optional**, a function to return true if this layer should be highlighted in the tree.
                  The layer will automatically be highlighted if you can buy an upgrade whether you have this or not.
+
+
+# Custom Prestige type only 
+(No effect otherwise)
+
+- prestigeButtonText(): **Only for custom prestige type**, Function that returns the entirety of the text that should
+                        be displayed on the prestige button.You can use HTML as well!
+
+- getResetGain(): **Only for custom prestige type**, Returns how many points you should get if you reset now. You can call
+            getResetGain(this.layer, useType = "static") or similar to calculate what your gain would be under another
+            prestige type (provided you have all of the required features in the layer.)
+
+- getNextAt(canMax=false): **Only for custom prestige type**, Returns how many of the base currency you need to get to
+                the next point. canMax is an optional variable used with Static-ish layers to differentiate between if 
+                it's looking for the first point you can reset at, or the requirement for any gain at all.
+                (Supporting both is good). You can also call getNextAt(this.layer, canMax=false, useType = "static")
+                or similar to calculate what your next at would be under another prestige type (provided you have
+                all of the required features in the layer.)
+
+- canReset(): **Only for custom prestige type**, return true only if you have the resources required to do a prestige here.

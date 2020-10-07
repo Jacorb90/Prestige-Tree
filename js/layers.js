@@ -35,6 +35,7 @@ addLayer("c", {
         }},
         effectDescription() { // Optional text to describe the effects
             eff = this.effect();
+            eff.waffleBoost = eff.waffleBoost.times(buyableEffect(this.layer, 11).first)
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
         milestones: {
@@ -171,30 +172,60 @@ addLayer("c", {
         ],
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
 
+        microtabs: {
+            stuff: {
+                first: {
+                    content: ["upgrades", ["display-text", function() {return "confirmed"}]]
+                },
+                second: {
+                    content: [["upgrade", 11],
+                            ["row", [["upgrade", 11], "blank", "blank", ["upgrade", 11],]],
+                        
+                        ["display-text", function() {return "double confirmed"}]]
+                },
+            },
+            otherStuff: {
+                // There could be another set of microtabs here
+            }
+        },
+
         // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
         tabFormat: {
-            main: 
-                ["main-display",
-                ["prestige-button", function() {return "Melt your points into "}],
-                ["blank", "5px"], // Height
-                ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
-                ["display-text",
-                    function() {return 'I have ' + format(player.points) + ' pointy points!'},
-                    {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
-                "h-line", "milestones", "blank", "upgrades", "challs"],
-            thingies: [
-                ["buyables", "150px"], "blank",
-                ["row", [
-                    ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
-                    ["display-text", function() {return "Beep"}], "blank", ["v-line", "200px"],
-                    ["column", [
-                        ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
-                        ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
-                    ]], 
-                ], {'width': '600px', 'height': '350px', 'background-color': 'green', 'border-style': 'solid'}],
-                "blank",
-                ["display-image", "discord.png"],
-            ],
+            main: {
+                buttonStyle: {'color': 'orange'},
+                content:
+                    ["main-display",
+                    ["prestige-button", function() {return "Melt your points into "}],
+                    ["blank", "5px"], // Height
+                    ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
+                    ["display-text",
+                        function() {return 'I have ' + format(player.points) + ' pointy points!'},
+                        {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
+                    "h-line", "milestones", "blank", "upgrades", "challs"],
+            },
+            thingies: {
+                style: {'background-color': '#222222'},
+                buttonStyle: {'border-color': 'orange'},
+                content:[
+                    ["buyables", "150px"], "blank",
+                    ["row", [
+                        ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
+                        ["display-text", function() {return "Beep"}], "blank", ["v-line", "200px"],
+                        ["column", [
+                            ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
+                            ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
+                        ]], 
+                    ], {'width': '600px', 'height': '350px', 'background-color': 'green', 'border-style': 'solid'}],
+                    "blank",
+                    ["display-image", "discord.png"],],
+            },
+            illuminati: {
+                content:[
+                    ["raw-html", function() {return "<h1> C O N F I R M E D </h1>"}],
+                    ["microtabs", "stuff", {'width': '600px', 'height': '350px', 'background-color': 'brown', 'border-style': 'solid'}]
+                ]
+            }
+
         },
         style() {return {
         //    'background-color': '#3325CC'
@@ -205,6 +236,7 @@ addLayer("c", {
         }
 })
 
+// This layer is mostly minimal but it uses a custom prestige type
 addLayer("f", {
         startData() { return {
             unl: false,
@@ -216,7 +248,7 @@ addLayer("f", {
         resource: "farm points", 
         baseResource: "candies", 
         baseAmount() {return player.points},
-        type: "static", 
+        type: "custom", // A "Custom" type which is effectively static
         exponent: 0.5,
         base: 3,
         resCeil: true,
@@ -229,7 +261,22 @@ addLayer("f", {
         },
         row: 1,
         layerShown() {return true}, 
-        branches: [["c", 1]] // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+        branches: [["c", 1]], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+
+        // The following are only currently used for "custom" Prestige type:
+        prestigeButtonText() { //Is secretly HTML
+            if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp.nextAt[layer]) + " candies)"
+            if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp.resetGain[this.layer]) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + format(tmp.nextAt[layer]) + " candies)"
+        },
+        getResetGain() {
+            return getResetGain(this.layer, useType = "static")
+        },
+        getNextAt(canMax=false) { //  
+            return getNextAt(this.layer, canMax, useType = "static")
+        },
+        canReset() {
+            return tmp.layerAmt[this.layer].gte(tmp.nextAt[this.layer])
+        },
     }, 
 )
 

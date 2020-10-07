@@ -92,9 +92,15 @@ function getStartPlayer() {
 		playerdata[layer].upgrades = []
 		playerdata[layer].milestones = []
 		playerdata[layer].challs = []
-		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat))
-			playerdata[layer].subtab = Object.keys(layers[layer].tabFormat)[0]
-
+		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
+			playerdata[layer].subtab = {}
+			playerdata[layer].subtab.mainTabs = Object.keys(layers[layer].tabFormat)[0]
+		}
+		if (layers[layer].microtabs) {
+			if (playerdata[layer].subtab == undefined) playerdata[layer].subtab = {}
+			for (item in layers[layer].microtabs)
+				playerdata[layer].subtab[item] = Object.keys(layers[layer].microtabs[item])[0]
+		}
 	}
 	return playerdata
 }
@@ -133,8 +139,17 @@ function fixSave() {
 			}
 		}
 		
-		if (player[layer].subtab == undefined && layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat))
-			player[layer].subtab = Object.keys(layers[layer].tabFormat)[0]
+		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
+			if (player[layer].subtab == undefined) player[layer].subtab = {}
+			if (player[layer].subtab.mainTabs == undefined) player[layer].subtab.mainTabs = Object.keys(layers[layer].tabFormat)[0]
+		}
+
+		if (layers[layer].microtabs) {
+			if (player[layer].subtab == undefined) player[layer].subtab = {}
+			for (item in layers[layer].microtabs)
+				if (player[layer].subtab[item] == undefined) player[layer].subtab[item] = Object.keys(layers[layer].microtabs[item])[0]
+		}
+	
 	}
 }
 

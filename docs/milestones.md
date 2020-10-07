@@ -29,6 +29,8 @@ Milestone features:
            the value being toggled is stored in, and the second is the internal name of the variable to toggle.
            (e.g. [["b", "auto"], ["g", "auto"])
 
+           **Tip:** Toggles are not de-set if the milestone becomes locked! In this case, you should also check if the player has the milestone.
+
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 
 - id: **Assigned automagically**. It's the id for this milestone.

@@ -48,38 +48,51 @@ function convertToDecimal() {
 	}
 }
 
-function getResetGain(layer) {
+function getResetGain(layer, useType = null) {
+	let type = useType
+	if (!useType) type = layers[layer].type
+
 	if (tmp.gainExp[layer].eq(0)) return new Decimal(0)
-	if (layers[layer].type=="static") {
+	if (type=="static") {
 		if ((!layers[layer].canBuyMax()) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(layers[layer].base).times(tmp.gainExp[layer]).pow(Decimal.pow(layers[layer].exponent, -1))
 		return gain.floor().sub(player[layer].points).add(1).max(1);
-	} else {
+	} else if (type=="normal"){
 		if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
 		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(layers[layer].exponent).times(tmp.gainMults[layer]).pow(tmp.gainExp[layer])
 		if (gain.gte("e1e7")) gain = gain.sqrt().times("e5e6")
 		return gain.floor().max(0);
+	} else if (type=="custom"){
+		return layers[layer].getResetGain()
+	} else {
+		return new Decimal(0)
 	}
 }
 
-function getNextAt(layer, disp=false) {
+function getNextAt(layer, canMax=false, useType = null) {
+	let type = useType
+	if (!useType) type = layers[layer].type
+
 	if (tmp.gainExp[layer].eq(0)) return new Decimal(1/0)
-	if (layers[layer].type=="static") 
+	if (type=="static") 
 	{
-		if (!layers[layer].canBuyMax()) disp = false
-		let amt = player[layer].points.plus((disp&&tmp.layerAmt[layer].gte(tmp.nextAt[layer]))?tmp.resetGain[layer]:0)
+		if (!layers[layer].canBuyMax()) canMax = false
+		let amt = player[layer].points.plus((canMax&&tmp.layerAmt[layer].gte(tmp.nextAt[layer]))?tmp.resetGain[layer]:0)
 		let extraCost = Decimal.pow(layers[layer].base, amt.pow(layers[layer].exponent).div(tmp.gainExp[layer])).times(tmp.gainMults[layer])
 		let cost = extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
 		if (layers[layer].resCeil) cost = cost.ceil()
 		return cost;
-	} else {
+	} else if (type=="normal"){
 		let next = tmp.resetGain[layer].add(1)
 		if (next.gte("e1e7")) next = next.div("e5e6").pow(2)
 		next = next.root(tmp.gainExp[layer]).div(tmp.gainMults[layer]).root(layers[layer].exponent).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
 		if (layers[layer].resCeil) next = next.ceil()
 		return next;
-	}
-}
+	} else if (type=="custom"){
+		return layers[layer].getNextAt(canMax)
+	} else {
+		return new Decimal(0)
+	}}
 
 // Return true if the layer should be highlighted. By default checks for upgrades only.
 function shouldNotify(layer){
@@ -114,6 +127,16 @@ function fullLayerReset(layer) {
 	player[layer].upgrades = []
 	player[layer].milestones = []
 	player[layer].challs = []
+	if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
+		if (player[layer].subtab == undefined) player[layer].subtab = {}
+		if (player[layer].subtab.mainTabs == undefined) player[layer].subtab.mainTabs = Object.keys(layers[layer].tabFormat)[0]
+	}
+
+	if (layers[layer].microtabs) {
+		if (player[layer].subtab == undefined) player[layer].subtab = {}
+		for (item in layers[layer].microtabs)
+			if (player[layer].subtab[item] == undefined) player[layer].subtab[item] = Object.keys(layers[layer].microtabs[item])[0]
+	}
 	resetBuyables(layer)
 }
 
@@ -154,7 +177,10 @@ function doReset(layer, force=false) {
 			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
 			gain =(layers[layer].canBuyMax() ? gain : 1)
 		} 
-		
+		if (layers[layer].type=="custom") {
+			if (!tmp.canReset[layer]) return;
+		} 
+
 		if (layers[layer].onPrestige)
 			layers[layer].onPrestige(gain)
 		

@@ -210,6 +210,7 @@ function loadVue() {
 		<span>
 			<button v-if="layers[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-bind:style="{'background-color': tmp.layerColor[layer]}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">{{data ? data() : "Reset for "}}</span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (layers[layer].resCeil ? formatWhole(tmp.nextAt[layer]) : format(tmp.nextAt[layer])) }} {{ layers[layer].baseResource }}</span></button>
 			<button v-if="layers[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-bind:style="{'background-color': tmp.layerColor[layer]}" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">{{data ? data() : "Reset for "}}</span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{layers[layer].resource}}<br><br><span v-if="player[layer].points.lt(10)">{{(tmp.layerAmt[layer].gte(tmp.nextAt[layer])&&layers[layer].canBuyMax && layers[layer].canBuyMax())?"Next":"Req"}}: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(layers[layer].resCeil ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer]))}} {{ layers[layer].baseResource }}</button>		
+			<button v-if="layers[layer].type=='custom'" v-bind:class="{ [layer]: true, reset: true, locked: !tmp.canReset[layer], can: tmp.canReset[layer] }" v-bind:style="{'background-color': tmp.layerColor[layer], 'white-space': 'pre-line' }" v-on:click="doReset(layer)" v-html="tmp.prestigeButtonText[layer]"></button>		
 			</span>
 		`
 	
@@ -255,6 +256,38 @@ function loadVue() {
 		</div>
 		`
 	})
+
+	// data = button size, in px
+	Vue.component('microtabs', {
+		props: ['layer', 'data'],
+		computed: {
+			currentTab() {return player[layer].subtab[data]}
+		},
+		template: `
+		<div v-if="layers[layer].microtabs">
+			<div class="upgTable">
+				<tab-buttons :layer="layer" :data="layers[layer].microtabs[data]" :name="data"></tab-buttons>
+			</div>
+			<column v-bind:style="readData(layers[layer].microtabs[data][player[layer].subtab[data]].style)" :layer="layer" :data="layers[layer].microtabs[data][player[layer].subtab[data]].content"></column>
+		</div>
+		`
+	})
+
+
+	// NOT FOR USE IN STANDARD TAB FORMATTING
+	Vue.component('tab-buttons', {
+		props: ['layer', 'data', 'name'],
+		template: `
+			<div class="upgRow">
+				<div v-for="tab in Object.keys(data)">
+					<button class="tabButton" v-bind:style="[{'border-color': tmp.layerColor[layer]}, readData(data[tab].buttonStyle)]" v-on:click="player[layer].subtab[name] = tab">{{tab}}</button>
+				</div>
+			</div>
+		`
+	})
+
+
+
 
 	app = new Vue({
 		el: "#app",
