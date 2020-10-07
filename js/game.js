@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.3.1",
+	num: "1.3.2",
 	name: "Tabception... ception!"
 }
 
