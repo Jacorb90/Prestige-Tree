@@ -167,9 +167,6 @@ addLayer("c", {
         doReset(resettingLayer){ // Triggers when this layer is being reset, along with the layer doing the resetting. Not triggered by lower layers resetting, but is by layers on the same row.
             if(layers[resettingLayer].row > this.row) fullLayerReset(this.layer) // This is actually the default behavior
         },
-        convertToDecimal() {
-            // Convert any layer-specific Decimal values (besides points, total, and best) from String to Decimal (used when loading save)
-        },
         layerShown() {return true}, // Condition for when layer appears on the tree
         update(diff) {
             if (player[this.layer].upgrades.includes(11)) player.points = player.points.add(tmp.pointGen.times(diff)).max(0)

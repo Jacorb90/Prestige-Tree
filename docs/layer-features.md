@@ -131,11 +131,6 @@ Key:
                            Without it, the default is to reset everything on the row, but only 
                            if it was triggered by a layer in a higher row.
 
-- convertToDecimal(): **sometimes required**, required if you add non-standard Decimals to startData. 
-                        This function converts those values from a string to a Decimal (used when loading).
-                        Convert a value to Decimal with `value = new Decimal(value)`
-
-
 - update(diff): **optional**, this function is called every game tick. Use it for any passive resource production or
                 time-based things. diff is the time since the last tick.
                 Suggestion: use addPoints(layer, gain) when generating points to automatically

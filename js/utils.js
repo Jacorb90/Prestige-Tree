@@ -107,6 +107,48 @@ function getStartPlayer() {
 }
 
 function fixSave() {
+	defaultData = getStartPlayer()
+	fixData(defaultData, player)
+
+	for(layer in layers)
+	{
+		if (player[layer].best !== undefined) player[layer].best = new Decimal (player[layer].best)
+		if (player[layer].total !== undefined) player[layer].total = new Decimal (player[layer].total)
+	}
+}
+
+function fixData(defaultData, newData) {
+	for (item in defaultData){
+		if (defaultData[item] == null) {
+			if (newData[item] === undefined)
+				newData[item] = null
+		}
+		else if (Array.isArray(defaultData[item])) {
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+			else
+				fixData(defaultData[item], newData[item])
+		}
+		else if (defaultData[item] instanceof Decimal) { // Convert to Decimal
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+			else
+				newData[item] = new Decimal(newData[item])
+		}
+		else if ((!!defaultData[item]) && (defaultData[item].constructor === Object)) {
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+			else
+				fixData(defaultData[item], newData[item])
+		}
+		else {
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+		}
+	}	
+}
+
+function hecj() {
 	defaultData = startPlayerBase()
 	for (datum in defaultData){
 		if (player[datum] == undefined){
@@ -154,6 +196,8 @@ function fixSave() {
 	}
 }
 
+
+
 function load() {
 	let get = localStorage.getItem(modInfo.id);
 	if (get===null || get===undefined) player = getStartPlayer()
@@ -166,7 +210,6 @@ function load() {
 		player.offTime.remain += (Date.now() - player.time) / 1000
 	}
 	player.time = Date.now();
-	convertToDecimal();
 	versionCheck();
 	changeTheme();
 	changeTreeQuality();
