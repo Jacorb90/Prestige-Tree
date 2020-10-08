@@ -229,6 +229,7 @@ function respecBuyables(layer) {
 	if (!layers[layer].buyables.respec) return
 	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + (layers[layer].name ? layers[layer].name : layer) + "\" reset as well!")) return
 	layers[layer].buyables.respec()
+	updateBuyableTemp(layer)
 }
 
 function canAffordUpg(layer, id) {
@@ -305,12 +306,23 @@ function buyUpg(layer, id) {
 		upg.onPurchase()
 }
 
+function buyMaxBuyable(layer, id) {
+	if (!player[layer].unl) return
+	if (!tmp.buyables[layer][id].unl) return
+	if (!tmp.buyables[layer][id].canAfford) return
+	if (!layers[layer].buyables[id].buyMax) return
+
+	layers[layer].buyables[id].buyMax()
+	updateBuyableTemp(layer)
+}
+
 function buyBuyable(layer, id) {
 	if (!player[layer].unl) return
 	if (!tmp.buyables[layer][id].unl) return
 	if (!tmp.buyables[layer][id].canAfford) return
 
 	layers[layer].buyables[id].buy()
+	updateBuyableTemp(layer)
 }
 
 function resetRow(row) {

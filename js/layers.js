@@ -298,10 +298,15 @@ addLayer("f", {
             return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
         },
 
+        midsection: [
+            "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
+            ["display-text", "Bork bork!"]
+        ],
+
         // The following are only currently used for "custom" Prestige type:
         prestigeButtonText() { //Is secretly HTML
             if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp.nextAt[layer]) + " candies)"
-            if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp.resetGain[this.layer]) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + format(tmp.nextAt[layer]) + " candies)"
+            if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp.resetGain[this.layer]) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp.nextAtDisp[layer]) + " candies)"
         },
         getResetGain() {
             return getResetGain(this.layer, useType = "static")

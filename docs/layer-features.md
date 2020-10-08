@@ -42,7 +42,7 @@ Key:
 
 - layerShown(): A function returning a bool which determines if this layer's node should be visible on the tree.
 
-- hotkeys: An array containing information on any hotkeys associated with this layer:
+- hotkeys: **optional**, An array containing information on any hotkeys associated with this layer:
     ```js
     hotkeys: [
         {key: "p", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" if ctrl is.
@@ -51,12 +51,15 @@ Key:
     ],
     ```
 
-- style(): A function returning a CSS object containing any CSS that should affect this layer's whole tab.
+- style(): **optional**, a function returning a CSS object containing any CSS that should affect this layer's whole tab.
 
-- tabFormat: Use this if you want to add extra things to your tab or change the layout.
+- tabFormat: **optional**, use this if you want to add extra things to your tab or change the layout. [See here for more info.](custom-tab-layouts.md)
+
+- midsection: **optional**, an alternative to tabFormat, which is inserted in between Milestones and Buyables in the
+              standard tab layout. (cannot do subtabs)
 
 
-# Big features
+# Big features (all optional)
 
 - upgrades: A grid of one-time purchases which can have unique upgrade conditions, currency costs, and bonuses.
     [Explanations are in a separate file.](upgrades.md)
