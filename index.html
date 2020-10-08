@@ -170,6 +170,9 @@
 					<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
 					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
 					<milestones v-bind:style="tmp.componentStyles[layer].milestones" :layer="layer"></milestones>
+					<div v-if="Array.isArray(layers[layer].midsection)">
+						<column :layer="layer" :data="layers[layer].midsection"></column>
+					</div>
 					<buyables v-bind:style="tmp.componentStyles[layer].buyables" :layer="layer"></buyables>
 					<upgrades v-bind:style="tmp.componentStyles[layer]['upgrades']" :layer="layer"></upgrades>
 					<challs v-bind:style="tmp.componentStyles[layer]['challs']" :layer="layer"></challs>
