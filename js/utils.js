@@ -414,3 +414,8 @@ var onFocused = false
 function focused(x) {
 	onFocused = x
 }
+
+function isFunction(obj) {
+	return !!(obj && obj.constructor && obj.call && obj.apply);
+  };
+  

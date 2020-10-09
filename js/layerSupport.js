@@ -86,3 +86,9 @@ function readData(data, args=null){
 	else
 		return data;
 }
+
+// This isn't worth making a .ts file over
+const UP = 1
+const DOWN = 2
+const LEFT = 3
+const RIGHT = 4

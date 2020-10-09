@@ -206,6 +206,29 @@ addLayer("c", {
             }
         },
 
+        gagues: {
+            longBoi: {
+                fillColor:() => "#4BEC13",
+                // fillStyle:(),
+                baseColor:() => "#333333",
+                // baseStyle:(),
+                // textStyle:(),
+
+                borderStyle() {return {'border-color': '#321188'}},
+                direction:() => RIGHT,
+                width:() => "250px",
+                height:() => "250px",
+                progress() {
+                    return (player.points.log().div(10))
+                },
+                display() {
+                    return format(player.points) + " / 1e10"
+                },
+                unl:() => true,
+
+            },
+        },
+
         // Optional, lets you format the tab yourself by listing components. You can create your own components in v.js.
         tabFormat: {
             "main tab": {

@@ -245,6 +245,18 @@ function loadVue() {
 		`
 	})
 
+	// data = id of gague
+	Vue.component('gague', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="layers[layer].gagues && tmp.gagues[layer][data].unl" 
+			v-bind:style="{'border-style': 'solid}"
+			
+		</div>
+		`
+	})
+
+		
 
 	// NOT FOR USE IN STANDARD TAB FORMATTING
 	Vue.component('tab-buttons', {

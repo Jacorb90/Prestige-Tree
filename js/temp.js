@@ -30,6 +30,8 @@ function setupTemp(){
 }
 
 function updateTemp() {
+	for (layer in layers) tmp[layer] = {}
+
 	if (tmp.genPoints == undefined) tmp.genPoints = false
 
 
@@ -141,6 +143,13 @@ function updateTemp() {
 	for (layer in layers) if (layers[layer].buyables) {
 		if(layers[layer].buyables !== undefined){
 			updateBuyableTemp(layer)
+		}
+	}
+
+	for (layer in layers) {
+		if(layers[layer].gagues !== undefined){
+			tmp[layer].gagues = {}
+			updateGagueTemp(layer)
 		}
 	}
 }
@@ -307,6 +316,23 @@ function setupBuyableTemp(layer) {
 			tmp.buyables[layer][id].cost = {}
 			if(data2[id].style) tmp.buyables[layer][id].style = {}
 
+		}
+	}
+}
+
+
+// The start of not being backwards with tmp
+function updateGagueTemp(layer) {
+	if (layers[layer] === undefined) return
+	let gagues = layers[layer].gagues
+	for (id in gagues) {
+		tmp[layer].gagues[id] = {}
+		for (item in gagues[id]) {
+			let thing = gagues[id][item]
+			if (isFunction(thing))
+				tmp[layer].gagues[id] = thing()
+			else
+				tmp[layer].gagues[id] = thing
 		}
 	}
 }
