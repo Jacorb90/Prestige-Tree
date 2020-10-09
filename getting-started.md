@@ -53,4 +53,8 @@ The benefits of using Github:
 7. Finally, at the top middle, click "push origin" to push your changes out onto the online repository.
 
 8. You can view your project on line, or share it with others, by going to
-https://raw.githack.com/Katakana1/[YOUR-GITHUB-USERNAME]/master/index.html
+https://raw.githack.com/[YOUR-GITHUB-USERNAME]/The-Modding-Tree/master/index.html
+
+
+And now, you have successfully used Github! You can look at the [documentation](!general-info.md) to
+see how The Modding Tree's system works and to make your mod a reality.
