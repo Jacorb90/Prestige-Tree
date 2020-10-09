@@ -31,6 +31,26 @@ The benefits of using Github:
     A "repository" is basically a "Github project", like The Modding Tree. "Cloning" is
     downloading a copy of the repository to your computer.
 
-5. Look for The Modding Tree in the list of repositiories (it should be the only one) and click "clone".
+5. Look for The Modding Tree in the list of repositiories (it should be the only one) and click "clone". It will download the files and handle everything.
 
-6. 
+
+# Using your repository
+
+1. Click on "show in finder" to the right, and then open index.html. This will let you view and
+    test your project!
+
+2. To edit your project, click "open in VSCode" in Github Desktop.
+
+3. Open index.html, and look at the top part where it says "modInfo". On the lines below that, change
+    the mod's name to whatever you want, and change the id as well. (The id is important, it determines where the game looks for your saves. It should be different from other mods, and shouldn't be changed once set.) 
+
+4. Reload index.html. The title on the tab, as well as on the info page, will now be the new ones!
+
+5. Go back to Github Desktop. It's time to save your changes into the git system by making a "commit".
+
+6. At the bottom right corner, add a summary of your changes, and then click "commit to master".
+
+7. Finally, at the top middle, click "push origin" to push your changes out onto the online repository.
+
+8. You can view your project on line, or share it with others, by going to
+https://raw.githack.com/Katakana1/[YOUR-GITHUB-USERNAME]/master/index.html

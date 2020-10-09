@@ -1,9 +1,11 @@
 #The Modding Tree changelog:
 
 
-##v1.3.5?
+##v1.3.5
 - Completely automated convertToDecimal, now you never have to worry about it again.
 - Branches can be defined without a color id. But they can also use hex values for color ids!
+- Created a tutorial for getting started with TMT and Github.
+- Page title is now automatically taken from mod name.
 
 
 ##v1.3.4: 10/8/20
