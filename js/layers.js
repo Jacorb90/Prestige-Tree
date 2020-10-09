@@ -289,7 +289,7 @@ addLayer("f", {
         },
         row: 1,
         layerShown() {return true}, 
-        branches: [["c", 1]], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+        branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
 
         tooltipLocked() { // Optional, tooltip displays when the layer is locked
             return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
