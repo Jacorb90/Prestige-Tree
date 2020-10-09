@@ -8,7 +8,6 @@
 			offlineLimit: 1  // In hours
 		}
 	</script>
-	<title>The Modding Tree</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
@@ -49,6 +48,19 @@
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br><br><br>
+			<h3>v1.3.5</h3>
+			<ul>
+				<li>The system now handles convertToDecimal for everything automatically!</li>
+				<li>Created a tutorial for getting started with TMT and Github.</li>
+				<li>Branches can be defined without a color id. But they can also use hex values for color ids!</li>
+				<li>Page title is now automatically taken from mod name.</li>
+
+			</ul>
+			<h3>v1.3.4</h3>
+			<ul>
+				<li>Added "midsection" feature to add things to a tab's layout while still keeping the standard layout.</li>
+				<li>Fix for being able to buy more buyables than you should.</li>
+			</ul><br>
 			<h3>v1.3.3</h3>
 			<ul>
 				<li>Fix for the "order of operations" issue in temp.</li>

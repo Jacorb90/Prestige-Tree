@@ -50,8 +50,16 @@ function drawTree() {
 }
 
 function drawTreeBranch(num1, data) { // taken from Antimatter Dimensions & adjusted slightly
-	let num2 = data[0]
-	let color_id = data[1]
+	let num2 = data
+	let color_id = 1
+
+	if (Array.isArray(data)){
+		num2 = data[0]
+		color_id = data[1]
+	}
+
+	if(typeof(color_id) == "number")
+		color_id = colors_theme[color_id]
 
 	if (document.getElementById(num1) == null || document.getElementById(num2) == null)
 		return
@@ -64,7 +72,7 @@ function drawTreeBranch(num1, data) { // taken from Antimatter Dimensions & adju
     let y2 = end.top + (end.height / 2) + (document.getElementById("treeTab").scrollTop || document.body.scrollTop);
     ctx.lineWidth = 15;
     ctx.beginPath();
-    ctx.strokeStyle = colors_theme[color_id]
+    ctx.strokeStyle = color_id
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();

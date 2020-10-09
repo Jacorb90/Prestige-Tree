@@ -113,10 +113,9 @@ Key:
 
 # Tree/node features
 
-- branches: **optional**, determines what lines should appear on the tree when this layer is visible.
-            An array of pairs consisting of a layer name and a number from 1 to 3.
-            A branch will appear connecting this layer to the correspodnding layer, with the color based on the number.
-            You should add the branch value to the layer that is unlocked second.
+- branches: **optional**, an array of layer ids. On a tree, a line will appear from this layer to all of the layers
+            in the list. Alternatively, an entry in the array can be a pair consisting of the layer id and a color
+            value. The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors)
 
 - nodeStyle(): **optional**, a function returning a CSS object, styles this layer's node on the tree
 
@@ -130,11 +129,6 @@ Key:
                            If you use it, you can choose what to keep via milestones and such.
                            Without it, the default is to reset everything on the row, but only 
                            if it was triggered by a layer in a higher row.
-
-- convertToDecimal(): **sometimes required**, required if you add non-standard Decimals to startData. 
-                        This function converts those values from a string to a Decimal (used when loading).
-                        Convert a value to Decimal with `value = new Decimal(value)`
-
 
 - update(diff): **optional**, this function is called every game tick. Use it for any passive resource production or
                 time-based things. diff is the time since the last tick.
