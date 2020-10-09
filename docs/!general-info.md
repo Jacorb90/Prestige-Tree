@@ -18,6 +18,7 @@ plain number, and perform operations on them by calling functions. e.g, instead 
 
 ## Table of Contents:
 
+- [Getting Started](getting-started.md): Getting your own copy of the code set up with Github Desktop.
 - [Basic layer breakdown](basic-layer-breakdown.md): Breaking down the components of a layer with minimal features.
 - [Layer features](layer-features.md): Explanations of all of the different properties that you can give a layer.
 - [Upgrades](upgrades.md): How to create upgrades for a layer.
@@ -28,3 +29,4 @@ plain number, and perform operations on them by calling functions. e.g, instead 
 - [Custom Tab Layouts](custom-tab-layouts.md): An optional way to give your tabs a different layout.
                                                    You can even create entirely new components to use.
 - [Subtabs and Microtabs](subtabs-and-microtabs.md): Create subtabs for your tabs, as well as "microtab" components that you can put inside the tabs.
+- [Updating TMT](updating-tmt.md): Using Github Desktop to update your mod's version of TMT.
