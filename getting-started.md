@@ -31,7 +31,9 @@ The benefits of using Github:
     A "repository" is basically a "Github project", like The Modding Tree. "Cloning" is
     downloading a copy of the repository to your computer.
 
-5. Look for The Modding Tree in the list of repositiories (it should be the only one) and click "clone". It will download the files and handle everything.
+5. Look for The Modding Tree in the list of repositiories (it should be the only one) and click "clone". 
+
+6. Select that you're using it for your own purposes, and click continue. It will download the files and handle everything.
 
 
 # Using your repository

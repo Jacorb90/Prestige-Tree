@@ -407,3 +407,5 @@ var onFocused = false
 function focused(x) {
 	onFocused = x
 }
+
+document.title = modInfo.name

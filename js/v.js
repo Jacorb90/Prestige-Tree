@@ -286,19 +286,6 @@ function loadVue() {
 		`
 	})
 
-	Vue.component('vue-title', {
-        props: ['title'],
-        watch: {
-            title: {
-                immediate: true,
-                handler() {
-                    document.title = this.title;
-                }
-            }
-        },
-        render () {
-        },
-    })
 
 	app = new Vue({
 		el: "#app",
