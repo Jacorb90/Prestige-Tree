@@ -24,7 +24,7 @@ plain number, and perform operations on them by calling functions. e.g, instead 
 - [Milestones](milestones.md): How to create milestones for a layer.
 - [Challenges](challenges.md): How to create challenges for a layer.
 - [Buyables](buyables.md): Create rebuyable upgrades for your layer (with the option to make them respec-able).
-                           Can be used to make Enhancers or Space Buildings.
+                           Can be used to make Enhancers or Space Buildings, but they're flexible enough to do anything.
 - [Custom Tab Layouts](custom-tab-layouts.md): An optional way to give your tabs a different layout.
                                                    You can even create entirely new components to use.
 - [Subtabs and Microtabs](subtabs-and-microtabs.md): Create subtabs for your tabs, as well as "microtab" components that you can put inside the tabs.

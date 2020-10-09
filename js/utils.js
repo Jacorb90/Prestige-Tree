@@ -148,56 +148,6 @@ function fixData(defaultData, newData) {
 	}	
 }
 
-function hecj() {
-	defaultData = startPlayerBase()
-	for (datum in defaultData){
-		if (player[datum] == undefined){
-			player[datum] = defaultData[datum]
-		}
-	}
-	for (layer in layers) {
-		defaultData = layers[layer].startData()
-		if (player[layer].upgrades == undefined)
-			player[layer].upgrades = []
-		if (player[layer].milestones == undefined)
-			player[layer].milestones = []
-		if (player[layer].challs == undefined)
-			player[layer].challs = []
-
-		for (datum in defaultData){
-			if (player[layer][datum] == undefined){
-				player[layer][datum] = defaultData[datum]
-			}
-		}
-
-		if (player[layer].spentOnBuyables == undefined)
-			player[layer].spentOnBuyables = new Decimal(0)
-
-		if (layers[layer].buyables) {
-			if (player[layer].buyables == undefined) player[layer].buyables = {}
-
-			for (id in layers[layer].buyables){
-				if (player[layer].buyables[id] == undefined && !isNaN(id))
-					player[layer].buyables[id] = new Decimal(0)
-			}
-		}
-		
-		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
-			if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
-			if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
-		}
-
-		if (layers[layer].microtabs) {
-			if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
-			for (item in layers[layer].microtabs)
-				if (player.subtabs[layer][item] == undefined) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
-		}
-	
-	}
-}
-
-
-
 function load() {
 	let get = localStorage.getItem(modInfo.id);
 	if (get===null || get===undefined) player = getStartPlayer()

@@ -1,6 +1,9 @@
 #The Modding Tree changelog:
 
 
+##v1.3.5?
+- Completely automated convertToDecimal, now you never have to worry about it again.
+
 ##v1.3.4: 10/8/20
 - Added "midsection" feature to add things to a tab's layout while still keeping the standard layout.
 - Fix for being able to buy more buyables than you should.
