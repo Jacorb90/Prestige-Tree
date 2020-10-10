@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.3.5 maybe",
+	num: "1.3.5",
 	name: "Tabception... ception!"
 }
 
@@ -201,7 +201,6 @@ function doReset(layer, force=false) {
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	prevOnReset = undefined
 
-	setupTemp();
 	updateTemp()
 	updateTemp()
 }
