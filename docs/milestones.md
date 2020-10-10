@@ -31,7 +31,7 @@ Milestone features:
 
            **Tip:** Toggles are not de-set if the milestone becomes locked! In this case, you should also check if the player has the milestone.
 
-- style(): **Optional**, A function returning a CSS object, which affects this milestone.
+- style: **Optional**, A CSS object, which affects this milestone.
 
 - unl(): A function returning a boolean to determine if the milestone should be shown. If absent, it is always shown.
 

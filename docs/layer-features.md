@@ -3,6 +3,8 @@
 This is a more comprehensive list of established features to add to layers.
 You can add more freely, if you want to have other functions or values associated with your layer. These have special functionality, though.
 
+You can make almost any value dynamic by using a function in its place, including all display strings and styling/color features.
+
 Key:    
 - No label: This is required and the game will crash if it isn't included.
 - **sometimes required**: This is may be required, depending on other things in the layer.
@@ -51,7 +53,7 @@ Key:
     ],
     ```
 
-- style(): **optional**, a function returning a CSS object containing any CSS that should affect this layer's whole tab.
+- style: **optional**, a CSS object containing any CSS that should affect this layer's whole tab.
 
 - tabFormat: **optional**, use this if you want to add extra things to your tab or change the layout. [See here for more info.](custom-tab-layouts.md)
 
@@ -110,6 +112,12 @@ Key:
 - onPrestige(gain): **optional**, A function that triggers when this layer prestiges, just before you gain the currency. 
                     Can be used to have secondary resource gain on prestige, or to recalculate things or whatnot.
 
+- resetDesc: **optional**, use this to replace "Reset for " on the Prestige button with something else.
+
+- prestigeButtonText(): **Sometimes required**, Use this to make the entirety of the text a Prestige button contains. Only required for custom layers,
+                        but usable by all types. 
+
+
 
 # Tree/node features
 
@@ -117,7 +125,7 @@ Key:
             in the list. Alternatively, an entry in the array can be a pair consisting of the layer id and a color
             value. The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors)
 
-- nodeStyle(): **optional**, a function returning a CSS object, styles this layer's node on the tree
+- nodeStyle: **optional**,  a CSS object, styles this layer's node on the tree
 
 - tooltip() / tooltipLocked(): **optional** Functions that return text, which is the tooltip for the node when the layer
                                is unlocked or locked, respectively. By default the tooltips behave the same as in the original Prestige Tree.
@@ -138,7 +146,7 @@ Key:
 - automate(): **optional**, this function is called every game tick, after production. Use it to activate any
                autobuyers or auto-resets or similar on this layer, if appropriate. 
 
-- resetsNothing(): **optional**, returns true if this layer shouldn't trigger any resets when you prestige.
+- resetsNothing: **optional**, returns true if this layer shouldn't trigger any resets when you prestige.
 
 - incr_order: **optional**, an array of layer ids. When this layer is unlocked for the first time, the "order" value
               for any not-yet-unlocked layers in this list increases. This can be used to make them harder to unlock.
@@ -157,21 +165,17 @@ Key:
 ```
 
 
-# Custom Prestige type only 
-(No effect otherwise)
+# Custom Prestige type  
 
-- prestigeButtonText(): **Only for custom prestige type**, Function that returns the entirety of the text that should
-                        be displayed on the prestige button.You can use HTML as well!
-
-- getResetGain(): **Only for custom prestige type**, Returns how many points you should get if you reset now. You can call
+- getResetGain(): **For custom prestige type**, Returns how many points you should get if you reset now. You can call
             getResetGain(this.layer, useType = "static") or similar to calculate what your gain would be under another
             prestige type (provided you have all of the required features in the layer.)
 
-- getNextAt(canMax=false): **Only for custom prestige type**, Returns how many of the base currency you need to get to
+- getNextAt(canMax=false): **For custom prestige type**, Returns how many of the base currency you need to get to
                 the next point. canMax is an optional variable used with Static-ish layers to differentiate between if 
                 it's looking for the first point you can reset at, or the requirement for any gain at all.
                 (Supporting both is good). You can also call getNextAt(this.layer, canMax=false, useType = "static")
                 or similar to calculate what your next at would be under another prestige type (provided you have
                 all of the required features in the layer.)
 
-- canReset(): **Only for custom prestige type**, return true only if you have the resources required to do a prestige here.
+- canReset(): **For custom prestige type**, return true only if you have the resources required to do a prestige here.

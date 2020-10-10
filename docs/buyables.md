@@ -45,7 +45,7 @@ Features:
 
 - buyMax(): **optional**, A function that implements buying as many of the buyable as possible.
 
-- style(): **Optional**, A function returning a CSS object, which affects this buyable.
+- style: **Optional**, A CSS object, which affects this buyable.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 

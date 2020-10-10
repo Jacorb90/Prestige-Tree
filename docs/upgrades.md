@@ -5,7 +5,7 @@ Upgrades are stored in the following format:
 Useful functions for dealing with Upgrades and implementing their effects:
 
 - hasUpg(layer, id): determine if the player has the upgrade
-- ugpEffect(layer, id): Returns the current effects of the upgrade, if any
+- upgEffect(layer, id): Returns the current effects of the upgrade, if any
 
 Hint: Basic point gain is calculated in game.js's "getPointGain".
 
@@ -50,7 +50,7 @@ By default, upgrades use the main prestige currency for the layer. You can inclu
 - currencyLayer: **optional**, the internal name of the layer that currency is stored in.
                  If it's not in a layer (like Points), omit.
 
-- style(): **Optional**, A function returning a CSS object, which affects this upgrade.
+- style: **Optional**, A a CSS object, which affects this upgrade.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 
