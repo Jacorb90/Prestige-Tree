@@ -333,7 +333,7 @@ function notifyLayer(name) {
 }
 
 function nodeShown(layer) {
-	if (tmp.layerShown[layer]) return true
+	if (tmp[layer].layerShown) return true
 	switch(layer) {
 		case "idk":
 			return player.l.unl
@@ -343,7 +343,7 @@ function nodeShown(layer) {
 }
 
 function layerUnl(layer) {
-	return LAYERS.includes(layer) && (player[layer].unl || (tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) && layers[layer].layerShown()))
+	return LAYERS.includes(layer) && (player[layer].unl || (tmp[layer].baseAmount.gte(tmp[layer].requires) && layers[layer].layerShown()))
 }
 
 function keepGoing() {
@@ -407,6 +407,21 @@ var onFocused = false
 function focused(x) {
 	onFocused = x
 }
+
+function prestigeButtonText(layer)
+{
+	if(tmp[layer].type == "normal")
+		return `${ player[layer].points.lt(1e3) ? (tmp[layer].resetDesc !== undefined ? tmp[layer].resetDesc : "Reset for ") : ""}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource} ${tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3) ? `<br><br>Next at ${ (tmp[layer].resCeil ? formatWhole(tmp[layer].nextAt) : format(tmp[layer].nextAt))}` : ""} ${ tmp[layer].baseResource }`
+	else if(tmp[layer].type== "static")
+		return `${tmp[layer].resetDesc !== undefined ? tmp[layer].resetDesc : "Reset for "}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource}<br><br>${player[layer].points.lt(20) ? (tmp[layer].baseAmount.gte(tmp[layer].nextAt)&&(tmp[layer].canBuyMax !== undefined) && tmp[layer].canBuyMax?"Next":"Req") : ""}: ${formatWhole(tmp[layer].baseAmount)} / ${(tmp[layer].resCeil ? formatWhole(tmp[layer].nextAtDisp) : format(tmp[layer].nextAtDisp))} ${ tmp[layer].baseResource }		
+		`
+	else
+		return layers[layer].prestigeButtonText()
+}
+
+
+
+
 
 function isFunction(obj) {
 	return !!(obj && obj.constructor && obj.call && obj.apply);

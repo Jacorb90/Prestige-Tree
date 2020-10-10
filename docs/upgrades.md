@@ -34,7 +34,7 @@ Individual upgrades can have these features:
 - effect(): **optional**, A function that calculates and returns the current values of any bonuses from the upgrade.
     Can return a value or an object containing multiple values.
 
-- effectDisplay(effects): **optional**, A function that returns a display of the current effects of the upgrade with
+- effectDisplay(): **optional**, A function that returns a display of the current effects of the upgrade with
                     formatting. Default behavior is to just display the a number appropriately formatted. Can use basic HTML.
 
 - cost: A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.

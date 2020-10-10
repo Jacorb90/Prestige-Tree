@@ -97,7 +97,7 @@ addLayer("c", {
                     if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
                     return ret;
                 },
-                effectDisplay(fx) { return format(fx)+"x" }, // Add formatting to the effect
+                effectDisplay() { return format(this.effect())+"x" }, // Add formatting to the effect
             },
             13: {
                 desc:() => "Unlock a <b>secret subtab</b> and make this layer act if you unlocked it first.",
@@ -132,12 +132,12 @@ addLayer("c", {
             respecText:() => "Respec Thingies", // Text on Respec button, optional
             11: {
                 title:() => "Exhancers", // Optional, displayed at the top in a larger font
-                cost(x) { // cost for buying xth buyable, can be an object if there are multiple currencies
+                cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
                     if (x.gte(25)) x = x.pow(2).div(25)
                     let cost = Decimal.pow(2, x.pow(1.5))
                     return cost.floor()
                 },
-                effect(x) { // Effects of owning x of the items, x is a decimal
+                effect(x=player[this.layer].buyables[this.id]) { // Effects of owning x of the items, x is a decimal
                     let eff = {}
                     if (x.gte(0)) eff.first = Decimal.pow(25, x.pow(1.1))
                     else eff.first = Decimal.pow(1/25, x.times(-1).pow(1.1))
@@ -147,16 +147,16 @@ addLayer("c", {
                     return eff;
                 },
                 display() { // Everything else displayed in the buyable button after the title
-                    let data = tmp.buyables[this.layer][this.id]
+                    let data = tmp[this.layer].buyables[this.id]
                     return "Cost: " + format(data.cost) + " lollipops\n\
                     Amount: " + player[this.layer].buyables[this.id] + "\n\
                     Adds + " + format(data.effect.first) + " things and multiplies stuff by " + format(data.effect.second)
                 },
                 unl() { return player[this.layer].unl }, 
                 canAfford() {
-                    return player[this.layer].points.gte(tmp.buyables[this.layer][this.id].cost)},
+                    return player[this.layer].points.gte(tmp[this.layer].buyables[this.id].cost)},
                 buy() { 
-                    cost = tmp.buyables[this.layer][this.id].cost
+                    cost = tmp[this.layer].buyables[this.id].cost
                     player[this.layer].points = player[this.layer].points.sub(cost)	
                     player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
                     player[this.layer].spentOnBuyables = player[this.layer].spentOnBuyables.add(cost) // This is a built-in system that you can use for respeccing but it only works with a single Decimal value
@@ -173,8 +173,6 @@ addLayer("c", {
         }, // Do any gameloop things (e.g. resource generation) inherent to this layer
         automate() {
         }, // Do any automation inherent to this layer if appropriate
-        updateTemp() {
-        }, // Do any necessary temp updating, not that important usually
         resetsNothing() {return false},
         onPrestige(gain) {
             return
@@ -232,7 +230,7 @@ addLayer("c", {
                 buttonStyle() {return  {'color': 'orange'}},
                 content:
                     ["main-display",
-                    ["prestige-button", function() {return "Melt your points into "}],
+                    "prestige-button",
                     ["blank", "5px"], // Height
                     ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
                     ["display-text",
@@ -249,8 +247,8 @@ addLayer("c", {
                         ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
                         ["display-text", function() {return "Beep"}], "blank", ["v-line", "200px"],
                         ["column", [
-                            ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
-                            ["prestige-button", function() {return "Be redundant for "}, {'width': '150px', 'height': '30px'}],
+                            ["prestige-button", "", {'width': '150px', 'height': '80px'}],
+                            ["prestige-button", "", {'width': '100px', 'height': '150px'}],
                         ]], 
                     ], {'width': '600px', 'height': '350px', 'background-color': 'green', 'border-style': 'solid'}],
                     "blank",
@@ -284,7 +282,8 @@ addLayer("c", {
         shouldNotify() { // Optional, layer will be highlighted on the tree if true.
                          // Layer will automatically highlight if an upgrade is purchasable.
             return (player.c.buyables[11] == 1)
-        }
+        },
+        resetDesc: "Melt your points into ",
 })
 
 // This layer is mostly minimal but it uses a custom prestige type
@@ -325,8 +324,8 @@ addLayer("f", {
 
         // The following are only currently used for "custom" Prestige type:
         prestigeButtonText() { //Is secretly HTML
-            if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp.nextAt[layer]) + " candies)"
-            if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp.resetGain[this.layer]) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp.nextAtDisp[layer]) + " candies)"
+            if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"
+            if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp[this.layer].resetGain) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp[layer].nextAtDisp) + " candies)"
         },
         getResetGain() {
             return getResetGain(this.layer, useType = "static")
@@ -335,7 +334,7 @@ addLayer("f", {
             return getNextAt(this.layer, canMax, useType = "static")
         },
         canReset() {
-            return tmp.layerAmt[this.layer].gte(tmp.nextAt[this.layer])
+            return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
         },
     }, 
 )

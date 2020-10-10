@@ -29,9 +29,9 @@ Features:
 - title: **optional**, displayed at the top in a larger font
          It can also be a function that returns updating text.
 
-- cost(x): cost for buying xth buyable, can be an object if there are multiple currencies
+- cost(): cost for buying xth buyable, can be an object if there are multiple currencies
                     
-- effect(x): **optional**, A function that calculates and returns the current values of bonuses
+- effect(): **optional**, A function that calculates and returns the current values of bonuses
               for having x of this buyable. Can return a value or an object containing multiple values.
 
 - display(): A function returning everything that should be displayed on the rebuyable after the title, likely

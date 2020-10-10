@@ -35,7 +35,7 @@ Individual Challenges can have these features:
 - effect(): **optional**, A function that calculates and returns the current values of any bonuses from the reward.
     Can return a value or an object containing multiple values. Can use basic HTML.
 
-- effectDisplay(effects): **optional**, A function that returns a display of the current effects of the reward with 
+- effectDisplay(): **optional**, A function that returns a display of the current effects of the reward with 
                      formatting. Default behavior is to just display the a number appropriately formatted.
 
 - goal: A Decimal for the cost of the upgrade. By default, the goal is in basic Points.

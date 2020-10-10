@@ -138,10 +138,6 @@ Key:
 - automate(): **optional**, this function is called every game tick, after production. Use it to activate any
                autobuyers or auto-resets or similar on this layer, if appropriate. 
 
-- updateTemp(): **optional**, this function is called every game tick. use it to update anything in the "tmp" object. 
-                You don't really need it. tmp is used as a way to store calculated values so it doesn't repeat
-                calculations.
-
 - resetsNothing(): **optional**, returns true if this layer shouldn't trigger any resets when you prestige.
 
 - incr_order: **optional**, an array of layer ids. When this layer is unlocked for the first time, the "order" value

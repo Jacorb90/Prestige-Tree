@@ -1,5 +1,4 @@
 var player;
-var tmp = {};
 var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
@@ -39,14 +38,14 @@ function getResetGain(layer, useType = null) {
 	let type = useType
 	if (!useType) type = layers[layer].type
 
-	if (tmp.gainExp[layer].eq(0)) return new Decimal(0)
+	if (tmp[layer].gainExp.eq(0)) return new Decimal(0)
 	if (type=="static") {
-		if ((!layers[layer].canBuyMax()) || tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(1)
-		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).div(tmp.gainMults[layer]).max(1).log(layers[layer].base).times(tmp.gainExp[layer]).pow(Decimal.pow(layers[layer].exponent, -1))
+		if ((!layers[layer].canBuyMax()) || tmp[layer].baseAmount.lt(tmp[layer].requires)) return new Decimal(1)
+		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).div(tmp[layer].gainMult).max(1).log(layers[layer].base).times(tmp[layer].gainExp).pow(Decimal.pow(layers[layer].exponent, -1))
 		return gain.floor().sub(player[layer].points).add(1).max(1);
 	} else if (type=="normal"){
-		if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return new Decimal(0)
-		let gain = tmp.layerAmt[layer].div(tmp.layerReqs[layer]).pow(layers[layer].exponent).times(tmp.gainMults[layer]).pow(tmp.gainExp[layer])
+		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return new Decimal(0)
+		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).pow(layers[layer].exponent).times(tmp[layer].gainMult).pow(tmp[layer].gainExp)
 		if (gain.gte("e1e7")) gain = gain.sqrt().times("e5e6")
 		return gain.floor().max(0);
 	} else if (type=="custom"){
@@ -60,19 +59,19 @@ function getNextAt(layer, canMax=false, useType = null) {
 	let type = useType
 	if (!useType) type = layers[layer].type
 
-	if (tmp.gainExp[layer].eq(0)) return new Decimal(1/0)
+	if (tmp[layer].gainExp.eq(0)) return new Decimal(1/0)
 	if (type=="static") 
 	{
 		if (!layers[layer].canBuyMax()) canMax = false
-		let amt = player[layer].points.plus((canMax&&tmp.layerAmt[layer].gte(tmp.nextAt[layer]))?tmp.resetGain[layer]:0)
-		let extraCost = Decimal.pow(layers[layer].base, amt.pow(layers[layer].exponent).div(tmp.gainExp[layer])).times(tmp.gainMults[layer])
-		let cost = extraCost.times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		let amt = player[layer].points.plus((canMax&&tmp[layer].baseAmount.gte(tmp[layer].nextAt))?tmp[layer].resetGain:0)
+		let extraCost = Decimal.pow(layers[layer].base, amt.pow(layers[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
+		let cost = extraCost.times(tmp[layer].requires).max(tmp[layer].requires)
 		if (layers[layer].resCeil) cost = cost.ceil()
 		return cost;
 	} else if (type=="normal"){
-		let next = tmp.resetGain[layer].add(1)
+		let next = tmp[layer].resetGain.add(1)
 		if (next.gte("e1e7")) next = next.div("e5e6").pow(2)
-		next = next.root(tmp.gainExp[layer]).div(tmp.gainMults[layer]).root(layers[layer].exponent).times(tmp.layerReqs[layer]).max(tmp.layerReqs[layer])
+		next = next.root(tmp[layer].gainExp.div(tmp[layer].gainMult).root(layers[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires))
 		if (layers[layer].resCeil) next = next.ceil()
 		return next;
 	} else if (type=="custom"){
@@ -85,7 +84,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 function shouldNotify(layer){
 	for (id in layers[layer].upgrades){
 		if (!isNaN(id)){
-			if (canAffordUpg(layer, id) && !hasUpg(layer, id) && tmp.upgrades[layer][id].unl){
+			if (canAffordUpg(layer, id) && !hasUpg(layer, id) && tmp[layer].upgrades[id].unl){
 				return true
 			}
 		}
@@ -96,6 +95,16 @@ function shouldNotify(layer){
 	}
 	else 
 		return false
+}
+
+function canReset(layer)
+{
+	if(tmp[layer].type == "normal")
+		return tmp[layer].baseAmount.gte(tmp[layer].requires)
+	else if(tmp[layer].type== "static")
+		return tmp[layer].baseAmount.gte(tmp[layer].nextAt) 
+	else
+		return layers[layer].canReset()
 }
 
 function rowReset(row, layer) {
@@ -150,7 +159,7 @@ function addPoints(layer, gain) {
 }
 
 function generatePoints(layer, diff) {
-	addPoints(layer, tmp.resetGain[layer].times(diff))
+	addPoints(layer, tmp[layer].resetGain.times(diff))
 }
 
 var prevOnReset
@@ -158,14 +167,14 @@ var prevOnReset
 function doReset(layer, force=false) {
 	let row = layers[layer].row
 	if (!force) {
-		if (tmp.layerAmt[layer].lt(tmp.layerReqs[layer])) return;
-		let gain = tmp.resetGain[layer]
+		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return;
+		let gain = tmp[layer].resetGain
 		if (layers[layer].type=="static") {
-			if (tmp.layerAmt[layer].lt(tmp.nextAt[layer])) return;
+			if (tmp[layer].baseAmount.lt(tmp[layer].nextAt)) return;
 			gain =(layers[layer].canBuyMax() ? gain : 1)
 		} 
 		if (layers[layer].type=="custom") {
-			if (!tmp.canReset[layer]) return;
+			if (!tmp[layer].canReset) return;
 		} 
 
 		if (layers[layer].onPrestige)
@@ -185,10 +194,10 @@ function doReset(layer, force=false) {
 			}
 		}
 	
-		tmp.layerAmt[layer] = new Decimal(0) // quick fix
+		tmp[layer].baseAmount = new Decimal(0) // quick fix
 	}
 
-	if (layers[layer].resetsNothing && layers[layer].resetsNothing()) return
+	if (tmp[layer].resetsNothing) return
 
 
 	for (layerResetting in layers) {
@@ -201,7 +210,6 @@ function doReset(layer, force=false) {
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	prevOnReset = undefined
 
-	setupTemp();
 	updateTemp()
 	updateTemp()
 }
@@ -216,7 +224,7 @@ function respecBuyables(layer) {
 
 function canAffordUpg(layer, id) {
 	let upg = layers[layer].upgrades[id]
-	let cost = tmp.upgrades[layer][id].cost
+	let cost = tmp[layer].upgrades[id].cost
 	return canAffordPurchase(layer, upg, cost) 
 }
 
@@ -233,15 +241,15 @@ function hasChall(layer, id){
 }
 
 function upgEffect(layer, id){
-	return (tmp.upgrades[layer][id].effect)
+	return (tmp[layer].upgrades[id].effect)
 }
 
 function challEffect(layer, id){
-	return (tmp.challs[layer][id].effect)
+	return (tmp[layer].challs[id].effect)
 }
 
 function buyableEffect(layer, id){
-	return (tmp.buyables[layer][id].effect)
+	return (tmp[layer].buyables[id].effect)
 }
 
 function canAffordPurchase(layer, thing, cost) {
@@ -265,7 +273,7 @@ function buyUpg(layer, id) {
 	if (!layers[layer].upgrades[id].unl()) return
 	if (player[layer].upgrades.includes(id)) return
 	let upg = layers[layer].upgrades[id]
-	let cost = tmp.upgrades[layer][id].cost
+	let cost = tmp[layer].upgrades[id].cost
 
 	if (upg.currencyInternalName){
 		let name = upg.currencyInternalName
@@ -290,8 +298,8 @@ function buyUpg(layer, id) {
 
 function buyMaxBuyable(layer, id) {
 	if (!player[layer].unl) return
-	if (!tmp.buyables[layer][id].unl) return
-	if (!tmp.buyables[layer][id].canAfford) return
+	if (!tmp[layer].buyables[id].unl) return
+	if (!tmp[layer].buyables[id].canAfford) return
 	if (!layers[layer].buyables[id].buyMax) return
 
 	layers[layer].buyables[id].buyMax()
@@ -300,8 +308,8 @@ function buyMaxBuyable(layer, id) {
 
 function buyBuyable(layer, id) {
 	if (!player[layer].unl) return
-	if (!tmp.buyables[layer][id].unl) return
-	if (!tmp.buyables[layer][id].canAfford) return
+	if (!tmp[layer].buyables[id].unl) return
+	if (!tmp[layer].buyables[id].canAfford) return
 
 	layers[layer].buyables[id].buy()
 	updateBuyableTemp(layer)

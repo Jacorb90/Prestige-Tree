@@ -15,7 +15,6 @@
 	<script type="text/javascript" src="js/layerSupport.js"></script>
 	<script type="text/javascript" src="js/layers.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
-	<script type="text/javascript" src="js/saves.js"></script>
 	<script type="text/javascript" src="js/utils.js"></script>
 	<script type="text/javascript" src="js/game.js"></script>
 	<script type="text/javascript" src="js/v.js"></script>
@@ -172,33 +171,33 @@
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
 		<div v-for="layer in LAYERS">
-			<div v-if="player.tab==layer" v-bind:class="'col right'" v-bind:style="tmp.style[layer] ? tmp.style[layer] : {}">
+			<div v-if="player.tab==layer" v-bind:class="'col right'" v-bind:style="tmp[layer].style ? tmp[layer].style : {}">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<div v-if="!layers[layer].tabFormat">
-					<main-display v-bind:style="tmp.componentStyles[layer]['main-display']" :layer="layer"></main-display>
-					<prestige-button v-bind:style="tmp.componentStyles[layer]['prestige-button']" :layer="layer"></prestige-button>
-					<span v-if="layers[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{layers[layer].baseResource}}</span>
+					<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
+					<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>
+					<span v-if="tmp[layer].type=='normal' && tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp[layer].baseAmt)}} {{tmp[layer].baseResource}}</span>
 					<br><br>
-					<span v-if="player[layer].best != undefined">Your best {{layers[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
-					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{layers[layer].resource}}<br></span>
-					<milestones v-bind:style="tmp.componentStyles[layer].milestones" :layer="layer"></milestones>
+					<span v-if="player[layer].best != undefined">Your best {{tmp[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
+					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{tmp[layer].resource}}<br></span>
+					<milestones v-bind:style="tmp[layer].componentStyles.milestones" :layer="layer"></milestones>
 					<div v-if="Array.isArray(layers[layer].midsection)">
-						<column :layer="layer" :data="layers[layer].midsection"></column>
+						<column :layer="layer" :data="tmp[layer].midsection"></column>
 					</div>
-					<buyables v-bind:style="tmp.componentStyles[layer].buyables" :layer="layer"></buyables>
-					<upgrades v-bind:style="tmp.componentStyles[layer]['upgrades']" :layer="layer"></upgrades>
-					<challs v-bind:style="tmp.componentStyles[layer]['challs']" :layer="layer"></challs>
+					<buyables v-bind:style="tmp[layer].componentStyles.buyables" :layer="layer"></buyables>
+					<upgrades v-bind:style="tmp[layer].componentStyles['upgrades']" :layer="layer"></upgrades>
+					<challs v-bind:style="tmp[layer].componentStyles['challs']" :layer="layer"></challs>
 					<br><br>
 				</div>
 				<div v-if="layers[layer].tabFormat">
 					<div v-if="Array.isArray(layers[layer].tabFormat)">
-						<column :layer="layer" :data="layers[layer].tabFormat"></column>
+						<column :layer="layer" :data="tmp[layer].tabFormat"></column>
 					</div>
-					<div v-else v-bind:style="[{'margin-top': '-50px'}, readData(layers[layer].tabFormat[player.subtabs[layer].mainTabs].style)]">
+					<div v-else v-bind:style="[{'margin-top': '-50px'}, tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style]">
 						<div class="upgTable" v-bind:style="{'padding-top': '25px', 'margin-bottom': '24px'}">
-							<tab-buttons v-bind:style="tmp.componentStyles[layer]['tab-buttons']" :layer="layer" :data="layers[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
+							<tab-buttons v-bind:style="tmp[layer].componentStyles['tab-buttons']" :layer="layer" :data="tmp[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
 						</div>
-						<column :layer="layer" :data="layers[layer].tabFormat[player.subtabs[layer].mainTabs].content"></column>
+						<column :layer="layer" :data="tmp[layer].tabFormat[player.subtabs[layer].mainTabs].content"></column>
 					</div>
 				</div>
 			</div>

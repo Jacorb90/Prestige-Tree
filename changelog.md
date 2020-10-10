@@ -1,6 +1,9 @@
 #The Modding Tree changelog:
 
 
+
+effectDisplay in Challenges and Upgrades no longer takes an argument
+
 ##v1.3.5
 - Completely automated convertToDecimal, now you never have to worry about it again.
 - Branches can be defined without a color id. But they can also use hex values for color ids!
