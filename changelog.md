@@ -6,7 +6,8 @@ Tmp does not need to be manually updated.
 Almost every value in layer data can be a function or a constant value!
 You don't have to have the same amount of upgrades in every row (and challs and buyables)
 Unl is optional for all Big Components (defaults to true).
-effectDisplay in Challenges and Upgrades no longer takes an argument
+effectDisplay in Challenges and Upgrades no longer takes an argument, as well as buyable effect.
+Buyable cost can take an argument for amount of buyables, but if one is not supplied it should do the cost of the next buyable.
 
 ##v1.3.5
 - Completely automated convertToDecimal, now you never have to worry about it again.

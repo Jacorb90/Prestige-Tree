@@ -140,9 +140,9 @@ function loadVue() {
 		template: `
 		<div v-if="layers[layer].milestones">
 			<table>
-				<tr v-for="id in Object.keys(tmp[layer].milestones)">
+				<tr v-for="id in Object.keys(tmp[layer].milestones)"><div v-if="layers[layer].milestones[id]!== undefined && tmp[layer].milestones[id].unl"
 					<milestone :layer = "layer" :data = "id" v-bind:style="tmp[layer].componentStyles.milestone"></milestone>
-				</tr>
+				</tr></div>
 			</table>
 			<br>
 		</div>

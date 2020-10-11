@@ -5,6 +5,7 @@ the player can reset the purchases to get their currency back.
 
 However, if you're creative, you can use them for basically anything. "canAfford()" is effectively "canClick()" and "buy()" is effectively "onClick()".
 
+The amount of a buyable owned is a Decimal, and can be accessed with buyablesOwned(layer, id).
 You can use buyableEffect(layer, id) to get the current effects of a buyable.
 
 Buyables should be formatted like this:
@@ -29,10 +30,11 @@ Features:
 - title: **optional**, displayed at the top in a larger font
          It can also be a function that returns updating text.
 
-- cost(): cost for buying xth buyable, can be an object if there are multiple currencies
+- cost(): cost for buying the next buyable. Can have an optional argument "x" to calculate the cost of the x+1th object,
+          but needs to use "current amount" as a default value for x. Can return an object if there are multiple currencies.
                     
 - effect(): **optional**, A function that calculates and returns the current values of bonuses
-              for having x of this buyable. Can return a value or an object containing multiple values.
+            of this buyable. Can return a value or an object containing multiple values.
 
 - display(): A function returning everything that should be displayed on the rebuyable after the title, likely
            including the description, amount bought, cost, and current effect. Can use basic HTML.
