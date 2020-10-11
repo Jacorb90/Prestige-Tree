@@ -28,6 +28,8 @@ function setupTempData(layerData, tmpData) {
 		if (layerData[item] == null) {
 			tmpData[item] = null
 		}
+		else if (layerData[item] instanceof Decimal)
+			tmpData[item] = layerData[item]
 		else if (Array.isArray(layerData[item])) {
 			tmpData[item] = []
 			setupTempData(layerData[item], tmpData[item])
@@ -37,7 +39,7 @@ function setupTempData(layerData, tmpData) {
 			setupTempData(layerData[item], tmpData[item])
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
-			tmpData[item] = {}
+			tmpData[item] = new Decimal(1) // The safest thing to put probably?
 		} else {
 			tmpData[item] = layerData[item]
 		}
@@ -64,7 +66,7 @@ function updateTemp() {
 }
 
 function updateTempData(layerData, tmpData) {
-
+	
 	for (item in layerData){
 		if (Array.isArray(layerData[item])) {
 			updateTempData(layerData[item], tmpData[item])
@@ -73,7 +75,7 @@ function updateTempData(layerData, tmpData) {
 			updateTempData(layerData[item], tmpData[item])
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
-			tmpData[item] = layerData[item]()
+			Vue.set(tmpData, item, layerData[item]())
 		}
 	}	
 }

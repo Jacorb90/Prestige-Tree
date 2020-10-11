@@ -22,10 +22,7 @@ which applies its style to the component.
 
 These are the existing components, but you can create more in v.js:
 
-- display-text: Displays some text. The argument is the text to display. It can also be a function that returns updating text.
-
-- raw-html: Displays some HTML. The argument is the HTML as a string, or a function that returns updating HTML.
-            It doesn't work with many vue things.
+- display-text: Displays some text (can use basic HTML). The argument is the text to display. It can also be a function that returns updating text.
 
 - blank: Adds empty space. The default dimensions are 8px x 17px. The argument changes the dimensions.
          If it's a single value (e.g. "20px"), that determines the height.

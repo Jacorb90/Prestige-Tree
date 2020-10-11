@@ -5,17 +5,10 @@ function loadVue() {
 	Vue.component('display-text', {
 		props: ['layer', 'data'],
 		template: `
-			<span v-html="readData(data)"></span>
+			<span v-html="data"></span>
 		`
 	})
 
-	// data = a function returning html content, with some limited functionality
-	Vue.component('raw-html', {
-		props: ['layer', 'data'],
-		template: `
-			<span v-html="readData(data)"></span>
-		`
-	})
 
 	// Blank space, data = optional height in px or pair with width and height in px
 	Vue.component('blank', {
@@ -33,7 +26,7 @@ function loadVue() {
 	Vue.component('display-image', {
 		props: ['layer', 'data'],
 		template: `
-			<img v-bind:src= "readData(data)" v-bind:alt= "readData(data)">
+			<img v-bind:src= "data" v-bind:alt= "data">
 		`
 	})
 		
@@ -45,8 +38,8 @@ function loadVue() {
 			<div class="upgRow">
 				<div v-for="item in data">
 				<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer" v-bind:style="tmp[layer].componentStyles[item]"></div>
-				<div v-else-if="item.length==3" v-bind:style="[tmp[layer].componentStyles[item], (item[2] ? item[2] : {})]" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
-				<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]" v-bind:style="tmp[layer].componentStyles[item]"></div>
+				<div v-else-if="item.length==3" v-bind:style="[tmp[layer].componentStyles[item[0]], (item[2] ? item[2] : {})]" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+				<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]" v-bind:style="tmp[layer].componentStyles[item[0]]"></div>
 				</div>
 			</div>
 		</div>
@@ -60,9 +53,9 @@ function loadVue() {
 		<div class="upgTable">
 			<div class="upgCol">
 				<div v-for="item in data">
-				<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer" v-bind:style="tmp[layer].componentStyles[item]"></div>
-				<div v-else-if="item.length==3" v-bind:style="[tmp[layer].componentStyles[item], (item[2] ? item[2] : {})]" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
-				<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]" v-bind:style="tmp[layer].componentStyles[item]"></div>
+					<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer" v-bind:style="tmp[layer].componentStyles[item]"></div>
+					<div v-else-if="item.length==3" v-bind:style="[tmp[layer].componentStyles[item[0]], (item[2] ? item[2] : {})]" v-bind:is="item[0]" :layer= "layer" :data= "item[1]"></div>
+					<div v-else-if="item.length==2" v-bind:is="item[0]" :layer= "layer" :data= "item[1]" v-bind:style="tmp[layer].componentStyles[item[0]]"></div>
 				</div>
 			</div>
 		</div>

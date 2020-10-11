@@ -27,11 +27,21 @@ function showPointGen(){
 
 // Calculate points/sec!
 function getPointGen() {
-	if(!hasUpg("p", 11))
-		return new Decimal(0)
+	if(!hasUpg("p", 11)) return new Decimal(0)
 
 	let gain = new Decimal(1)
-	if (hasUpg("c", 12)) gain = gain.times(upgEffect("c", 12))
+	if (hasUpg("p", 12)) gain = gain.times(upgEffect("p", 12))
+	if (hasUpg("p", 13)) gain = gain.times(upgEffect("p", 13))
+	if (hasUpg("p", 22)) gain = gain.times(upgEffect("p", 22))
+	if (player.b.unl) gain = gain.times(layers.b.effect())
+	if (player.g.unl) gain = gain.times(layers.g.effect().powerBoost)
+	if (hasUpg("e", 11)) gain = gain.times(layers.e.upgrades[11].effect())
+	if (player.e.unl && tmp.e.buyables) gain = gain.times(tmp.e.buyables[11].effect.second)
+	if (player.r.upgrades.includes(11)) gain = gain.times(layers.r.upgrades[11].effect())
+  	if (player.d.buyables[12].gt(0)) gain = gain.times(layers.d.buyables[12].effect(player.d.buyables[12]).first)
+  	if (!player.s.active) if (player.pr.buyables[13].gt(0)) gain = gain.times(layers.pr.buyables[13].effect().first)
+	if (player.d.banking == 1) gain = gain.sqrt()
+ 	if (player.d.banking == 2) gain = gain.add(1).log10()
 	return gain
 }
 
@@ -179,16 +189,11 @@ var prevOnReset
 function doReset(layer, force=false) {
 	let row = layers[layer].row
 	if (!force) {
-		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return;
+		if (!tmp[layer].canReset) return
 		let gain = tmp[layer].resetGain
 		if (layers[layer].type=="static") {
-			if (tmp[layer].baseAmount.lt(tmp[layer].nextAt)) return;
 			gain =(layers[layer].canBuyMax() ? gain : 1)
 		} 
-		if (layers[layer].type=="custom") {
-			if (!tmp[layer].canReset) return;
-		} 
-
 		if (layers[layer].onPrestige)
 			layers[layer].onPrestige(gain)
 		
@@ -234,36 +239,50 @@ function respecBuyables(layer) {
 	updateBuyableTemp(layer)
 }
 
+
+
 function canAffordUpg(layer, id) {
+	if (!layers[layer].upgrades) return false
 	let upg = layers[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost
 	return canAffordPurchase(layer, upg, cost) 
 }
 
 function hasUpg(layer, id){
+	if (!layers[layer].upgrades) return false
+
 	return (player[layer].upgrades.includes(toNumber(id)) || player[layer].upgrades.includes(id.toString()))
 }
 
-function hasMilestone(layer, id){
+function hasMilestone(layer, id) {
+	if (!layers[layer].milestones) return false
+
 	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString()))
 }
 
 function hasChall(layer, id){
+	if (!layers[layer].challs) return false
+
 	return (player[layer].challs.includes(toNumber(id)) || player[layer].challs.includes(id.toString()))
 }
 
 function upgEffect(layer, id){
+	if (!layers[layer].upgrades) return {}
+
 	return (tmp[layer].upgrades[id].effect)
 }
 
 function challEffect(layer, id){
+	if (!layers[layer].chall) return false
+
 	return (tmp[layer].challs[id].effect)
 }
 
 function buyableEffect(layer, id){
+	if (!layers[layer].buyables) return false
+
 	return (tmp[layer].buyables[id].effect)
 }
-
 
 function canAffordPurchase(layer, thing, cost) {
 	if (thing.currencyInternalName){
