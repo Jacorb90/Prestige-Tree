@@ -103,7 +103,7 @@ function loadVue() {
 	Vue.component('chall', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="layers[layer].challs && tmp[layer].challs[data].unl && !(player.hideChalls && hasChall(layer, [data]))" v-bind:class="{hChall: true, done: player[layer].challs.includes(data), canComplete: player[layer].active == data&&!player[layer].challs.includes(data)&&canCompleteChall(layer, data)}">
+		<div v-if="layers[layer].challs && layers[layer].challs[data]!== undefined && tmp[layer].challs[data].unl && !(player.hideChalls && hasChall(layer, [data]))" v-bind:class="{hChall: true, done: player[layer].challs.includes(data), canComplete: player[layer].active == data&&!player[layer].challs.includes(data)&&canCompleteChall(layer, data)}">
 			<br><h3 v-html="tmp[layer].challs[data].name"></h3><br><br>
 			<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': tmp[layer].color}" v-on:click="startChall(layer, data)">{{player[layer].active==(data)?(canCompleteChall(layer, data)?"Finish":"Exit Early"):(player[layer].challs.includes(data)?"Completed":"Start")}}</button><br><br>
 			<span v-html="tmp[layer].challs[data].desc"></span><br>
@@ -132,7 +132,7 @@ function loadVue() {
 	Vue.component('upgrade', {
 		props: ['layer', 'data'],
 		template: `
-		<button v-if="layers[layer].upgrades && tmp[layer].upgrades[data].unl" v-on:click="buyUpg(layer, data)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(data), locked: (!(canAffordUpg(layer, data))&&!player[layer].upgrades.includes(data)), can: (canAffordUpg(layer, data)&&!player[layer].upgrades.includes(data))}"
+		<button v-if="layers[layer].upgrades && layers[layer].upgrades[data]!== undefined && tmp[layer].upgrades[data].unl" v-on:click="buyUpg(layer, data)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(data), locked: (!(canAffordUpg(layer, data))&&!player[layer].upgrades.includes(data)), can: (canAffordUpg(layer, data)&&!player[layer].upgrades.includes(data))}"
 			v-bind:style="[((!hasUpg(layer, data) && canAffordUpg(layer, data)) ? {'background-color': tmp[layer].color} : {}), tmp[layer].upgrades[data].style]">
 			<span v-if= "tmp[layer].upgrades[data].title"><h3 v-html="tmp[layer].upgrades[data].title"></h3><br></span>
 			<span v-html="tmp[layer].upgrades[data].desc"></span>
@@ -160,7 +160,7 @@ function loadVue() {
 	Vue.component('milestone', {
 		props: ['layer', 'data'],
 		template: `
-		<td v-if="layers[layer].milestones && milestoneShown(layer, data)" v-bind:style="[(tmp[layer].milestones[data].unl && !tmp[layer].milestones[data].unl) ? {'visibility': 'hidden'} : {}, tmp[layer].milestones[data].style]" v-bind:class="{milestone: !player[layer].milestones.includes(data), milestoneDone: player[layer].milestones.includes(data)}">
+		<td v-if="layers[layer].milestones && layers[layer].milestones[data]!== undefined && milestoneShown(layer, data)" v-bind:style="[(tmp[layer].milestones[data].unl && !tmp[layer].milestones[data].unl) ? {'visibility': 'hidden'} : {}, tmp[layer].milestones[data].style]" v-bind:class="{milestone: !player[layer].milestones.includes(data), milestoneDone: player[layer].milestones.includes(data)}">
 			<h3 v-html="tmp[layer].milestones[data].requirementDesc"></h3><br>
 			<span v-html="tmp[layer].milestones[data].effectDesc"></span><br>
 		<span v-if="(tmp[layer].milestones[data].toggles)&&(player[layer].milestones.includes(data))" v-for="toggle in tmp[layer].milestones[data].toggles"><toggle :layer= "layer" :data= "toggle" v-bind:style="tmp[layer].componentStyles.toggle"></toggle>&nbsp;</span></td></tr>
@@ -215,7 +215,7 @@ function loadVue() {
 		props: ['layer', 'data', 'size'],
 		template: `
 		<button 
-			v-if="layers[layer].buyables && tmp[layer].buyables[data].unl" 
+			v-if="layers[layer].buyables && layers[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unl" 
 			v-bind:class="{ buyable: true, can: tmp[layer].buyables[data].canAfford, locked: !tmp[layer].buyables[data].canAfford}"
 			v-bind:style="[tmp[layer].buyables[data].canAfford ? {'background-color': tmp[layer].color} : {}, {'height': (size ? size : 'inherit'), 'width': (size ? size : '200px')}, tmp[layer].buyables[data].style]"
 			v-on:click="buyBuyable(layer, data)">

@@ -80,7 +80,7 @@ addLayer("c", {
             },
         }, 
         upgrades: {
-            rows: 1,
+            rows: 2,
             cols: 3,
             11: {
                 title:() => "Generator of Genericness",
@@ -119,6 +119,12 @@ addLayer("c", {
                         }
                     } // Otherwise use the default
                 },
+            },
+            22: {
+                title:() => "This upgrade doesn't exist",
+                desc:() => "Or does it?.",
+                cost:() => new Decimal(1),
+                unl() { return player[this.layer].unl }, // The upgrade is only visible when this is true
             },
         },
         buyables: {
