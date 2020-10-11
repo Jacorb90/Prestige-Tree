@@ -1,7 +1,9 @@
 # Buyables
 
-Buyables are things that can be bought multiple times with scaling costs. If you set a respec function,
+Buyables are usually things that can be bought multiple times with scaling costs. If you set a respec function,
 the player can reset the purchases to get their currency back.
+
+However, if you're creative, you can use them for basically anything. "canAfford()" is effectively "canClick()" and "buy()" is effectively "onClick()".
 
 You can use buyableEffect(layer, id) to get the current effects of a buyable.
 

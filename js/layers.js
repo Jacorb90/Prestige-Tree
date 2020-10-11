@@ -167,9 +167,6 @@ addLayer("c", {
         doReset(resettingLayer){ // Triggers when this layer is being reset, along with the layer doing the resetting. Not triggered by lower layers resetting, but is by layers on the same row.
             if(layers[resettingLayer].row > this.row) fullLayerReset(this.layer) // This is actually the default behavior
         },
-        convertToDecimal() {
-            // Convert any layer-specific Decimal values (besides points, total, and best) from String to Decimal (used when loading save)
-        },
         layerShown() {return true}, // Condition for when layer appears on the tree
         update(diff) {
             if (player[this.layer].upgrades.includes(11)) player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
@@ -292,7 +289,7 @@ addLayer("f", {
         },
         row: 1,
         layerShown() {return true}, 
-        branches: [["c", 1]], // Each pair corresponds to a line added to the tree when this node is unlocked. The letter is the other end of the line, and the number affects the color, 1 is default
+        branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
 
         tooltipLocked() { // Optional, tooltip displays when the layer is locked
             return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))

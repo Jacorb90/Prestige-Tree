@@ -5,7 +5,7 @@ var NaNalert = false;
 var gameEnded = false;
 
 let VERSION = {
-	num: "1.3.4",
+	num: "1.3.5",
 	name: "Tabception... ception!"
 }
 
@@ -33,24 +33,6 @@ function inChallenge(layer, id){
 
 	if (layers[layer].challs[chall].countsAs)
 		return layers[layer].challs[id].countsAs.includes(id)
-}
-
-function convertToDecimal() {
-	player.points = new Decimal(player.points)
-	for (layer in layers) {
-		player[layer].points = new Decimal(player[layer].points)
-		if (player[layer].best != undefined) player[layer].best = new Decimal(player[layer].best)
-		if (player[layer].total !== undefined) player[layer].total = new Decimal(player[layer].total)
-		player[layer].spentOnBuyables = new Decimal(player[layer].spentOnBuyables)
-
-		if (player[layer].buyables != undefined) {
-			for (id in player[layer].buyables)
-				player[layer].buyables[id] = new Decimal(player[layer].buyables[id])
-		}
-		player[layer].best = new Decimal(player[layer].best)
-
-		if (layers[layer].convertToDecimal) layers[layer].convertToDecimal();
-	}
 }
 
 function getResetGain(layer, useType = null) {
@@ -219,7 +201,6 @@ function doReset(layer, force=false) {
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	prevOnReset = undefined
 
-	setupTemp();
 	updateTemp()
 	updateTemp()
 }

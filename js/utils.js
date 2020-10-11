@@ -107,51 +107,45 @@ function getStartPlayer() {
 }
 
 function fixSave() {
-	defaultData = startPlayerBase()
-	for (datum in defaultData){
-		if (player[datum] == undefined){
-			player[datum] = defaultData[datum]
-		}
+	defaultData = getStartPlayer()
+	fixData(defaultData, player)
+
+	for(layer in layers)
+	{
+		if (player[layer].best !== undefined) player[layer].best = new Decimal (player[layer].best)
+		if (player[layer].total !== undefined) player[layer].total = new Decimal (player[layer].total)
 	}
-	for (layer in layers) {
-		defaultData = layers[layer].startData()
-		if (player[layer].upgrades == undefined)
-			player[layer].upgrades = []
-		if (player[layer].milestones == undefined)
-			player[layer].milestones = []
-		if (player[layer].challs == undefined)
-			player[layer].challs = []
+}
 
-		for (datum in defaultData){
-			if (player[layer][datum] == undefined){
-				player[layer][datum] = defaultData[datum]
-			}
+function fixData(defaultData, newData) {
+	for (item in defaultData){
+		if (defaultData[item] == null) {
+			if (newData[item] === undefined)
+				newData[item] = null
 		}
-
-		if (player[layer].spentOnBuyables == undefined)
-			player[layer].spentOnBuyables = new Decimal(0)
-
-		if (layers[layer].buyables) {
-			if (player[layer].buyables == undefined) player[layer].buyables = {}
-
-			for (id in layers[layer].buyables){
-				if (player[layer].buyables[id] == undefined && !isNaN(id))
-					player[layer].buyables[id] = new Decimal(0)
-			}
+		else if (Array.isArray(defaultData[item])) {
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+			else
+				fixData(defaultData[item], newData[item])
 		}
-		
-		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
-			if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
-			if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
+		else if (defaultData[item] instanceof Decimal) { // Convert to Decimal
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+			else
+				newData[item] = new Decimal(newData[item])
 		}
-
-		if (layers[layer].microtabs) {
-			if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
-			for (item in layers[layer].microtabs)
-				if (player.subtabs[layer][item] == undefined) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
+		else if ((!!defaultData[item]) && (defaultData[item].constructor === Object)) {
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+			else
+				fixData(defaultData[item], newData[item])
 		}
-	
-	}
+		else {
+			if (newData[item] === undefined)
+				newData[item] = defaultData[item]
+		}
+	}	
 }
 
 function load() {
@@ -166,7 +160,6 @@ function load() {
 		player.offTime.remain += (Date.now() - player.time) / 1000
 	}
 	player.time = Date.now();
-	convertToDecimal();
 	versionCheck();
 	changeTheme();
 	changeTreeQuality();
@@ -414,3 +407,5 @@ var onFocused = false
 function focused(x) {
 	onFocused = x
 }
+
+document.title = modInfo.name
