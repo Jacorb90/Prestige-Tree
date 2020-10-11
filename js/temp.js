@@ -77,3 +77,13 @@ function updateTempData(layerData, tmpData) {
 		}
 	}	
 }
+
+function updateChallTemp(layer)
+{
+	updateTempData(layers[layer].challs, tmp[layer].challs)
+}
+
+function updateBuyableTemp(layer)
+{
+	updateTempData(layers[layer].buyables, tmp[layer].buyables)
+}

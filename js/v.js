@@ -92,7 +92,7 @@ function loadVue() {
 		<div v-if="layers[layer].challs" class="upgTable">
 			<div v-for="row in tmp[layer].challs.rows" class="upgRow">
 				<div v-for="col in tmp[layer].challs.cols">
-					<chall :layer = "layer" :data = "row*10+col" v-bind:style="tmp[layer].componentStyles.chall"></chall>
+					<chall v-if="layers[layer].challs[row*10+col]!== undefined && tmp[layer].challs[row*10+col].unl" :layer = "layer" :data = "row*10+col" v-bind:style="tmp[layer].componentStyles.chall"></chall>
 				</div>
 			</div>
 		</div>
@@ -119,9 +119,9 @@ function loadVue() {
 		template: `
 		<div v-if="layers[layer].upgrades" class="upgTable">
 			<div v-for="row in layers[layer].upgrades.rows" class="upgRow">
-				<div v-for="col in layers[layer].upgrades.cols" class="upgAlign">
+				<div v-for="col in layers[layer].upgrades.cols"><div v-if="layers[layer].upgrades[row*10+col]!== undefined && tmp[layer].upgrades[row*10+col].unl" class="upgAlign">
 					<upgrade :layer = "layer" :data = "row*10+col" v-bind:style="tmp[layer].componentStyles.upgrade"></upgrade>
-				</div>
+				</div></div>
 			</div>
 			<br>
 		</div>
@@ -201,13 +201,13 @@ function loadVue() {
 		<div v-if="layers[layer].buyables" class="upgTable">
 			<button v-if="tmp[layer].buyables.respec" v-on:click="respecBuyables(layer)" v-bind:class="{ longUpg: true, can: player[layer].unl, locked: !player[layer].unl }">{{tmp[layer].buyables.respecText ? tmp[layer].buyables.respecText : "Respec"}}</button><br>
 			<div v-for="row in tmp[layer].buyables.rows" class="upgRow">
-				<div v-for="col in tmp[layer].buyables.cols" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : '200px'),}">
+				<div v-for="col in tmp[layer].buyables.cols"><div v-if="layers[layer].buyables[row*10+col]!== undefined && tmp[layer].buyables[row*10+col].unl" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : '200px'),}">
 					<buyable :layer = "layer" :data = "row*10+col" :size = "data" v-bind:style="tmp[layer].componentStyles.buyable"></buyable>
-				</div>
+				</div></div>
 				<br>
 			</div>
 		</div>
-		`
+	`
 	})
 
 	// data = id of buyable

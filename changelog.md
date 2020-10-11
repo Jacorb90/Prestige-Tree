@@ -3,6 +3,7 @@
 Almost every value in layer data can be a function or a constant value!
 effectDisplay in Challenges and Upgrades no longer takes an argument
 You don't have to have the same amount of upgrades in every row (and challs and buyables)
+Unl is optional for all Big Components (defaults to true).
 
 ##v1.3.5
 - Completely automated convertToDecimal, now you never have to worry about it again.

@@ -34,6 +34,8 @@ function updateLayers(){
                 if (!isNaN(thing)){
                     layers[layer].upgrades[thing].id = thing
                     layers[layer].upgrades[thing].layer = layer
+                    if (layers[layer].upgrades[thing].unl === undefined)
+                        layers[layer].upgrades[thing].unl = true
                 }
             }
         }
@@ -42,6 +44,8 @@ function updateLayers(){
                 if (!isNaN(thing)){
                     layers[layer].milestones[thing].id = thing
                     layers[layer].milestones[thing].layer = layer
+                    if (layers[layer].milestones[thing].unl === undefined)
+                        layers[layer].milestones[thing].unl = true
                 }
             }
         }
@@ -50,6 +54,8 @@ function updateLayers(){
                 if (!isNaN(thing)){
                     layers[layer].challs[thing].id = thing
                     layers[layer].challs[thing].layer = layer
+                    if (layers[layer].challs[thing].unl === undefined)
+                        layers[layer].challs[thing].unl = true
                 }
             }
         }
@@ -59,7 +65,8 @@ function updateLayers(){
                 if (!isNaN(thing)){
                     layers[layer].buyables[thing].id = thing
                     layers[layer].buyables[thing].layer = layer
-
+                    if (layers[layer].buyables[thing].unl === undefined)
+                        layers[layer].buyables[thing].unl = true
                 }
             }  
         }
