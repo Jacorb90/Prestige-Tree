@@ -23,10 +23,12 @@ function updateHotkeys()
 }
 
 var ROW_LAYERS = {}
+var TREE_LAYERS = {}
 
 function updateLayers(){
     LAYERS = Object.keys(layers);
     ROW_LAYERS = {}
+    TREE_LAYERS = {}
     for (layer in layers){
         layers[layer].layer = layer
         if (layers[layer].upgrades){
@@ -72,12 +74,21 @@ function updateLayers(){
         }
 
         if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
-
+        if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
 
         row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}
+        if(!TREE_LAYERS[row]) TREE_LAYERS[row] = []
         ROW_LAYERS[row][layer]=layer;
+        let position = (layers[layer].position !== undefined ? layers[layer].position : layer)
+        TREE_LAYERS[row].push({layer: layer, position: position})
+
+        
     }
+    for (row in TREE_LAYERS) {
+        TREE_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
+    }
+
     updateHotkeys()
 }
 
@@ -92,6 +103,13 @@ function readData(data, args=null){
 		return data(args);
 	else
 		return data;
+}
+
+function someLayerUnlocked(row){
+    for (layer in ROW_LAYERS[row])
+        if (player[layer].unl)
+            return true
+    return false
 }
 
 // This isn't worth making a .ts file over

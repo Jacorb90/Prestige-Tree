@@ -8,8 +8,8 @@
 	<script type="text/javascript" src="js/layerSupport.js"></script>
 	<script type="text/javascript" src="js/layers.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
-	<script type="text/javascript" src="js/utils.js"></script>
 	<script type="text/javascript" src="js/game.js"></script>
+	<script type="text/javascript" src="js/utils.js"></script>
 	<script type="text/javascript" src="js/v.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
 
@@ -64,7 +64,7 @@
 			<br><br>
 			<div class="link" onclick="showTab('changelog')">Changelog</div><br>
 			<span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></span>
-			<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
+			<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
 			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
 			<br>
 			Note by Jacorb: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
@@ -118,17 +118,11 @@
 			<br>
 			<span v-if="showPointGen()">({{format(getPointGen())}}/sec)</span>
 			<br><br><br><br>
-			<!-- *************************** Modify the tree in the table below! *************************** -->
-			<table>
-				<td><layer-node layer='c' abb='C'></layer-node></td>
-			</table><table>
-				<td><button class="treeNode hidden"></button></td>
-			</table><table>
-				<td v-if="player.tab=='tree'&&(player.c.unl||player.c.unl)" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(1)"></img></td>
-				<td><layer-node layer='f' abb='F'></layer-node></td>
-			</table><table>
-				<td><button class="treeNode hidden"></button></td>
-			</table>
+			<span v-for="row in TREE_LAYERS"><table>
+				<td v-if="player.tab=='tree'&& someLayerUnlocked(row) && row != 0" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(row)"></img></td>
+				<td v-for="node in row"><layer-node :layer='node.layer' :abb='layers[node.layer].symbol'></layer-node></td>
+				<table><button class="treeNode hidden"></button></td></table>
+			</span>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
 		<div v-for="layer in LAYERS">
