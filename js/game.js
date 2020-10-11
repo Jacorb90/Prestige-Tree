@@ -10,6 +10,7 @@ let modInfo = {
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
+	changelogLink: "https://github.com/Acamaeda/The-Modding-Tree/blob/master/changelog.md",
 	offlineLimit: 1  // In hours
 }
 

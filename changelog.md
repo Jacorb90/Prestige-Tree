@@ -3,7 +3,7 @@
 Added clickables, a more generalized variant of buyables!
 Support for multiple completions of challenges.
 Added getter/setter functions for buyable amount and such
-Moved modInfo to game.js, added a spot for a Discord link, and a separate mod version from the TMT version
+Moved modInfo to game.js, added a spot for a Discord link, changelog link, and a separate mod version from the TMT version
 Tree structure is based on layer data, no index.html needed.
 Tmp does not need to be manually updated.
 Almost every value in layer data can be a function or a constant value!
@@ -12,6 +12,7 @@ Unl is optional for all Big Components (defaults to true).
 effectDisplay in Challenges and Upgrades no longer takes an argument, as well as buyable effect.
 Buyable cost can take an argument for amount of buyables, but if one is not supplied it should do the cost of the next buyable.
 All displays will update correctly.
+Changelog is no longer in index.html at all.
 
 ##v1.3.5
 - Completely automated convertToDecimal, now you never have to worry about it again.
