@@ -3,9 +3,21 @@ var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
 
+
+let modInfo = {
+	name: "The Modding Tree",
+	id: "modbase",
+	pointsName: "points",
+	discordName: "",
+	discordLink: "",
+	offlineLimit: 1  // In hours
+}
+
 let VERSION = {
 	num: "1.3.5 maybe",
-	name: "Tabception... ception!"
+	name: "Tabception... ception!",
+	tmtNum: "1.3.5 maybe",
+	tmtName: "Tabception... ception!"
 }
 
 // Determines if it should show points/sec
