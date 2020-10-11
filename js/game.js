@@ -154,25 +154,6 @@ function resetBuyables(layer){
 	player[layer].spentOnBuyables = new Decimal(0)
 }
 
-function getStartBuyables(layer){
-	let data = {}
-	if (layers[layer].buyables) {
-		for (id in layers[layer].buyables)
-			if (!isNaN(id))
-				data[id] = new Decimal(0)
-	}
-	return data
-}
-
-function getStartClickables(layer){
-	let data = {}
-	if (layers[layer].buyables) {
-		for (id in layers[layer].buyables)
-			if (!isNaN(id))
-				data[id] = ""
-	}
-	return data
-}
 
 function addPoints(layer, gain) {
 	player[layer].points = player[layer].points.add(gain).max(0)
@@ -292,10 +273,13 @@ function canCompleteChall(layer, x)
 function completeChall(layer, x) {
 	var x = player[layer].active
 	if (!x) return
-	if (! canCompleteChall(layer, x)) return
-	if (!player[layer].challs.includes(x)) {
+	if (! canCompleteChall(layer, x)){
+		delete player[layer].active
+		return
+	}
+	if (player[layer].challs[x] < tmp[layer].challs[x].completionLimit) {
 		needCanvasUpdate = true
-		player[layer].challs.push(x);
+		player[layer].challs[x] += 1
 		if (layers[layer].challs[x].onComplete) layers[layer].challs[x].onComplete()
 	}
 	delete player[layer].active

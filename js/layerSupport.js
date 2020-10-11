@@ -58,6 +58,9 @@ function updateLayers(){
                     layers[layer].challs[thing].layer = layer
                     if (layers[layer].challs[thing].unl === undefined)
                         layers[layer].challs[thing].unl = true
+                    if (layers[layer].challs[thing].completionLimit === undefined)
+                        layers[layer].challs[thing].completionLimit = 1
+
                 }
             }
         }

@@ -96,9 +96,9 @@ function loadVue() {
 	Vue.component('chall', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="layers[layer].challs && layers[layer].challs[data]!== undefined && tmp[layer].challs[data].unl && !(player.hideChalls && hasChall(layer, [data]))" v-bind:class="{hChall: true, done: player[layer].challs.includes(data), canComplete: player[layer].active == data&&!player[layer].challs.includes(data)&&canCompleteChall(layer, data)}">
+		<div v-if="layers[layer].challs && layers[layer].challs[data]!== undefined && tmp[layer].challs[data].unl && !(player.hideChalls && hasChall(layer, [data]))" v-bind:class="{hChall: true, done: hasChall(layer, data), canComplete: player[layer].active == data&&!hasChall(layer, data)&&canCompleteChall(layer, data)}">
 			<br><h3 v-html="tmp[layer].challs[data].name"></h3><br><br>
-			<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': tmp[layer].color}" v-on:click="startChall(layer, data)">{{player[layer].active==(data)?(canCompleteChall(layer, data)?"Finish":"Exit Early"):(player[layer].challs.includes(data)?"Completed":"Start")}}</button><br><br>
+			<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': tmp[layer].color}" v-on:click="startChall(layer, data)">{{player[layer].active==(data)?(canCompleteChall(layer, data)?"Finish":"Exit Early"):(hasChall(layer, data)?"Completed":"Start")}}</button><br><br>
 			<span v-html="tmp[layer].challs[data].desc"></span><br>
 			Goal: {{format(tmp[layer].challs[data].goal)}} {{tmp[layer].challs[data].currencyDisplayName ? tmp[layer].challs[data].currencyDisplayName : "points"}}<br>
 			Reward: <span v-html="tmp[layer].challs[data].reward"></span><br>

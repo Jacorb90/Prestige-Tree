@@ -64,8 +64,9 @@ addLayer("c", {
             rows: 2,
     		cols: 12,
 		    11: {
-			    name:() => "Fun",
-			    desc:() => "Makes the game 0% harder",
+                name:() => "Fun",
+                completionLimit: 3,
+			    desc() {return "Makes the game 0% harder<br>"+challCompletions(this.layer, this.id) + "/" + this.completionLimit + " completions"},
 			    unl() { return player[this.layer].best.gt(0) },
                 goal:() => new Decimal("20"),
                 currencyDisplayName: "lollipops", // Use if using a nonstandard currency

@@ -4,6 +4,7 @@ Useful functions for dealing with Challenges and implementing their effects:
 
 - inChall(layer, id): determine if the player is in a given challenge (or another challenge on the same layer that counts as this one)
 - hasChall(layer, id): determine if the player has completed the challenge
+- challCompletions(layer, id): determine if the player has completed the challenge
 - challEffect(layer, id): Returns the current effects of the challenge, if any
 
 
@@ -53,6 +54,8 @@ By default, challenges use basic Points for the goal. You can change that using 
 - currencyInternalName: **optional**, the internal name for that currency
 - currencyLayer: **optional**, the internal name of the layer that currency is stored in.
                  If it's part of a layer, omit.
+
+- completionLimit: **optional**, the amount of times you can complete this challenge. Default is 1 completion.
 
 - style: **Optional**, A CSS object, which affects this challenge.
 

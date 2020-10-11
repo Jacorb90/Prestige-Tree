@@ -1,5 +1,8 @@
 #The Modding Tree changelog:
 
+Added clickables, a more generalized variant of buyables!
+Support for multiple completions of challenges.
+Added getter/setter functions for buyable amount and such
 Moved modInfo to game.js, added a spot for a Discord link, and a separate mod version from the TMT version
 Tree structure is based on layer data, no index.html needed.
 Tmp does not need to be manually updated.
@@ -8,6 +11,7 @@ You don't have to have the same amount of upgrades in every row (and challs and 
 Unl is optional for all Big Components (defaults to true).
 effectDisplay in Challenges and Upgrades no longer takes an argument, as well as buyable effect.
 Buyable cost can take an argument for amount of buyables, but if one is not supplied it should do the cost of the next buyable.
+All displays will update correctly.
 
 ##v1.3.5
 - Completely automated convertToDecimal, now you never have to worry about it again.

@@ -93,7 +93,7 @@ function getStartPlayer() {
 		playerdata[layer].spentOnBuyables = new Decimal(0)
 		playerdata[layer].upgrades = []
 		playerdata[layer].milestones = []
-		playerdata[layer].challs = []
+		playerdata[layer].challs = getStartChalls(layer)
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 			playerdata.subtabs[layer] = {}
 			playerdata.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
@@ -105,6 +105,37 @@ function getStartPlayer() {
 		}
 	}
 	return playerdata
+}
+
+
+function getStartBuyables(layer){
+	let data = {}
+	if (layers[layer].buyables) {
+		for (id in layers[layer].buyables)
+			if (!isNaN(id))
+				data[id] = new Decimal(0)
+	}
+	return data
+}
+
+function getStartClickables(layer){
+	let data = {}
+	if (layers[layer].clickables) {
+		for (id in layers[layer].clickables)
+			if (!isNaN(id))
+				data[id] = ""
+	}
+	return data
+}
+
+function getStartChalls(layer){
+	let data = {}
+	if (layers[layer].challs) {
+		for (id in layers[layer].challs)
+			if (!isNaN(id))
+				data[id] = 0
+	}
+	return data
 }
 
 function fixSave() {
@@ -137,7 +168,7 @@ function fixData(defaultData, newData) {
 				newData[item] = new Decimal(newData[item])
 		}
 		else if ((!!defaultData[item]) && (defaultData[item].constructor === Object)) {
-			if (newData[item] === undefined)
+			if (newData[item] === undefined || (defaultData[item].constructor !== Object))
 				newData[item] = defaultData[item]
 			else
 				fixData(defaultData[item], newData[item])
@@ -338,7 +369,11 @@ function hasMilestone(layer, id){
 }
 
 function hasChall(layer, id){
-	return (player[layer].challs.includes(toNumber(id)) || player[layer].challs.includes(id.toString()))
+	return (player[layer].challs[id])
+}
+
+function challCompletions(layer, id){
+	return (player[layer].challs[id])
 }
 
 function getBuyableAmt(layer, id){
