@@ -201,7 +201,7 @@ function loadVue() {
 		<div v-if="layers[layer].buyables" class="upgTable">
 			<button v-if="tmp[layer].buyables.respec" v-on:click="respecBuyables(layer)" v-bind:class="{ longUpg: true, can: player[layer].unl, locked: !player[layer].unl }">{{tmp[layer].buyables.respecText ? tmp[layer].buyables.respecText : "Respec"}}</button><br>
 			<div v-for="row in tmp[layer].buyables.rows" class="upgRow">
-				<div v-for="col in tmp[layer].buyables.cols"><div v-if="layers[layer].buyables[row*10+col]!== undefined && tmp[layer].buyables[row*10+col].unl" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : '200px'),}">
+				<div v-for="col in tmp[layer].buyables.cols"><div v-if="layers[layer].buyables[row*10+col]!== undefined && tmp[layer].buyables[row*10+col].unl" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : 'inherit'),}">
 					<buyable :layer = "layer" :data = "row*10+col" :size = "data" v-bind:style="tmp[layer].componentStyles.buyable"></buyable>
 				</div></div>
 				<br>
@@ -217,7 +217,7 @@ function loadVue() {
 		<button 
 			v-if="layers[layer].buyables && layers[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unl" 
 			v-bind:class="{ buyable: true, can: tmp[layer].buyables[data].canAfford, locked: !tmp[layer].buyables[data].canAfford}"
-			v-bind:style="[tmp[layer].buyables[data].canAfford ? {'background-color': tmp[layer].color} : {}, {'height': (size ? size : 'inherit'), 'width': (size ? size : '200px')}, tmp[layer].buyables[data].style]"
+			v-bind:style="[tmp[layer].buyables[data].canAfford ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].buyables[data].style]"
 			v-on:click="buyBuyable(layer, data)">
 			<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
 			<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp[layer].buyables[data].display"></span>
