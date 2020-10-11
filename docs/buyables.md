@@ -3,9 +3,8 @@
 Buyables are usually things that can be bought multiple times with scaling costs. If you set a respec function,
 the player can reset the purchases to get their currency back.
 
-However, if you're creative, you can use them for basically anything. "canAfford()" is effectively "canClick()" and "buy()" is effectively "onClick()".
-
-The amount of a buyable owned is a Decimal, and can be accessed with buyablesOwned(layer, id).
+The amount of a buyable owned is a Decimal.
+You can get or set the amount of a buyable with getBuyableAmt(layer, id) and setBuyableAmt(layer, id, amt).
 You can use buyableEffect(layer, id) to get the current effects of a buyable.
 
 Buyables should be formatted like this:
@@ -36,7 +35,7 @@ Features:
 - effect(): **optional**, A function that calculates and returns the current values of bonuses
             of this buyable. Can return a value or an object containing multiple values.
 
-- display(): A function returning everything that should be displayed on the rebuyable after the title, likely
+- display(): A function returning everything that should be displayed on the buyable after the title, likely
            including the description, amount bought, cost, and current effect. Can use basic HTML.
 
 - unl(): A function returning a bool to determine if the buyable is visible or not.

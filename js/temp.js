@@ -3,7 +3,7 @@ var tmp = {}
 // Tmp will not call these
 var activeFunctions = [
 	"startData", "onPrestige", "doReset", "update", "automate",
-	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress"
+	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress"
 ]
 
 function setupTemp() {
@@ -88,4 +88,9 @@ function updateChallTemp(layer)
 function updateBuyableTemp(layer)
 {
 	updateTempData(layers[layer].buyables, tmp[layer].buyables)
+}
+
+function updateClickableTemp(layer)
+{
+	updateTempData(layers[layer].clickables, tmp[layer].clickables)
 }

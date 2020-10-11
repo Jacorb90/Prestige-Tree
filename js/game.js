@@ -27,7 +27,7 @@ function showPointGen(){
 
 // Calculate points/sec!
 function getPointGen() {
-	if(!hasUpg("p", 11))
+	if(!hasUpg("c", 11))
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
@@ -164,6 +164,16 @@ function getStartBuyables(layer){
 	return data
 }
 
+function getStartClickables(layer){
+	let data = {}
+	if (layers[layer].buyables) {
+		for (id in layers[layer].buyables)
+			if (!isNaN(id))
+				data[id] = ""
+	}
+	return data
+}
+
 function addPoints(layer, gain) {
 	player[layer].points = player[layer].points.add(gain).max(0)
 	if (player[layer].best) player[layer].best = player[layer].best.max(player[layer].points)
@@ -224,116 +234,6 @@ function doReset(layer, force=false) {
 
 	updateTemp()
 	updateTemp()
-}
-
-function respecBuyables(layer) {
-	if (!layers[layer].buyables) return
-	if (!layers[layer].buyables.respec) return
-	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + (layers[layer].name ? layers[layer].name : layer) + "\" reset as well!")) return
-	layers[layer].buyables.respec()
-	updateBuyableTemp(layer)
-}
-
-function canAffordUpg(layer, id) {
-	let upg = layers[layer].upgrades[id]
-	let cost = tmp[layer].upgrades[id].cost
-	return canAffordPurchase(layer, upg, cost) 
-}
-
-function hasUpg(layer, id){
-	return (player[layer].upgrades.includes(toNumber(id)) || player[layer].upgrades.includes(id.toString()))
-}
-
-function hasMilestone(layer, id){
-	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString()))
-}
-
-function hasChall(layer, id){
-	return (player[layer].challs.includes(toNumber(id)) || player[layer].challs.includes(id.toString()))
-}
-
-function buyablesOwned(layer, id){
-	return (player[layer].buyables[id])
-}
-
-function clickableState(layer, id){
-	return (player[layer].clickables[id])
-}
-
-function upgEffect(layer, id){
-	return (tmp[layer].upgrades[id].effect)
-}
-
-function challEffect(layer, id){
-	return (tmp[layer].challs[id].effect)
-}
-
-function buyableEffect(layer, id){
-	return (tmp[layer].buyables[id].effect)
-}
-
-
-function canAffordPurchase(layer, thing, cost) {
-	if (thing.currencyInternalName){
-		let name = thing.currencyInternalName
-		if (thing.currencyLayer){
-			let lr = thing.currencyLayer
-			return !(player[lr][name].lt(cost)) 
-		}
-		else {
-			return !(player[name].lt(cost))
-		}
-	}
-	else {
-		return !(player[layer].points.lt(cost))
-	}
-}
-
-function buyUpg(layer, id) {
-	if (!player[layer].unl) return
-	if (!layers[layer].upgrades[id].unl()) return
-	if (player[layer].upgrades.includes(id)) return
-	let upg = layers[layer].upgrades[id]
-	let cost = tmp[layer].upgrades[id].cost
-
-	if (upg.currencyInternalName){
-		let name = upg.currencyInternalName
-		if (upg.currencyLayer){
-			let lr = upg.currencyLayer
-			if (player[lr][name].lt(cost)) return
-			player[lr][name] = player[lr][name].sub(cost)
-		}
-		else {
-			if (player[name].lt(cost)) return
-			player[name] = player[name].sub(cost)
-		}
-	}
-	else {
-		if (player[layer].points.lt(cost)) return
-		player[layer].points = player[layer].points.sub(cost)	
-	}
-	player[layer].upgrades.push(id);
-	if (upg.onPurchase != undefined)
-		upg.onPurchase()
-}
-
-function buyMaxBuyable(layer, id) {
-	if (!player[layer].unl) return
-	if (!tmp[layer].buyables[id].unl) return
-	if (!tmp[layer].buyables[id].canAfford) return
-	if (!layers[layer].buyables[id].buyMax) return
-
-	layers[layer].buyables[id].buyMax()
-	updateBuyableTemp(layer)
-}
-
-function buyBuyable(layer, id) {
-	if (!player[layer].unl) return
-	if (!tmp[layer].buyables[id].unl) return
-	if (!tmp[layer].buyables[id].canAfford) return
-
-	layers[layer].buyables[id].buy()
-	updateBuyableTemp(layer)
 }
 
 function resetRow(row) {

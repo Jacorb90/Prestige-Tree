@@ -35,8 +35,8 @@ These are the existing components, but you can create more in v.js:
 
 - upgrades, milestones, challs: Display the upgrades, milestones, and challenges for a layer, as appropriate.
 
-- buyables: Display all of the buyables for this layer, as appropriate. The argument optional, and is the size of the
-            boxes in pixels.
+- buyables, clickables: Display all of the buyables/clickables for this layer, as appropriate. The argument optional,
+            and is the size of the boxes in pixels.
 
 - microtabs: Display a set of subtabs for an area. The argument is the name of the set of microtabs in the "microtabs" feature.
 

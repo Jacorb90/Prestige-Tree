@@ -73,6 +73,18 @@ function updateLayers(){
             }  
         }
 
+        if (layers[layer].clickables){
+            layers[layer].clickables.layer = layer
+            for (thing in layers[layer].clickables){
+                if (!isNaN(thing)){
+                    layers[layer].clickables[thing].id = thing
+                    layers[layer].clickables[thing].layer = layer
+                    if (layers[layer].clickables[thing].unl === undefined)
+                        layers[layer].clickables[thing].unl = true
+                }
+            }  
+        }
+
         if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
         if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
 

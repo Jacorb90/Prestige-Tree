@@ -266,6 +266,14 @@ function hasChall(layer, id){
 	return (player[layer].challs.includes(toNumber(id)) || player[layer].challs.includes(id.toString()))
 }
 
+function buyablesOwned(layer, id){
+	return (player[layer].buyables[id])
+}
+
+function clickableState(layer, id){
+	return (player[layer].clickables[id])
+}
+
 function upgEffect(layer, id){
 	if (!layers[layer].upgrades) return {}
 

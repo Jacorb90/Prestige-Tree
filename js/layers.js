@@ -295,12 +295,13 @@ addLayer("c", {
         resetDesc: "Melt your points into ",
 })
 
-// This layer is mostly minimal but it uses a custom prestige type
+// This layer is mostly minimal but it uses a custom prestige type and a clickable
 addLayer("f", {
         startData() { return {
             unl: false,
 			points: new Decimal(0),
             boop: false,
+            clickables: {[11]: "Start"} // Optional default Clickable state
         }},
         color:() => "#FE0102",
         requires() {return new Decimal(10)}, 
@@ -345,6 +346,66 @@ addLayer("f", {
         canReset() {
             return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
         },
+
+        // This is also non minimal, a Clickable!
+        clickables: {
+            rows: 1,
+            cols: 1,
+            masterButtonPress() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
+                if (getClickableState(this.layer, 11) == "Borkened...")
+                    player[this.layer].clickables[11] = "Start"
+            },
+            masterButtonText() {return (getClickableState(this.layer, 11) == "Borkened...") ? "Fix the clickable!" : "Does nothing"}, // Text on Respec button, optional
+            11: {
+                title:() => "Clicky clicky!", // Optional, displayed at the top in a larger font
+                display() { // Everything else displayed in the buyable button after the title
+                    let data = getClickableState(this.layer, this.id)
+                    return "Current state:<br>" + data
+                },
+                unl() { return player[this.layer].unl }, 
+                canClick() {
+                    return getClickableState(this.layer, this.id) !== "Borkened..."},
+                onClick() { 
+                    switch(getClickableState(this.layer, this.id)){
+                        case "Start":
+                            player[this.layer].clickables[this.id] = "A new state!"
+                            break;
+                        case "A new state!":
+                            player[this.layer].clickables[this.id] = "Keep going!"
+                            break;
+                        case "Keep going!":
+                            player[this.layer].clickables[this.id] = "Maybe that's a bit too far..."
+                            break;                        
+                        case "Maybe that's a bit too far...":
+                            player[this.layer].clickables[this.id] = "Borkened..."
+                            break;
+                        default:
+                            player[this.layer].clickables[this.id] = "Start"
+                            break;
+
+                    }
+                },
+                style() {
+                    switch(getClickableState(this.layer, this.id)){
+                        case "Start":
+                            return {'background-color': 'green'}
+                            break;
+                        case "A new state!":
+                            return {'background-color': 'yellow'}
+                            break;
+                        case "Keep going!":
+                            return {'background-color': 'orange'}
+                            break;                        
+                        case "Maybe that's a bit too far...":
+                            return {'background-color': 'red'}
+                            break;
+                        default:
+                            return {}
+                            break;
+                }},
+            },
+        },
+
     }, 
 )
 

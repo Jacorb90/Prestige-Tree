@@ -218,6 +218,39 @@ function loadVue() {
 		`
 	})
 
+
+	// data = button size, in px
+	Vue.component('clickables', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="layers[layer].clickables" class="upgTable">
+			<button v-if="tmp[layer].clickables.masterButtonPress" v-on:click="layers[layer].clickables.masterButtonPress()" v-bind:class="{ longUpg: true, can: player[layer].unl, locked: !player[layer].unl }">{{tmp[layer].clickables.masterButtonText ? tmp[layer].clickables.masterButtonText : "Click me!"}}</button><br>
+			<div v-for="row in tmp[layer].clickables.rows" class="upgRow">
+				<div v-for="col in tmp[layer].clickables.cols"><div v-if="layers[layer].clickables[row*10+col]!== undefined && tmp[layer].clickables[row*10+col].unl" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : 'inherit'),}">
+					<clickable :layer = "layer" :data = "row*10+col" :size = "data" v-bind:style="tmp[layer].componentStyles.clickable"></clickable>
+				</div></div>
+				<br>
+			</div>
+		</div>
+	`
+	})
+
+	// data = id of clickable
+	Vue.component('clickable', {
+		props: ['layer', 'data', 'size'],
+		template: `
+		<button 
+			v-if="layers[layer].clickables && layers[layer].clickables[data]!== undefined && tmp[layer].clickables[data].unl" 
+			v-bind:class="{ upg: true, can: tmp[layer].clickables[data].canClick, locked: !tmp[layer].clickables[data].canClick}"
+			v-bind:style="[tmp[layer].clickables[data].canClick ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].clickables[data].style]"
+			v-on:click="clickClickable(layer, data)">
+			<span v-if= "tmp[layer].clickables[data].title"><h2 v-html="tmp[layer].clickables[data].title"></h2><br></span>
+			<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp[layer].clickables[data].display"></span>
+		</button>
+		`
+	})
+
+
 	// data = button size, in px
 	Vue.component('microtabs', {
 		props: ['layer', 'data'],
