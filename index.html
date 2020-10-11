@@ -108,7 +108,7 @@
 			<h2 id="points">{{format(player.points)}}</h2>
 			<span v-if="player.points.lt('1e1e6')"> {{modInfo.pointsName}}</span>
 			<br>
-			<span v-if="showPointGen()">({{format(getPointGen())}}/sec)</span>
+			<span v-if="canGenPoints()">({{format(getPointGen())}}/sec)</span>
 			<br><br><br><br>
 			<span v-for="row in TREE_LAYERS"><table>
 				<td v-if="player.tab=='tree'&& someLayerUnlocked(row) && row != 0" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(row)"></img></td>

@@ -22,13 +22,13 @@ let VERSION = {
 }
 
 // Determines if it should show points/sec
-function showPointGen(){
-	return (tmp.pointGen.neq(new Decimal(0)))
-} 
+function canGenPoints(){
+	return hasUpg("c", 11)
+}
 
 // Calculate points/sec!
 function getPointGen() {
-	if(!hasUpg("c", 11))
+	if(!canGenPoints())
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
@@ -37,15 +37,6 @@ function getPointGen() {
 }
 
 
-
-// Function to determine if the player is in a challenge
-function inChallenge(layer, id){
-	let chall = player[layer].active
-	if (chall==toNumber(id)) return true
-
-	if (layers[layer].challs[chall].countsAs)
-		return layers[layer].challs[id].countsAs.includes(id)
-}
 
 function getResetGain(layer, useType = null) {
 	let type = useType
@@ -304,7 +295,7 @@ function gameLoop(diff) {
 	if (player.devSpeed) diff *= player.devSpeed
 
 	addTime(diff)
-
+	player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
 	for (layer in layers){
 		if (layers[layer].update) layers[layer].update(diff);
 	}

@@ -477,6 +477,15 @@ function clickClickable(layer, id) {
 	updateClickableTemp(layer)
 }
 
+// Function to determine if the player is in a challenge
+function inChallenge(layer, id){
+	let chall = player[layer].active
+	if (chall==toNumber(id)) return true
+
+	if (layers[layer].challs[chall].countsAs)
+		return layers[layer].challs[id].countsAs.includes(id)
+}
+
 // ************ Misc ************
 
 var onTreeTab = true

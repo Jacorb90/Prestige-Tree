@@ -1,5 +1,6 @@
 #The Modding Tree changelog:
 
+##v2.0
 Added clickables, a more generalized variant of buyables!
 Support for multiple completions of challenges.
 Added getter/setter functions for buyable amount and such
@@ -13,14 +14,18 @@ effectDisplay in Challenges and Upgrades no longer takes an argument, as well as
 Buyable cost can take an argument for amount of buyables, but if one is not supplied it should do the cost of the next buyable.
 All displays will update correctly.
 Changelog is no longer in index.html at all.
+Generation of Points now happens in the main game loop (not in a layer update function), enabled by canGenPoints in game.js
+
 
 ##v1.3.5
+
 - Completely automated convertToDecimal, now you never have to worry about it again.
 - Branches can be defined without a color id. But they can also use hex values for color ids!
 - Created a tutorial for getting started with TMT and Github.
 - Page title is now automatically taken from mod name.
 
 ##v1.3.4: 10/8/20
+
 - Added "midsection" feature to add things to a tab's layout while still keeping the standard layout.
 - Fix for being able to buy more buyables than you should.
 

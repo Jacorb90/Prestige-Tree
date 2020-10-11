@@ -178,9 +178,6 @@ addLayer("c", {
             if(layers[resettingLayer].row > this.row) fullLayerReset(this.layer) // This is actually the default behavior
         },
         layerShown() {return true}, // Condition for when layer appears on the tree
-        update(diff) {
-            if (player[this.layer].upgrades.includes(11)) player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
-        }, // Do any gameloop things (e.g. resource generation) inherent to this layer
         automate() {
         }, // Do any automation inherent to this layer if appropriate
         resetsNothing() {return false},
