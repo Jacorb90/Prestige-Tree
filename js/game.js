@@ -77,7 +77,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 	} else if (type=="normal"){
 		let next = tmp[layer].resetGain.add(1)
 		if (next.gte("e1e7")) next = next.div("e5e6").pow(2)
-		next=next.root(tmp[layer].gainExp.div(tmp[layer].gainMult)).root(tmp[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires)
+		next = next.root(tmp[layer].gainExp).div(tmp[layer].gainMult).root(tmp[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires)
 		if (layers[layer].resCeil) next = next.ceil()
 		return next;
 	} else if (type=="custom"){
