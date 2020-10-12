@@ -117,8 +117,8 @@
 			</span>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
-		<div v-for="layer in LAYERS">
-			<div v-if="player.tab==layer" v-bind:class="'col right'" v-bind:style="tmp[layer].style ? tmp[layer].style : {}">
+		<div v-for="layer in LAYERS" >
+			<div v-if="player.tab==layer" v-bind:class="'col right fast tab'"  v-bind:style="[tmp[layer].style ? tmp[layer].style : {}, (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) ? tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style : {}]">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<div v-if="!layers[layer].tabFormat">
 					<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
@@ -141,7 +141,7 @@
 					<div v-if="Array.isArray(layers[layer].tabFormat)">
 						<column :layer="layer" :data="tmp[layer].tabFormat"></column>
 					</div>
-					<div v-else v-bind:style="[{'margin-top': '-50px'}, tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style]">
+					<div v-else v-bind:style="[{'margin-top': '-50px'}]">
 						<div class="upgTable" v-bind:style="{'padding-top': '25px', 'margin-bottom': '24px'}">
 							<tab-buttons v-bind:style="tmp[layer].componentStyles['tab-buttons']" :layer="layer" :data="tmp[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
 						</div>

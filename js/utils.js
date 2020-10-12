@@ -423,7 +423,7 @@ function canAffordPurchase(layer, thing, cost) {
 
 function buyUpg(layer, id) {
 	if (!player[layer].unl) return
-	if (!layers[layer].upgrades[id].unl()) return
+	if (!layers[layer].upgrades[id].unl) return
 	if (player[layer].upgrades.includes(id)) return
 	let upg = layers[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost

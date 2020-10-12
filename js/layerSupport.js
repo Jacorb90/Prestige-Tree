@@ -88,6 +88,18 @@ function updateLayers(){
             }  
         }
 
+        if (layers[layer].bars){
+            layers[layer].bars.layer = layer
+            for (thing in layers[layer].bars){
+                if (!isNaN(thing)){
+                    layers[layer].bars[thing].id = thing
+                    layers[layer].bars[thing].layer = layer
+                    if (layers[layer].bars[thing].unl === undefined)
+                        layers[layer].bars[thing].unl = true
+                }
+            }  
+        }
+
         if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
         if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
 
@@ -127,8 +139,9 @@ function someLayerUnlocked(row){
     return false
 }
 
+
 // This isn't worth making a .ts file over
-const UP = 1
-const DOWN = 2
-const LEFT = 3
-const RIGHT = 4
+const UP = 0
+const DOWN = 1
+const LEFT = 2
+const RIGHT = 3

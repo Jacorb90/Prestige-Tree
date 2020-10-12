@@ -208,23 +208,54 @@ addLayer("c", {
             }
         },
 
-        gagues: {
+        bars: {
             longBoi: {
-                fillColor:() => "#4BEC13",
-                // fillStyle:(),
-                baseColor:() => "#333333",
-                // baseStyle:(),
-                // textStyle:(),
+                fillStyle: {'background-color' : "#FFFFFF"},
+                baseStyle: {'background-color' : "#696969"},
+                textStyle: {'color': '#04e050'},
 
-                borderStyle() {return {'border-color': '#321188'}},
-                direction:() => RIGHT,
-                width:() => "250px",
-                height:() => "250px",
+                borderStyle() {return {}},
+                direction: RIGHT,
+                width: 300,
+                height: 30,
                 progress() {
-                    return (player.points.log().div(10))
+                    return (player.points.log(10).div(10)).toNumber()
                 },
                 display() {
-                    return format(player.points) + " / 1e10"
+                    return format(player.points) + " / 1e10 points"
+                },
+                unl:() => true,
+
+            },
+            tallBoi: {
+                fillStyle: {'background-color' : "#4BEC13"},
+                baseStyle: {'background-color' : "#000000"},
+                textStyle: {'text-shadow': '0px 0px 2px #000000'},
+
+                borderStyle() {return {}},
+                direction: UP,
+                width: 50,
+                height: 200,
+                progress() {
+                    return player.points.div(100)
+                },
+                display() {
+                    return formatWhole((player.points.div(1)).min(100)) + "%"
+                },
+                unl:() => true,
+
+            },
+            flatBoi: {
+                fillStyle: {'background-color' : "#FE0102"},
+                baseStyle: {'background-color' : "#222222"},
+                textStyle: {'text-shadow': '0px 0px 2px #000000'},
+
+                borderStyle() {return {}},
+                direction: UP,
+                width: 100,
+                height: 30,
+                progress() {
+                    return player.c.points.div(50)
                 },
                 unl:() => true,
 
@@ -248,7 +279,7 @@ addLayer("c", {
             thingies: {
                 style() {return  {'background-color': '#222222'}},
                 buttonStyle() {return {'border-color': 'orange'}},
-                content:[
+                content:[ 
                     ["buyables", ""], "blank",
                     ["row", [
                         ["toggle", ["c", "beep"]], ["blank", ["30px", "10px"]], // Width, height
@@ -261,17 +292,33 @@ addLayer("c", {
                     "blank",
                     ["display-image", "discord.png"],],
             },
+            jail: {
+                content: [
+                    ["bar", "longBoi"], "blank",
+                    ["row", [
+                        ["column", [
+                            ["display-text", "Sugar level:", {'color': 'teal'}],  "blank", ["bar", "tallBoi"]],
+                        {'background-color': '#555555', 'padding': '15px'}],
+                        "blank",
+                        ["column", [
+                        ["display-text", "idk"],
+                        ["blank", ['0', '50px']], ["bar", "flatBoi"]
+                        ]],
+                    ]],
+                    "blank", ["display-text", "It's because bars! So funny! Ha ha!"],
+                ],
+            },
             illuminati: {
                 unl() {return (hasUpg("c", 13))},
                 content:[
-                    ["raw-html", function() {return "<h1> C O N F I R M E D </h1>"}],
+                    ["raw-html", function() {return "<h1> C O N F I R M E D </h1>"}], "blank",
                     ["microtabs", "stuff", {'width': '600px', 'height': '350px', 'background-color': 'brown', 'border-style': 'solid'}]
                 ]
             }
 
         },
         style() {return {
-            'background-color': '#3325CC' 
+           //'background-color': '#3325CC' 
         }},
         nodeStyle() {return { // Style on the layer node
             'color': '#3325CC',
@@ -344,7 +391,16 @@ addLayer("f", {
         canReset() {
             return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
         },
-
+        upgrades: {
+            rows: 1,
+            cols: 1,
+            11: {
+                title:() => "Generator",
+                cost:() => new Decimal(1),
+                desc:() => "Gain 1 point per second",
+            }
+         
+    },
         // This is also non minimal, a Clickable!
         clickables: {
             rows: 1,

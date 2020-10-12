@@ -5,19 +5,26 @@ function loadVue() {
 	Vue.component('display-text', {
 		props: ['layer', 'data'],
 		template: `
-			<span v-html="data"></span>
+			<span class="instant" v-html="data"></span>
 		`
 	})
 
+// data = a function returning the content (actually HTML)
+	Vue.component('raw-html', {
+			props: ['layer', 'data'],
+			template: `
+				<span class="instant"  v-html="data"></span>
+			`
+		})
 
 	// Blank space, data = optional height in px or pair with width and height in px
 	Vue.component('blank', {
 		props: ['layer', 'data'],
 		template: `
-			<div>
-			<div v-if="!data" v-bind:style="{'width': '8px', 'height': '17px'}"></div>
-			<div v-else-if="Array.isArray(data)" v-bind:style="{'width': data[0], 'height': data[1]}"></div>
-			<div v-else v-bind:style="{'width': '8px', 'height': 'data'}"><br></div>
+			<div class = "instant">
+			<div class = "instant" v-if="!data" v-bind:style="{'width': '8px', 'height': '17px'}"></div>
+			<div class = "instant" v-else-if="Array.isArray(data)" v-bind:style="{'width': data[0], 'height': data[1]}"></div>
+			<div class = "instant" v-else v-bind:style="{'width': '8px', 'height': 'data'}"><br></div>
 			</div>
 		`
 	})
@@ -26,7 +33,7 @@ function loadVue() {
 	Vue.component('display-image', {
 		props: ['layer', 'data'],
 		template: `
-			<img v-bind:src= "data" v-bind:alt= "data">
+			<img class="instant" v-bind:src= "data" v-bind:alt= "data">
 		`
 	})
 		
@@ -34,7 +41,7 @@ function loadVue() {
 	Vue.component('row', {
 		props: ['layer', 'data'],
 		template: `
-		<div class="upgTable">
+		<div class="upgTable instant" >
 			<div class="upgRow">
 				<div v-for="item in data">
 				<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer" v-bind:style="tmp[layer].componentStyles[item]"></div>
@@ -50,7 +57,7 @@ function loadVue() {
 	Vue.component('column', {
 		props: ['layer', 'data'],
 		template: `
-		<div class="upgTable">
+		<div class="upgTable instant" >
 			<div class="upgCol">
 				<div v-for="item in data">
 					<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer" v-bind:style="tmp[layer].componentStyles[item]"></div>
@@ -67,7 +74,7 @@ function loadVue() {
 	Vue.component('h-line', {
 		props: ['layer', 'data'],
 			template:`
-				<hr v-bind:style="data ? {'width': data} : {}" class="hl">
+				<hr class="instant" v-bind:style="data ? {'width': data} : {}" class="hl">
 			`
 		})
 
@@ -75,7 +82,7 @@ function loadVue() {
 	Vue.component('v-line', {
 		props: ['layer', 'data'],
 		template: `
-			<div v-bind:style="data ? {'height': data} : {}" class="vl2"></div>
+			<div class="instant" v-bind:style="data ? {'height': data} : {}" class="vl2"></div>
 		`
 	})
 
@@ -153,7 +160,7 @@ function loadVue() {
 	Vue.component('milestone', {
 		props: ['layer', 'data'],
 		template: `
-		<td v-if="layers[layer].milestones && layers[layer].milestones[data]!== undefined && milestoneShown(layer, data)" v-bind:style="[(tmp[layer].milestones[data].unl && !tmp[layer].milestones[data].unl) ? {'visibility': 'hidden'} : {}, tmp[layer].milestones[data].style]" v-bind:class="{milestone: !player[layer].milestones.includes(data), milestoneDone: player[layer].milestones.includes(data)}">
+		<td v-if="layers[layer].milestones && layers[layer].milestones[data]!== undefined && milestoneShown(layer, data)" v-bind:style="[(!tmp[layer].milestones[data].unl) ? {'visibility': 'hidden'} : {}, tmp[layer].milestones[data].style]" v-bind:class="{milestone: !player[layer].milestones.includes(data), milestoneDone: player[layer].milestones.includes(data)}">
 			<h3 v-html="tmp[layer].milestones[data].requirementDesc"></h3><br>
 			<span v-html="tmp[layer].milestones[data].effectDesc"></span><br>
 		<span v-if="(tmp[layer].milestones[data].toggles)&&(player[layer].milestones.includes(data))" v-for="toggle in tmp[layer].milestones[data].toggles"><toggle :layer= "layer" :data= "toggle" v-bind:style="tmp[layer].componentStyles.toggle"></toggle>&nbsp;</span></td></tr>
@@ -267,18 +274,23 @@ function loadVue() {
 		`
 	})
 
-	// data = id of gague
-	Vue.component('gague', {
+
+	// data = id of the bar
+	Vue.component('bar', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="tmp[layer].gagues && tmp[layer].gagues[data].unl" 
-			v-bind:style="{'border-style': 'solid}"
+		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unl" v-bind:style="{'position': 'relative'}"><div class ="barBorder"  v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].dims]">
 			
-		</div>
+			<div class = "overlayTextContainer" v-bind:style="[tmp[layer].bars[data].dims]">
+				<span class = "overlayText" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].textStyle]" v-html="tmp[layer].bars[data].display"></span>
+			</div>
+			<div class ="fill" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].fillStyle, tmp[layer].bars[data].fillDims]"></div>
+		
+		</div></div>
 		`
 	})
 
-		
+
 
 	// NOT FOR USE IN STANDARD TAB FORMATTING
 	Vue.component('tab-buttons', {

@@ -17,6 +17,7 @@ function setupTemp() {
 		tmp[layer].notify = {}
 		tmp[layer].canReset = {}
 		tmp[layer].prestigeButtonText = {}
+		setupBarStyles(layer)
 	}
 }
 
@@ -59,7 +60,7 @@ function updateTemp() {
 		tmp[layer].notify = shouldNotify(layer)
 		tmp[layer].canReset = canReset(layer)
 		tmp[layer].prestigeButtonText = prestigeButtonText(layer)
-
+		constructBarStyles(layer)
 	}
 
 	tmp.pointGen = getPointGen()
@@ -93,4 +94,48 @@ function updateBuyableTemp(layer)
 function updateClickableTemp(layer)
 {
 	updateTempData(layers[layer].clickables, tmp[layer].clickables)
+}
+
+
+var DIR_MARGINS = ["margin-bottom", "margin-top", "margin-right", "margin-left"]
+
+function constructBarStyles(layer){
+	if (layers[layer].bars === undefined)
+		return
+	for (id in layers[layer].bars){
+		if (id !== "layer") {
+			let bar = tmp[layer].bars[id]
+			if (bar.progress instanceof Decimal)
+				bar.progress = bar.progress.toNumber()
+			bar.dims = {'width': bar.width + "px", 'height': bar.height + "px"}
+			let dir = bar.direction
+			bar.fillDims = {'width': bar.width + "px", 'height': bar.height + "px"}
+			if (dir !== undefined)
+			{
+				bar.fillDims[DIR_MARGINS[dir]] = "0px"
+				if (dir == UP || dir == DOWN)
+				{
+					bar.fillDims.height = bar.height * Math.min(bar.progress, 1) + "px"
+					if (dir == UP) bar.fillDims['margin-top'] =  bar.height * (1 - Math.min(bar.progress, 1)) + "px"
+				}
+				else
+				{
+					bar.fillDims.width = bar.width * Math.min(bar.progress, 1) + "px"
+					if (dir == LEFT) bar.fillDims['margin-left'] =  bar.width * (1 - Math.min(bar.progress, 1)) + "px"
+				}
+			}
+		}
+
+	}
+}
+
+function setupBarStyles(layer){
+	if (layers[layer].bars === undefined)
+		return
+	for (id in layers[layer].bars){
+		let bar = tmp[layer].bars[id]
+		bar.dims = {}
+		let dir = bar.direction
+		bar.fillDims = {}
+	}
 }

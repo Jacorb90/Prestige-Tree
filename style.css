@@ -122,9 +122,37 @@ h1, h2, h3, b, input {
 	text-shadow: 0px 0px 7px var(--color);
 }
 
+.barBorder {
+	border: 2px solid;
+	border-radius: 10%;
+	border-color: var(--color);
+	overflow: hidden;
+	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+}
+
+.overlayTextContainer {
+	z-index: 3;
+	border-radius: 10%;
+	vertical-align: middle;
+	display: flex;
+	justify-content: center;
+	align-items: left;
+	position: absolute;
+}
+
+.fill {
+	background-color: var(--color);
+	border-radius: 5%;
+    position: absolute;
+	overflow: hidden;
+}
+
+.overlayText {
+	z-index: 6;
+}
+
 .tabButton {
 	background-color: transparent;
-	border: none;
 	color: var(--color);
 	font-size: 20px;
 	cursor: pointer;
@@ -357,6 +385,14 @@ a {
 	overflow-y: auto;
 	overflow-x: auto;
 	transition-duration: 0s
+}
+
+.instant {
+	transition-duration: 0s !important
+}
+
+.fast {
+	transition:color none
 }
 
 .col.right {
