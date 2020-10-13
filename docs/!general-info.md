@@ -2,10 +2,12 @@
 The main way to add content is through creating layers. You can either add a layer directly in the layers object in layersSupportjs,
 or declare it in another file and then do "`addLayer(layername, layerdata)`"
 (good for breaking things up into smaller files). The existing layers are just examples and can be freely deleted.
-You can use those as references and a base for your own layers.
+You can also use them as references and a base for your own layers.
 
 
-**You will also need to add layer nodes to the tree in the HTML, look for where it says "Modify the tree in the table below!"** While you're there, you can also edit the modInfo at the top to change the name for your mod and some other settings. A unique modId will prevent your mod's saves from conflicting with other mods.
+The first thing you need to do is to edit the modInfo at the top of game.js to set your modID (a string). A
+unique modId will prevent your mod's saves from conflicting with other mods.
+
 
 
 Most of the time, you won't need to dive deep into the code to create things, but you still can if you really want to.
@@ -15,6 +17,10 @@ The Modding Tree uses break_eternity.js to store large values. This means that m
 and must be treated differently. For example, you have to use `new Decimal(x)` to create a Decimal value instead of a
 plain number, and perform operations on them by calling functions. e.g, instead of `x = x + y`, use `x = x.add(y)`.
 
+Almost all values can be either a constant value, or a dynamic value. Dynamic values are defined by putting a function
+that returns what the value should be at any given time.
+
+All display text can be basic HTML instead (But you can't use most Vue features there).
 
 ## Table of Contents:
 

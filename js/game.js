@@ -14,11 +14,12 @@ let modInfo = {
 	offlineLimit: 1  // In hours
 }
 
+// Set your version in num and name, but leave the tmt values so people know what version it is
 let VERSION = {
-	num: "1.3.5 maybe",
-	name: "Tabception... ception!",
-	tmtNum: "1.3.5 maybe",
-	tmtName: "Tabception... ception!"
+	num: "2.0",
+	name: "Finally making some progress!",
+	tmtNum: "2.0",
+	tmtName: "Finally making some progress!"
 }
 
 // Determines if it should show points/sec
@@ -120,26 +121,28 @@ function rowReset(row, layer) {
 			layers[lr].doReset(layer)
 		}
 		else
-			if(layers[layer].row > layers[lr].row) fullLayerReset(lr)
+			if(layers[layer].row > layers[lr].row) layerDataReset(lr)
 	}
 }
 
-function fullLayerReset(layer) {
+function layerDataReset(layer, keep = []) {
+	let storedData = {}
+
+	for (thing in keep) {
+		if (player[layer][keep[thing]] !== undefined)
+			storedData[keep[thing]] = player[layer][keep[thing]]
+	}
+	console.log(storedData)
+
 	player[layer] = layers[layer].startData();
 	player[layer].upgrades = []
 	player[layer].milestones = []
 	player[layer].challenges = []
-	if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
-		if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
-		if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
-	}
-
-	if (layers[layer].microtabs) {
-		if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
-		for (item in layers[layer].microtabs)
-			if (player.subtabs[layer][item] == undefined) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
-	}
 	resetBuyables(layer)
+
+	for (thing in storedData) {
+		player[layer][thing] =storedData[thing]
+	}
 }
 
 function resetBuyables(layer){

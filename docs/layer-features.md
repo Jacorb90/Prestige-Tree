@@ -145,9 +145,14 @@ Key:
 # Other features
 
 - doReset(resettingLayer): **optional**, is triggered when a layer on a row greater than or equal to this one does a reset.
-                           If you use it, you can choose what to keep via milestones and such.
-                           Without it, the default is to reset everything on the row, but only 
-                           if it was triggered by a layer in a higher row.
+                The default behavior is to reset everything on the row, but only if it was triggered by a layer in a higher row.
+                
+                If you want to keep things, determine what to keep based on the resettingLayer, milestones, and such, then call
+                resetLayerData(layer, keep), where layer is this layer, and keep is an array of the names of things to keep.
+                It can include things like "points", "best", "total" (for this layer's prestige currency), "upgrades", 
+                any unique variables like "generatorPower", etc.
+                If you want to only keep specific upgrades or something like that, save them in a separate variable, then
+                call resetLayerData, and then set player[layer].upgrades to the saved upgrades.
 
 - update(diff): **optional**, this function is called every game tick. Use it for any passive resource production or
                 time-based things. diff is the time since the last tick.

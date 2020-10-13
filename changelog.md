@@ -1,8 +1,8 @@
 #The Modding Tree changelog:
 
 ##v2.0
-Added Progress bars, which are highly customizable and can be horizontal or vertical.
-Added clickables, a more generalized variant of buyables!
+Added progress bars, which are highly customizable and can be horizontal or vertical!
+Added clickables, a more generalized variant of buyables.
 Support for multiple completions of challenges.
 Added getter/setter functions for buyable amount and such
 Moved modInfo to game.js, added a spot for a Discord link, changelog link, and a separate mod version from the TMT version
