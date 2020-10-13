@@ -428,7 +428,7 @@ ul {
 	list-style-type: none;
 }
 
-.hChall {
+.hChallenge {
 	background-color: #bf8f8f;
 	border: 4px solid;
 	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
@@ -439,11 +439,11 @@ ul {
 	border-radius: 33.33%;
 }
 
-.hChall.done {
+.hChallenge.done {
 	background-color: #77bf5f;
 }
 
-.hChall.canComplete {
+.hChallenge.canComplete {
 	background-color: #ffbf00;
 }
 

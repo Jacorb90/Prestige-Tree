@@ -38,14 +38,16 @@ Features:
 - display(): A function returning everything that should be displayed on the clickable after the title, likely
              changing based on its state. Can use basic HTML.
 
-- unl(): A function returning a bool to determine if the clickable is visible or not.
+- unlocked(): **optional**, A function returning a bool to determine if the clickable is visible or not. Default is unlocked.
 
 - canClick(): A function returning a bool to determine if you can click the clickable.
 
 - onClick(): A function that implements clicking one of the clickable. 
 
-- style: **Optional**, A CSS object, which affects this clickable.
+- style: **Optional**, Applies CSS to this clickable, in the form of an object where the keys are CSS attributes,
+         and the values are the values for those attributes (both as strings)
 
-- layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
+- layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar.
 
-- id: **Assigned automagically**. It's the id for this clickable.
+- id: **Assigned automagically**. It's the "key" which the clickable was stored under, for convenient access.
+      The clickable in the example's id is 11.

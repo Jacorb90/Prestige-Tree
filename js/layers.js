@@ -4,7 +4,7 @@ addLayer("c", {
         symbol: "C", // This appears on the layer's node. Default is the id with the first letter capitalized
         position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
-            unl: true,
+            unlocked: true,
 			points: new Decimal(0),
             best: new Decimal(0),
             total: new Decimal(0),
@@ -19,12 +19,12 @@ addLayer("c", {
         type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
         exponent: 0.5, // Prestige currency exponent
         base: 5, // Only needed for static layers, base of the formula (b^(x^exp))
-        resCeil: false, // True if the cost needs to be rounded up (use when baseResource is static?)
+        roundUpCost: false, // True if the cost needs to be rounded up (use when baseResource is static?)
         canBuyMax() {}, // Only needed for static layers with buy max
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
-            if (hasUpg(this.layer, 166)) mult = mult.times(2) // These upgrades don't exist
-			if (hasUpg(this.layer, 120)) mult = mult.times(upgEffect(this.layer, 120))
+            if (hasUpgrade(this.layer, 166)) mult = mult.times(2) // These upgrades don't exist
+			if (hasUpgrade(this.layer, 120)) mult = mult.times(upgradeEffect(this.layer, 120))
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -42,14 +42,14 @@ addLayer("c", {
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
         milestones: {
-            0: {requirementDesc:() => "3 Lollipops",
+            0: {requirementDescription:() => "3 Lollipops",
                 done() {return player[this.layer].best.gte(3)}, // Used to determine when to give the milestone
-                effectDesc:() => "Unlock the next milestone",
+                effectDescription:() => "Unlock the next milestone",
             },
-            1: {requirementDesc:() => "4 Lollipops",
-                unl() {return hasMilestone(this.layer, 0)},
+            1: {requirementDescription:() => "4 Lollipops",
+                unlocked() {return hasMilestone(this.layer, 0)},
                 done() {return player[this.layer].best.gte(4)},
-                effectDesc:() => "You can toggle beep and boop (which do nothing)",
+                effectDescription:() => "You can toggle beep and boop (which do nothing)",
                 toggles: [
                     ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
                     ["f", "boop"]],
@@ -60,25 +60,25 @@ addLayer("c", {
         
                 },
         },
-        challs: {
+        challenges: {
             rows: 2,
     		cols: 12,
 		    11: {
                 name:() => "Fun",
                 completionLimit: 3,
-			    desc() {return "Makes the game 0% harder<br>"+challCompletions(this.layer, this.id) + "/" + this.completionLimit + " completions"},
-			    unl() { return player[this.layer].best.gt(0) },
+			    challengeDescription() {return "Makes the game 0% harder<br>"+challengeCompletions(this.layer, this.id) + "/" + this.completionLimit + " completions"},
+			    unlocked() { return player[this.layer].best.gt(0) },
                 goal:() => new Decimal("20"),
                 currencyDisplayName: "lollipops", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
                 currencyLayer: this.layer, // Leave empty if not in a layer
-                effect() {
+                rewardEffect() {
                     let ret = player[this.layer].points.add(1).tetrate(0.02)
                     return ret;
                 },
-                effectDisplay(x) { return format(x)+"x" },
+                rewardDisplay() { return format(this.rewardEffect())+"x" },
                 countsAs: [12, 21], // Use this for if a challenge includes the effects of other challenges. Being in this challenge "counts as" being in these.
-                reward:() => "Says hi",
+                rewardDescription: "Says hi",
                 onComplete() {console.log("hiii")} // Called when you complete the challenge
             },
         }, 
@@ -87,14 +87,14 @@ addLayer("c", {
             cols: 3,
             11: {
                 title:() => "Generator of Genericness",
-                desc:() => "Gain 1 Point every second.",
+                description:() => "Gain 1 Point every second.",
                 cost:() => new Decimal(1),
-                unl() { return player[this.layer].unl }, // The upgrade is only visible when this is true
+                unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
             12: {
-                desc:() => "Candy generation is faster based on your unspent Lollipops.",
+                description:() => "Candy generation is faster based on your unspent Lollipops.",
                 cost:() => new Decimal(1),
-                unl() { return (hasUpg(this.layer, 11))},
+                unlocked() { return (hasUpgrade(this.layer, 11))},
                 effect() { // Calculate bonuses from the upgrade. Can return a single value or an object with multiple values
                     let ret = player[this.layer].points.add(1).pow(player[this.layer].upgrades.includes(24)?1.1:(player[this.layer].upgrades.includes(14)?0.75:0.5)) 
                     if (ret.gte("1e20000000")) ret = ret.sqrt().times("1e10000000")
@@ -103,20 +103,20 @@ addLayer("c", {
                 effectDisplay() { return format(this.effect())+"x" }, // Add formatting to the effect
             },
             13: {
-                desc:() => "Unlock a <b>secret subtab</b> and make this layer act if you unlocked it first.",
+                description:() => "Unlock a <b>secret subtab</b> and make this layer act if you unlocked it first.",
                 cost:() => new Decimal(69),
                 currencyDisplayName: "candies", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
                 currencyLayer: "", // Leave empty if not in a layer "e.g. points"
-                unl() { return (hasUpg(this.layer, 12))},
+                unlocked() { return (hasUpgrade(this.layer, 12))},
                 onPurchase() { // This function triggers when the upgrade is purchased
                     player[this.layer].order = 0
                 },
                 style() {
-                    if (hasUpg(this.layer, this.id)) return {
+                    if (hasUpgrade(this.layer, this.id)) return {
                     'background-color': '#1111dd' 
                     }
-                    else if (!canAffordUpg(this.layer, this.id)) {
+                    else if (!canAffordUpgrade(this.layer, this.id)) {
                         return {
                             'background-color': '#dd1111' 
                         }
@@ -125,9 +125,9 @@ addLayer("c", {
             },
             22: {
                 title:() => "This upgrade doesn't exist",
-                desc:() => "Or does it?.",
-                cost:() => new Decimal(1),
-                unl() { return player[this.layer].unl }, // The upgrade is only visible when this is true
+                description:() => "Or does it?.",
+                cost:() => new Decimal(3),
+                unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
         },
         buyables: {
@@ -161,7 +161,7 @@ addLayer("c", {
                     Amount: " + player[this.layer].buyables[this.id] + "\n\
                     Adds + " + format(data.effect.first) + " things and multiplies stuff by " + format(data.effect.second)
                 },
-                unl() { return player[this.layer].unl }, 
+                unlocked() { return player[this.layer].unlocked }, 
                 canAfford() {
                     return player[this.layer].points.gte(tmp[this.layer].buyables[this.id].cost)},
                 buy() { 
@@ -186,8 +186,8 @@ addLayer("c", {
         }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
 
         hotkeys: [
-            {key: "c", desc: "C: reset for lollipops or whatever", onPress(){if (player[this.layer].unl) doReset(this.layer)}},
-            {key: "ctrl+c" + this.layer, desc: "Ctrl+c: respec things", onPress(){if (player[this.layer].unl) respecBuyables(this.layer)}},
+            {key: "c", description: "C: reset for lollipops or whatever", onPress(){if (player[this.layer].unlocked) doReset(this.layer)}},
+            {key: "ctrl+c" + this.layer, description: "Ctrl+c: respec things", onPress(){if (player[this.layer].unlocked) respecBuyables(this.layer)}},
         ],
         incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
 
@@ -224,7 +224,7 @@ addLayer("c", {
                 display() {
                     return format(player.points) + " / 1e10 points"
                 },
-                unl:() => true,
+                unlocked:() => true,
 
             },
             tallBoi: {
@@ -242,7 +242,7 @@ addLayer("c", {
                 display() {
                     return formatWhole((player.points.div(1)).min(100)) + "%"
                 },
-                unl:() => true,
+                unlocked:() => true,
 
             },
             flatBoi: {
@@ -257,7 +257,7 @@ addLayer("c", {
                 progress() {
                     return player.c.points.div(50)
                 },
-                unl:() => true,
+                unlocked:() => true,
 
             },
         },
@@ -274,7 +274,7 @@ addLayer("c", {
                     ["display-text",
                         function() {return 'I have ' + format(player.points) + ' pointy points!'},
                         {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
-                    "h-line", "milestones", "blank", "upgrades", "challs"],
+                    "h-line", "milestones", "blank", "upgrades", "challenges"],
             },
             thingies: {
                 style() {return  {'background-color': '#222222'}},
@@ -309,7 +309,7 @@ addLayer("c", {
                 ],
             },
             illuminati: {
-                unl() {return (hasUpg("c", 13))},
+                unlocked() {return (hasUpgrade("c", 13))},
                 content:[
                     ["raw-html", function() {return "<h1> C O N F I R M E D </h1>"}], "blank",
                     ["microtabs", "stuff", {'width': '600px', 'height': '350px', 'background-color': 'brown', 'border-style': 'solid'}]
@@ -325,7 +325,7 @@ addLayer("c", {
             'text-decoration': 'underline' 
         }},
         componentStyles: {
-            "chall"() {return {'height': '200px'}},
+            "challenge"() {return {'height': '200px'}},
             "prestige-button"() {return {'color': '#AA66AA'}},
         },
         tooltip() { // Optional, tooltip displays when the layer is unlocked
@@ -337,13 +337,13 @@ addLayer("c", {
                          // Layer will automatically highlight if an upgrade is purchasable.
             return (player.c.buyables[11] == 1)
         },
-        resetDesc: "Melt your points into ",
+        resetDescription: "Melt your points into ",
 })
 
 // This layer is mostly minimal but it uses a custom prestige type and a clickable
 addLayer("f", {
         startData() { return {
-            unl: false,
+            unlocked: false,
 			points: new Decimal(0),
             boop: false,
             clickables: {[11]: "Start"} // Optional default Clickable state
@@ -356,7 +356,7 @@ addLayer("f", {
         type: "custom", // A "Custom" type which is effectively static
         exponent: 0.5,
         base: 3,
-        resCeil: true,
+        roundUpCost: true,
         canBuyMax:() => true,
         gainMult() {
             return new Decimal(1)
@@ -391,16 +391,6 @@ addLayer("f", {
         canReset() {
             return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
         },
-        upgrades: {
-            rows: 1,
-            cols: 1,
-            11: {
-                title:() => "Generator",
-                cost:() => new Decimal(1),
-                desc:() => "Gain 1 point per second",
-            }
-         
-    },
         // This is also non minimal, a Clickable!
         clickables: {
             rows: 1,
@@ -416,7 +406,7 @@ addLayer("f", {
                     let data = getClickableState(this.layer, this.id)
                     return "Current state:<br>" + data
                 },
-                unl() { return player[this.layer].unl }, 
+                unlocked() { return player[this.layer].unlocked }, 
                 canClick() {
                     return getClickableState(this.layer, this.id) !== "Borkened..."},
                 onClick() { 

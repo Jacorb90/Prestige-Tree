@@ -78,7 +78,7 @@ function startPlayerBase() {
 		timePlayed: 0,
 		keepGoing: false,
 		hasNaN: false,
-		hideChalls: false,
+		hideChallenges: false,
 		points: new Decimal(10),
 		subtabs: {},
 	}
@@ -93,7 +93,7 @@ function getStartPlayer() {
 		playerdata[layer].spentOnBuyables = new Decimal(0)
 		playerdata[layer].upgrades = []
 		playerdata[layer].milestones = []
-		playerdata[layer].challs = getStartChalls(layer)
+		playerdata[layer].challenges = getStartChallenges(layer)
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 			playerdata.subtabs[layer] = {}
 			playerdata.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
@@ -128,10 +128,10 @@ function getStartClickables(layer){
 	return data
 }
 
-function getStartChalls(layer){
+function getStartChallenges(layer){
 	let data = {}
-	if (layers[layer].challs) {
-		for (id in layers[layer].challs)
+	if (layers[layer].challenges) {
+		for (id in layers[layer].challenges)
 			if (!isNaN(id))
 				data[id] = 0
 	}
@@ -354,13 +354,13 @@ function respecBuyables(layer) {
 	updateBuyableTemp(layer)
 }
 
-function canAffordUpg(layer, id) {
+function canAffordUpgrade(layer, id) {
 	let upg = layers[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost
 	return canAffordPurchase(layer, upg, cost) 
 }
 
-function hasUpg(layer, id){
+function hasUpgrade(layer, id){
 	return (player[layer].upgrades.includes(toNumber(id)) || player[layer].upgrades.includes(id.toString()))
 }
 
@@ -368,19 +368,19 @@ function hasMilestone(layer, id){
 	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString()))
 }
 
-function hasChall(layer, id){
-	return (player[layer].challs[id])
+function hasChallenge(layer, id){
+	return (player[layer].challenges[id])
 }
 
-function challCompletions(layer, id){
-	return (player[layer].challs[id])
+function challengeCompletions(layer, id){
+	return (player[layer].challenges[id])
 }
 
-function getBuyableAmt(layer, id){
+function getBuyableAmount(layer, id){
 	return (player[layer].buyables[id])
 }
 
-function setBuyableAmt(layer, id, amt){
+function setBuyableAmount(layer, id, amt){
 	player[layer].buyables[id] = amt
 }
 
@@ -392,12 +392,12 @@ function setClickableState(layer, id, state){
 	player[layer].clickables[id] = state
 }
 
-function upgEffect(layer, id){
+function upgradeEffect(layer, id){
 	return (tmp[layer].upgrades[id].effect)
 }
 
-function challEffect(layer, id){
-	return (tmp[layer].challs[id].effect)
+function challengeEffect(layer, id){
+	return (tmp[layer].challenges[id].effect)
 }
 
 function buyableEffect(layer, id){
@@ -422,8 +422,8 @@ function canAffordPurchase(layer, thing, cost) {
 }
 
 function buyUpg(layer, id) {
-	if (!player[layer].unl) return
-	if (!layers[layer].upgrades[id].unl) return
+	if (!player[layer].unlocked) return
+	if (!layers[layer].upgrades[id].unlocked) return
 	if (player[layer].upgrades.includes(id)) return
 	let upg = layers[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost
@@ -450,8 +450,8 @@ function buyUpg(layer, id) {
 }
 
 function buyMaxBuyable(layer, id) {
-	if (!player[layer].unl) return
-	if (!tmp[layer].buyables[id].unl) return
+	if (!player[layer].unlocked) return
+	if (!tmp[layer].buyables[id].unlocked) return
 	if (!tmp[layer].buyables[id].canAfford) return
 	if (!layers[layer].buyables[id].buyMax) return
 
@@ -460,8 +460,8 @@ function buyMaxBuyable(layer, id) {
 }
 
 function buyBuyable(layer, id) {
-	if (!player[layer].unl) return
-	if (!tmp[layer].buyables[id].unl) return
+	if (!player[layer].unlocked) return
+	if (!tmp[layer].buyables[id].unlocked) return
 	if (!tmp[layer].buyables[id].canAfford) return
 
 	layers[layer].buyables[id].buy()
@@ -469,8 +469,8 @@ function buyBuyable(layer, id) {
 }
 
 function clickClickable(layer, id) {
-	if (!player[layer].unl) return
-	if (!tmp[layer].clickables[id].unl) return
+	if (!player[layer].unlocked) return
+	if (!tmp[layer].clickables[id].unlocked) return
 	if (!tmp[layer].clickables[id].canClick) return
 
 	layers[layer].clickables[id].onClick()
@@ -479,18 +479,18 @@ function clickClickable(layer, id) {
 
 // Function to determine if the player is in a challenge
 function inChallenge(layer, id){
-	let chall = player[layer].active
-	if (chall==toNumber(id)) return true
+	let challenge = player[layer].active
+	if (challenge==toNumber(id)) return true
 
-	if (layers[layer].challs[chall].countsAs)
-		return layers[layer].challs[id].countsAs.includes(id)
+	if (layers[layer].challenges[challenge].countsAs)
+		return layers[layer].challenges[id].countsAs.includes(id)
 }
 
 // ************ Misc ************
 
 var onTreeTab = true
 function showTab(name) {
-	if (LAYERS.includes(name) && !layerUnl(name)) return
+	if (LAYERS.includes(name) && !layerunlocked(name)) return
 
 	var toTreeTab = name == "tree"
 	player.tab = name
@@ -504,7 +504,7 @@ function showTab(name) {
 }
 
 function notifyLayer(name) {
-	if (player.tab == name || !layerUnl(name)) return
+	if (player.tab == name || !layerunlocked(name)) return
 	player.notify[name] = 1
 }
 
@@ -512,14 +512,14 @@ function nodeShown(layer) {
 	if (tmp[layer].layerShown) return true
 	switch(layer) {
 		case "idk":
-			return player.l.unl
+			return player.l.unlocked
 			break;
 	}
 	return false
 }
 
-function layerUnl(layer) {
-	return LAYERS.includes(layer) && (player[layer].unl || (tmp[layer].baseAmount.gte(tmp[layer].requires) && layers[layer].layerShown()))
+function layerunlocked(layer) {
+	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].baseAmount.gte(tmp[layer].requires) && layers[layer].layerShown()))
 }
 
 function keepGoing() {
@@ -574,7 +574,7 @@ document.onkeydown = function(e) {
 	if (onFocused) return
 	if (ctrlDown && key != "-" && key != "_" && key != "+" && key != "=" && key != "r" && key != "R" && key != "F5") e.preventDefault()
 	if(hotkeys[key]){
-		if (player[hotkeys[key].layer].unl)
+		if (player[hotkeys[key].layer].unlocked)
 			hotkeys[key].onPress()
 	}
 }
@@ -587,9 +587,9 @@ function focused(x) {
 function prestigeButtonText(layer)
 {
 	if(tmp[layer].type == "normal")
-		return `${ player[layer].points.lt(1e3) ? (tmp[layer].resetDesc !== undefined ? tmp[layer].resetDesc : "Reset for ") : ""}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource} ${tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3) ? `<br><br>Next at ${ (tmp[layer].resCeil ? formatWhole(tmp[layer].nextAt) : format(tmp[layer].nextAt))}` : ""} ${ tmp[layer].baseResource }`
+		return `${ player[layer].points.lt(1e3) ? (tmp[layer].resetDescription !== undefined ? tmp[layer].resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource} ${tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3) ? `<br><br>Next at ${ (tmp[layer].roundUpCost ? formatWhole(tmp[layer].nextAt) : format(tmp[layer].nextAt))}` : ""} ${ tmp[layer].baseResource }`
 	else if(tmp[layer].type== "static")
-		return `${tmp[layer].resetDesc !== undefined ? tmp[layer].resetDesc : "Reset for "}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource}<br><br>${player[layer].points.lt(20) ? (tmp[layer].baseAmount.gte(tmp[layer].nextAt)&&(tmp[layer].canBuyMax !== undefined) && tmp[layer].canBuyMax?"Next":"Req") : ""}: ${formatWhole(tmp[layer].baseAmount)} / ${(tmp[layer].resCeil ? formatWhole(tmp[layer].nextAtDisp) : format(tmp[layer].nextAtDisp))} ${ tmp[layer].baseResource }		
+		return `${tmp[layer].resetDescription !== undefined ? tmp[layer].resetDescription : "Reset for "}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource}<br><br>${player[layer].points.lt(20) ? (tmp[layer].baseAmount.gte(tmp[layer].nextAt)&&(tmp[layer].canBuyMax !== undefined) && tmp[layer].canBuyMax?"Next":"Req") : ""}: ${formatWhole(tmp[layer].baseAmount)} / ${(tmp[layer].roundUpCost ? formatWhole(tmp[layer].nextAtDisp) : format(tmp[layer].nextAtDisp))} ${ tmp[layer].baseResource }		
 		`
 	else
 		return layers[layer].prestigeButtonText()

@@ -16,7 +16,8 @@ Buyable cost can take an argument for amount of buyables, but if one is not supp
 All displays will update correctly.
 Changelog is no longer in index.html at all.
 Generation of Points now happens in the main game loop (not in a layer update function), enabled by canGenPoints in game.js
-
+Renamed many things to increase readability (see something or other for a list)
+Improved documentation based on feedback
 
 ##v1.3.5
 
@@ -106,7 +107,19 @@ Define "CSS Object" clearly in the first instance in each file
 Explain automagical assignments better
 
 
+"incr_order", 
 
-Change all "chall", "unl", "desc", "res_ceil", "incr_order", 
 
-Challenges: "chall", "desc", reward -> rewardDescription, effect -> reward, effectDisplay -> rewardDisplay,
+All instances of: 
+    chall -> challenge
+    unl -> unlocked
+    upg -> upgrade
+    amt -> amount
+    desc -> description
+    resCeil -> roundUpCost
+
+Challenges:
+    desc -> challengeDescription
+    reward -> rewardDescription
+    effect -> rewardEffect
+    effectDisplay -> rewardDisplay

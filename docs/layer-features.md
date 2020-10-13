@@ -21,7 +21,7 @@ Key:
             Any nonstandard Decimal variables need to be added to convertToDecimal as well.
     Standard values:
         Required:
-            unl: a bool determining if this layer is unlocked or not
+            unlocked: a bool determining if this layer is unlocked or not
             points: a Decimal, the main currency for the layer
         Optional:
             total: A Decimal, tracks total amount of main prestige currency
@@ -49,11 +49,12 @@ Key:
     hotkeys: [
         {key: "p", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" if ctrl is.
         desc: "p: reset your points for prestige points", // The description of the hotkey used in the How To Play
-        onPress(){if (player.p.unl) doReset("p")}}, // This function is called when the hotkey is pressed.
+        onPress(){if (player.p.unlocked) doReset("p")}}, // This function is called when the hotkey is pressed.
     ],
     ```
 
-- style: **optional**, a CSS object containing any CSS that should affect this layer's whole tab.
+- style: **optional**, a "CSS object" where the keys are CSS attributes ,containing any CSS that should affect this
+         layer's entire tab.
 
 - tabFormat: **optional**, use this if you want to add extra things to your tab or change the layout. [See here for more info.](custom-tab-layouts.md)
 
@@ -73,12 +74,17 @@ Key:
               they recieve a bonus.
     [Explanations are in a separate file.](challenges.md)
 
-- buyables: Effectively upgrades that can be bought multiple times, and are optionally respeccable.
+- buyables: Effectively upgrades that can be bought multiple times, and are optionally respeccable. Many uses.
     [Explanations are in a separate file.](buyables.md)
+
+- clickables: Extremely versatile and generalized buttons which can only be clicked sometimes.
+    [Explanations are in a separate file.](clickables.md)
 
 - microtabs: An area that functions like a set of subtabs, with buttons at the top changing the content within. (Advanced)
     [Explanations are in a separate file.](subtabs-and-microtabs.md)
 
+- bars: Display some information as a progress bar, gague, or similar. They are highly customizable, and can be vertical as well.
+    [Explanations are in a separate file.](bars.md)
 
 # Prestige formula features
 
@@ -101,7 +107,7 @@ Key:
 
 - base: **sometimes required**, required for "static" layers, used as described above.
 
-- resCeil: **optional**, a bool, which is true if the resource cost needs to be rounded up.
+- roundUpCost: **optional**, a bool, which is true if the resource cost needs to be rounded up.
             (use if the base resource is a "static" currency.)
 
 - canBuyMax(): **sometimes required**, required for static layers, function used to determine if buying max is permitted.
@@ -130,7 +136,7 @@ Key:
             in the list. Alternatively, an entry in the array can be a pair consisting of the layer id and a color
             value. The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors)
 
-- nodeStyle: **optional**,  a CSS object, styles this layer's node on the tree
+- nodeStyle: **optional**,  a CSS object, where the keys are CSS attributes, which styles this layer's node on the tree
 
 - tooltip() / tooltipLocked(): **optional** Functions that return text, which is the tooltip for the node when the layer
                                is unlocked or locked, respectively. By default the tooltips behave the same as in the original Prestige Tree.
@@ -164,7 +170,7 @@ Key:
 
 ```js
         componentStyles: {
-            "chall"() {return {'height': '200px'}},
+            "challenges"() {return {'height': '200px'}},
             "prestige-button"() {return {'color': '#AA66AA'}},
         },
 ```

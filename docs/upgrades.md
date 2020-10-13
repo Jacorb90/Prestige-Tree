@@ -4,8 +4,8 @@ Upgrades are stored in the following format:
 
 Useful functions for dealing with Upgrades and implementing their effects:
 
-- hasUpg(layer, id): determine if the player has the upgrade
-- upgEffect(layer, id): Returns the current effects of the upgrade, if any
+- hasUpgrade(layer, id): determine if the player has the upgrade
+- upgradeEffect(layer, id): Returns the current effects of the upgrade, if any
 
 Hint: Basic point gain is calculated in game.js's "getPointGain".
 
@@ -28,7 +28,7 @@ Individual upgrades can have these features:
 - title: **optional**, displayed at the top in a larger font
          It can also be a function that returns updating text. Can use basic HTML.
 
-- desc: A description of the upgrade's effect. *You will also have to implement the effect where it is applied.*
+- description: A description of the upgrade's effect. *You will also have to implement the effect where it is applied.*
         It can also be a function that returns updating text. Can use basic HTML.
 
 - effect(): **optional**, A function that calculates and returns the current values of any bonuses from the upgrade.
@@ -39,7 +39,7 @@ Individual upgrades can have these features:
 
 - cost: A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
 
-- unl(): A function returning a bool to determine if the upgrade is visible or not.
+- unlocked(): **optional**, A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
 
 - onPurchase() - **optional**, this function will be called when the upgrade is purchased.
                  Good for upgrades like "makes this layer act like it was unlocked first".
@@ -50,8 +50,10 @@ By default, upgrades use the main prestige currency for the layer. You can inclu
 - currencyLayer: **optional**, the internal name of the layer that currency is stored in.
                  If it's not in a layer (like Points), omit.
 
-- style: **Optional**, A a CSS object, which affects this upgrade.
+- style: **Optional**, Applies CSS to this upgrade, in the form of an object where the keys are CSS attributes,
+         and the values are the values for those attributes (both as strings)
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 
-- id: **Assigned automagically**. It's the id for this upgrade.
+- id: **Assigned automagically**. It's the "key" which the upgrade was stored under, for convenient access.
+      The upgrade in the example's id is 11.

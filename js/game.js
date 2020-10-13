@@ -23,7 +23,7 @@ let VERSION = {
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return hasUpg("c", 11)
+	return hasUpgrade("c", 11)
 }
 
 // Calculate points/sec!
@@ -32,7 +32,7 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
-	if (hasUpg("c", 12)) gain = gain.times(upgEffect("c", 12))
+	if (hasUpgrade("c", 12)) gain = gain.times(upgradeEffect("c", 12))
 	return gain
 }
 
@@ -72,13 +72,13 @@ function getNextAt(layer, canMax=false, useType = null) {
 		let amt = player[layer].points.plus((canMax&&tmp[layer].baseAmount.gte(tmp[layer].nextAt))?tmp[layer].resetGain:0)
 		let extraCost = Decimal.pow(layers[layer].base, amt.pow(tmp[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
 		let cost = extraCost.times(tmp[layer].requires).max(tmp[layer].requires)
-		if (layers[layer].resCeil) cost = cost.ceil()
+		if (layers[layer].roundUpCost) cost = cost.ceil()
 		return cost;
 	} else if (type=="normal"){
 		let next = tmp[layer].resetGain.add(1)
 		if (next.gte("e1e7")) next = next.div("e5e6").pow(2)
 		next = next.root(tmp[layer].gainExp).div(tmp[layer].gainMult).root(tmp[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires)
-		if (layers[layer].resCeil) next = next.ceil()
+		if (layers[layer].roundUpCost) next = next.ceil()
 		return next;
 	} else if (type=="custom"){
 		return layers[layer].getNextAt(canMax)
@@ -90,7 +90,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 function shouldNotify(layer){
 	for (id in layers[layer].upgrades){
 		if (!isNaN(id)){
-			if (canAffordUpg(layer, id) && !hasUpg(layer, id) && tmp[layer].upgrades[id].unl){
+			if (canAffordUpgrade(layer, id) && !hasUpgrade(layer, id) && tmp[layer].upgrades[id].unlocked){
 				return true
 			}
 		}
@@ -128,7 +128,7 @@ function fullLayerReset(layer) {
 	player[layer] = layers[layer].startData();
 	player[layer].upgrades = []
 	player[layer].milestones = []
-	player[layer].challs = []
+	player[layer].challenges = []
 	if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 		if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
 		if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
@@ -180,14 +180,14 @@ function doReset(layer, force=false) {
 		addPoints(layer, gain)
 		updateMilestones(layer)
 
-		if (!player[layer].unl) {
-			player[layer].unl = true;
+		if (!player[layer].unlocked) {
+			player[layer].unlocked = true;
 			needCanvasUpdate = true;
 
 			if (layers[layer].incr_order){
 				lrs = layers[layer].incr_order
 				for (lr in lrs)
-					if (!player[lrs[lr]].unl) player[lrs[lr]].order++
+					if (!player[lrs[lr]].unlocked) player[lrs[lr]].order++
 			}
 		}
 	
@@ -198,7 +198,7 @@ function doReset(layer, force=false) {
 
 
 	for (layerResetting in layers) {
-		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChall(layerResetting)
+		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChallenge(layerResetting)
 	}
 
 	prevOnReset = {...player} //Deep Copy
@@ -219,7 +219,7 @@ function resetRow(row) {
 	rowReset(row+1, post_layers[0])
 	doReset(pre_layers[0], true)
 	for (let layer in layers) {
-		player[layers[layer]].unl = false
+		player[layers[layer]].unlocked = false
 		if (player[layers[layer]].order) player[layers[layer]].order = 0
 	}
 	player.points = new Decimal(10)
@@ -227,11 +227,11 @@ function resetRow(row) {
 	resizeCanvas();
 }
 
-function startChall(layer, x) {
+function startChallenge(layer, x) {
 	let enter = false
-	if (!player[layer].unl) return
+	if (!player[layer].unlocked) return
 	if (player[layer].active == x) {
-		completeChall(layer, x)
+		completeChallenge(layer, x)
 		delete player[layer].active
 	} else {
 		enter = true
@@ -239,45 +239,45 @@ function startChall(layer, x) {
 	doReset(layer, true)
 	if(enter) player[layer].active = x
 
-	updateChallTemp(layer)
+	updateChallengeTemp(layer)
 }
 
-function canCompleteChall(layer, x)
+function canCompleteChallenge(layer, x)
 {
 	if (x != player[layer].active) return
 
-	let chall = layers[layer].challs[x]
+	let challenge = layers[layer].challenges[x]
 
-	if (chall.currencyInternalName){
-		let name = chall.currencyInternalName
-		if (chall.currencyLayer){
-			let lr = chall.currencyLayer
-			return !(player[lr][name].lt(readData(chall.goal))) 
+	if (challenge.currencyInternalName){
+		let name = challenge.currencyInternalName
+		if (challenge.currencyLayer){
+			let lr = challenge.currencyLayer
+			return !(player[lr][name].lt(readData(challenge.goal))) 
 		}
 		else {
-			return !(player[name].lt(chall.cost))
+			return !(player[name].lt(challenge.cost))
 		}
 	}
 	else {
-		return !(player[layer].points.lt(chall.cost))
+		return !(player[layer].points.lt(challenge.cost))
 	}
 
 }
 
-function completeChall(layer, x) {
+function completeChallenge(layer, x) {
 	var x = player[layer].active
 	if (!x) return
-	if (! canCompleteChall(layer, x)){
+	if (! canCompleteChallenge(layer, x)){
 		delete player[layer].active
 		return
 	}
-	if (player[layer].challs[x] < tmp[layer].challs[x].completionLimit) {
+	if (player[layer].challenges[x] < tmp[layer].challenges[x].completionLimit) {
 		needCanvasUpdate = true
-		player[layer].challs[x] += 1
-		if (layers[layer].challs[x].onComplete) layers[layer].challs[x].onComplete()
+		player[layer].challenges[x] += 1
+		if (layers[layer].challenges[x].onComplete) layers[layer].challenges[x].onComplete()
 	}
 	delete player[layer].active
-	updateChallTemp(layer)
+	updateChallengeTemp(layer)
 }
 
 VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.pre ? " Beta " + VERSION.beta : "")

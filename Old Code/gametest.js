@@ -49,11 +49,11 @@ function getPointGen() {
 
 // Function to determine if the player is in a challenge
 function inChallenge(layer, id){
-	let chall = player[layer].active
-	if (chall==toNumber(id)) return true
+	let challenge = player[layer].active
+	if (challenge==toNumber(id)) return true
 
-	if (layers[layer].challs[chall].countsAs)
-		return layers[layer].challs[id].countsAs.includes(id)
+	if (layers[layer].challenges[challenge].countsAs)
+		return layers[layer].challenges[id].countsAs.includes(id)
 }
 
 function getResetGain(layer, useType = null) {
@@ -144,7 +144,7 @@ function fullLayerReset(layer) {
 	player[layer] = layers[layer].startData();
 	player[layer].upgrades = []
 	player[layer].milestones = []
-	player[layer].challs = []
+	player[layer].challenges = []
 	if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 		if (player.subtabs[layer] == undefined) player.subtabs[layer] = {}
 		if (player.subtabs[layer].mainTabs == undefined) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
@@ -218,7 +218,7 @@ function doReset(layer, force=false) {
 
 
 	for (layerResetting in layers) {
-		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChall(layerResetting)
+		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChallenge(layerResetting)
 	}
 
 	prevOnReset = {...player} //Deep Copy
@@ -260,10 +260,10 @@ function hasMilestone(layer, id) {
 	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString()))
 }
 
-function hasChall(layer, id){
-	if (!layers[layer].challs) return false
+function hasChallenge(layer, id){
+	if (!layers[layer].challenges) return false
 
-	return (player[layer].challs.includes(toNumber(id)) || player[layer].challs.includes(id.toString()))
+	return (player[layer].challenges.includes(toNumber(id)) || player[layer].challenges.includes(id.toString()))
 }
 
 function buyablesOwned(layer, id){
@@ -280,10 +280,10 @@ function upgEffect(layer, id){
 	return (tmp[layer].upgrades[id].effect)
 }
 
-function challEffect(layer, id){
-	if (!layers[layer].chall) return false
+function challengeEffect(layer, id){
+	if (!layers[layer].challenge) return false
 
-	return (tmp[layer].challs[id].effect)
+	return (tmp[layer].challenges[id].effect)
 }
 
 function buyableEffect(layer, id){
@@ -371,11 +371,11 @@ function resetRow(row) {
 	resizeCanvas();
 }
 
-function startChall(layer, x) {
+function startChallenge(layer, x) {
 	let enter = false
 	if (!player[layer].unl) return
 	if (player[layer].active == x) {
-		completeChall(layer, x)
+		completeChallenge(layer, x)
 		delete player[layer].active
 	} else {
 		enter = true
@@ -383,42 +383,42 @@ function startChall(layer, x) {
 	doReset(layer, true)
 	if(enter) player[layer].active = x
 
-	updateChallTemp(layer)
+	updateChallengeTemp(layer)
 }
 
-function canCompleteChall(layer, x)
+function canCompleteChallenge(layer, x)
 {
 	if (x != player[layer].active) return
 
-	let chall = layers[layer].challs[x]
+	let challenge = layers[layer].challenges[x]
 
-	if (chall.currencyInternalName){
-		let name = chall.currencyInternalName
-		if (chall.currencyLayer){
-			let lr = chall.currencyLayer
-			return !(player[lr][name].lt(readData(chall.goal))) 
+	if (challenge.currencyInternalName){
+		let name = challenge.currencyInternalName
+		if (challenge.currencyLayer){
+			let lr = challenge.currencyLayer
+			return !(player[lr][name].lt(readData(challenge.goal))) 
 		}
 		else {
-			return !(player[name].lt(chall.cost))
+			return !(player[name].lt(challenge.cost))
 		}
 	}
 	else {
-		return !(player[layer].points.lt(chall.cost))
+		return !(player[layer].points.lt(challenge.cost))
 	}
 
 }
 
-function completeChall(layer, x) {
+function completeChallenge(layer, x) {
 	var x = player[layer].active
 	if (!x) return
-	if (! canCompleteChall(layer, x)) return
-	if (!player[layer].challs.includes(x)) {
+	if (! canCompleteChallenge(layer, x)) return
+	if (!player[layer].challenges.includes(x)) {
 		needCanvasUpdate = true
-		player[layer].challs.push(x);
-		if (layers[layer].challs[x].onComplete) layers[layer].challs[x].onComplete()
+		player[layer].challenges.push(x);
+		if (layers[layer].challenges[x].onComplete) layers[layer].challenges[x].onComplete()
 	}
 	delete player[layer].active
-	updateChallTemp(layer)
+	updateChallengeTemp(layer)
 }
 
 VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.pre ? " Beta " + VERSION.beta : "")

@@ -31,10 +31,13 @@ Milestone features:
 
            **Tip:** Toggles are not de-set if the milestone becomes locked! In this case, you should also check if the player has the milestone.
 
-- style: **Optional**, A CSS object, which affects this milestone.
+- style: **Optional**, Applies CSS to this milestone, in the form of an object where the keys are CSS attributes,
+         and the values are the values for those attributes (both as strings)
 
-- unl(): A function returning a boolean to determine if the milestone should be shown. If absent, it is always shown.
+- unlocked(): **Optional** A function returning a boolean to determine if the milestone should be shown.
+              If absent, it is always shown.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 
-- id: **Assigned automagically**. It's the id for this milestone.
+- id: **Assigned automagically**. It's the "key" which the milestone was stored under, for convenient access.
+      The milestone in the example's id is 0.

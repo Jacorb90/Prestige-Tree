@@ -17,8 +17,9 @@ Custom tab layouts can be used to do basically anything in a tab window, especia
             "milestones", "blank", "blank", "upgrades"]
 ```
 
-It is a list of components, which can be either just a name, or an array with arguments. If it's an array, the first item is the name of the component, the second is the data passed into it, and the third (optional) is a CSS object,
-which applies its style to the component.
+It is a list of components, which can be either just a name, or an array with arguments. If it's an array,
+the first item is the name of the component, the second is the data passed into it, and the third (optional)
+applies a CSS style to it with a "CSS object", where the keys are CSS attributes.
 
 These are the existing components, but you can create more in v.js:
 
@@ -42,6 +43,8 @@ These are the existing components, but you can create more in v.js:
 
 - upgrade, milestone, chall, buyable: An individual upgrade, challenge, etc. The argument is the id.
         This can be used if you want to have upgrades split up across multiple subtabs, for example.
+
+- bar: Display a bar. The argument is the id of the bar to display.
 
 - toggle: A toggle button that toggles a bool value. The data is a pair that identifies what bool to toggle, [layer, id]
 

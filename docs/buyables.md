@@ -17,7 +17,7 @@ Buyables should be formatted like this:
                      Having this function makes a respec button appear
         respecText: **optional**, text that appears on the respec button
         11: {
-            desc:() => "Blah",
+            display:() => "Blah",
             etc
         }
         etc
@@ -30,7 +30,8 @@ Features:
          It can also be a function that returns updating text.
 
 - cost(): cost for buying the next buyable. Can have an optional argument "x" to calculate the cost of the x+1th object,
-          but needs to use "current amount" as a default value for x. Can return an object if there are multiple currencies.
+          but needs to use "current amount" as a default value for x. (x is a Decimal).
+          Can return an object if there are multiple currencies.
                     
 - effect(): **optional**, A function that calculates and returns the current values of bonuses
             of this buyable. Can return a value or an object containing multiple values.
@@ -38,16 +39,18 @@ Features:
 - display(): A function returning everything that should be displayed on the buyable after the title, likely
            including the description, amount bought, cost, and current effect. Can use basic HTML.
 
-- unl(): A function returning a bool to determine if the buyable is visible or not.
+- unlocked(): **optional**, A function returning a bool to determine if the buyable is visible or not. Default is unlocked.
 
 - canAfford(): A function returning a bool to determine if you can buy one of the buyables.
 
-- buy(): A function that implements buying one of the buyable. 
+- buy(): A function that implements buying one of the buyable, including spending the currency.
 
 - buyMax(): **optional**, A function that implements buying as many of the buyable as possible.
 
-- style: **Optional**, A CSS object, which affects this buyable.
-
+- style: **Optional**, Applies CSS to this buyable, in the form of an object where the keys are CSS attributes,
+         and the values are the values for those attributes (both as strings)
+         
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 
-- id: **Assigned automagically**. It's the id for this buyable.
+- id: **Assigned automagically**. It's the "key" which the buyable was stored under, for convenient access.
+      The buyable in the example's id is 11.

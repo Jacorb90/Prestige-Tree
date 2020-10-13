@@ -81,9 +81,9 @@ function updateTempData(layerData, tmpData) {
 	}	
 }
 
-function updateChallTemp(layer)
+function updateChallengeTemp(layer)
 {
-	updateTempData(layers[layer].challs, tmp[layer].challs)
+	updateTempData(layers[layer].challenges, tmp[layer].challenges)
 }
 
 function updateBuyableTemp(layer)
