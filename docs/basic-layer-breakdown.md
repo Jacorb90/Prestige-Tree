@@ -18,7 +18,7 @@ This is a very minimal layer with minimal features. Most things will require add
         baseResource: "points",                 // The name of the resource your prestige gain is based on
         baseAmount() {return player.points},    // A function to return the current value of that resource
 
-        requires: new Decimal(200)},            // The amount of the base needed to  gain 1 of the prestige currency.
+        requires: new Decimal(200),            // The amount of the base needed to  gain 1 of the prestige currency.
                                                 // Also the amount required to unlock the layer.
         
         type: "normal",                         // Determines the formula used for calculating prestige currency.

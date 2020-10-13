@@ -1,6 +1,7 @@
 #The Modding Tree changelog:
 
 ##v2.0
+Added Progress bars, which are highly customizable and can be horizontal or vertical.
 Added clickables, a more generalized variant of buyables!
 Support for multiple completions of challenges.
 Added getter/setter functions for buyable amount and such
@@ -94,3 +95,18 @@ parameters.
 
 #v1.0:
 - First release.
+
+
+Make it clear that anything can be a function
+
+buyables.md: cost is a Decimal
+
+Define "CSS Object" clearly in the first instance in each file
+
+Explain automagical assignments better
+
+
+
+Change all "chall", "unl", "desc", "res_ceil", "incr_order", 
+
+Challenges: "chall", "desc", reward -> rewardDescription, effect -> reward, effectDisplay -> rewardDisplay,
