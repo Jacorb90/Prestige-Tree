@@ -17,7 +17,7 @@ Buyables should be formatted like this:
                      Having this function makes a respec button appear
         respecText: **optional**, text that appears on the respec button
         11: {
-            display:() => "Blah",
+            display() {return "Blah"},
             etc
         }
         etc

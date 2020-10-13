@@ -15,7 +15,7 @@ Hint: Basic point gain is calculated in game.js's "getPointGain".
         rows: # of rows
         cols: # of columns
         11: {
-            desc:() => "Blah",
+            desc: "Blah",
             more features
         }
         etc

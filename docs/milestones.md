@@ -5,7 +5,7 @@ Milestones should be formatted like this:
 ```js
     milestones: {
         0: {
-            requirementDesc:() => "123 waffles",
+            requirementDesc: "123 waffles",
         }
         etc
     }

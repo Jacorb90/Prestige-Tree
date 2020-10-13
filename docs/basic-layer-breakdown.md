@@ -8,7 +8,6 @@ This is a very minimal layer with minimal features. Most things will require add
         startData() { return {                  // startData is a function that returns default data for a layer. 
             unlocked: false,                    // You can add more variables here to add them to your layer.
             points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
-                                                // If you add non-standard Decimal variables, look at convertToDecimal
         }},
 
         color: "#FE0102",                       // The color for this layer, which affects many elements

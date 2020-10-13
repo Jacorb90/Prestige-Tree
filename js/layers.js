@@ -305,7 +305,7 @@ addLayer("c", {
                         ["blank", ['0', '50px']], ["bar", "flatBoi"]
                         ]],
                     ]],
-                    "blank", ["display-text", "It's because bars! So funny! Ha ha!"],
+                    "blank", ["display-text", "It's jail because \"bars\"! So funny! Ha ha!"],
                 ],
             },
             illuminati: {

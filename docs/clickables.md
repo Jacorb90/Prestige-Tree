@@ -20,7 +20,7 @@ Clickables should be formatted like this:
                             // pressing it will call the function.
         masterButtonText: "Press me!" // **optional** text to display on the Master Button
         11: {
-            desc:() => "Blah",
+            display() {return "Blah"},
             etc
         }
         etc

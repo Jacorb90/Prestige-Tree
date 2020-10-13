@@ -15,7 +15,7 @@ Challenges are stored in the following format:
         rows: # of rows
         cols: # of columns
         11: {
-            name:() => "Ouch",
+            name: "Ouch",
             etc
         }
         etc

@@ -91,12 +91,11 @@ function updateLayers(){
         if (layers[layer].bars){
             layers[layer].bars.layer = layer
             for (thing in layers[layer].bars){
-                if (!isNaN(thing)){
-                    layers[layer].bars[thing].id = thing
-                    layers[layer].bars[thing].layer = layer
-                    if (layers[layer].bars[thing].unlocked === undefined)
-                        layers[layer].bars[thing].unlocked = true
-                }
+                layers[layer].bars[thing].id = thing
+                layers[layer].bars[thing].layer = layer
+                if (layers[layer].bars[thing].unlocked === undefined)
+                    layers[layer].bars[thing].unlocked = true
+                
             }  
         }
 

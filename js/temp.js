@@ -107,6 +107,8 @@ function constructBarStyles(layer){
 			let bar = tmp[layer].bars[id]
 			if (bar.progress instanceof Decimal)
 				bar.progress = bar.progress.toNumber()
+			bar.progress = Math.min(Math.max(bar.progress, 0), 1)
+
 			bar.dims = {'width': bar.width + "px", 'height': bar.height + "px"}
 			let dir = bar.direction
 			bar.fillDims = {'width': bar.width + "px", 'height': bar.height + "px"}
@@ -115,12 +117,12 @@ function constructBarStyles(layer){
 				bar.fillDims[DIR_MARGINS[dir]] = "0px"
 				if (dir == UP || dir == DOWN)
 				{
-					bar.fillDims.height = bar.height * Math.min(bar.progress, 1) + "px"
+					bar.fillDims.height = bar.height * bar.progress + "px"
 					if (dir == UP) bar.fillDims['margin-top'] =  bar.height * (1 - Math.min(bar.progress, 1)) + "px"
 				}
 				else
 				{
-					bar.fillDims.width = bar.width * Math.min(bar.progress, 1) + "px"
+					bar.fillDims.width = bar.width * bar.progress + "px"
 					if (dir == LEFT) bar.fillDims['margin-left'] =  bar.width * (1 - Math.min(bar.progress, 1)) + "px"
 				}
 			}
