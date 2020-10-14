@@ -4,6 +4,7 @@
 Added progress bars, which are highly customizable and can be horizontal or vertical!
 Added clickables, a more generalized variant of buyables.
 Support for multiple completions of challenges.
+The points display and other gui elements stay at the top of the screen when the tree scrolls.
 Added getter/setter functions for buyable amount and such
 Moved modInfo to game.js, added a spot for a Discord link, changelog link, and a separate mod version from the TMT version
 Tree structure is based on layer data, no index.html needed.

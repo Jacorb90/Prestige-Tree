@@ -523,3 +523,13 @@ ul {
 	flex-direction: column;
 	justify-content: center;
 }
+
+.treeOverlay {
+	z-index: 200000;
+	pointer-events:none; 
+}
+
+.overlayThing {
+	pointer-events:auto;
+	background-color: var(--background);
+}
