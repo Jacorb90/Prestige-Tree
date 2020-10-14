@@ -24,6 +24,7 @@ function updateHotkeys()
 
 var ROW_LAYERS = {}
 var TREE_LAYERS = {}
+var OTHER_LAYERS = {}
 
 function updateLayers(){
     LAYERS = Object.keys(layers);
@@ -104,11 +105,14 @@ function updateLayers(){
 
         row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}
-        if(!TREE_LAYERS[row]) TREE_LAYERS[row] = []
+        if(!TREE_LAYERS[row] && !isNaN(row)) TREE_LAYERS[row] = []
+        if(!OTHER_LAYERS[row] && isNaN(row)) OTHER_LAYERS[row] = []
+
         ROW_LAYERS[row][layer]=layer;
         let position = (layers[layer].position !== undefined ? layers[layer].position : layer)
-        TREE_LAYERS[row].push({layer: layer, position: position})
-
+        
+        if (!isNaN(row)) TREE_LAYERS[row].push({layer: layer, position: position})
+        else OTHER_LAYERS[row].push({layer: layer, position: position})
         
     }
     for (row in TREE_LAYERS) {

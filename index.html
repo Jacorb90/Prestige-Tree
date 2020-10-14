@@ -111,6 +111,9 @@
 				<br>
 				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
 			</div>
+			<div class="sideLayers" >
+				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node.layer' :abb='layers[node.layer].symbol' :size="'small'"></layer-node></div>
+			</div>
 		</div>
 
 

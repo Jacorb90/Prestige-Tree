@@ -342,112 +342,255 @@ addLayer("c", {
 
 // This layer is mostly minimal but it uses a custom prestige type and a clickable
 addLayer("f", {
+    startData() { return {
+        unlocked: false,
+        points: new Decimal(0),
+        boop: false,
+        clickables: {[11]: "Start"} // Optional default Clickable state
+    }},
+    color:() => "#FE0102",
+    requires() {return new Decimal(10)}, 
+    resource: "farm points", 
+    baseResource: "candies", 
+    baseAmount() {return player.points},
+    type: "custom", // A "Custom" type which is effectively static
+    exponent: 0.5,
+    base: 3,
+    roundUpCost: true,
+    canBuyMax:() => true,
+    gainMult() {
+        return new Decimal(1)
+    },
+    gainExp() {
+        return new Decimal(1)
+    },
+    row: 1,
+    layerShown() {return true}, 
+    branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
+
+    tooltipLocked() { // Optional, tooltip displays when the layer is locked
+        return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
+    },
+
+    midsection: [
+        "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
+        ["display-text", "Bork bork!"]
+    ],
+
+    // The following are only currently used for "custom" Prestige type:
+    prestigeButtonText() { //Is secretly HTML
+        if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"
+        if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp[this.layer].resetGain) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp[layer].nextAtDisp) + " candies)"
+    },
+    getResetGain() {
+        return getResetGain(this.layer, useType = "static")
+    },
+    getNextAt(canMax=false) { //  
+        return getNextAt(this.layer, canMax, useType = "static")
+    },
+    canReset() {
+        return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
+    },
+    // This is also non minimal, a Clickable!
+    clickables: {
+        rows: 1,
+        cols: 1,
+        masterButtonPress() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
+            if (getClickableState(this.layer, 11) == "Borkened...")
+                player[this.layer].clickables[11] = "Start"
+        },
+        masterButtonText() {return (getClickableState(this.layer, 11) == "Borkened...") ? "Fix the clickable!" : "Does nothing"}, // Text on Respec button, optional
+        11: {
+            title:() => "Clicky clicky!", // Optional, displayed at the top in a larger font
+            display() { // Everything else displayed in the buyable button after the title
+                let data = getClickableState(this.layer, this.id)
+                return "Current state:<br>" + data
+            },
+            unlocked() { return player[this.layer].unlocked }, 
+            canClick() {
+                return getClickableState(this.layer, this.id) !== "Borkened..."},
+            onClick() { 
+                switch(getClickableState(this.layer, this.id)){
+                    case "Start":
+                        player[this.layer].clickables[this.id] = "A new state!"
+                        break;
+                    case "A new state!":
+                        player[this.layer].clickables[this.id] = "Keep going!"
+                        break;
+                    case "Keep going!":
+                        player[this.layer].clickables[this.id] = "Maybe that's a bit too far..."
+                        break;                        
+                    case "Maybe that's a bit too far...":
+                        player[this.layer].clickables[this.id] = "Borkened..."
+                        break;
+                    default:
+                        player[this.layer].clickables[this.id] = "Start"
+                        break;
+
+                }
+            },
+            style() {
+                switch(getClickableState(this.layer, this.id)){
+                    case "Start":
+                        return {'background-color': 'green'}
+                        break;
+                    case "A new state!":
+                        return {'background-color': 'yellow'}
+                        break;
+                    case "Keep going!":
+                        return {'background-color': 'orange'}
+                        break;                        
+                    case "Maybe that's a bit too far...":
+                        return {'background-color': 'red'}
+                        break;
+                    default:
+                        return {}
+                        break;
+            }},
+        },
+    },
+
+}, 
+)
+
+
+// This layer is mostly minimal but it uses a custom prestige type and a clickable
+addLayer("f", {
+    startData() { return {
+        unlocked: false,
+        points: new Decimal(0),
+        boop: false,
+        clickables: {[11]: "Start"} // Optional default Clickable state
+    }},
+    color:() => "#FE0102",
+    requires() {return new Decimal(10)}, 
+    resource: "farm points", 
+    baseResource: "candies", 
+    baseAmount() {return player.points},
+    type: "custom", // A "Custom" type which is effectively static
+    exponent: 0.5,
+    base: 3,
+    roundUpCost: true,
+    canBuyMax:() => true,
+    gainMult() {
+        return new Decimal(1)
+    },
+    gainExp() {
+        return new Decimal(1)
+    },
+    row: 1,
+    layerShown() {return true}, 
+    branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
+
+    tooltipLocked() { // Optional, tooltip displays when the layer is locked
+        return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
+    },
+
+    midsection: [
+        "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
+        ["display-text", "Bork bork!"]
+    ],
+
+    // The following are only currently used for "custom" Prestige type:
+    prestigeButtonText() { //Is secretly HTML
+        if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"
+        if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp[this.layer].resetGain) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp[layer].nextAtDisp) + " candies)"
+    },
+    getResetGain() {
+        return getResetGain(this.layer, useType = "static")
+    },
+    getNextAt(canMax=false) { //  
+        return getNextAt(this.layer, canMax, useType = "static")
+    },
+    canReset() {
+        return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
+    },
+    // This is also non minimal, a Clickable!
+    clickables: {
+        rows: 1,
+        cols: 1,
+        masterButtonPress() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
+            if (getClickableState(this.layer, 11) == "Borkened...")
+                player[this.layer].clickables[11] = "Start"
+        },
+        masterButtonText() {return (getClickableState(this.layer, 11) == "Borkened...") ? "Fix the clickable!" : "Does nothing"}, // Text on Respec button, optional
+        11: {
+            title:() => "Clicky clicky!", // Optional, displayed at the top in a larger font
+            display() { // Everything else displayed in the buyable button after the title
+                let data = getClickableState(this.layer, this.id)
+                return "Current state:<br>" + data
+            },
+            unlocked() { return player[this.layer].unlocked }, 
+            canClick() {
+                return getClickableState(this.layer, this.id) !== "Borkened..."},
+            onClick() { 
+                switch(getClickableState(this.layer, this.id)){
+                    case "Start":
+                        player[this.layer].clickables[this.id] = "A new state!"
+                        break;
+                    case "A new state!":
+                        player[this.layer].clickables[this.id] = "Keep going!"
+                        break;
+                    case "Keep going!":
+                        player[this.layer].clickables[this.id] = "Maybe that's a bit too far..."
+                        break;                        
+                    case "Maybe that's a bit too far...":
+                        player[this.layer].clickables[this.id] = "Borkened..."
+                        break;
+                    default:
+                        player[this.layer].clickables[this.id] = "Start"
+                        break;
+
+                }
+            },
+            style() {
+                switch(getClickableState(this.layer, this.id)){
+                    case "Start":
+                        return {'background-color': 'green'}
+                        break;
+                    case "A new state!":
+                        return {'background-color': 'yellow'}
+                        break;
+                    case "Keep going!":
+                        return {'background-color': 'orange'}
+                        break;                        
+                    case "Maybe that's a bit too far...":
+                        return {'background-color': 'red'}
+                        break;
+                    default:
+                        return {}
+                        break;
+            }},
+        },
+    },
+
+}, 
+)
+
+
+// This layer is mostly minimal but it uses a custom prestige type and a clickable
+addLayer("a", {
         startData() { return {
-            unlocked: false,
+            unlocked: true,
 			points: new Decimal(0),
-            boop: false,
-            clickables: {[11]: "Start"} // Optional default Clickable state
         }},
-        color:() => "#FE0102",
-        requires() {return new Decimal(10)}, 
-        resource: "farm points", 
+        color: "yellow",
+        requires: new Decimal (1), 
+        resource: "idk", 
         baseResource: "candies", 
         baseAmount() {return player.points},
-        type: "custom", // A "Custom" type which is effectively static
+        type: "normal", // A "Custom" type which is effectively static
         exponent: 0.5,
-        base: 3,
-        roundUpCost: true,
-        canBuyMax:() => true,
         gainMult() {
             return new Decimal(1)
         },
         gainExp() {
             return new Decimal(1)
         },
-        row: 1,
+        row: "side",
         layerShown() {return true}, 
-        branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
-
-        tooltipLocked() { // Optional, tooltip displays when the layer is locked
-            return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
-        },
-
-        midsection: [
-            "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
-            ["display-text", "Bork bork!"]
-        ],
-
-        // The following are only currently used for "custom" Prestige type:
-        prestigeButtonText() { //Is secretly HTML
-            if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"
-            if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp[this.layer].resetGain) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp[layer].nextAtDisp) + " candies)"
-        },
-        getResetGain() {
-            return getResetGain(this.layer, useType = "static")
-        },
-        getNextAt(canMax=false) { //  
-            return getNextAt(this.layer, canMax, useType = "static")
-        },
-        canReset() {
-            return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
-        },
-        // This is also non minimal, a Clickable!
-        clickables: {
-            rows: 1,
-            cols: 1,
-            masterButtonPress() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
-                if (getClickableState(this.layer, 11) == "Borkened...")
-                    player[this.layer].clickables[11] = "Start"
-            },
-            masterButtonText() {return (getClickableState(this.layer, 11) == "Borkened...") ? "Fix the clickable!" : "Does nothing"}, // Text on Respec button, optional
-            11: {
-                title:() => "Clicky clicky!", // Optional, displayed at the top in a larger font
-                display() { // Everything else displayed in the buyable button after the title
-                    let data = getClickableState(this.layer, this.id)
-                    return "Current state:<br>" + data
-                },
-                unlocked() { return player[this.layer].unlocked }, 
-                canClick() {
-                    return getClickableState(this.layer, this.id) !== "Borkened..."},
-                onClick() { 
-                    switch(getClickableState(this.layer, this.id)){
-                        case "Start":
-                            player[this.layer].clickables[this.id] = "A new state!"
-                            break;
-                        case "A new state!":
-                            player[this.layer].clickables[this.id] = "Keep going!"
-                            break;
-                        case "Keep going!":
-                            player[this.layer].clickables[this.id] = "Maybe that's a bit too far..."
-                            break;                        
-                        case "Maybe that's a bit too far...":
-                            player[this.layer].clickables[this.id] = "Borkened..."
-                            break;
-                        default:
-                            player[this.layer].clickables[this.id] = "Start"
-                            break;
-
-                    }
-                },
-                style() {
-                    switch(getClickableState(this.layer, this.id)){
-                        case "Start":
-                            return {'background-color': 'green'}
-                            break;
-                        case "A new state!":
-                            return {'background-color': 'yellow'}
-                            break;
-                        case "Keep going!":
-                            return {'background-color': 'orange'}
-                            break;                        
-                        case "Maybe that's a bit too far...":
-                            return {'background-color': 'red'}
-                            break;
-                        default:
-                            return {}
-                            break;
-                }},
-            },
+        tooltipUnlocked() { // Optional, tooltip displays when the layer is locked
+            return ("YEETS")
         },
 
     }, 

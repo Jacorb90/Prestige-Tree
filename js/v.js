@@ -305,7 +305,7 @@ function loadVue() {
 	})
 
 	Vue.component('layer-node', {
-		props: ['layer', 'abb'],
+		props: ['layer', 'abb', 'size'],
 		template: `
 		<button v-if="nodeShown(layer)"
 			v-bind:id="layer"
@@ -317,7 +317,8 @@ function loadVue() {
 				: (tmp[layer].tooltipLocked ? tmp[layer].tooltipLocked : 'Reach ' + formatWhole(tmp[layer].requires) + ' ' + tmp[layer].baseResource + ' to unlock (You have ' + formatWhole(tmp[layer].baseAmount) + ' ' + tmp[layer].baseResource + ')')
 			"
 			v-bind:class="{
-				treeNode: true,
+				treeNode: size != 'small',
+				smallNode: size == 'small',
 				[layer]: true,
 				hidden: !tmp[layer].layerShown,
 				locked: !player[layer].unlocked && !tmp[layer].baseAmount.gte(tmp[layer].requires),

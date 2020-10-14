@@ -74,6 +74,20 @@ h1, h2, h3, b, input {
 	text-shadow: var(--hqProperty3);
 }
 
+.smallNode {
+	height: 60px;
+	width: 60px;
+	border: var(--hqProperty1);
+	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-radius: 50%;
+	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
+	font-size: 30px;
+	font-family: "Lucida Console", "Courier New", monospace;
+	color: rgba(0, 0, 0, 0.5);
+	text-shadow: var(--hqProperty3);
+}
+
+
 .locked {
 	background-color: #bf8f8f;
 	cursor: not-allowed;
@@ -532,4 +546,11 @@ ul {
 .overlayThing {
 	pointer-events:auto;
 	background-color: var(--background);
+}
+
+.sideLayers {
+	pointer-events:auto;
+	position: absolute;
+	right: 35px;
+	top: 55px;
 }
