@@ -117,11 +117,11 @@ function canReset(layer)
 function rowReset(row, layer) {
 	for (lr in ROW_LAYERS[row]){
 		if(layers[lr].doReset) {
-			player[lr].active = null // Exit challenges on any row reset on an equal or higher row
+			player[lr].activeChallenge = null // Exit challenges on any row reset on an equal or higher row
 			layers[lr].doReset(layer)
 		}
 		else
-			if(layers[layer].row > layers[lr].row) layerDataReset(lr)
+			if(layers[layer].row > layers[lr].row && row !== "side") layerDataReset(lr)
 	}
 }
 
@@ -208,6 +208,7 @@ function doReset(layer, force=false) {
 	player.points = (row == 0 ? new Decimal(0) : new Decimal(10))
 
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
+	rowReset("side", layer)
 	prevOnReset = undefined
 
 	updateTemp()
@@ -233,21 +234,21 @@ function resetRow(row) {
 function startChallenge(layer, x) {
 	let enter = false
 	if (!player[layer].unlocked) return
-	if (player[layer].active == x) {
+	if (player[layer].activeChallenge == x) {
 		completeChallenge(layer, x)
-		delete player[layer].active
+		delete player[layer].activeChallenge
 	} else {
 		enter = true
 	}	
 	doReset(layer, true)
-	if(enter) player[layer].active = x
+	if(enter) player[layer].activeChallenge = x
 
 	updateChallengeTemp(layer)
 }
 
 function canCompleteChallenge(layer, x)
 {
-	if (x != player[layer].active) return
+	if (x != player[layer].activeChallenge) return
 
 	let challenge = layers[layer].challenges[x]
 
@@ -268,10 +269,10 @@ function canCompleteChallenge(layer, x)
 }
 
 function completeChallenge(layer, x) {
-	var x = player[layer].active
+	var x = player[layer].activeChallenge
 	if (!x) return
 	if (! canCompleteChallenge(layer, x)){
-		delete player[layer].active
+		delete player[layer].activeChallenge
 		return
 	}
 	if (player[layer].challenges[x] < tmp[layer].challenges[x].completionLimit) {
@@ -279,7 +280,7 @@ function completeChallenge(layer, x) {
 		player[layer].challenges[x] += 1
 		if (layers[layer].challenges[x].onComplete) layers[layer].challenges[x].onComplete()
 	}
-	delete player[layer].active
+	delete player[layer].activeChallenge
 	updateChallengeTemp(layer)
 }
 

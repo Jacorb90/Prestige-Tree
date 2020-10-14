@@ -592,7 +592,6 @@ addLayer("a", {
         tooltipUnlocked() { // Optional, tooltip displays when the layer is locked
             return ("YEETS")
         },
-
     }, 
 )
 

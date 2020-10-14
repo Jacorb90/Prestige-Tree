@@ -30,7 +30,11 @@ Key:
 
 - color: A color associated with this layer, used in many places. (A string in hex format with a #)
 
-- row: The row of the layer, starting at 0.
+- row: The row of the layer, starting at 0. This affects where the node appears on the tree, and which resets affect the layer.
+
+       Using "side" instead of a number will cause the layer to appear off to the side as a smaller node (useful for achievements
+       and statistics). Side layers are not affected by resets unless you add a doReset to them.
+       
 
 - resource: Name of the main currency you gain by resetting on this layer.
 
@@ -146,6 +150,7 @@ Key:
 
 - doReset(resettingLayer): **optional**, is triggered when a layer on a row greater than or equal to this one does a reset.
                 The default behavior is to reset everything on the row, but only if it was triggered by a layer in a higher row.
+                (doReset is always called for side layers, but for these the default behavior is to reset nothing.)
                 
                 If you want to keep things, determine what to keep based on the resettingLayer, milestones, and such, then call
                 resetLayerData(layer, keep), where layer is this layer, and keep is an array of the names of things to keep.
