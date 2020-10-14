@@ -18,6 +18,7 @@ Changelog is no longer in index.html at all.
 Generation of Points now happens in the main game loop (not in a layer update function), enabled by canGenPoints in game.js
 Renamed many things to increase readability (see something or other for a list)
 Improved documentation based on feedback
+Changed fullLayerReset to resetLayerData with ways to keep things
 
 ##v1.3.5
 
