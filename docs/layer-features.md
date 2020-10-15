@@ -26,7 +26,7 @@ Key:
         Optional:
             total: A Decimal, tracks total amount of main prestige currency
             best: A Decimal, tracks highest amount of main prestige currency
-            order: used to keep track of relevant layers unlocked before this one.
+            unlockOrder: used to keep track of relevant layers unlocked before this one.
 
 - color: A color associated with this layer, used in many places. (A string in hex format with a #)
 
@@ -110,7 +110,7 @@ Key:
 
 - requires: A Decimal, the amount of the base needed to gain 1 of the prestige currency.
             Also the amount required to unlock the layer.
-            You can instead make this a function, to make it harder if another layer was unlocked first (based on "order").
+            You can instead make this a function, to make it harder if another layer was unlocked first (based on unlockOrder).
 
 - exponent: Used as described above.
 
@@ -174,7 +174,7 @@ Key:
 
 - resetsNothing: **optional**, returns true if this layer shouldn't trigger any resets when you prestige.
 
-- incr_order: **optional**, an array of layer ids. When this layer is unlocked for the first time, the "order" value
+- increaseUnlockOrder: **optional**, an array of layer ids. When this layer is unlocked for the first time, the unlockOrder value
               for any not-yet-unlocked layers in this list increases. This can be used to make them harder to unlock.
 
 - should_notify: **optional**, a function to return true if this layer should be highlighted in the tree.

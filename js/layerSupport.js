@@ -112,6 +112,7 @@ function updateLayers(){
 
         if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
         if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
+        if(layers[layer].unlockOrder === undefined) layers[layer].unlockOrder = 0
 
         row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}

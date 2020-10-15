@@ -110,7 +110,7 @@ addLayer("c", {
                 currencyLayer: "", // Leave empty if not in a layer "e.g. points"
                 unlocked() { return (hasUpgrade(this.layer, 12))},
                 onPurchase() { // This function triggers when the upgrade is purchased
-                    player[this.layer].order = 0
+                    player[this.layer].unlockOrder = 0
                 },
                 style() {
                     if (hasUpgrade(this.layer, this.id)) return {
@@ -189,7 +189,7 @@ addLayer("c", {
             {key: "c", description: "C: reset for lollipops or whatever", onPress(){if (player[this.layer].unlocked) doReset(this.layer)}},
             {key: "ctrl+c" + this.layer, description: "Ctrl+c: respec things", onPress(){if (player[this.layer].unlocked) respecBuyables(this.layer)}},
         ],
-        incr_order: [], // Array of layer names to have their order increased when this one is first unlocked
+        increaseUnlockOrder: [], // Array of layer names to have their order increased when this one is first unlocked
 
         microtabs: {
             stuff: {

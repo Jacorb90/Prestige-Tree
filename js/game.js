@@ -193,10 +193,10 @@ function doReset(layer, force=false) {
 			player[layer].unlocked = true;
 			needCanvasUpdate = true;
 
-			if (layers[layer].incr_order){
-				lrs = layers[layer].incr_order
+			if (layers[layer].increaseUnlockOrder){
+				lrs = layers[layer].increaseUnlockOrder
 				for (lr in lrs)
-					if (!player[lrs[lr]].unlocked) player[lrs[lr]].order++
+					if (!player[lrs[lr]].unlocked) player[lrs[lr]].unlockOrder++
 			}
 		}
 	
@@ -230,7 +230,7 @@ function resetRow(row) {
 	doReset(pre_layers[0], true)
 	for (let layer in layers) {
 		player[layers[layer]].unlocked = false
-		if (player[layers[layer]].order) player[layers[layer]].order = 0
+		if (player[layers[layer]].unlockOrder) player[layers[layer]].unlockOrder = 0
 	}
 	player.points = new Decimal(10)
 	updateTemp();
