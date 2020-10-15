@@ -17,7 +17,7 @@ The benefits of using Github:
 - It lets you collaborate with other people, if you want to.
 
 
-# Getting set up with Github and The Modding Tree:
+## Getting set up with Github and The Modding Tree:
 
 1. Install [Github Desktop](https://desktop.github.com/) and [Visual Studio Code](https://code.visualstudio.com/).
 
@@ -36,7 +36,7 @@ The benefits of using Github:
 6. Select that you're using it for your own purposes, and click continue. It will download the files and handle everything.
 
 
-# Using your repository
+## Using your repository
 
 1. Click on "show in finder" to the right, and then open index.html. This will let you view and
     test your project!

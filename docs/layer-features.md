@@ -10,7 +10,7 @@ Key:
 - **sometimes required**: This is may be required, depending on other things in the layer.
 - **optional**: You can leave this out if you don't intend to use that feature for the layer.
 
-# Layer Definition features
+## Layer Definition features
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
       to access the save value. It makes copying code to new layers easier. It is also assigned to all upgrades and buyables and such.
@@ -66,7 +66,7 @@ Key:
               standard tab layout. (cannot do subtabs)
 
 
-# Big features (all optional)
+## Big features (all optional)
 
 - upgrades: A grid of one-time purchases which can have unique upgrade conditions, currency costs, and bonuses.
     [Explanations are in a separate file.](upgrades.md)
@@ -94,7 +94,7 @@ Key:
     [Explanations are in a separate file.](achievements.md)
 
 
-# Prestige formula features
+## Prestige formula features
 
 - type: Determines which prestige formula you use.
     "normal": The amount of currency you gain is independent of its current amount (like Prestige).
@@ -134,7 +134,7 @@ Key:
 
 
 
-# Tree/node features
+## Tree/node features
 
 - symbol: **optional**, the text that appears on this layer's node. Default is the layer id with the first letter capitalized
 
@@ -151,7 +151,7 @@ Key:
                                is unlocked or locked, respectively. By default the tooltips behave the same as in the original Prestige Tree.
 
 
-# Other features
+## Other features
 
 - doReset(resettingLayer): **optional**, is triggered when a layer on a row greater than or equal to this one does a reset.
                 The default behavior is to reset everything on the row, but only if it was triggered by a layer in a higher row.
@@ -191,7 +191,7 @@ Key:
 ```
 
 
-# Custom Prestige type  
+## Custom Prestige type  
 
 - getResetGain(): **For custom prestige type**, Returns how many points you should get if you reset now. You can call
             getResetGain(this.layer, useType = "static") or similar to calculate what your gain would be under another

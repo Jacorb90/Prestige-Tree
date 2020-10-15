@@ -1,4 +1,4 @@
-#Milestones
+# Milestones
 
 Milestones are awarded to the player when they meet a certain goal, and give some benefit. Milestones should be formatted like this:
 
