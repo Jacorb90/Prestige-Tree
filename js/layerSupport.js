@@ -30,6 +30,7 @@ function updateLayers(){
     LAYERS = Object.keys(layers);
     ROW_LAYERS = {}
     TREE_LAYERS = {}
+    OTHER_LAYERS = {}
     for (layer in layers){
         layers[layer].layer = layer
         if (layers[layer].upgrades){
@@ -126,10 +127,12 @@ function updateLayers(){
         else OTHER_LAYERS[row].push({layer: layer, position: position})
         
     }
+    for (row in OTHER_LAYERS) {
+        OTHER_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
+    }
     for (row in TREE_LAYERS) {
         TREE_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
     }
-
     updateHotkeys()
 }
 

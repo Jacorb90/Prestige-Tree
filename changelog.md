@@ -1,5 +1,8 @@
 # The Modding Tree changelog:
 
+# v2.0.1 10/15/20
+- Fixed side layers appearing multiple times.
+
 ## v2.0 10/15/20
 - Added progress bars, which are highly customizable and can be horizontal or vertical!
 - Added "side layers", displayed smaller and off to the side, and don't get reset by default.
