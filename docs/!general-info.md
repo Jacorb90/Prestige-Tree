@@ -39,4 +39,5 @@ All display text can be basic HTML instead (But you can't use most Vue features 
 - [Custom Tab Layouts](custom-tab-layouts.md): An optional way to give your tabs a different layout.
                                                    You can even create entirely new components to use.
 - [Subtabs and Microtabs](subtabs-and-microtabs.md): Create subtabs for your tabs, as well as "microtab" components that you can put inside the tabs.
+- [Achievements](milestones.md): How to create achievements for a layer (or for the whole game).
 - [Updating TMT](updating-tmt.md): Using Github Desktop to update your mod's version of TMT.

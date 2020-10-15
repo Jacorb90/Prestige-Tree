@@ -36,14 +36,14 @@ These are the existing components, but you can create more in v.js:
 - prestige-button: The argument is a string that the prestige button should say before the amount of
                    currency you will gain. It can also be a function that returns updating text.
 
-- upgrades, milestones, challs: Display the upgrades, milestones, and challenges for a layer, as appropriate.
+- upgrades, milestones, challs, achievements: Display the upgrades, milestones, and challenges for a layer, as appropriate.
 
 - buyables, clickables: Display all of the buyables/clickables for this layer, as appropriate. The argument optional,
             and is the size of the boxes in pixels.
 
 - microtabs: Display a set of subtabs for an area. The argument is the name of the set of microtabs in the "microtabs" feature.
 
-- upgrade, milestone, chall, buyable: An individual upgrade, challenge, etc. The argument is the id.
+- upgrade, milestone, chall, buyable, clickable, achievement: An individual upgrade, challenge, etc. The argument is the id.
         This can be used if you want to have upgrades split up across multiple subtabs, for example.
 
 - bar: Display a bar. The argument is the id of the bar to display.

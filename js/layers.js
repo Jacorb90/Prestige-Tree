@@ -576,8 +576,8 @@ addLayer("a", {
         }},
         color: "yellow",
         requires: new Decimal (1), 
-        resource: "idk", 
-        baseResource: "candies", 
+        resource: "achievement power", 
+        baseResource: "achievements", 
         baseAmount() {return player.points},
         type: "normal", // A "Custom" type which is effectively static
         exponent: 0.5,
@@ -589,9 +589,35 @@ addLayer("a", {
         },
         row: "side",
         layerShown() {return true}, 
-        tooltipUnlocked() { // Optional, tooltip displays when the layer is locked
-            return ("YEETS")
+        tooltip() { // Optional, tooltip displays when the layer is locked
+            return ("Achievements")
         },
+        achievements: {
+            rows: 2,
+            cols: 3,
+            11: {
+                name: "Get me!",
+                done() {return true}, // This one is a freebie
+                goalTooltip: "How did this happen?", // Shows when achievement is not completed
+                doneTooltip: "You did it!", // Showed when the achievement is completed
+            },
+            12: {
+                name: "Impossible!",
+                done() {return false},
+                goalTooltip: "Mwahahaha!", // Shows when achievement is not completed
+                doneTooltip: "HOW????", // Showed when the achievement is completed
+            },
+            13: {
+                name: "EIEIO",
+                done() {return player.f.points.gte(1)},
+                goalTooltip: "Get a farm point.", // Shows when achievement is not completed
+                doneTooltip: "Get a farm point.\n\nReward: The dinosaur is now your friend.", // Showed when the achievement is completed
+                onComplete() {console.log("Bork bork bork!")}
+            },
+        },
+        tabFormat: [
+            "main-display", "blank", "blank", "achievements",
+        ]
     }, 
 )
 

@@ -291,6 +291,36 @@ function loadVue() {
 	})
 
 
+	Vue.component('achievements', {
+		props: ['layer'],
+		template: `
+		<div v-if="layers[layer].achievements" class="upgTable">
+			<div v-for="row in layers[layer].achievements.rows" class="upgRow">
+				<div v-for="col in layers[layer].achievements.cols"><div v-if="layers[layer].achievements[row*10+col]!== undefined && tmp[layer].achievements[row*10+col].unlocked" class="upgAlign">
+					<achievement :layer = "layer" :data = "row*10+col" v-bind:style="tmp[layer].componentStyles.achievement"></achievement>
+				</div></div>
+			</div>
+			<br>
+		</div>
+		`
+	})
+
+	// data = id
+	Vue.component('achievement', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="layers[layer].achievements && layers[layer].achievements[data]!== undefined && tmp[layer].achievements[data].unlocked" v-bind:class="{ [layer]: true, achievement: true, locked: !hasAchievement(layer, data), bought: hasAchievement(layer, data)}"
+			v-bind:tooltip="
+				hasAchievement(layer, data) ? (tmp[layer].achievements[data].doneTooltip ? tmp[layer].achievements[data].doneTooltip : 'You did it!')
+				: (tmp[layer].achievements[data].goalTooltip ? tmp[layer].achievements[data].goalTooltip : 'LOCKED')
+			"
+
+			v-bind:style="[(!tmp[layer].achievements[data].unlocked) ? {'visibility': 'hidden'} : {}, tmp[layer].achievements[data].style,]">
+			<span v-if= "tmp[layer].achievements[data].name"><br><h3 v-html="tmp[layer].achievements[data].name"></h3><br></span>
+		</div>
+		`
+	})
+
 
 	// NOT FOR USE IN STANDARD TAB FORMATTING
 	Vue.component('tab-buttons', {

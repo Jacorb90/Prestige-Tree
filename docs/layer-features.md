@@ -90,6 +90,10 @@ Key:
 - bars: Display some information as a progress bar, gague, or similar. They are highly customizable, and can be vertical as well.
     [Explanations are in a separate file.](bars.md)
 
+- achievements: Kind of like milestones, but with a different display style and some other differences. Extra features are on the way at a later date!
+    [Explanations are in a separate file.](achievements.md)
+
+
 # Prestige formula features
 
 - baseResource: The name of the resource that determines how much of the main currency you gain on reset.

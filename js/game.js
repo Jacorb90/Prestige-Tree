@@ -17,9 +17,9 @@ let modInfo = {
 // Set your version in num and name, but leave the tmt values so people know what version it is
 let VERSION = {
 	num: "2.0",
-	name: "Finally making some progress!",
+	name: "Pinnacle of Achievement Mountain",
 	tmtNum: "2.0",
-	tmtName: "Finally making some progress!"
+	tmtName: "Pinnacle of Achievement Mountain"
 }
 
 // Determines if it should show points/sec
@@ -182,6 +182,7 @@ function doReset(layer, force=false) {
 		
 		addPoints(layer, gain)
 		updateMilestones(layer)
+		updateAchievements(layer)
 
 		if (!player[layer].unlocked) {
 			player[layer].unlocked = true;
@@ -312,6 +313,7 @@ function gameLoop(diff) {
 
 	for (layer in layers){
 		if (layers[layer].milestones) updateMilestones(layer);
+		if (layers[layer].achievements) updateAchievements(layer)
 	}
 
 	if (player.hasNaN&&!NaNalert) {

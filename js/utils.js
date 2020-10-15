@@ -93,6 +93,7 @@ function getStartPlayer() {
 		playerdata[layer].spentOnBuyables = new Decimal(0)
 		playerdata[layer].upgrades = []
 		playerdata[layer].milestones = []
+		playerdata[layer].achievements = []
 		playerdata[layer].challenges = getStartChallenges(layer)
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 			playerdata.subtabs[layer] = {}
@@ -368,6 +369,10 @@ function hasMilestone(layer, id){
 	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString()))
 }
 
+function hasAchievement(layer, id){
+	return (player[layer].achievements.includes(toNumber(id)) || player[layer].achievements.includes(id.toString()))
+}
+
 function hasChallenge(layer, id){
 	return (player[layer].challenges[id])
 }
@@ -404,6 +409,9 @@ function buyableEffect(layer, id){
 	return (tmp[layer].buyables[id].effect)
 }
 
+function achievementEffect(layer, id){
+	return (tmp[layer].achievements[id].effect)
+}
 
 function canAffordPurchase(layer, thing, cost) {
 	if (thing.currencyInternalName){
@@ -537,6 +545,15 @@ function updateMilestones(layer){
 	for (id in layers[layer].milestones){
 		if (!(player[layer].milestones.includes(id)) && layers[layer].milestones[id].done())
 			player[layer].milestones.push(id)
+	}
+}
+
+function updateAchievements(layer){
+	for (id in layers[layer].achievements){
+		if (!isNaN(id) && !(player[layer].achievements.includes(id)) && layers[layer].achievements[id].done()) {
+			player[layer].achievements.push(id)
+			if (layers[layer].achievements[id].onComplete) layers[layer].achievements[id].onComplete()
+		}
 	}
 }
 

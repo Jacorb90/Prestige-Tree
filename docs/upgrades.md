@@ -1,7 +1,5 @@
 # Upgrades
 
-Upgrades are stored in the following format:
-
 Useful functions for dealing with Upgrades and implementing their effects:
 
 - hasUpgrade(layer, id): determine if the player has the upgrade
@@ -9,6 +7,7 @@ Useful functions for dealing with Upgrades and implementing their effects:
 
 Hint: Basic point gain is calculated in game.js's "getPointGain".
 
+Upgrades are stored in the following format:
 
 ```js
     upgrades: {

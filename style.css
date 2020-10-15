@@ -200,6 +200,20 @@ h1, h2, h3, b, input {
 	font-size: 10px;
 }
 
+.achievement {
+	height: 90px;
+	width: 90px;
+	border-radius: 25%;
+	border: 2px solid;
+	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	font-size: 10px;
+	color: white;
+	text-shadow: 0px 0px 2px #000000;
+}
+.achievement:hover {
+	box-shadow: 0px 0px 10px var(--points);
+}
+
 .buyable {
 	height: 200px;
 	width: 200px;
@@ -541,6 +555,7 @@ ul {
 .treeOverlay {
 	z-index: 200000;
 	pointer-events:none; 
+	overflow:hidden;
 }
 
 .overlayThing {
@@ -551,6 +566,6 @@ ul {
 .sideLayers {
 	pointer-events:auto;
 	position: absolute;
-	right: 35px;
-	top: 55px;
+	right: 55px;
+	top: 65px;
 }

@@ -52,6 +52,16 @@ function updateLayers(){
                 }
             }
         }
+        if (layers[layer].achievements){
+            for (thing in layers[layer].achievements){
+                if (!isNaN(thing)){
+                    layers[layer].achievements[thing].id = thing
+                    layers[layer].achievements[thing].layer = layer
+                    if (layers[layer].achievements[thing].unlocked === undefined)
+                        layers[layer].achievements[thing].unlocked = true
+                }
+            }
+        }
         if (layers[layer].challenges){
             for (thing in layers[layer].challenges){
                 if (!isNaN(thing)){

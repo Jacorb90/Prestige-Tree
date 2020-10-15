@@ -1,6 +1,6 @@
 #Milestones
 
-Milestones should be formatted like this:
+Milestones are awarded to the player when they meet a certain goal, and give some benefit. Milestones should be formatted like this:
 
 ```js
     milestones: {
@@ -21,7 +21,7 @@ Milestone features:
 - effectDesc: A string describing the reward for having the milestone. *You will have to implement the reward elsewhere.*
               It can also be a function that returns updating text. Can use basic HTML.
 
-- done(): A function returning a boolean to determine if the milestone has been fulfilled.
+- done(): A function returning a boolean to determine if the milestone should be awarded.
 
 - toggles: *optional*, Creates toggle buttons that appear on the milestone when it is unlocked.
            The toggles can toggle a given boolean value in a layer.
