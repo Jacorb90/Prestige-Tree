@@ -486,7 +486,7 @@ addLayer("a", {
                 name: "EIEIO",
                 done() {return player.f.points.gte(1)},
                 goalTooltip: "Get a farm point.", // Shows when achievement is not completed
-                doneTooltip: "Get a farm point.\n\nReward: The dinosaur is now your friend.", // Showed when the achievement is completed
+                doneTooltip: "Get a farm point.\n\nReward: The dinosaur is now your friend (you can max Farm Points).", // Showed when the achievement is completed
                 onComplete() {console.log("Bork bork bork!")}
             },
         },
