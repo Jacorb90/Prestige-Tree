@@ -162,7 +162,7 @@ Key:
                 It can include things like "points", "best", "total" (for this layer's prestige currency), "upgrades", 
                 any unique variables like "generatorPower", etc.
                 If you want to only keep specific upgrades or something like that, save them in a separate variable, then
-                call resetLayerData, and then set player[layer].upgrades to the saved upgrades.
+                call layerDataReset, and then set player[layer].upgrades to the saved upgrades.
 
 - update(diff): **optional**, this function is called every game tick. Use it for any passive resource production or
                 time-based things. diff is the time since the last tick.
