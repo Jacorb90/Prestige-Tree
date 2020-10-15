@@ -34,7 +34,7 @@ function format(decimal, precision=2) {
 		var slog = decimal.slog()
 		if (slog.gte(1e6)) return "F" + format(slog.floor())
 		else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-	} else if (decimal.gte("1e1000")) return (Math.floor(decimal.mantissa + 0.01) + ("e"+formatWhole(decimal.log10())))
+	} else if (decimal.gte("1e1000")) return (Math.floor(decimal.mantissa + 0.01) + ("e"+formatWhole(decimal.log10().floor())))
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
@@ -78,7 +78,7 @@ function startPlayerBase() {
 		timePlayed: 0,
 		keepGoing: false,
 		hasNaN: false,
-		hideChalls: false,
+		hideChallenges: false,
 		points: new Decimal(10),
 		subtabs: {},
 	}
@@ -89,10 +89,12 @@ function getStartPlayer() {
 	for (layer in layers){
 		playerdata[layer] = layers[layer].startData()
 		playerdata[layer].buyables = getStartBuyables(layer)
+		if(playerdata[layer].clickables == undefined) playerdata[layer].clickables = getStartClickables(layer)
 		playerdata[layer].spentOnBuyables = new Decimal(0)
 		playerdata[layer].upgrades = []
 		playerdata[layer].milestones = []
-		playerdata[layer].challs = []
+		playerdata[layer].achievements = []
+		playerdata[layer].challenges = getStartChallenges(layer)
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 			playerdata.subtabs[layer] = {}
 			playerdata.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
@@ -104,6 +106,37 @@ function getStartPlayer() {
 		}
 	}
 	return playerdata
+}
+
+
+function getStartBuyables(layer){
+	let data = {}
+	if (layers[layer].buyables) {
+		for (id in layers[layer].buyables)
+			if (!isNaN(id))
+				data[id] = new Decimal(0)
+	}
+	return data
+}
+
+function getStartClickables(layer){
+	let data = {}
+	if (layers[layer].clickables) {
+		for (id in layers[layer].clickables)
+			if (!isNaN(id))
+				data[id] = ""
+	}
+	return data
+}
+
+function getStartChallenges(layer){
+	let data = {}
+	if (layers[layer].challenges) {
+		for (id in layers[layer].challenges)
+			if (!isNaN(id))
+				data[id] = 0
+	}
+	return data
 }
 
 function fixSave() {
@@ -136,7 +169,7 @@ function fixData(defaultData, newData) {
 				newData[item] = new Decimal(newData[item])
 		}
 		else if ((!!defaultData[item]) && (defaultData[item].constructor === Object)) {
-			if (newData[item] === undefined)
+			if (newData[item] === undefined || (defaultData[item].constructor !== Object))
 				newData[item] = defaultData[item]
 			else
 				fixData(defaultData[item], newData[item])
@@ -310,11 +343,162 @@ function milestoneShown(layer, id) {
 	return false;
 }
 
+
+
+// ************ Big Feature related ************
+
+function respecBuyables(layer) {
+	if (!layers[layer].buyables) return
+	if (!layers[layer].buyables.respec) return
+	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + (layers[layer].name ? layers[layer].name : layer) + "\" reset as well!")) return
+	layers[layer].buyables.respec()
+	updateBuyableTemp(layer)
+}
+
+function canAffordUpgrade(layer, id) {
+	let upg = layers[layer].upgrades[id]
+	let cost = tmp[layer].upgrades[id].cost
+	return canAffordPurchase(layer, upg, cost) 
+}
+
+function hasUpgrade(layer, id){
+	return (player[layer].upgrades.includes(toNumber(id)) || player[layer].upgrades.includes(id.toString()))
+}
+
+function hasMilestone(layer, id){
+	return (player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString()))
+}
+
+function hasAchievement(layer, id){
+	return (player[layer].achievements.includes(toNumber(id)) || player[layer].achievements.includes(id.toString()))
+}
+
+function hasChallenge(layer, id){
+	return (player[layer].challenges[id])
+}
+
+function challengeCompletions(layer, id){
+	return (player[layer].challenges[id])
+}
+
+function getBuyableAmount(layer, id){
+	return (player[layer].buyables[id])
+}
+
+function setBuyableAmount(layer, id, amt){
+	player[layer].buyables[id] = amt
+}
+
+function getClickableState(layer, id){
+	return (player[layer].clickables[id])
+}
+
+function setClickableState(layer, id, state){
+	player[layer].clickables[id] = state
+}
+
+function upgradeEffect(layer, id){
+	return (tmp[layer].upgrades[id].effect)
+}
+
+function challengeEffect(layer, id){
+	return (tmp[layer].challenges[id].effect)
+}
+
+function buyableEffect(layer, id){
+	return (tmp[layer].buyables[id].effect)
+}
+
+function achievementEffect(layer, id){
+	return (tmp[layer].achievements[id].effect)
+}
+
+function canAffordPurchase(layer, thing, cost) {
+	if (thing.currencyInternalName){
+		let name = thing.currencyInternalName
+		if (thing.currencyLayer){
+			let lr = thing.currencyLayer
+			return !(player[lr][name].lt(cost)) 
+		}
+		else {
+			return !(player[name].lt(cost))
+		}
+	}
+	else {
+		return !(player[layer].points.lt(cost))
+	}
+}
+
+function buyUpg(layer, id) {
+	if (!player[layer].unlocked) return
+	if (!layers[layer].upgrades[id].unlocked) return
+	if (player[layer].upgrades.includes(id)) return
+	let upg = layers[layer].upgrades[id]
+	let cost = tmp[layer].upgrades[id].cost
+
+	if (upg.currencyInternalName){
+		let name = upg.currencyInternalName
+		if (upg.currencyLayer){
+			let lr = upg.currencyLayer
+			if (player[lr][name].lt(cost)) return
+			player[lr][name] = player[lr][name].sub(cost)
+		}
+		else {
+			if (player[name].lt(cost)) return
+			player[name] = player[name].sub(cost)
+		}
+	}
+	else {
+		if (player[layer].points.lt(cost)) return
+		player[layer].points = player[layer].points.sub(cost)	
+	}
+	player[layer].upgrades.push(id);
+	if (upg.onPurchase != undefined)
+		upg.onPurchase()
+}
+
+function buyMaxBuyable(layer, id) {
+	if (!player[layer].unlocked) return
+	if (!tmp[layer].buyables[id].unlocked) return
+	if (!tmp[layer].buyables[id].canAfford) return
+	if (!layers[layer].buyables[id].buyMax) return
+
+	layers[layer].buyables[id].buyMax()
+	updateBuyableTemp(layer)
+}
+
+function buyBuyable(layer, id) {
+	if (!player[layer].unlocked) return
+	if (!tmp[layer].buyables[id].unlocked) return
+	if (!tmp[layer].buyables[id].canAfford) return
+
+	layers[layer].buyables[id].buy()
+	updateBuyableTemp(layer)
+}
+
+function clickClickable(layer, id) {
+	if (!player[layer].unlocked) return
+	if (!tmp[layer].clickables[id].unlocked) return
+	if (!tmp[layer].clickables[id].canClick) return
+
+	layers[layer].clickables[id].onClick()
+	updateClickableTemp(layer)
+}
+
+// Function to determine if the player is in a challenge
+function inChallenge(layer, id){
+	let challenge = player[layer].activeChallenge
+	if (challenge==toNumber(id)) return true
+
+	if (layers[layer].challenges[challenge].countsAs)
+		return layers[layer].challenges[id].countsAs.includes(id)
+}
+
 // ************ Misc ************
 
 var onTreeTab = true
 function showTab(name) {
-	if (LAYERS.includes(name) && !layerUnl(name)) return
+	if (LAYERS.includes(name) && !layerunlocked(name)) return
 
 	var toTreeTab = name == "tree"
 	player.tab = name
@@ -328,22 +512,22 @@ function showTab(name) {
 }
 
 function notifyLayer(name) {
-	if (player.tab == name || !layerUnl(name)) return
+	if (player.tab == name || !layerunlocked(name)) return
 	player.notify[name] = 1
 }
 
 function nodeShown(layer) {
-	if (tmp.layerShown[layer]) return true
+	if (tmp[layer].layerShown) return true
 	switch(layer) {
 		case "idk":
-			return player.l.unl
+			return player.l.unlocked
 			break;
 	}
 	return false
 }
 
-function layerUnl(layer) {
-	return LAYERS.includes(layer) && (player[layer].unl || (tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) && layers[layer].layerShown()))
+function layerunlocked(layer) {
+	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].baseAmount.gte(tmp[layer].requires) && layers[layer].layerShown()))
 }
 
 function keepGoing() {
@@ -361,6 +545,15 @@ function updateMilestones(layer){
 	for (id in layers[layer].milestones){
 		if (!(player[layer].milestones.includes(id)) && layers[layer].milestones[id].done())
 			player[layer].milestones.push(id)
+	}
+}
+
+function updateAchievements(layer){
+	for (id in layers[layer].achievements){
+		if (!isNaN(id) && !(player[layer].achievements.includes(id)) && layers[layer].achievements[id].done()) {
+			player[layer].achievements.push(id)
+			if (layers[layer].achievements[id].onComplete) layers[layer].achievements[id].onComplete()
+		}
 	}
 }
 
@@ -398,7 +591,7 @@ document.onkeydown = function(e) {
 	if (onFocused) return
 	if (ctrlDown && key != "-" && key != "_" && key != "+" && key != "=" && key != "r" && key != "R" && key != "F5") e.preventDefault()
 	if(hotkeys[key]){
-		if (player[hotkeys[key].layer].unl)
+		if (player[hotkeys[key].layer].unlocked)
 			hotkeys[key].onPress()
 	}
 }
@@ -408,4 +601,25 @@ function focused(x) {
 	onFocused = x
 }
 
+function prestigeButtonText(layer)
+{
+	if(tmp[layer].type == "normal")
+		return `${ player[layer].points.lt(1e3) ? (tmp[layer].resetDescription !== undefined ? tmp[layer].resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource} ${tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3) ? `<br><br>Next at ${ (tmp[layer].roundUpCost ? formatWhole(tmp[layer].nextAt) : format(tmp[layer].nextAt))} ${ tmp[layer].baseResource }` : ""}`
+	else if(tmp[layer].type== "static")
+		return `${tmp[layer].resetDescription !== undefined ? tmp[layer].resetDescription : "Reset for "}+<b>${formatWhole(tmp[layer].resetGain)}</b> ${tmp[layer].resource}<br><br>${player[layer].points.lt(20) ? (tmp[layer].baseAmount.gte(tmp[layer].nextAt)&&(tmp[layer].canBuyMax !== undefined) && tmp[layer].canBuyMax?"Next":"Req") : ""}: ${formatWhole(tmp[layer].baseAmount)} / ${(tmp[layer].roundUpCost ? formatWhole(tmp[layer].nextAtDisp) : format(tmp[layer].nextAtDisp))} ${ tmp[layer].baseResource }		
+		`
+	else if(tmp[layer].type == "none")
+		return ""
+	else
+		return layers[layer].prestigeButtonText()
+}
+
+
+
+
+
+function isFunction(obj) {
+	return !!(obj && obj.constructor && obj.call && obj.apply);
+  };
+  
 document.title = modInfo.name

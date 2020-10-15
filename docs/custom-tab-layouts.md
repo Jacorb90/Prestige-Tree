@@ -17,15 +17,15 @@ Custom tab layouts can be used to do basically anything in a tab window, especia
             "milestones", "blank", "blank", "upgrades"]
 ```
 
-It is a list of components, which can be either just a name, or an array with arguments. If it's an array, the first item is the name of the component, the second is the data passed into it, and the third (optional) is a CSS object,
-which applies its style to the component.
+It is a list of components, which can be either just a name, or an array with arguments. If it's an array,
+the first item is the name of the component, the second is the data passed into it, and the third (optional)
+applies a CSS style to it with a "CSS object", where the keys are CSS attributes.
 
 These are the existing components, but you can create more in v.js:
 
-- display-text: Displays some text. The argument is the text to display. It can also be a function that returns updating text.
+- display-text: Displays some text (can use basic HTML). The argument is the text to display. It can also be a function that returns updating text.
 
-- raw-html: Displays some HTML. The argument is the HTML as a string, or a function that returns updating HTML.
-            It doesn't work with many vue things.
+- raw-html: Displays some basic HTML, can also be a function.
 
 - blank: Adds empty space. The default dimensions are 8px x 17px. The argument changes the dimensions.
          If it's a single value (e.g. "20px"), that determines the height.
@@ -36,15 +36,17 @@ These are the existing components, but you can create more in v.js:
 - prestige-button: The argument is a string that the prestige button should say before the amount of
                    currency you will gain. It can also be a function that returns updating text.
 
-- upgrades, milestones, challs: Display the upgrades, milestones, and challenges for a layer, as appropriate.
+- upgrades, milestones, challs, achievements: Display the upgrades, milestones, and challenges for a layer, as appropriate.
 
-- buyables: Display all of the buyables for this layer, as appropriate. The argument optional, and is the size of the
-            boxes in pixels.
+- buyables, clickables: Display all of the buyables/clickables for this layer, as appropriate. The argument optional,
+            and is the size of the boxes in pixels.
 
 - microtabs: Display a set of subtabs for an area. The argument is the name of the set of microtabs in the "microtabs" feature.
 
-- upgrade, milestone, chall, buyable: An individual upgrade, challenge, etc. The argument is the id.
+- upgrade, milestone, chall, buyable, clickable, achievement: An individual upgrade, challenge, etc. The argument is the id.
         This can be used if you want to have upgrades split up across multiple subtabs, for example.
+
+- bar: Display a bar. The argument is the id of the bar to display.
 
 - toggle: A toggle button that toggles a bool value. The data is a pair that identifies what bool to toggle, [layer, id]
 

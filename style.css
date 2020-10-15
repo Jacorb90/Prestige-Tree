@@ -49,12 +49,10 @@ td {
 }
 
 .upgAlign {
-	height: 120px;
 	vertical-align: 0
 }
 
 .bigUpgAlign {
-	height: 200px;
 	vertical-align: 0
 }
 
@@ -67,7 +65,7 @@ h1, h2, h3, b, input {
 	height: 100px;
 	width: 100px;
 	border: var(--hqProperty1);
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	border-radius: 50%;
 	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
 	font-size: 40px;
@@ -75,6 +73,20 @@ h1, h2, h3, b, input {
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
 }
+
+.smallNode {
+	height: 60px;
+	width: 60px;
+	border: var(--hqProperty1);
+	border-color: rgba(0, 0, 0, 0.125);
+	border-radius: 50%;
+	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
+	font-size: 30px;
+	font-family: "Lucida Console", "Courier New", monospace;
+	color: rgba(0, 0, 0, 0.5);
+	text-shadow: var(--hqProperty3);
+}
+
 
 .locked {
 	background-color: #bf8f8f;
@@ -92,7 +104,7 @@ h1, h2, h3, b, input {
 
 .treeNode.notify {
 	transform: scale(1.1, 1.1);
-	border-color: rgba(255, 0, 0, 0.125) rgba(255, 0, 0, 0.25) rgba(255, 0, 0, 0.25) rgba(255, 0, 0, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	box-shadow: var(--hqProperty2a), 0px 0px 20px #ff0000;
 	z-index: 3
 }
@@ -124,9 +136,37 @@ h1, h2, h3, b, input {
 	text-shadow: 0px 0px 7px var(--color);
 }
 
+.barBorder {
+	border: 2px solid;
+	border-radius: 10%;
+	border-color: var(--color);
+	overflow: hidden;
+	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+}
+
+.overlayTextContainer {
+	z-index: 3;
+	border-radius: 10%;
+	vertical-align: middle;
+	display: flex;
+	justify-content: center;
+	align-items: left;
+	position: absolute;
+}
+
+.fill {
+	background-color: var(--color);
+	border-radius: 5%;
+    position: absolute;
+	overflow: hidden;
+}
+
+.overlayText {
+	z-index: 6;
+}
+
 .tabButton {
 	background-color: transparent;
-	border: none;
 	color: var(--color);
 	font-size: 20px;
 	cursor: pointer;
@@ -134,7 +174,7 @@ h1, h2, h3, b, input {
 	margin: 5px 5px 5px 5px;
 	border-radius: 25%;
 	border: 2px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 
 }
 
@@ -148,7 +188,7 @@ h1, h2, h3, b, input {
 	width: 180px;
 	border-radius: 25%;
 	border: 4px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 }
 
 .upg {
@@ -156,8 +196,22 @@ h1, h2, h3, b, input {
 	width: 120px;
 	border-radius: 25%;
 	border: 2px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	font-size: 10px;
+}
+
+.achievement {
+	height: 90px;
+	width: 90px;
+	border-radius: 25%;
+	border: 2px solid;
+	border-color: rgba(0, 0, 0, 0.125);
+	font-size: 10px;
+	color: white;
+	text-shadow: 0px 0px 2px #000000;
+}
+.achievement:hover {
+	box-shadow: 0px 0px 10px var(--points);
 }
 
 .buyable {
@@ -165,7 +219,7 @@ h1, h2, h3, b, input {
 	width: 200px;
 	border-radius: 25%;
 	border: 2px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	font-size: 10px;
 }
 
@@ -174,7 +228,7 @@ h1, h2, h3, b, input {
 	width: 200px;
 	border-radius: 25%;
 	border: 2px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 }
 
 .longUpg {
@@ -183,7 +237,7 @@ h1, h2, h3, b, input {
 	background: var(--points);
 	border-radius: 50%;
 	border: 2px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	font-size: 10px;
 }
 
@@ -192,7 +246,7 @@ h1, h2, h3, b, input {
 	width: 40px;
 	border-radius: 25%;
 	border: 2px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 }
 
 #points {
@@ -319,7 +373,7 @@ a {
 	background-color: #bf8f8f;
 	border: 4px solid;
 	border-radius: 4px;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	color: rgba(0, 0, 0, 0.5);
 }
 
@@ -329,7 +383,7 @@ a {
 	background-color: #77bf5f;
 	border: 4px solid;
 	border-radius: 4px;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	color: rgba(0, 0, 0, 0.5);
 }
 
@@ -359,6 +413,14 @@ a {
 	overflow-y: auto;
 	overflow-x: auto;
 	transition-duration: 0s
+}
+
+.instant {
+	transition-duration: 0s !important
+}
+
+.fast {
+	transition:color none
 }
 
 .col.right {
@@ -394,10 +456,10 @@ ul {
 	list-style-type: none;
 }
 
-.hChall {
+.hChallenge {
 	background-color: #bf8f8f;
 	border: 4px solid;
-	border-color: rgba(255, 255, 255, 0.125) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.25) rgba(255, 255, 255, 0.125);
+	border-color: rgba(0, 0, 0, 0.125);
 	color: rgba(0, 0, 0, 0.5);
 	width: 300px;
 	height: 300px;
@@ -405,11 +467,11 @@ ul {
 	border-radius: 33.33%;
 }
 
-.hChall.done {
+.hChallenge.done {
 	background-color: #77bf5f;
 }
 
-.hChall.canComplete {
+.hChallenge.canComplete {
 	background-color: #ffbf00;
 }
 
@@ -488,4 +550,22 @@ ul {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+}
+
+.treeOverlay {
+	z-index: 200000;
+	pointer-events:none; 
+	overflow:hidden;
+}
+
+.overlayThing {
+	pointer-events:auto;
+	background-color: var(--background);
+}
+
+.sideLayers {
+	pointer-events:auto;
+	position: absolute;
+	right: 55px;
+	top: 65px;
 }
