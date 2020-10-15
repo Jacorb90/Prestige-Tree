@@ -96,6 +96,14 @@ Key:
 
 # Prestige formula features
 
+- type: Determines which prestige formula you use.
+    "normal": The amount of currency you gain is independent of its current amount (like Prestige).
+        formula before bonuses is based on `baseResource^exponent`
+    "static": The cost is dependent on your total after reset. 
+        formula before bonuses is based on `base^(x^exponent)`
+    "custom": You can define everything, from the calculations to the text on the button, yourself. (See more at the bottom)
+    "none": This layer does not prestige, and therefore does not need any of the other features in this section.
+
 - baseResource: The name of the resource that determines how much of the main currency you gain on reset.
 
 - baseAmount(): A function that gets the current value of the base resource.
@@ -103,13 +111,6 @@ Key:
 - requires: A Decimal, the amount of the base needed to gain 1 of the prestige currency.
             Also the amount required to unlock the layer.
             You can instead make this a function, to make it harder if another layer was unlocked first (based on "order").
-
-- type: Determines which prestige formula you use.
-    "normal": The amount of currency you gain is independent of its current amount (like Prestige).
-        formula before bonuses is based on `baseResource^exponent`
-    "static": The cost is dependent on your total after reset. 
-        formula before bonuses is based on `base^(x^exponent)`
-    "custom": You can define everything, from the calculations to the text on the button, yourself. (See more at the bottom)
 
 - exponent: Used as described above.
 

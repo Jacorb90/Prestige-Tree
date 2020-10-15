@@ -42,7 +42,8 @@ function getPointGen() {
 function getResetGain(layer, useType = null) {
 	let type = useType
 	if (!useType) type = layers[layer].type
-
+	if(tmp[layer].type == "none")
+		return new Decimal (0)
 	if (tmp[layer].gainExp.eq(0)) return new Decimal(0)
 	if (type=="static") {
 		if ((!layers[layer].canBuyMax()) || tmp[layer].baseAmount.lt(tmp[layer].requires)) return new Decimal(1)
@@ -63,6 +64,8 @@ function getResetGain(layer, useType = null) {
 function getNextAt(layer, canMax=false, useType = null) {
 	let type = useType
 	if (!useType) type = layers[layer].type
+	if(tmp[layer].type == "none")
+		return new Decimal (Infinity)
 
 	if (tmp[layer].gainMult.lte(0)) return new Decimal(Infinity)
 	if (tmp[layer].gainExp.lte(0)) return new Decimal(Infinity)
@@ -110,6 +113,8 @@ function canReset(layer)
 		return tmp[layer].baseAmount.gte(tmp[layer].requires)
 	else if(tmp[layer].type== "static")
 		return tmp[layer].baseAmount.gte(tmp[layer].nextAt) 
+	if(tmp[layer].type == "none")
+		return false
 	else
 		return layers[layer].canReset()
 }

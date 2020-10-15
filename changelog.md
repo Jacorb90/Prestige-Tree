@@ -1,6 +1,6 @@
-#T he Modding Tree changelog:
+# The Modding Tree changelog:
 
-# v2.0 10/14/20
+## v2.0 10/14/20
 - Added progress bars, which are highly customizable and can be horizontal or vertical!
 - Added "side layers", displayed smaller and off to the side, and don't get reset by default.
     They can be used for global achievements and statistics. Speaking of which...
@@ -8,6 +8,7 @@
 - Added clickables, a more generalized variant of buyables.
 - Almost every value in layer data can be either a function or a constant value!
 - Added support for multiple completions of challenges.
+- Added "none" prestige type, which removes the need for any other prestige-related features.
 - The points display and other gui elements stay at the top of the screen when the tree scrolls.
 - Added getter/setter functions for the amounts and effects of most Big Features
 - Moved modInfo to game.js, added a spot in modInfo for a Discord link, changelog link.
@@ -22,26 +23,27 @@
 - Changed the reset functions to make keeping things easier
 - Renamed many things to increase readability (see something or other for a list)
 - Improved documentation based on feedback
+
   [For a full list of changes to the format and functionality of existing things, click here.](2.0-format-changes.md)
 
 
 
-## v1.3.5
+### v1.3.5
 
 - Completely automated convertToDecimal, now you never have to worry about it again.
 - Branches can be defined without a color id. But they can also use hex values for color ids!
 - Created a tutorial for getting started with TMT and Github.
 - Page title is now automatically taken from mod name.
 
-## v1.3.4: 10/8/20
+### v1.3.4: 10/8/20
 
 - Added "midsection" feature to add things to a tab's layout while still keeping the standard layout.
 - Fix for being able to buy more buyables than you should.
 
-## v1.3.3: - 10/7/20
+### v1.3.3: - 10/7/20
 - Fix for the "order of operations" issue in temp.
 
-## v1.3.1: - 10/7/20
+### v1.3.1: - 10/7/20
 
 - Added custom CSS and tooltips for Layer Nodes.
 - Added custom CSS for upgrades, buyables, milestones, and challenges, both individually and layer-wide.
@@ -64,20 +66,20 @@
 
 
 
-## v1.2.4 - 10/4/20
+### v1.2.4 - 10/4/20
 
 - Layers are now highlighted if you can buy an upgrade, and a new feature, shouldNotify,
 lets you make it highlight other ways.
 - Fixed bugs with hasUpg, hasChall, hasMilestone, and inChallenge.
 - Changed the sample code to use the above functions for convenience.
 
-## v1.2.3 - 10/3/20
+### v1.2.3 - 10/3/20
 
 - Added a row component, which displays a list of objects in a row.
 - Added a column component, which displays a list of objects in a column (useful within a row).
 - Changed blanks to have a customizable width and height.
 
-# v1.2: This Changes Everything! - 10/3/20
+## v1.2: This Changes Everything! - 10/3/20
 
 - Many layer features can now be static values or functions. (This made some formats change,
 which will break old things)
@@ -90,11 +92,11 @@ which will break old things)
 
 
 
-## v1.1.1
+### v1.1.1
 
 - You can define hotkeys directly from layer config.
 
-# v1.1: Enhanced Edition
+## v1.1: Enhanced Edition
 
 - Added "Buyables", which can function like Space Buildings or Enhancers.
 - Custom CSS can now be used on any component! Make the third argument an object with CSS
@@ -102,5 +104,5 @@ parameters.
 - Lots of minor good things.
 
 
-# v1.0:
+## v1.0:
 - First release.

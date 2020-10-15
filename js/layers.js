@@ -460,18 +460,8 @@ addLayer("a", {
 			points: new Decimal(0),
         }},
         color: "yellow",
-        requires: new Decimal (1), 
         resource: "achievement power", 
-        baseResource: "achievements", 
-        baseAmount() {return player.points},
-        type: "normal", // A "Custom" type which is effectively static
-        exponent: 0.5,
-        gainMult() {
-            return new Decimal(1)
-        },
-        gainExp() {
-            return new Decimal(1)
-        },
+        type: "none",
         row: "side",
         layerShown() {return true}, 
         tooltip() { // Optional, tooltip displays when the layer is locked
@@ -500,8 +490,8 @@ addLayer("a", {
                 onComplete() {console.log("Bork bork bork!")}
             },
         },
-        tabFormat: [
-            "main-display", "blank", "blank", "achievements",
+        midsection: [
+            "achievements",
         ]
     }, 
 )

@@ -148,8 +148,10 @@
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<div v-if="!layers[layer].tabFormat">
 					<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
-					<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>
-					<span v-if="tmp[layer].type=='normal' && tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp[layer].baseAmt)}} {{tmp[layer].baseResource}}</span>
+					<div v-if="tmp[layer].type !== 'none'">
+						<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>
+						<span v-if="tmp[layer].type=='normal' && tmp[layer].resetGain.lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp[layer].baseAmt)}} {{tmp[layer].baseResource}}</span>
+					</div>
 					<br><br>
 					<span v-if="player[layer].best != undefined">Your best {{tmp[layer].resource}} is {{formatWhole(player[layer].best)}}<br></span>
 					<span v-if="player[layer].total != undefined">You have made a total of {{formatWhole(player[layer].total)}} {{tmp[layer].resource}}<br></span>
