@@ -1,25 +1,28 @@
 #The Modding Tree changelog:
 
 ##v2.0
-Added progress bars, which are highly customizable and can be horizontal or vertical!
-Added clickables, a more generalized variant of buyables.
-Support for multiple completions of challenges.
-The points display and other gui elements stay at the top of the screen when the tree scrolls.
-Added getter/setter functions for buyable amount and such
-Moved modInfo to game.js, added a spot for a Discord link, changelog link, and a separate mod version from the TMT version
-Tree structure is based on layer data, no index.html needed.
-Tmp does not need to be manually updated.
-Almost every value in layer data can be a function or a constant value!
-You don't have to have the same amount of upgrades in every row (and challs and buyables)
-Unl is optional for all Big Components (defaults to true).
-effectDisplay in Challenges and Upgrades no longer takes an argument, as well as buyable effect.
-Buyable cost can take an argument for amount of buyables, but if one is not supplied it should do the cost of the next buyable.
-All displays will update correctly.
-Changelog is no longer in index.html at all.
-Generation of Points now happens in the main game loop (not in a layer update function), enabled by canGenPoints in game.js
-Renamed many things to increase readability (see something or other for a list)
-Improved documentation based on feedback
-Changed fullLayerReset to resetLayerData with ways to keep things
+- Added progress bars, which are highly customizable and can be horizontal or vertical!
+- Added "side layers", displayed smaller and off to the side, and don't get reset by default.
+    They can be used for global achievements and statistics. Speaking of which...
+- Added achievements!
+- Added clickables, a more generalized variant of buyables.
+- Almost every value in layer data can be either a function or a constant value!
+- Added support for multiple completions of challenges.
+- The points display and other gui elements stay at the top of the screen when the tree scrolls.
+- Added getter/setter functions for the amounts and effects of most Big Features
+- Moved modInfo to game.js, added a spot in modInfo for a Discord link, changelog link.
+    Also added a separate mod version from the TMT version in VERSION.
+- Tree structure is based on layer data, no index.html editing is needed.
+- Tmp does not need to be manually updated.
+- You don't have to have the same amount of upgrades in every row (and challs and buyables)
+- "unlocked" is optional for all Big Components (defaults to true).
+- All displays will update correctly.
+- Changelog is no longer in index.html at all.
+- Generation of Points now happens in the main game loop
+- Changed the reset functions to make keeping things easier
+- Renamed many things to increase readability (see something or other for a list)
+- Improved documentation based on feedback
+  [For a full list of changes to the format and functionality of existing things, click here.](2.0-format-changes.md)
 
 ##v1.3.5
 
@@ -98,30 +101,3 @@ parameters.
 
 #v1.0:
 - First release.
-
-
-Make it clear that anything can be a function
-
-buyables.md: cost is a Decimal
-
-Define "CSS Object" clearly in the first instance in each file
-
-Explain automagical assignments better
-
-
-"incr_order", 
-
-
-All instances of: 
-    chall -> challenge
-    unl -> unlocked
-    upg -> upgrade
-    amt -> amount
-    desc -> description
-    resCeil -> roundUpCost
-
-Challenges:
-    desc -> challengeDescription
-    reward -> rewardDescription
-    effect -> rewardEffect
-    effectDisplay -> rewardDisplay
