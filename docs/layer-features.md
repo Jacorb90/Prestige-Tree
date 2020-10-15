@@ -141,7 +141,7 @@ Key:
             and layers are sorted in alphabetical order.
 
 - branches: **optional**, an array of layer ids. On a tree, a line will appear from this layer to all of the layers
-            in the list. Alternatively, an entry in the array can be a pair consisting of the layer id and a color
+            in the list. Alternatively, an entry in the array can be a 2-element array consisting of the layer id and a color
             value. The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors)
 
 - nodeStyle: **optional**,  a CSS object, where the keys are CSS attributes, which styles this layer's node on the tree

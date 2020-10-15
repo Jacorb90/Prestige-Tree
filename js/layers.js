@@ -11,8 +11,8 @@ addLayer("c", {
             buyables: {}, // You don't actually have to initialize this one
             beep: false,
         }},
-        color:() => "#4BDC13",
-        requires:() => new Decimal(10), // Can be a function that takes requirement increases into account
+        color: "#4BDC13",
+        requires: new Decimal(10), // Can be a function that takes requirement increases into account
         resource: "lollipops", // Name of prestige currency
         baseResource: "candies", // Name of resource prestige is based on
         baseAmount() {return player.points}, // Get the current amount of baseResource
@@ -42,14 +42,14 @@ addLayer("c", {
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
         },
         milestones: {
-            0: {requirementDescription:() => "3 Lollipops",
+            0: {requirementDescription: "3 Lollipops",
                 done() {return player[this.layer].best.gte(3)}, // Used to determine when to give the milestone
-                effectDescription:() => "Unlock the next milestone",
+                effectDescription: "Unlock the next milestone",
             },
-            1: {requirementDescription:() => "4 Lollipops",
+            1: {requirementDescription: "4 Lollipops",
                 unlocked() {return hasMilestone(this.layer, 0)},
                 done() {return player[this.layer].best.gte(4)},
-                effectDescription:() => "You can toggle beep and boop (which do nothing)",
+                effectDescription: "You can toggle beep and boop (which do nothing)",
                 toggles: [
                     ["c", "beep"], // Each toggle is defined by a layer and the data toggled for that layer
                     ["f", "boop"]],
@@ -64,11 +64,11 @@ addLayer("c", {
             rows: 2,
     		cols: 12,
 		    11: {
-                name:() => "Fun",
+                name: "Fun",
                 completionLimit: 3,
 			    challengeDescription() {return "Makes the game 0% harder<br>"+challengeCompletions(this.layer, this.id) + "/" + this.completionLimit + " completions"},
 			    unlocked() { return player[this.layer].best.gt(0) },
-                goal:() => new Decimal("20"),
+                goal: new Decimal("20"),
                 currencyDisplayName: "lollipops", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
                 currencyLayer: this.layer, // Leave empty if not in a layer
@@ -86,14 +86,14 @@ addLayer("c", {
             rows: 2,
             cols: 3,
             11: {
-                title:() => "Generator of Genericness",
-                description:() => "Gain 1 Point every second.",
-                cost:() => new Decimal(1),
+                title: "Generator of Genericness",
+                description: "Gain 1 Point every second.",
+                cost: new Decimal(1),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
             12: {
-                description:() => "Candy generation is faster based on your unspent Lollipops.",
-                cost:() => new Decimal(1),
+                description: "Candy generation is faster based on your unspent Lollipops.",
+                cost: new Decimal(1),
                 unlocked() { return (hasUpgrade(this.layer, 11))},
                 effect() { // Calculate bonuses from the upgrade. Can return a single value or an object with multiple values
                     let ret = player[this.layer].points.add(1).pow(player[this.layer].upgrades.includes(24)?1.1:(player[this.layer].upgrades.includes(14)?0.75:0.5)) 
@@ -103,8 +103,8 @@ addLayer("c", {
                 effectDisplay() { return format(this.effect())+"x" }, // Add formatting to the effect
             },
             13: {
-                description:() => "Unlock a <b>secret subtab</b> and make this layer act if you unlocked it first.",
-                cost:() => new Decimal(69),
+                description: "Unlock a <b>secret subtab</b> and make this layer act if you unlocked it first.",
+                cost: new Decimal(69),
                 currencyDisplayName: "candies", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
                 currencyLayer: "", // Leave empty if not in a layer "e.g. points"
@@ -124,9 +124,9 @@ addLayer("c", {
                 },
             },
             22: {
-                title:() => "This upgrade doesn't exist",
-                description:() => "Or does it?.",
-                cost:() => new Decimal(3),
+                title: "This upgrade doesn't exist",
+                description: "Or does it?.",
+                cost: new Decimal(3),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
         },
@@ -138,9 +138,9 @@ addLayer("c", {
                 resetBuyables(this.layer)
                 doReset(this.layer, true) // Force a reset
             },
-            respecText:() => "Respec Thingies", // Text on Respec button, optional
+            respecText: "Respec Thingies", // Text on Respec button, optional
             11: {
-                title:() => "Exhancers", // Optional, displayed at the top in a larger font
+                title: "Exhancers", // Optional, displayed at the top in a larger font
                 cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
                     if (x.gte(25)) x = x.pow(2).div(25)
                     let cost = Decimal.pow(2, x.pow(1.5))
@@ -224,7 +224,7 @@ addLayer("c", {
                 display() {
                     return format(player.points) + " / 1e10 points"
                 },
-                unlocked:() => true,
+                unlocked: true,
 
             },
             tallBoi: {
@@ -242,7 +242,7 @@ addLayer("c", {
                 display() {
                     return formatWhole((player.points.div(1)).min(100)) + "%"
                 },
-                unlocked:() => true,
+                unlocked: true,
 
             },
             flatBoi: {
@@ -257,7 +257,7 @@ addLayer("c", {
                 progress() {
                     return player.c.points.div(50)
                 },
-                unlocked:() => true,
+                unlocked: true,
 
             },
         },
@@ -348,7 +348,7 @@ addLayer("f", {
         boop: false,
         clickables: {[11]: "Start"} // Optional default Clickable state
     }},
-    color:() => "#FE0102",
+    color: "#FE0102",
     requires() {return new Decimal(10)}, 
     resource: "farm points", 
     baseResource: "candies", 
@@ -357,7 +357,7 @@ addLayer("f", {
     exponent: 0.5,
     base: 3,
     roundUpCost: true,
-    canBuyMax:() => true,
+    canBuyMax() {return hasAchievement('a', 13)},
     gainMult() {
         return new Decimal(1)
     },
@@ -401,7 +401,7 @@ addLayer("f", {
         },
         masterButtonText() {return (getClickableState(this.layer, 11) == "Borkened...") ? "Fix the clickable!" : "Does nothing"}, // Text on Respec button, optional
         11: {
-            title:() => "Clicky clicky!", // Optional, displayed at the top in a larger font
+            title: "Clicky clicky!", // Optional, displayed at the top in a larger font
             display() { // Everything else displayed in the buyable button after the title
                 let data = getClickableState(this.layer, this.id)
                 return "Current state:<br>" + data
@@ -452,121 +452,6 @@ addLayer("f", {
 
 }, 
 )
-
-
-// This layer is mostly minimal but it uses a custom prestige type and a clickable
-addLayer("f", {
-    startData() { return {
-        unlocked: false,
-        points: new Decimal(0),
-        boop: false,
-        clickables: {[11]: "Start"} // Optional default Clickable state
-    }},
-    color:() => "#FE0102",
-    requires() {return new Decimal(10)}, 
-    resource: "farm points", 
-    baseResource: "candies", 
-    baseAmount() {return player.points},
-    type: "custom", // A "Custom" type which is effectively static
-    exponent: 0.5,
-    base: 3,
-    roundUpCost: true,
-    canBuyMax:() => true,
-    gainMult() {
-        return new Decimal(1)
-    },
-    gainExp() {
-        return new Decimal(1)
-    },
-    row: 1,
-    layerShown() {return true}, 
-    branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
-
-    tooltipLocked() { // Optional, tooltip displays when the layer is locked
-        return ("This weird farmer dinosaur will only see you if you have at least " + this.requires() + " candies. You only have " + formatWhole(player.points))
-    },
-
-    midsection: [
-        "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
-        ["display-text", "Bork bork!"]
-    ],
-
-    // The following are only currently used for "custom" Prestige type:
-    prestigeButtonText() { //Is secretly HTML
-        if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"
-        if (this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you <b>" + formatWhole(tmp[this.layer].resetGain) + "</b> Farm Points in exchange for all of your candies and lollipops! (You'll get another one at " + formatWhole(tmp[layer].nextAtDisp) + " candies)"
-    },
-    getResetGain() {
-        return getResetGain(this.layer, useType = "static")
-    },
-    getNextAt(canMax=false) { //  
-        return getNextAt(this.layer, canMax, useType = "static")
-    },
-    canReset() {
-        return tmp[this.layer].baseAmount.gte(tmp[this.layer].nextAt)
-    },
-    // This is also non minimal, a Clickable!
-    clickables: {
-        rows: 1,
-        cols: 1,
-        masterButtonPress() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
-            if (getClickableState(this.layer, 11) == "Borkened...")
-                player[this.layer].clickables[11] = "Start"
-        },
-        masterButtonText() {return (getClickableState(this.layer, 11) == "Borkened...") ? "Fix the clickable!" : "Does nothing"}, // Text on Respec button, optional
-        11: {
-            title:() => "Clicky clicky!", // Optional, displayed at the top in a larger font
-            display() { // Everything else displayed in the buyable button after the title
-                let data = getClickableState(this.layer, this.id)
-                return "Current state:<br>" + data
-            },
-            unlocked() { return player[this.layer].unlocked }, 
-            canClick() {
-                return getClickableState(this.layer, this.id) !== "Borkened..."},
-            onClick() { 
-                switch(getClickableState(this.layer, this.id)){
-                    case "Start":
-                        player[this.layer].clickables[this.id] = "A new state!"
-                        break;
-                    case "A new state!":
-                        player[this.layer].clickables[this.id] = "Keep going!"
-                        break;
-                    case "Keep going!":
-                        player[this.layer].clickables[this.id] = "Maybe that's a bit too far..."
-                        break;                        
-                    case "Maybe that's a bit too far...":
-                        player[this.layer].clickables[this.id] = "Borkened..."
-                        break;
-                    default:
-                        player[this.layer].clickables[this.id] = "Start"
-                        break;
-
-                }
-            },
-            style() {
-                switch(getClickableState(this.layer, this.id)){
-                    case "Start":
-                        return {'background-color': 'green'}
-                        break;
-                    case "A new state!":
-                        return {'background-color': 'yellow'}
-                        break;
-                    case "Keep going!":
-                        return {'background-color': 'orange'}
-                        break;                        
-                    case "Maybe that's a bit too far...":
-                        return {'background-color': 'red'}
-                        break;
-                    default:
-                        return {}
-                        break;
-            }},
-        },
-    },
-
-}, 
-)
-
 
 // This layer is mostly minimal but it uses a custom prestige type and a clickable
 addLayer("a", {
