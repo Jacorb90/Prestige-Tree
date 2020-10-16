@@ -107,14 +107,27 @@ function constructBarStyles(layer){
 			let bar = tmp[layer].bars[id]
 			if (bar.progress instanceof Decimal)
 				bar.progress = bar.progress.toNumber()
-			bar.progress = Math.min(Math.max(bar.progress, 0), 1)
+			bar.progress = (1 -Math.min(Math.max(bar.progress, 0), 1)) * 100
 
 			bar.dims = {'width': bar.width + "px", 'height': bar.height + "px"}
 			let dir = bar.direction
-			bar.fillDims = {'width': bar.width + "px", 'height': bar.height + "px"}
+			bar.fillDims = {'width': (bar.width + 0.5) + "px", 'height': (bar.height + 0.5)  + "px"}
 			if (dir !== undefined)
 			{
-				bar.fillDims['clip-path'] = 'inset(0% 0% 50% 0%)'
+				bar.fillDims['clip-path'] = 'inset(0% 50% 0% 0%)'
+				if(dir == UP){
+					bar.fillDims['clip-path'] = 'inset(' + bar.progress + '% 0% 0% 0%)'
+				}
+				else if(dir == DOWN){
+					bar.fillDims['clip-path'] = 'inset(0% 0% ' + bar.progress + '% 0%)'
+				}
+				else if(dir == RIGHT){
+					bar.fillDims['clip-path'] = 'inset(0% ' + bar.progress + '% 0% 0%)'
+				}
+				else if(dir == LEFT){
+					bar.fillDims['clip-path'] = 'inset(0% 0% 0% ' + bar.progress + '%)'
+				}
+
 			}
 		}
 

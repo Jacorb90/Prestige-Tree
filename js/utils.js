@@ -350,7 +350,7 @@ function milestoneShown(layer, id) {
 function respecBuyables(layer) {
 	if (!layers[layer].buyables) return
 	if (!layers[layer].buyables.respec) return
-	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + (layers[layer].name ? layers[layer].name : layer) + "\" reset as well!")) return
+	if (!confirm("Are you sure you want to respec? This will force you to do a \"" + (tmp[layer].name ? tmp[layer].name : layer) + "\" reset as well!")) return
 	layers[layer].buyables.respec()
 	updateBuyableTemp(layer)
 }
@@ -409,6 +409,10 @@ function buyableEffect(layer, id){
 	return (tmp[layer].buyables[id].effect)
 }
 
+function clickableEffect(layer, id){
+	return (tmp[layer].clickables[id].effect)
+}
+
 function achievementEffect(layer, id){
 	return (tmp[layer].achievements[id].effect)
 }
@@ -435,7 +439,7 @@ function canAffordPurchase(layer, thing, cost) {
 
 function buyUpg(layer, id) {
 	if (!player[layer].unlocked) return
-	if (!layers[layer].upgrades[id].unlocked) return
+	if (!tmp[layer].upgrades[id].unlocked) return
 	if (player[layer].upgrades.includes(id)) return
 	let upg = tmp[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost
@@ -499,7 +503,7 @@ function inChallenge(layer, id){
 	if (challenge==toNumber(id)) return true
 
 	if (layers[layer].challenges[challenge].countsAs)
-		return layers[layer].challenges[id].countsAs.includes(id)
+		return tmp[layer].challenges[id].countsAs.includes(id)
 }
 
 // ************ Misc ************
@@ -535,7 +539,7 @@ function nodeShown(layer) {
 }
 
 function layerunlocked(layer) {
-	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].baseAmount.gte(tmp[layer].requires) && layers[layer].layerShown()))
+	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].baseAmount.gte(tmp[layer].requires) && tmp[layer].layerShown))
 }
 
 function keepGoing() {

@@ -47,6 +47,7 @@ Key:
                      If the text stays constant, it can just be a string.
 
 - layerShown(): A function returning a bool which determines if this layer's node should be visible on the tree.
+                It can also return "ghost", which will hide the layer, but its node will still take up space in the tree.
 
 - hotkeys: **optional**, An array containing information on any hotkeys associated with this layer:
     ```js

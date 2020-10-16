@@ -139,13 +139,16 @@ h1, h2, h3, b, input {
 .barBase {
 	overflow: hidden;
 	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
-
+	display:table
 }
 
 .barBorder {
 	border: 2px solid;
 	border-radius: 10%;
 	border-color: var(--color);
+	overflow: hidden;
+	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+	margin:0
 }
 
 .overlayTextContainer {
@@ -160,9 +163,10 @@ h1, h2, h3, b, input {
 
 .fill {
 	background-color: var(--color);
-	border-radius: 10%;
+	z-index:2;
     position: absolute;
 	overflow: hidden;
+	margin-left: -0.5px;
 }
 
 .overlayText {
@@ -574,4 +578,8 @@ ul {
 
 button > * {
 	pointer-events:none;
+}
+
+.ghost {
+	visibility: hidden
 }

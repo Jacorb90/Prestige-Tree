@@ -40,7 +40,7 @@ function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	for (layer in layers){
-		if (layers[layer].layerShown() && tmp[layer].branches){
+		if (tmp[layer].layerShown && tmp[layer].branches){
 			for (branch in tmp[layer].branches)
 				{
 					drawTreeBranch(layer, tmp[layer].branches[branch])

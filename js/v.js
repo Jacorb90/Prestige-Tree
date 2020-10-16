@@ -291,13 +291,13 @@ function loadVue() {
 	Vue.component('bar', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div class ="barBorder barBase"  v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].dims]">
-			
-			<div class = "overlayTextContainer" v-bind:style="[tmp[layer].bars[data].dims]">
+		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].dims, {'display': 'table'}]">
+			<div class = "overlayTextContainer barBorder" v-bind:style="[tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].dims]">
 				<span class = "overlayText" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].textStyle]" v-html="tmp[layer].bars[data].display"></span>
 			</div>
-			<div class ="fill barBorder" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].fillStyle, tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].fillDims]"></div>
-		
+			<div class ="barBG barBorder" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle,  tmp[layer].bars[data].dims]">
+				<div class ="fill" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].fillStyle, tmp[layer].bars[data].fillDims]"></div>
+			</div>
 		</div></div>
 		`
 	})
@@ -362,10 +362,11 @@ function loadVue() {
 				treeNode: size != 'small',
 				smallNode: size == 'small',
 				[layer]: true,
+				ghost: tmp[layer].layerShown == 'ghost',
 				hidden: !tmp[layer].layerShown,
 				locked: !player[layer].unlocked && !tmp[layer].baseAmount.gte(tmp[layer].requires),
 				notify: tmp[layer].notify,
-				can: layerunlocked(layer),
+				can: player[layer].unlocked,
 			}"
 			v-bind:style="[layerunlocked(layer) ? {
 				'background-color': tmp[layer].color,

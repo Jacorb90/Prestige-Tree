@@ -237,7 +237,7 @@ addLayer("c", {
                 baseStyle: {'background-color' : "#000000"},
                 textStyle: {'text-shadow': '0px 0px 2px #000000'},
 
-                borderStyle() {return {}},
+                borderStyle() {return {'border-width': "7px"}},
                 direction: UP,
                 width: 50,
                 height: 200,
@@ -498,5 +498,20 @@ addLayer("a", {
             "achievements",
         ]
     }, 
+)
+
+
+// This layer is mostly minimal but it uses a custom prestige type and a clickable
+addLayer("spook", {
+    startData() { return {
+        unlocked: true,
+        points: new Decimal(0),
+    }},
+    color: "yellow",
+    resource: "achievement power", 
+    type: "none",
+    row: 1,
+    layerShown: "ghost",
+}, 
 )
 

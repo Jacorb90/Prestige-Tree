@@ -1,5 +1,11 @@
 # The Modding Tree changelog:
 
+### v2.0.5 - 10/16/20
+- Made more features (including prestige parameters) able to be dynamic.
+- Layer nodes can be hidden but still take up space with "ghost" visibility
+- Added clickableEffect for real.
+- Fixed some visual issues with bars.
+- A few other minor tweaks and improvements.
 
 ### v2.0.4 - 10/16/20
 - Fixed HTML on buttons interfering with clicking on them.
