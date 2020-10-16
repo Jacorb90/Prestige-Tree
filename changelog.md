@@ -1,14 +1,14 @@
 # The Modding Tree changelog:
 
-# v2.0.2 10/15/20
+### v2.0.2 - 10/15/20
 - Branches are now dynamic (they can be functions).
 - Fixed a crash related to offline time.
 - Fixed links being too wide.
 
-# v2.0.1 10/15/20
+### v2.0.1 - 10/15/20
 - Fixed side layers appearing multiple times.
 
-## v2.0 10/15/20
+## v2.0: The Pinnacle of Achievement Mountain - 10/15/20
 - Added progress bars, which are highly customizable and can be horizontal or vertical!
 - Added "side layers", displayed smaller and off to the side, and don't get reset by default.
     They can be used for global achievements and statistics. Speaking of which...
@@ -29,29 +29,29 @@
 - Changelog is no longer in index.html at all.
 - Generation of Points now happens in the main game loop
 - Changed the reset functions to make keeping things easier
-- Renamed many things to increase readability (see something or other for a list)
+- Renamed many things to increase readability (see the list in the link below)
 - Improved documentation based on feedback
 
   [For a full list of changes to the format and functionality of existing things, click here.](2.0-format-changes.md)
 
 
 
-### v1.3.5
+### v1.3.5:
 
 - Completely automated convertToDecimal, now you never have to worry about it again.
 - Branches can be defined without a color id. But they can also use hex values for color ids!
 - Created a tutorial for getting started with TMT and Github.
 - Page title is now automatically taken from mod name.
 
-### v1.3.4: 10/8/20
+### v1.3.4 - 10/8/20
 
 - Added "midsection" feature to add things to a tab's layout while still keeping the standard layout.
 - Fix for being able to buy more buyables than you should.
 
-### v1.3.3: - 10/7/20
+### v1.3.3 - 10/7/20
 - Fix for the "order of operations" issue in temp.
 
-### v1.3.1: - 10/7/20
+### v1.3.1 - 10/7/20
 
 - Added custom CSS and tooltips for Layer Nodes.
 - Added custom CSS for upgrades, buyables, milestones, and challenges, both individually and layer-wide.
@@ -100,7 +100,7 @@ which will break old things)
 
 
 
-### v1.1.1
+### v1.1.1:
 
 - You can define hotkeys directly from layer config.
 
