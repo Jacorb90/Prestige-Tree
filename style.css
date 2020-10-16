@@ -567,3 +567,7 @@ ul {
 	right: 55px;
 	top: 65px;
 }
+
+button > * {
+	pointer-events:none;
+}

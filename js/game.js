@@ -16,9 +16,9 @@ let modInfo = {
 
 // Set your version in num and name, but leave the tmt values so people know what version it is
 let VERSION = {
-	num: "2.0.3",
+	num: "2.0.4",
 	name: "Pinnacle of Achievement Mountain",
-	tmtNum: "2.0.3",
+	tmtNum: "2.0.4",
 	tmtName: "Pinnacle of Achievement Mountain"
 }
 

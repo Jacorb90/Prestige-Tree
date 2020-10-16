@@ -1,12 +1,16 @@
 # The Modding Tree changelog:
 
 
+### v2.0.4 - 10/16/20
+- Fixed HTML on buttons interfering with clicking on them.
+
 ### v2.0.3 - 10/16/20
 - Fixed hotkeys not displaying in info.
 - Fixed the game supressing all external hotkeys.
 - You can use more things as currencies for upgrade costs and challenge goals using currencyLocation.
 - Added maxTickLength, which can be used to prevent offline time or tab-switching from breaking time-limit based mechanics.
-- Made buyable respec buttons, and clickable "master" buttons their own components, and gave them a hide/show feature.
+- Made buyable respec buttons and clickable "master" buttons their own components, and gave them a hide/show feature.
+- Added a general "tooltip" feature for achievements.
 
 ### v2.0.2 - 10/15/20
 - Branches are now dynamic (they can be functions).
