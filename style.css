@@ -136,12 +136,16 @@ h1, h2, h3, b, input {
 	text-shadow: 0px 0px 7px var(--color);
 }
 
+.barBase {
+	overflow: hidden;
+	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+
+}
+
 .barBorder {
 	border: 2px solid;
 	border-radius: 10%;
 	border-color: var(--color);
-	overflow: hidden;
-	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
 
 .overlayTextContainer {
@@ -156,7 +160,7 @@ h1, h2, h3, b, input {
 
 .fill {
 	background-color: var(--color);
-	border-radius: 5%;
+	border-radius: 10%;
     position: absolute;
 	overflow: hidden;
 }

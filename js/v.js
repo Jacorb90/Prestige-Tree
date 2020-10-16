@@ -291,12 +291,12 @@ function loadVue() {
 	Vue.component('bar', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div class ="barBorder"  v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].dims]">
+		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div class ="barBorder barBase"  v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].dims]">
 			
 			<div class = "overlayTextContainer" v-bind:style="[tmp[layer].bars[data].dims]">
 				<span class = "overlayText" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].textStyle]" v-html="tmp[layer].bars[data].display"></span>
 			</div>
-			<div class ="fill" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].fillStyle, tmp[layer].bars[data].fillDims]"></div>
+			<div class ="fill barBorder" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].fillStyle, tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].fillDims]"></div>
 		
 		</div></div>
 		`
