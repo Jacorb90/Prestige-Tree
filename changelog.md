@@ -1,5 +1,10 @@
 # The Modding Tree changelog:
 
+# v2.0.2 10/15/20
+- Branches are now dynamic (they can be functions).
+- Fixed a crash related to offline time.
+- Fixed links being too wide.
+
 # v2.0.1 10/15/20
 - Fixed side layers appearing multiple times.
 
