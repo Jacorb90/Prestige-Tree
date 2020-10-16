@@ -19,6 +19,7 @@ Clickables should be formatted like this:
         masterButtonPress() // **optional** If this is present, an additional button will appear above the clickables.
                             // pressing it will call the function.
         masterButtonText: "Press me!" // **optional** text to display on the Master Button
+        showMasterButton(){} //**optional**, a function determining whether or not to show the button. Defaults to true if absent.
         11: {
             display() {return "Blah"},
             etc

@@ -53,7 +53,9 @@ By default, challenges use basic Points for the goal. You can change that using 
 - currencyDisplayName: **optional**, the name to display for the currency for the goal
 - currencyInternalName: **optional**, the internal name for that currency
 - currencyLayer: **optional**, the internal name of the layer that currency is stored in.
-                 If it's part of a layer, omit.
+                 If it's not in a layer, omit. If it's not stored directly in a layer, instead use the next feature.
+- currencyLocation: **optional**, if your currency is stored in something inside a layer (e.g. a buyable's amount), you can access it this way.
+                    This is a function returning the object in "player" that contains the value (like player[this.layer].buyables)
 
 - completionLimit: **optional**, the amount of times you can complete this challenge. Default is 1 completion.
 

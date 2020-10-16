@@ -107,7 +107,7 @@ addLayer("c", {
                 cost: new Decimal(69),
                 currencyDisplayName: "candies", // Use if using a nonstandard currency
                 currencyInternalName: "points", // Use if using a nonstandard currency
-                currencyLayer: "", // Leave empty if not in a layer "e.g. points"
+                currencyLocation: "", // The object in player data that the currency is contained in
                 unlocked() { return (hasUpgrade(this.layer, 12))},
                 onPurchase() { // This function triggers when the upgrade is purchased
                     player[this.layer].unlockOrder = 0
@@ -126,6 +126,10 @@ addLayer("c", {
             22: {
                 title: "This upgrade doesn't exist",
                 description: "Or does it?.",
+                currencyLocation() {return player[this.layer].buyables}, // The object in player data that the currency is contained in
+                currencyDisplayName: "exhancers", // Use if using a nonstandard currency
+                currencyInternalName: 11, // Use if using a nonstandard currency
+
                 cost: new Decimal(3),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
@@ -133,6 +137,7 @@ addLayer("c", {
         buyables: {
             rows: 1,
             cols: 12,
+            showRespec: true,
             respec() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
                 player[this.layer].points = player[this.layer].points.add(player[this.layer].spentOnBuyables) // A built-in thing to keep track of this but only keeps a single value
                 resetBuyables(this.layer)
@@ -186,8 +191,8 @@ addLayer("c", {
         }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
 
         hotkeys: [
-            {key: "c", description: "C: reset for lollipops or whatever", onPress(){if (player[this.layer].unlocked) doReset(this.layer)}},
-            {key: "ctrl+c" + this.layer, description: "Ctrl+c: respec things", onPress(){if (player[this.layer].unlocked) respecBuyables(this.layer)}},
+            {key: "c", description: "C: reset for lollipops or whatever", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+            {key: "ctrl+c", description: "Ctrl+c: respec things", onPress(){if (player[this.layer].unlocked) respecBuyables(this.layer)}},
         ],
         increaseUnlockOrder: [], // Array of layer names to have their order increased when this one is first unlocked
 
@@ -485,8 +490,7 @@ addLayer("a", {
             13: {
                 name: "EIEIO",
                 done() {return player.f.points.gte(1)},
-                goalTooltip: "Get a farm point.", // Shows when achievement is not completed
-                doneTooltip: "Get a farm point.\n\nReward: The dinosaur is now your friend (you can max Farm Points).", // Showed when the achievement is completed
+                tooltip: "Get a farm point.\n\nReward: The dinosaur is now your friend (you can max Farm Points).", // Showed when the achievement is completed
                 onComplete() {console.log("Bork bork bork!")}
             },
         },

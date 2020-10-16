@@ -356,7 +356,7 @@ function respecBuyables(layer) {
 }
 
 function canAffordUpgrade(layer, id) {
-	let upg = layers[layer].upgrades[id]
+	let upg = tmp[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost
 	return canAffordPurchase(layer, upg, cost) 
 }
@@ -414,9 +414,13 @@ function achievementEffect(layer, id){
 }
 
 function canAffordPurchase(layer, thing, cost) {
+
 	if (thing.currencyInternalName){
 		let name = thing.currencyInternalName
-		if (thing.currencyLayer){
+		if (thing.currencyLocation){
+			return !(thing.currencyLocation[name].lt(cost)) 
+		}
+		else if (thing.currencyLayer){
 			let lr = thing.currencyLayer
 			return !(player[lr][name].lt(cost)) 
 		}
@@ -433,12 +437,16 @@ function buyUpg(layer, id) {
 	if (!player[layer].unlocked) return
 	if (!layers[layer].upgrades[id].unlocked) return
 	if (player[layer].upgrades.includes(id)) return
-	let upg = layers[layer].upgrades[id]
+	let upg = tmp[layer].upgrades[id]
 	let cost = tmp[layer].upgrades[id].cost
 
 	if (upg.currencyInternalName){
 		let name = upg.currencyInternalName
-		if (upg.currencyLayer){
+		if (upg.currencyLocation){
+			if (upg.currencyLocation[name].lt(cost)) return
+			upg.currencyLocation[name] = upg.currencyLocation[name].sub(cost)
+		}
+		else if (upg.currencyLayer){
 			let lr = upg.currencyLayer
 			if (player[lr][name].lt(cost)) return
 			player[lr][name] = player[lr][name].sub(cost)
@@ -589,7 +597,7 @@ document.onkeydown = function(e) {
 	let key = e.key
 	if (ctrlDown) key = "ctrl+" + key
 	if (onFocused) return
-	if (ctrlDown && key != "-" && key != "_" && key != "+" && key != "=" && key != "r" && key != "R" && key != "F5") e.preventDefault()
+	if (ctrlDown && hotkeys[key]) e.preventDefault()
 	if(hotkeys[key]){
 		if (player[hotkeys[key].layer].unlocked)
 			hotkeys[key].onPress()

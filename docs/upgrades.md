@@ -43,11 +43,13 @@ Individual upgrades can have these features:
 - onPurchase() - **optional**, this function will be called when the upgrade is purchased.
                  Good for upgrades like "makes this layer act like it was unlocked first".
 
-By default, upgrades use the main prestige currency for the layer. You can include these to change them:
+By default, upgrades use the main prestige currency for the layer. You can include these to change them (but it needs to be a Decimal):
 - currencyDisplayName: **optional**, the name to display for the currency for the upgrade
 - currencyInternalName: **optional**, the internal name for that currency
 - currencyLayer: **optional**, the internal name of the layer that currency is stored in.
-                 If it's not in a layer (like Points), omit.
+                 If it's not in a layer (like Points), omit. If it's not stored directly in a layer, instead use the next feature.
+- currencyLocation: **optional**, if your currency is stored in something inside a layer (e.g. a buyable's amount), you can access it this way.
+                    This is a function returning the object in "player" that contains the value (like player[this.layer].buyables)
 
 - style: **Optional**, Applies CSS to this upgrade, in the form of an object where the keys are CSS attributes,
          and the values are the values for those attributes (both as strings)

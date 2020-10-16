@@ -63,7 +63,7 @@
 			<br><br>
 			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
 			<h3>Hotkeys</h3><br>
-			<span v-for="key in hotkeys" v-if="player[key.layer].unl"><br>{{key.description}}</span>
+			<span v-for="key in hotkeys" v-if="player[key.layer].unlocked"><br>{{key.description}}</span>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('tree')">←</button><br>
