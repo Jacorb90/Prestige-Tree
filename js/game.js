@@ -6,7 +6,7 @@ var gameEnded = false;
 // Don't change this
 const TMT_VERSION = {
 	tmtNum: "2.1",
-	tmtName: "Non-nonsensical"
+	tmtName: "We should have thought of this sooner!"
 }
 
 function getResetGain(layer, useType = null) {
@@ -267,10 +267,9 @@ VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSI
 VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "")
 
 
-const ENDGAME = new Decimal("e280000000");
 
 function gameLoop(diff) {
-	if (player.points.gte(ENDGAME) || gameEnded) gameEnded = 1
+	if (isEndgame() || gameEnded) gameEnded = 1
 
 	if (isNaN(diff)) diff = 0
 	if (gameEnded && !player.keepGoing) {

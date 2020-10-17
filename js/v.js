@@ -412,7 +412,6 @@ function loadVue() {
 			milestoneShown,
 			keepGoing,
 			VERSION,
-			ENDGAME,
 			LAYERS,
 			hotkeys
 		},

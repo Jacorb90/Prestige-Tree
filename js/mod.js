@@ -12,7 +12,7 @@ let modInfo = {
 // Set your version in num and name
 let VERSION = {
 	num: "2.1",
-	name: "Non-nonsensical!",
+	name: " We should have thought of this sooner!",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -50,6 +50,13 @@ var displayThings = [
 	function() {if (player.f.points.gt(1)) return `You have ${player.f.points} farm points. (Which do nothing.)`},
 	function() {if (inChallenge("c", 11)) return "The game is currently <h1>0%</h1> harder."},
 ]
+
+// Determines when the game "ends"
+function isEndgame() {
+	return player.points.gte(new Decimal("e280000000"))
+}
+
+
 
 // Less important things beyond this point!
 
