@@ -3,43 +3,10 @@ var needCanvasUpdate = true;
 var NaNalert = false;
 var gameEnded = false;
 
-
-let modInfo = {
-	name: "The Modding Tree",
-	id: "modbase",
-	pointsName: "points",
-	discordName: "",
-	discordLink: "",
-	changelogLink: "https://github.com/Acamaeda/The-Modding-Tree/blob/master/changelog.md",
-	offlineLimit: 1  // In hours
-}
-
-// Set your version in num and name, but leave the tmt values so people know what version it is
-let VERSION = {
-	num: "2.0.5.1",
-	name: "Pinnacle of Achievement Mountain",
-	tmtNum: "2.0.5.1",
-	tmtName: "Pinnacle of Achievement Mountain"
-}
-
-// Determines if it should show points/sec
-function canGenPoints(){
-	return hasUpgrade("c", 11)
-}
-
-// Calculate points/sec!
-function getPointGen() {
-	if(!canGenPoints())
-		return new Decimal(0)
-
-	let gain = new Decimal(1)
-	if (hasUpgrade("c", 12)) gain = gain.times(upgradeEffect("c", 12))
-	return gain
-}
-
-// You can change this if you have things that can be messed up by long tick lengths
-function maxTickLength() {
-	return(3600000) // Default is 1 hour which is just arbitrarily large
+// Don't change this
+const TMT_VERSION = {
+	tmtNum: "2.1",
+	tmtName: "Non-nonsensical"
 }
 
 function getResetGain(layer, useType = null) {
@@ -214,7 +181,7 @@ function doReset(layer, force=false) {
 	}
 
 	prevOnReset = {...player} //Deep Copy
-	player.points = (row == 0 ? new Decimal(0) : new Decimal(10))
+	player.points = (row == 0 ? new Decimal(0) : getStartPoints())
 
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	rowReset("side", layer)
@@ -235,7 +202,7 @@ function resetRow(row) {
 		player[layer].unlocked = false
 		if (player[layer].unlockOrder) player[layer].unlockOrder = 0
 	}
-	player.points = new Decimal(10)
+	player.points = getStartPoints()
 	updateTemp();
 	resizeCanvas();
 }

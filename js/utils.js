@@ -79,7 +79,7 @@ function startPlayerBase() {
 		keepGoing: false,
 		hasNaN: false,
 		hideChallenges: false,
-		points: new Decimal(10),
+		points: modInfo.initialStartPoints,
 		subtabs: {},
 	}
 }

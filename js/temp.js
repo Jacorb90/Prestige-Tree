@@ -6,6 +6,11 @@ var activeFunctions = [
 	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress"
 ]
 
+var noCall = doNotCallTheseFunctionsEveryTick
+for (item in noCall) {
+	activeFunctions.push(noCall[item])
+}
+
 function setupTemp() {
 	tmp = {}
 	setupTempData(layers, tmp)
