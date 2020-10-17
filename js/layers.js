@@ -176,7 +176,13 @@ addLayer("c", {
                     player[this.layer].spentOnBuyables = player[this.layer].spentOnBuyables.add(cost) // This is a built-in system that you can use for respeccing but it only works with a single Decimal value
                 },
                 buyMax() {}, // You'll have to handle this yourself if you want
-                style: {'height':'222px'}
+                style: {'height':'222px'},
+                sellOne() {
+                    let amount = getBuyableAmount(this.layer, this.id)
+                    if (amount.lte(0)) return // Only sell one if there is at least one
+                    setBuyableAmount(this.layer, this.id, amount.sub(1))
+                    player[this.layer].points = player[this.layer].points.add(this.cost())
+                },
             },
         },
         doReset(resettingLayer){ // Triggers when this layer is being reset, along with the layer doing the resetting. Not triggered by lower layers resetting, but is by layers on the same row.

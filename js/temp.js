@@ -3,7 +3,8 @@ var tmp = {}
 // Tmp will not call these
 var activeFunctions = [
 	"startData", "onPrestige", "doReset", "update", "automate",
-	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress"
+	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress",
+	"sellOne", "sellAll",
 ]
 
 var noCall = doNotCallTheseFunctionsEveryTick

@@ -17,6 +17,7 @@ Buyables should be formatted like this:
                      // Having this function makes a respec button appear
         respecText:// **optional**, text that appears on the respec button
         showRespecButton(){} //**optional**, a function determining whether or not to show the button. Defaults to true if absent.
+        sellOneText, sellAllText:// **optional**, text that appears on the "sell one" and "sell all" buttons respectively (if you are using them)
         11: {
             display() {return "Blah"},
             etc
@@ -55,3 +56,14 @@ Features:
 
 - id: **Assigned automagically**. It's the "key" which the buyable was stored under, for convenient access.
       The buyable in the example's id is 11.
+
+Sell One/Sell All:
+
+Including a sellOne or sellAll function will cause an additional button to appear beneath the buyable.
+They are functionally identical, but "sell one" appears above "sell all". You can also use them for other things.
+
+sellOne/sellAll(): **optional**, Called when the button is pressed. The standard use would be to decrease/reset the amount of the buyable,
+                   And possibly return some currency to the player.
+
+canSellOne/canSellAll(): **optional**, booleans determining whether or not to show the buttons. If  "canSellOne/All" is absent but 
+                         "sellOne/All" is present, the appropriate button will always show.

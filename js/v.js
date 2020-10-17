@@ -202,7 +202,7 @@ function loadVue() {
 			<respec-button v-if="tmp[layer].buyables.respec && !(layers[layer].buyables.showRespec !== undefined && tmp[layer].buyables.showRespec == false)" :layer = "layer" v-bind:style="[{'margin-bottom': '12px'}, tmp[layer].componentStyles['respec-button']]"></respec-button>
 			<div v-for="row in tmp[layer].buyables.rows" class="upgRow">
 				<div v-for="col in tmp[layer].buyables.cols"><div v-if="layers[layer].buyables[row*10+col]!== undefined && tmp[layer].buyables[row*10+col].unlocked" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : 'inherit'),}">
-					<buyable :layer = "layer" :data = "row*10+col" :size = "data" v-bind:style="tmp[layer].componentStyles.buyable"></buyable>
+					<buyable :layer = "layer" :data = "row*10+col" :size = "data"></buyable>
 				</div></div>
 				<br>
 			</div>
@@ -214,21 +214,24 @@ function loadVue() {
 	Vue.component('buyable', {
 		props: ['layer', 'data', 'size'],
 		template: `
-		<button 
-			v-if="layers[layer].buyables && layers[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unlocked" 
-			v-bind:class="{ buyable: true, can: tmp[layer].buyables[data].canAfford, locked: !tmp[layer].buyables[data].canAfford}"
-			v-bind:style="[tmp[layer].buyables[data].canAfford ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].buyables[data].style]"
+		<div v-if="layers[layer].buyables && layers[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unlocked" style="display: grid">
+			<button v-bind:class="{ buyable: true, can: tmp[layer].buyables[data].canAfford, locked: !tmp[layer].buyables[data].canAfford}"
+			v-bind:style="[tmp[layer].buyables[data].canAfford ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].componentStyles.buyable, tmp[layer].buyables[data].style]"
 			v-on:click="buyBuyable(layer, data)">
-			<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
-			<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp[layer].buyables[data].display"></span>
-		</button>
+				<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
+				<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp[layer].buyables[data].display"></span>
+			</button>
+			<br v-if="(layers[layer].buyables[data].sellOne !== undefined && !(layers[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)) || (layers[layer].buyables[data].sellAll && !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false))">
+			<sell-one :layer="layer" :data="data" v-bind:style="layers[layer].componentStyles['sell-one']" v-if="(layers[layer].buyables[data].sellOne)&& !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)"></sell-one>
+			<sell-all :layer="layer" :data="data" v-bind:style="layers[layer].componentStyles['sell-all']" v-if="(layers[layer].buyables[data].sellAll)&& !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false)"></sell-all>
+		</div>
 		`
 	})
 
 	Vue.component('respec-button', {
 		props: ['layer', 'data'],
 		template: `
-			<button v-if="layers[layer].buyables && tmp[layer].buyables.respec && !(layers[layer].buyables.showRespec !== undefined && tmp[layer].buyables.showRespec == false)" v-on:click="respecBuyables(layer)" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.respecText ? tmp[layer].buyables.respecText : "Respec"}}</button><br>
+			<button v-if="layers[layer].buyables && tmp[layer].buyables.respec && !(layers[layer].buyables.showRespec !== undefined && tmp[layer].buyables.showRespec == false)" v-on:click="respecBuyables(layer)" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.respecText ? tmp[layer].buyables.respecText : "Respec"}}</button>
 	`
 	})
 
@@ -266,7 +269,7 @@ function loadVue() {
 	Vue.component('master-button', {
 		props: ['layer', 'data'],
 		template: `
-		<button v-if="tmp[layer].clickables && tmp[layer].clickables.masterButtonPress && !(layers[layer].clickables.showMasterButton !== undefined && tmp[layer].clickables.showMasterButton == false)" v-on:click="layers[layer].clickables.masterButtonPress()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].clickables.masterButtonText ? tmp[layer].clickables.masterButtonText : "Click me!"}}</button><br>
+		<button v-if="tmp[layer].clickables && tmp[layer].clickables.masterButtonPress && !(layers[layer].clickables.showMasterButton !== undefined && tmp[layer].clickables.showMasterButton == false)" v-on:click="layers[layer].clickables.masterButtonPress()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].clickables.masterButtonText ? tmp[layer].clickables.masterButtonText : "Click me!"}}</button>
 	`
 	})
 
@@ -333,6 +336,20 @@ function loadVue() {
 		`
 	})
 
+
+	// These are for buyables, data is the id of the corresponding buyable
+	Vue.component('sell-one', {
+		props: ['layer', 'data'],
+		template: `
+			<button v-if="layers[layer].buyables && layers[layer].buyables[data].sellOne && !(layers[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)" v-on:click="layers[layer].buyables[data].sellOne()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.sellOneText ? tmp[layer].buyables.sellOneText : "Sell One"}}</button>
+	`
+	})
+	Vue.component('sell-all', {
+		props: ['layer', 'data'],
+		template: `
+			<button v-if="layers[layer].buyables && layers[layer].buyables[data].sellAll && !(layers[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false)" v-on:click="layers[layer].buyables[data].sellAll()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.sellAllText ? tmp[layer].buyables.sellAllText : "Sell All"}}</button>
+	`
+	})
 
 	// NOT FOR USE IN STANDARD TAB FORMATTING
 	Vue.component('tab-buttons', {

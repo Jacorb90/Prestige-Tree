@@ -2,6 +2,7 @@
 
 - Moved most of the code users will want to edit to mod.js.
 - Added getStartPoints()
+- Added "sell one" and "sell all" buttons for buyables.
 - Fixed issues with version number
 
 ### v2.0.5 - 10/16/20
