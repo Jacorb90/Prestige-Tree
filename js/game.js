@@ -107,7 +107,6 @@ function layerDataReset(layer, keep = []) {
 		if (player[layer][keep[thing]] !== undefined)
 			storedData[keep[thing]] = player[layer][keep[thing]]
 	}
-	console.log(storedData)
 
 	player[layer] = layers[layer].startData();
 	player[layer].upgrades = []

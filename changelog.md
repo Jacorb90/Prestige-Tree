@@ -8,6 +8,7 @@
 - Added the ability to display more things at the top of the tree tab below points.
 - Made the endgame condition customizable
 - Added "sell one" and "sell all" buttons for buyables.
+- Moved the old "game" to demo.js, and replaced it with a minimal game that won't cause issues when edited.
 - Fixed issues with version number
 - Fixed number formatting issue making things like "10e9" appear.
 
