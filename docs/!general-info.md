@@ -25,6 +25,7 @@ All display text can be basic HTML instead (But you can't use most Vue features 
 ## Table of Contents:
 
 - [Getting Started](getting-started.md): Getting your own copy of the code set up with Github Desktop.
+- [Main mod info](main-mod-info.md): How to set up general things for your mod in mod.js.
 - [Basic layer breakdown](basic-layer-breakdown.md): Breaking down the components of a layer with minimal features.
 - [Layer features](layer-features.md): Explanations of all of the different properties that you can give a layer.
 - [Upgrades](upgrades.md): How to create upgrades for a layer.

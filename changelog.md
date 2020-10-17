@@ -1,7 +1,8 @@
 # The Modding Tree changelog:
 
-## v2.1: Non-nonsensical - 10/x/20
-- Moved most of the code users will want to edit to mod.js.
+## v2.1: We should have thought of this sooner! - 10/17/20
+- Moved most of the code users will want to edit to mod.js, added documentation for it.
+    - Specifically, modInfo, VERSION, canGenPoints, getPointGen, and maxTickLength
 - Added getStartPoints()
 - Added the ability to store non-layer-related data
 - Added the ability to display more things at the top of the tree tab below points.

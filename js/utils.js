@@ -90,11 +90,12 @@ function startPlayerBase() {
 
 function getStartPlayer() {
 	playerdata = startPlayerBase()
-	extradata = addedPlayerData()
-
-	for (thing in extradata)
-		playerdata[thing] = extradata[thing]
-
+	
+	if (addedPlayerData) {
+		extradata = addedPlayerData()
+		for (thing in extradata)
+			playerdata[thing] = extradata[thing]
+	}
 	for (layer in layers){
 		playerdata[layer] = layers[layer].startData()
 		playerdata[layer].buyables = getStartBuyables(layer)
