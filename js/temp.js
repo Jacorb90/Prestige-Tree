@@ -14,8 +14,10 @@ for (item in noCall) {
 
 function setupTemp() {
 	tmp = {}
-	setupTempData(layers, tmp)
+	tmp.pointGen = {}
+	tmp.displayThings = []
 
+	setupTempData(layers, tmp)
 	for (layer in layers){
 		tmp[layer].resetGain = {}
 		tmp[layer].nextAt = {}
@@ -28,9 +30,6 @@ function setupTemp() {
 }
 
 function setupTempData(layerData, tmpData) {
-	tmp.pointGen = {}
-
-
 	for (item in layerData){
 		if (layerData[item] == null) {
 			tmpData[item] = null
@@ -70,6 +69,13 @@ function updateTemp() {
 	}
 
 	tmp.pointGen = getPointGen()
+	tmp.displayThings = []
+	for (thing in displayThings){
+		let text = displayThings[thing]
+		if (isFunction(text)) text = text()
+		tmp.displayThings.push(text) 
+	}
+
 }
 
 function updateTempData(layerData, tmpData) {

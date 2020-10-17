@@ -1,9 +1,14 @@
 # The Modding Tree changelog:
 
+## v2.1: Non-nonsensical - 10/x/20
 - Moved most of the code users will want to edit to mod.js.
 - Added getStartPoints()
+- Added the ability to store non-layer-related data
+- Added the ability to display more things at the top of the tree tab below points.
 - Added "sell one" and "sell all" buttons for buyables.
 - Fixed issues with version number
+- Fixed number formatting issue making things like "10e9" appear.
+
 
 ### v2.0.5 - 10/16/20
 - Made more features (including prestige parameters) able to be dynamic.

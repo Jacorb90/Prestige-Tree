@@ -15,7 +15,8 @@ let VERSION = {
 	name: "Non-nonsensical!",
 }
 
-// Add the names of functions that do something when you call them here. (The ones here are examples)
+// If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
+// (The ones here are examples, all official functions are already taken care of)
 var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
 
 function getStartPoints(){
@@ -37,7 +38,18 @@ function getPointGen() {
 	return gain
 }
 
+// You can add non-layer related variables that should to into "player" and be saved here, along with default values
+function addedPlayerData() { return {
+	weather: "Yes",
+	happiness: new Decimal(72),
+}}
 
+// Display extra things at the top of the page
+var displayThings = [
+	function() {if (player.points.eq(69)) return "Tee hee!"},
+	function() {if (player.f.points.gt(1)) return `You have ${player.f.points} farm points. (Which do nothing.)`},
+	function() {if (inChallenge("c", 11)) return "The game is currently <h1>0%</h1> harder."},
+]
 
 // Less important things beyond this point!
 

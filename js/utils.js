@@ -3,7 +3,11 @@
 function exponentialFormat(num, precision) {
 	let e = num.log10().floor()
 	let m = num.div(Decimal.pow(10, e))
-	return m.toStringWithDecimalPlaces(3)+"e"+e.toStringWithDecimalPlaces(0)
+	if(m.toStringWithDecimalPlaces(precision) == 10) {
+		m = new Decimal(1)
+		e = e.add(1)
+	}
+	return m.toStringWithDecimalPlaces(precision)+"e"+e.toStringWithDecimalPlaces(0)
 }
 
 function commaFormat(num, precision) {
@@ -34,7 +38,7 @@ function format(decimal, precision=2) {
 		var slog = decimal.slog()
 		if (slog.gte(1e6)) return "F" + format(slog.floor())
 		else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-	} else if (decimal.gte("1e1000")) return (Math.floor(decimal.mantissa + 0.01) + ("e"+formatWhole(decimal.log10().floor())))
+	} else if (decimal.gte("1e1000")) return exponentialFormat(decimal, 0)
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
 	else return commaFormat(decimal, precision)
@@ -86,6 +90,11 @@ function startPlayerBase() {
 
 function getStartPlayer() {
 	playerdata = startPlayerBase()
+	extradata = addedPlayerData()
+
+	for (thing in extradata)
+		playerdata[thing] = extradata[thing]
+
 	for (layer in layers){
 		playerdata[layer] = layers[layer].startData()
 		playerdata[layer].buyables = getStartBuyables(layer)
@@ -500,7 +509,9 @@ function clickClickable(layer, id) {
 // Function to determine if the player is in a challenge
 function inChallenge(layer, id){
 	let challenge = player[layer].activeChallenge
-	if (challenge==toNumber(id)) return true
+	if (challenge == null) return
+	id = toNumber(id)
+	if (challenge==id) return true
 
 	if (layers[layer].challenges[challenge].countsAs)
 		return tmp[layer].challenges[id].countsAs.includes(id)
