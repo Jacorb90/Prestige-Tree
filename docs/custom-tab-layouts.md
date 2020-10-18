@@ -38,6 +38,9 @@ These are the existing components, but you can create more in v.js:
 
 - main-display: The text that displays the main currency for the layer and its effects.
 
+- resource-display: The text that displays the currency that this layer is based on, as well as the best and/or total
+                    values for this layer's prestige currency (if they are put in startData for this layer)
+
 - prestige-button: The argument is a string that the prestige button should say before the amount of
                    currency you will gain. It can also be a function that returns updating text.
 

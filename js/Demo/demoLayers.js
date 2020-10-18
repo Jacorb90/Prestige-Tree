@@ -279,7 +279,7 @@ addLayer("c", {
                 buttonStyle() {return  {'color': 'orange'}},
                 content:
                     ["main-display",
-                    "prestige-button",
+                    "prestige-button", "resource-display",
                     ["blank", "5px"], // Height
                     ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
                     ["display-text",
