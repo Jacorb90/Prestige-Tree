@@ -1,5 +1,10 @@
 # The Modding Tree changelog:
 
+### v2.1.1 - 10/17/20
+- Added resource-display component, which displays the base currency for the prestige layer, as well as the best
+    and/or total of this layer's prestige currency.
+- Fixed the value for the base currency not updating in resource-display.
+
 ## v2.1: We should have thought of this sooner! - 10/17/20
 - Moved most of the code users will want to edit to mod.js, added documentation for it.
     - Specifically, modInfo, VERSION, canGenPoints, getPointGen, and maxTickLength
