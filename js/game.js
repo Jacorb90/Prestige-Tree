@@ -301,7 +301,7 @@ function gameLoop(diff) {
 		player.autosave = false;
 		NaNalert = true;
 
-		alert("We have detected a corruption in your save. Please visit https://discord.gg/wwQfgPa for help.")
+		alert("We have detected a corruption in your save. Please visit one of the discords in the info panel for help.")
 	}
 }
 
