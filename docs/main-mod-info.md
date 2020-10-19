@@ -9,6 +9,7 @@ Here's a breakdown of what's in it:
 - modInfo is where most of the basic configuration for the mod is. It contains:
     - name: The name of your mod. (a string)
     - id: The id for your mod, a unique string that is used to determine savefile location. Setting it is important!
+    - author: The name of the author, displayed in the info tab.
     - pointsName: This changes what is displayed instead of "points" for the main currency. (It does not affect it in the code.)
     - discordName, discordLink: If you have a Discord server or other discussion place, you can add a link to it.
                 "discordName" is the text on the link, and "discordLink" is the url of an invite.

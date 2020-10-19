@@ -31,8 +31,9 @@
 			<br>
 			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
 			<br><br><br>
-			<a class="link" href="https://discord.gg/F3xveHV" target="_blank">The Modding Tree Discord</a><br>
-			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Main Prestige Tree Discord</a><br>
+			<span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></span>
+			<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
+			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
 			<br><br>
 			If you would like to speedrun this, press Play Again and record your attempt, then submit on the Discord Server in the channel #speedrun-submissions.
 			<br><br><br>
@@ -48,6 +49,10 @@
 			<h2>{{modInfo.name}}</h2>
 			<br>
 			<h3>{{VERSION.withName}}</h3>
+			<span v-if="modInfo.author">
+				<br>
+				Made by {{modInfo.author}}	
+			</span>
 			<br>
 			The Modding Tree {{TMT_VERSION.tmtNum}} by Acamaeda
 			<br>

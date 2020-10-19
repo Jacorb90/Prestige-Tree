@@ -447,6 +447,10 @@ function canAffordPurchase(layer, thing, cost) {
 	}
 }
 
+function buyUpgrade(layer, id) {
+	buyUpg(layer, id)
+}
+
 function buyUpg(layer, id) {
 	if (!player[layer].unlocked) return
 	if (!tmp[layer].upgrades[id].unlocked) return

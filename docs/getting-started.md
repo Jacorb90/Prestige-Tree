@@ -43,7 +43,7 @@ The benefits of using Github:
 
 2. To edit your project, click "open in VSCode" in Github Desktop.
 
-3. Open game.js in VSCode, and look at the top part where it says "modInfo". On the lines below that, change
+3. Open mod.js in VSCode, and look at the top part where it says "modInfo". On the lines below that, change
     the mod's name to whatever you want, and change the id as well. (It can be any string value, and it's used to determine
     where the savefile is. Make it something that's probably unique, and don't change it again later.)
 

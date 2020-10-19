@@ -1,5 +1,11 @@
 # The Modding Tree changelog:
 
+- Added buyUpgrade function (buyUpg still works though)
+- Added author name to modInfo.
+- Fixes to outdated information in docs.
+- Improvements to Discord links.
+- Thank you to thepaperpilot for contributing to this update!
+
 ### v2.1.1 - 10/17/20
 - Added resource-display component, which displays the base currency for the prestige layer, as well as the best
     and/or total of this layer's prestige currency.

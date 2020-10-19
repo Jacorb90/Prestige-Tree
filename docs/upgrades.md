@@ -4,6 +4,7 @@ Useful functions for dealing with Upgrades and implementing their effects:
 
 - hasUpgrade(layer, id): determine if the player has the upgrade
 - upgradeEffect(layer, id): Returns the current effects of the upgrade, if any
+- buyUpgrade(layer, id): Buys an upgrade directly (if affordable)
 
 Hint: Basic point gain is calculated in game.js's "getPointGain".
 
