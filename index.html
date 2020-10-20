@@ -25,7 +25,7 @@
 			<br>
 			<h2>{{modInfo.name}} {{VERSION.withoutName}}</h2><br><br>
 			<h3>Congratulations! You have reached the end and beaten this game, but for now...</h3><br>
-			<h3>Please check the Discord to see there are new content updates!</h3><br><br>
+			<h3>Please check the Discord to see if there are new content updates!</h3><br><br>
 			<div v-if="!player.timePlayedReset">It took you {{formatTime(player.timePlayed)}} to beat the game.</div>
 			<div v-if="player.timePlayedReset">Make sure that you record the time in your stream or else your speedrun won't count!</div>
 			<br>
@@ -99,7 +99,14 @@
 			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
 			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'"  class="overlayThing" onclick="showTab('info')"><br>i</div>
-			<img id="discord"  class="overlayThing" onclick="window.open((modInfo.discordLink ? modInfo.discordLink : 'https://discord.gg/F3xveHV'),'mywindow')" src="discord.png"  target="_blank"></img>
+			<div id="discord" class="overlayThing">
+				<img onclick="window.open((modInfo.discordLink ? modInfo.discordLink : 'https://discord.gg/F3xveHV'),'mywindow')" src="discord.png"  target="_blank"></img>
+				<ul id="discord-links">
+					<li v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></li>
+					<li><a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br></li>
+					<li><a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a></li>
+				</ul>
+			</div>
 			<div class="overlayThing" style="padding-bottom:7px; width: 90%">
 				<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
 					<br>Dev Speed: {{format(player.devSpeed)}}x<br>

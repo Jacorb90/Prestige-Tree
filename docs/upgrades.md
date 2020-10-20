@@ -6,7 +6,7 @@ Useful functions for dealing with Upgrades and implementing their effects:
 - upgradeEffect(layer, id): Returns the current effects of the upgrade, if any
 - buyUpgrade(layer, id): Buys an upgrade directly (if affordable)
 
-Hint: Basic point gain is calculated in game.js's "getPointGain".
+Hint: Basic point gain is calculated in mod.js's "getPointGen".
 
 Upgrades are stored in the following format:
 
@@ -15,7 +15,7 @@ Upgrades are stored in the following format:
         rows: # of rows
         cols: # of columns
         11: {
-            desc: "Blah",
+            description: "Blah",
             more features
         }
         etc
