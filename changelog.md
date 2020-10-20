@@ -2,6 +2,7 @@
 
 - Added buyUpgrade function (buyUpg still works though)
 - Added author name to modInfo.
+- Fix to crash caused when the name of a subtab or microtab is changed.
 - Fixes to outdated information in docs.
 - Improvements to Discord links.
 - Thank you to thepaperpilot for contributing to this update!

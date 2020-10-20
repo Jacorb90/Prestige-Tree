@@ -157,6 +157,15 @@ function fixSave() {
 	{
 		if (player[layer].best !== undefined) player[layer].best = new Decimal (player[layer].best)
 		if (player[layer].total !== undefined) player[layer].total = new Decimal (player[layer].total)
+
+		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
+		
+			if(!Object.keys(layers[layer].tabFormat).includes(player.subtabs[layer].mainTabs)) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
+		}
+		if (layers[layer].microtabs) {
+			for (item in layers[layer].microtabs)
+				if(!Object.keys(layers[layer].microtabs[item]).includes(player.subtabs[layer][item])) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
+		}
 	}
 }
 
