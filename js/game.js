@@ -101,7 +101,7 @@ function rowReset(row, layer) {
 }
 
 function layerDataReset(layer, keep = []) {
-	let storedData = {}
+	let storedData = {unlocked: player[layer].unlocked} // Always keep unlocked
 
 	for (thing in keep) {
 		if (player[layer][keep[thing]] !== undefined)
@@ -111,8 +111,10 @@ function layerDataReset(layer, keep = []) {
 	player[layer] = layers[layer].startData();
 	player[layer].upgrades = []
 	player[layer].milestones = []
-	player[layer].challenges = []
+	player[layer].challenges = getStartChallenges(layer)
 	resetBuyables(layer)
+	if (layers[layer].clickables && !player[layer].clickables) 
+		player[layer].clickables = getStartClickables(layer)
 
 	for (thing in storedData) {
 		player[layer][thing] =storedData[thing]

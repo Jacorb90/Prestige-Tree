@@ -122,7 +122,7 @@ Key:
 
 - canBuyMax(): **sometimes required**, required for static layers, function used to determine if buying max is permitted.
 
-- gainMult(), gainExp(): Functions that calculate the multiplier and exponent on resource gain from upgrades
+- gainMult(), gainExp(): **optional**, Functions that calculate the multiplier and exponent on resource gain from upgrades
                          and boosts and such. Plug in any bonuses here.
 
 - onPrestige(gain): **optional**, A function that triggers when this layer prestiges, just before you gain the currency. 

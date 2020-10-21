@@ -1,7 +1,12 @@
 # The Modding Tree changelog:
 
+### v2.1.3 - 10/21/20
+- gainMult and gainExp are now optional.
+- Layer unlocking is now kept on reset.
+- Game should start up faster.
 - Layer updates now have a determined order and starts with earlier-rowed layers.
 - Automation now has a determined order and starts with later-rowed layers.
+- Fixed issues with resetting clickables and challenges.
 - Commas should no longer appear in the decimal places of a number.
 - Fixed potential issue in displaying the tree.
 

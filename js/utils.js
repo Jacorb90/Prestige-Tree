@@ -222,6 +222,8 @@ function load() {
 	versionCheck();
 	changeTheme();
 	changeTreeQuality();
+	updateLayers()
+
 	setupTemp();
 	updateTemp();
 	updateTemp();

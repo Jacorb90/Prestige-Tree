@@ -115,7 +115,9 @@ function updateLayers(){
 
         if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
         if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
-        if(layers[layer].unlockOrder === undefined) layers[layer].unlockOrder = 0
+        if(layers[layer].unlockOrder === undefined) layers[layer].unlockOrder = []
+        if(layers[layer].gainMult === undefined) layers[layer].gainMult = new Decimal(1)
+        if(layers[layer].gainExp === undefined) layers[layer].gainExp = new Decimal(1)
 
         let row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}
@@ -142,7 +144,6 @@ function updateLayers(){
 
 function addLayer(layerName, layerData){ // Call this to add layers from a different file!
     layers[layerName] = layerData
-    updateLayers()
 }
 
 // If data is a function, return the result of calling it. Otherwise, return the data.
