@@ -1,5 +1,6 @@
 # The Modding Tree changelog:
 
+### v2.1.2 - 10/19/20
 - Added buyUpgrade function (buyUpg still works though)
 - Added author name to modInfo.
 - Fix to crash caused when the name of a subtab or microtab is changed.
