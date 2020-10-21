@@ -5,7 +5,7 @@ var gameEnded = false;
 
 // Don't change this
 const TMT_VERSION = {
-	tmtNum: "2.1.1",
+	tmtNum: "2.1.3.1",
 	tmtName: "We should have thought of this sooner!"
 }
 
@@ -289,14 +289,14 @@ function gameLoop(diff) {
 	for (x = 0; x <= maxRow; x++){
 		for (item in TREE_LAYERS[x]) {
 			let layer = TREE_LAYERS[x][item].layer
-			if (layers[layer].update) layers[layer].update();
+			if (layers[layer].update) layers[layer].update(diff);
 		}
 	}
 
 	for (row in OTHER_LAYERS){
 		for (item in OTHER_LAYERS[row]) {
 			let layer = OTHER_LAYERS[row][item].layer
-			if (layers[layer].update) layers[layer].update();
+			if (layers[layer].update) layers[layer].update(diff);
 		}
 	}	
 

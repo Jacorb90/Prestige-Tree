@@ -1,5 +1,8 @@
 # The Modding Tree changelog:
 
+### v2.1.3.1 - 10/21/20
+- Fixed the update function.
+
 ### v2.1.3 - 10/21/20
 - gainMult and gainExp are now optional.
 - Layer unlocking is now kept on reset.
