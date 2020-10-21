@@ -283,12 +283,33 @@ function gameLoop(diff) {
 
 	addTime(diff)
 	player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
-	for (layer in layers){
-		if (layers[layer].update) layers[layer].update(diff);
+
+	for (x = 0; x <= maxRow; x++){
+		for (item in TREE_LAYERS[x]) {
+			let layer = TREE_LAYERS[x][item].layer
+			if (layers[layer].update) layers[layer].update();
+		}
 	}
 
-	for (layer in layers){
-		if (layers[layer].automate) layers[layer].automate();
+	for (row in OTHER_LAYERS){
+		for (item in OTHER_LAYERS[row]) {
+			let layer = OTHER_LAYERS[row][item].layer
+			if (layers[layer].update) layers[layer].update();
+		}
+	}	
+
+	for (x = maxRow; x >= 0; x--){
+		for (item in TREE_LAYERS[x]) {
+			let layer = TREE_LAYERS[x][item].layer
+			if (layers[layer].automate) layers[layer].automate();
+		}
+	}
+
+	for (row in OTHER_LAYERS){
+		for (item in OTHER_LAYERS[row]) {
+			let layer = OTHER_LAYERS[row][item].layer
+			if (layers[layer].automate) layers[layer].automate();
+		}
 	}
 
 	for (layer in layers){

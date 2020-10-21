@@ -151,9 +151,9 @@
 				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
-			<span v-for="row in TREE_LAYERS"><table>
+			<span v-for="(n, row) in (maxRow + 1)"><table>
 				<td v-if="player.tab=='tree'&& someLayerUnlocked(row) && row != 0" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(row)"></img></td>
-				<td v-for="node in row"><layer-node :layer='node.layer' :abb='layers[node.layer].symbol'></layer-node></td>
+				<td v-for="node in TREE_LAYERS[row]"><layer-node :layer='node.layer' :abb='layers[node.layer].symbol'></layer-node></td>
 				<table><button class="treeNode hidden"></button></td></table>
 			</span>
 			<canvas id="treeCanvas" class="canvas"></canvas>

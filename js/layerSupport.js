@@ -8,6 +8,8 @@ var LAYERS = Object.keys(layers);
 
 var hotkeys = {};
 
+var maxRow = 0;
+
 function updateHotkeys()
 {
     hotkeys = {};
@@ -115,7 +117,7 @@ function updateLayers(){
         if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
         if(layers[layer].unlockOrder === undefined) layers[layer].unlockOrder = 0
 
-        row = layers[layer].row
+        let row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}
         if(!TREE_LAYERS[row] && !isNaN(row)) TREE_LAYERS[row] = []
         if(!OTHER_LAYERS[row] && isNaN(row)) OTHER_LAYERS[row] = []
@@ -125,6 +127,8 @@ function updateLayers(){
         
         if (!isNaN(row)) TREE_LAYERS[row].push({layer: layer, position: position})
         else OTHER_LAYERS[row].push({layer: layer, position: position})
+
+        if (maxRow < layers[layer].row) maxRow = layers[layer].row
         
     }
     for (row in OTHER_LAYERS) {

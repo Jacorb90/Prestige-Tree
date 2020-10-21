@@ -220,6 +220,7 @@ h1, h2, h3, b, input {
 }
 .achievement:hover {
 	box-shadow: 0px 0px 10px var(--points);
+	z-index: 7;
 }
 
 .buyable {
