@@ -1,5 +1,7 @@
 # The Modding Tree changelog:
 
+- Fixed some numbers not displaying with enough digits.
+
 ### v2.1.3.1 - 10/21/20
 - Fixed the update function.
 

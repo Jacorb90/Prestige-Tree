@@ -52,6 +52,8 @@ function format(decimal, precision=2) {
 }
 
 function formatWhole(decimal) {
+	decimal = new Decimal(decimal)
+	if (decimal.gte(1e9)) return format(decimal, 2)
 	return format(decimal, 0)
 }
 
