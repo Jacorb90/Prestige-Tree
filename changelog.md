@@ -1,5 +1,6 @@
 # The Modding Tree changelog:
 
+- Fixed the "blank" component breaking if only specifying the height.
 - Fixed some numbers not displaying with enough digits.
 
 ### v2.1.3.1 - 10/21/20
