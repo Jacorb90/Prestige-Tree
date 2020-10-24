@@ -46,6 +46,8 @@ Key:
 - effectDescription: **optional**, A function that returns a description of this effect.
                      If the text stays constant, it can just be a string.
 
+- lore: **optional**, Displays some text (can use basic HTML) in a box at the top of the layer tab, unless the player has hidden the lore in the settings.
+
 - layerShown(): A function returning a bool which determines if this layer's node should be visible on the tree.
                 It can also return "ghost", which will hide the layer, but its node will still take up space in the tree.
 
