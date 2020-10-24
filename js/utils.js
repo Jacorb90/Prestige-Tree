@@ -90,6 +90,7 @@ function startPlayerBase() {
 		keepGoing: false,
 		hasNaN: false,
 		hideChallenges: false,
+		showStory: true,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
 	}

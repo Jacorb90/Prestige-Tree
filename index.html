@@ -91,6 +91,7 @@
 				</tr>
 					<tr>
 						<td><button class="opt" onclick="toggleOpt('hideChallenges')">Completed Challenges: {{ player.hideChallenges?"HIDDEN":"SHOWN" }}</button></td>
+						<td><button class="opt" onclick="toggleOpt('showStory')">Story: {{ player.showStory?"SHOWN":"HIDDEN" }}</button></td>
 					<!--	<td><button class="opt" onclick="toggleOpt('oldStyle')">Style: {{ player.oldStyle?"v1.0":"NEW" }}</button></td>-->
 				</tr> 
 			</table>
@@ -162,6 +163,7 @@
 			<div v-if="player.tab==layer" v-bind:class="'col right fast tab'"  v-bind:style="[tmp[layer].style ? tmp[layer].style : {}, (layers[layer].tabFormat && !Array.isArray(tmp[layer].tabFormat)) ? tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style : {}]">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<div v-if="!layers[layer].tabFormat">
+					<lore v-if="tmp[layer].lore" :layer="layer"></lore>
 					<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
 					<div v-if="tmp[layer].type !== 'none'">
 						<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>

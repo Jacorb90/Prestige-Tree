@@ -597,3 +597,10 @@ button > * {
 .ghost {
 	visibility: hidden
 }
+
+.story {
+    max-width: 600px;
+    border: solid 5px;
+    padding: 8px;
+    margin-bottom: 8px;
+}

@@ -69,6 +69,16 @@ function loadVue() {
 		`
 	})
 
+	Vue.component('lore', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="player.showStory"
+			v-bind:class="{ story: true }"
+			v-html="layers[layer].lore">
+		</div>
+		`
+	})
+
 
 	// Data = width in px, by default fills the full area
 	Vue.component('h-line', {
