@@ -2,6 +2,7 @@
 
 - Fixed the "blank" component breaking if only specifying the height.
 - Fixed some numbers not displaying with enough digits.
+- Made a few more things able to be functions.
 
 ### v2.1.3.1 - 10/21/20
 - Fixed the update function.
