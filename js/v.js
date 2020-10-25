@@ -118,10 +118,17 @@ function loadVue() {
 		props: ['layer'],
 		template: `
 		<div v-if="layers[layer].upgrades" class="upgTable">
+<<<<<<< Updated upstream
 			<div v-for="row in layers[layer].upgrades.rows" class="upgRow">
 				<div v-for="col in layers[layer].upgrades.cols" class="upgAlign">
 					<upgrade :layer = "layer" :data = "row*10+col" v-bind:style="tmp.componentStyles[layer].upgrade"></upgrade>
 				</div>
+=======
+			<div v-for="row in tmp[layer].upgrades.rows" class="upgRow">
+				<div v-for="col in tmp[layer].upgrades.cols"><div v-if="tmp[layer].upgrades[row*10+col]!== undefined && tmp[layer].upgrades[row*10+col].unlocked" class="upgAlign">
+					<upgrade :layer = "layer" :data = "row*10+col" v-bind:style="tmp[layer].componentStyles.upgrade"></upgrade>
+				</div></div>
+>>>>>>> Stashed changes
 			</div>
 			<br>
 		</div>
@@ -132,12 +139,21 @@ function loadVue() {
 	Vue.component('upgrade', {
 		props: ['layer', 'data'],
 		template: `
+<<<<<<< Updated upstream
 		<button v-if="layers[layer].upgrades && tmp.upgrades[layer][data].unl" v-on:click="buyUpg(layer, data)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(data), locked: (!(canAffordUpg(layer, data))&&!player[layer].upgrades.includes(data)), can: (canAffordUpg(layer, data)&&!player[layer].upgrades.includes(data))}"
 			v-bind:style="[((!hasUpg(layer, data) && canAffordUpg(layer, data)) ? {'background-color': tmp.layerColor[layer]} : {}), tmp.upgrades[layer][data].style]">
 			<span v-if= "tmp.upgrades[layer][data].title"><h3 v-html="tmp.upgrades[layer][data].title"></h3><br></span>
 			<span v-html="tmp.upgrades[layer][data].desc"></span>
 			<span v-if="tmp.upgrades[layer][data].effect"><br>Currently: <span v-html="(tmp.upgrades[layer][data].effectDisplay) ? (tmp.upgrades[layer][data].effectDisplay) : format(tmp.upgrades[layer][data].effect)"></span></span>
 			<br><br>Cost: {{ formatWhole(tmp.upgrades[layer][data].cost) }} {{(layers[layer].upgrades[data].currencyDisplayName ? layers[layer].upgrades[data].currencyDisplayName : layers[layer].resource)}}
+=======
+		<button v-if="layers[layer].upgrades && tmp[layer].upgrades[data]!== undefined && tmp[layer].upgrades[data].unlocked" v-on:click="buyUpg(layer, data)" v-bind:class="{ [layer]: true, upg: true, bought: hasUpgrade(layer, data), locked: (!(canAffordUpgrade(layer, data))&&!hasUpgrade(layer, data)), can: (canAffordUpgrade(layer, data)&&!hasUpgrade(layer, data))}"
+			v-bind:style="[((!hasUpgrade(layer, data) && canAffordUpgrade(layer, data)) ? {'background-color': tmp[layer].color} : {}), tmp[layer].upgrades[data].style]">
+			<span v-if= "tmp[layer].upgrades[data].title"><h3 v-html="tmp[layer].upgrades[data].title"></h3><br></span>
+			<span v-html="tmp[layer].upgrades[data].description"></span>
+			<span v-if="tmp[layer].upgrades[data].effect"><br>Currently: <span v-html="(tmp[layer].upgrades[data].effectDisplay) ? (tmp[layer].upgrades[data].effectDisplay) : format(tmp[layer].upgrades[data].effect)"></span></span>
+			<br><br>Cost: {{ formatWhole(tmp[layer].upgrades[data].cost) }} {{(tmp[layer].upgrades[data].currencyDisplayName ? tmp[layer].upgrades[data].currencyDisplayName : tmp[layer].resource)}}
+>>>>>>> Stashed changes
 		</button>
 		`
 	})
@@ -147,9 +163,15 @@ function loadVue() {
 		template: `
 		<div v-if="layers[layer].milestones">
 			<table>
+<<<<<<< Updated upstream
 				<tr v-for="id in Object.keys(layers[layer].milestones)">
 					<milestone :layer = "layer" :data = "id" v-bind:style="tmp.componentStyles[layer].milestone"></milestone>
 				</tr>
+=======
+				<tr v-for="id in Object.keys(tmp[layer].milestones)"><div v-if="tmp[layer].milestones[id]!== undefined && tmp[layer].milestones[id].unlocked"
+					<milestone :layer = "layer" :data = "id" v-bind:style="tmp[layer].componentStyles.milestone"></milestone>
+				</tr></div>
+>>>>>>> Stashed changes
 			</table>
 			<br>
 		</div>
@@ -160,10 +182,17 @@ function loadVue() {
 	Vue.component('milestone', {
 		props: ['layer', 'data'],
 		template: `
+<<<<<<< Updated upstream
 		<td v-if="layers[layer].milestones && milestoneShown(layer, data)" v-bind:style="[(layers[layer].milestones[data].unl && !tmp.milestones[layer][data].unl) ? {'visibility': 'hidden'} : {}, tmp.milestones[layer][data].style]" v-bind:class="{milestone: !player[layer].milestones.includes(data), milestoneDone: player[layer].milestones.includes(data)}">
 			<h3 v-html="tmp.milestones[layer][data].requirementDesc"></h3><br>
 			<span v-html="tmp.milestones[layer][data].effectDesc"></span><br>
 		<span v-if="(layers[layer].milestones[data].toggles)&&(player[layer].milestones.includes(data))" v-for="toggle in layers[layer].milestones[data].toggles"><toggle :layer= "layer" :data= "toggle" v-bind:style="tmp.componentStyles[layer].toggle"></toggle>&nbsp;</span></td></tr>
+=======
+		<td v-if="layers[layer].milestones && tmp[layer].milestones[data]!== undefined && milestoneShown(layer, data)" v-bind:style="[(!tmp[layer].milestones[data].unlocked) ? {'visibility': 'hidden'} : {}, tmp[layer].milestones[data].style]" v-bind:class="{milestone: !hasMilestone(layer, data), milestoneDone: hasMilestone(layer, data)}">
+			<h3 v-html="tmp[layer].milestones[data].requirementDescription"></h3><br>
+			<span v-html="tmp[layer].milestones[data].effectDescription"></span><br>
+		<span v-if="(tmp[layer].milestones[data].toggles)&&(hasMilestone(layer, data))" v-for="toggle in tmp[layer].milestones[data].toggles"><toggle :layer= "layer" :data= "toggle" v-bind:style="tmp[layer].componentStyles.toggle"></toggle>&nbsp;</span></td></tr>
+>>>>>>> Stashed changes
 		`
 	})
 
@@ -203,11 +232,19 @@ function loadVue() {
 		props: ['layer', 'data'],
 		template: `
 		<div v-if="layers[layer].buyables" class="upgTable">
+<<<<<<< Updated upstream
 			<button v-if="layers[layer].buyables.respec" v-on:click="respecBuyables(layer)" v-bind:class="{ longUpg: true, can: player[layer].unl, locked: !player[layer].unl }">{{layers[layer].buyables.respecText ? tmp.buyables[layer].respecText : "Respec"}}</button><br>
 			<div v-for="row in layers[layer].buyables.rows" class="upgRow">
 				<div v-for="col in layers[layer].buyables.cols" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : '200px'),}">
 					<buyable :layer = "layer" :data = "row*10+col" :size = "data" v-bind:style="tmp.componentStyles[layer].buyable"></buyable>
 				</div>
+=======
+			<respec-button v-if="tmp[layer].buyables.respec && !(tmp[layer].buyables.showRespec !== undefined && tmp[layer].buyables.showRespec == false)" :layer = "layer" v-bind:style="[{'margin-bottom': '12px'}, tmp[layer].componentStyles['respec-button']]"></respec-button>
+			<div v-for="row in tmp[layer].buyables.rows" class="upgRow">
+				<div v-for="col in tmp[layer].buyables.cols"><div v-if="tmp[layer].buyables[row*10+col]!== undefined && tmp[layer].buyables[row*10+col].unlocked" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : 'inherit'),}">
+					<buyable :layer = "layer" :data = "row*10+col" :size = "data"></buyable>
+				</div></div>
+>>>>>>> Stashed changes
 				<br>
 			</div>
 		</div>
@@ -218,6 +255,7 @@ function loadVue() {
 	Vue.component('buyable', {
 		props: ['layer', 'data', 'size'],
 		template: `
+<<<<<<< Updated upstream
 		<button 
 			v-if="layers[layer].buyables && tmp.buyables[layer][data].unl" 
 			v-bind:class="{ buyable: true, can: tmp.buyables[layer][data].canAfford, locked: !tmp.buyables[layer][data].canAfford}"
@@ -225,10 +263,70 @@ function loadVue() {
 			v-on:click="buyBuyable(layer, data)">
 			<span v-if= "layers[layer].buyables[data].title"><h2 v-html="tmp.buyables[layer][data].title"></h2><br></span>
 			<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp.buyables[layer][data].display"></span>
+=======
+		<div v-if="layers[layer].buyables && tmp[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unlocked" style="display: grid">
+			<button v-bind:class="{ buyable: true, can: tmp[layer].buyables[data].canAfford, locked: !tmp[layer].buyables[data].canAfford}"
+			v-bind:style="[tmp[layer].buyables[data].canAfford ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].componentStyles.buyable, tmp[layer].buyables[data].style]"
+			v-on:click="buyBuyable(layer, data)">
+				<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
+				<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp[layer].buyables[data].display"></span>
+			</button>
+			<br v-if="(tmp[layer].buyables[data].sellOne !== undefined && !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)) || (tmp[layer].buyables[data].sellAll && !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false))">
+			<sell-one :layer="layer" :data="data" v-bind:style="tmp[layer].componentStyles['sell-one']" v-if="(tmp[layer].buyables[data].sellOne)&& !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)"></sell-one>
+			<sell-all :layer="layer" :data="data" v-bind:style="tmp[layer].componentStyles['sell-all']" v-if="(tmp[layer].buyables[data].sellAll)&& !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false)"></sell-all>
+		</div>
+		`
+	})
+
+	Vue.component('respec-button', {
+		props: ['layer', 'data'],
+		template: `
+			<button v-if="layers[layer].buyables && tmp[layer].buyables.respec && !(tmp[layer].buyables.showRespec !== undefined && tmp[layer].buyables.showRespec == false)" v-on:click="respecBuyables(layer)" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.respecText ? tmp[layer].buyables.respecText : "Respec"}}</button>
+	`
+	})
+
+	// data = button size, in px
+	Vue.component('clickables', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="layers[layer].clickables" class="upgTable">
+			<master-button v-if="tmp[layer].clickables.masterButtonPress && !(tmp[layer].clickables.showMasterButton !== undefined && tmp[layer].clickables.showMasterButton == false)" :layer = "layer" v-bind:style="[{'margin-bottom': '12px'}, tmp[layer].componentStyles['master-button']]"></master-button>
+			<div v-for="row in tmp[layer].clickables.rows" class="upgRow">
+				<div v-for="col in tmp[layer].clickables.cols"><div v-if="tmp[layer].clickables[row*10+col]!== undefined && tmp[layer].clickables[row*10+col].unlocked" class="upgAlign" v-bind:style="{'margin-left': '7px', 'margin-right': '7px',  'height': (data ? data : 'inherit'),}">
+					<clickable :layer = "layer" :data = "row*10+col" :size = "data" v-bind:style="tmp[layer].componentStyles.clickable"></clickable>
+				</div></div>
+				<br>
+			</div>
+		</div>
+	`
+	})
+
+	// data = id of clickable
+	Vue.component('clickable', {
+		props: ['layer', 'data', 'size'],
+		template: `
+		<button 
+			v-if="layers[layer].clickables && tmp[layer].clickables[data]!== undefined && tmp[layer].clickables[data].unlocked" 
+			v-bind:class="{ upg: true, can: tmp[layer].clickables[data].canClick, locked: !tmp[layer].clickables[data].canClick}"
+			v-bind:style="[tmp[layer].clickables[data].canClick ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].clickables[data].style]"
+			v-on:click="clickClickable(layer, data)">
+			<span v-if= "tmp[layer].clickables[data].title"><h2 v-html="tmp[layer].clickables[data].title"></h2><br></span>
+			<span v-bind:style="{'white-space': 'pre-line'}" v-html="tmp[layer].clickables[data].display"></span>
+>>>>>>> Stashed changes
 		</button>
 		`
 	})
 
+<<<<<<< Updated upstream
+=======
+	Vue.component('master-button', {
+		props: ['layer', 'data'],
+		template: `
+		<button v-if="tmp[layer].clickables && tmp[layer].clickables.masterButtonPress && !(tmp[layer].clickables.showMasterButton !== undefined && tmp[layer].clickables.showMasterButton == false)" v-on:click="tmp[layer].clickables.masterButtonPress()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].clickables.masterButtonText ? tmp[layer].clickables.masterButtonText : "Click me!"}}</button>
+	`
+	})
+
+>>>>>>> Stashed changes
 	// data = button size, in px
 	Vue.component('microtabs', {
 		props: ['layer', 'data'],
@@ -246,6 +344,70 @@ function loadVue() {
 	})
 
 
+<<<<<<< Updated upstream
+=======
+	// data = id of the bar
+	Vue.component('bar', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].dims, {'display': 'table'}]">
+			<div class = "overlayTextContainer barBorder" v-bind:style="[tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].dims]">
+				<span class = "overlayText" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].textStyle]" v-html="tmp[layer].bars[data].display"></span>
+			</div>
+			<div class ="barBG barBorder" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle,  tmp[layer].bars[data].dims]">
+				<div class ="fill" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].fillStyle, tmp[layer].bars[data].fillDims]"></div>
+			</div>
+		</div></div>
+		`
+	})
+
+
+	Vue.component('achievements', {
+		props: ['layer'],
+		template: `
+		<div v-if="layers[layer].achievements" class="upgTable">
+			<div v-for="row in tmp[layer].achievements.rows" class="upgRow">
+				<div v-for="col in tmp[layer].achievements.cols"><div v-if="tmp[layer].achievements[row*10+col]!== undefined && tmp[layer].achievements[row*10+col].unlocked" class="upgAlign">
+					<achievement :layer = "layer" :data = "row*10+col" v-bind:style="tmp[layer].componentStyles.achievement"></achievement>
+				</div></div>
+			</div>
+			<br>
+		</div>
+		`
+	})
+
+	// data = id
+	Vue.component('achievement', {
+		props: ['layer', 'data'],
+		template: `
+		<div v-if="layers[layer].achievements && tmp[layer].achievements[data]!== undefined && tmp[layer].achievements[data].unlocked" v-bind:class="{ [layer]: true, achievement: true, locked: !hasAchievement(layer, data), bought: hasAchievement(layer, data)}"
+			v-bind:tooltip="
+				hasAchievement(layer, data) ? (tmp[layer].achievements[data].doneTooltip ? tmp[layer].achievements[data].doneTooltip : (tmp[layer].achievements[data].tooltip ? tmp[layer].achievements[data].tooltip : 'You did it!'))
+				: (tmp[layer].achievements[data].goalTooltip ? tmp[layer].achievements[data].goalTooltip : (tmp[layer].achievements[data].tooltip ? tmp[layer].achievements[data].tooltip : 'LOCKED'))
+			"
+
+			v-bind:style="[(!tmp[layer].achievements[data].unlocked) ? {'visibility': 'hidden'} : {}, tmp[layer].achievements[data].style,]">
+			<span v-if= "tmp[layer].achievements[data].name"><br><h3 v-html="tmp[layer].achievements[data].name"></h3><br></span>
+		</div>
+		`
+	})
+
+
+	// These are for buyables, data is the id of the corresponding buyable
+	Vue.component('sell-one', {
+		props: ['layer', 'data'],
+		template: `
+			<button v-if="layers[layer].buyables && tmp[layer].buyables[data].sellOne && !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)" v-on:click="tmp[layer].buyables[data].sellOne()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.sellOneText ? tmp[layer].buyables.sellOneText : "Sell One"}}</button>
+	`
+	})
+	Vue.component('sell-all', {
+		props: ['layer', 'data'],
+		template: `
+			<button v-if="layers[layer].buyables && tmp[layer].buyables[data].sellAll && !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false)" v-on:click="tmp[layer].buyables[data].sellAll()" v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.sellAllText ? tmp[layer].buyables.sellAllText : "Sell All"}}</button>
+	`
+	})
+
+>>>>>>> Stashed changes
 	// NOT FOR USE IN STANDARD TAB FORMATTING
 	Vue.component('tab-buttons', {
 		props: ['layer', 'data', 'name'],
