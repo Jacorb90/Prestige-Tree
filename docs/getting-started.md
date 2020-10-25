@@ -17,7 +17,7 @@ The benefits of using Github:
 - It lets you collaborate with other people, if you want to.
 
 
-# Getting set up with Github and The Modding Tree:
+## Getting set up with Github and The Modding Tree:
 
 1. Install [Github Desktop](https://desktop.github.com/) and [Visual Studio Code](https://code.visualstudio.com/).
 
@@ -36,17 +36,18 @@ The benefits of using Github:
 6. Select that you're using it for your own purposes, and click continue. It will download the files and handle everything.
 
 
-# Using your repository
+## Using your repository
 
 1. Click on "show in finder" to the right, and then open index.html. This will let you view and
     test your project!
 
 2. To edit your project, click "open in VSCode" in Github Desktop.
 
-3. Open index.html, and look at the top part where it says "modInfo". On the lines below that, change
-    the mod's name to whatever you want, and change the id as well. (The id is important, it determines where the game looks for your saves. It should be different from other mods, and shouldn't be changed once set.) 
+3. Open mod.js in VSCode, and look at the top part where it says "modInfo". On the lines below that, change
+    the mod's name to whatever you want, and change the id as well. (It can be any string value, and it's used to determine
+    where the savefile is. Make it something that's probably unique, and don't change it again later.)
 
-4. Reload index.html. The title on the tab, as well as on the info page, will now be the new ones!
+4. Save game.js, and then reload index.html. The title on the tab, as well as on the info page, will now be the new ones!
 
 5. Go back to Github Desktop. It's time to save your changes into the git system by making a "commit".
 

@@ -1,11 +1,11 @@
-#Milestones
+# Milestones
 
-Milestones should be formatted like this:
+Milestones are awarded to the player when they meet a certain goal, and give some benefit. Milestones should be formatted like this:
 
 ```js
     milestones: {
         0: {
-            requirementDesc:() => "123 waffles",
+            requirementDesc: "123 waffles",
         }
         etc
     }
@@ -21,7 +21,7 @@ Milestone features:
 - effectDesc: A string describing the reward for having the milestone. *You will have to implement the reward elsewhere.*
               It can also be a function that returns updating text. Can use basic HTML.
 
-- done(): A function returning a boolean to determine if the milestone has been fulfilled.
+- done(): A function returning a boolean to determine if the milestone should be awarded.
 
 - toggles: *optional*, Creates toggle buttons that appear on the milestone when it is unlocked.
            The toggles can toggle a given boolean value in a layer.
@@ -31,10 +31,13 @@ Milestone features:
 
            **Tip:** Toggles are not de-set if the milestone becomes locked! In this case, you should also check if the player has the milestone.
 
-- style(): **Optional**, A function returning a CSS object, which affects this milestone.
+- style: **Optional**, Applies CSS to this milestone, in the form of an object where the keys are CSS attributes,
+         and the values are the values for those attributes (both as strings)
 
-- unl(): A function returning a boolean to determine if the milestone should be shown. If absent, it is always shown.
+- unlocked(): **Optional** A function returning a boolean to determine if the milestone should be shown.
+              If absent, it is always shown.
 
 - layer: **Assigned automagically**. It's the same value as the name of this layer, so you can do player[this.layer].points or similar
 
-- id: **Assigned automagically**. It's the id for this milestone.
+- id: **Assigned automagically**. It's the "key" which the milestone was stored under, for convenient access.
+      The milestone in the example's id is 0.
