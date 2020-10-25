@@ -69,17 +69,17 @@ function loadVue() {
 		`
 	})
 
-	Vue.component('lore', {
+	Vue.component('infobox', {
 		props: ['layer', 'data'],
 		template: `
-		<div class="story instant" v-bind:style="{'border-color': tmp[layer].color, 'border-radius': player[layer].loreHidden ? 0 : '8px'}">
+		<div class="story instant" v-if="tmp[layer].infoboxes && tmp[layer].infoboxes[data]!== undefined && tmp[layer].infoboxes[data].unlocked" v-bind:style="{'border-color': tmp[layer].color, 'border-radius': player.infoboxes[layer][data] ? 0 : '8px'}">
 			<button class="story-title" v-bind:style="{'background-color': tmp[layer].color}"
-				v-on:click="player[layer].loreHidden = !player[layer].loreHidden">
-				<span class="story-toggle">{{player[layer].loreHidden ? "+" : "-"}}</span>
-				{{layers[layer].name}}
+				v-on:click="player.infoboxes[layer][data] = !player.infoboxes[layer][data]">
+				<span class="story-toggle">{{player.infoboxes[layer][data] ? "+" : "-"}}</span>
+				<span v-html="tmp[layer].infoboxes[data].title ? tmp[layer].infoboxes[data].title : (tmp[layer].name)"></span>
 			</button>
-			<div v-if="!player[layer].loreHidden" class="story-text">
-				<span v-html="data ? data : layers[layer].lore"></span>
+			<div v-if="!player.infoboxes[layer][data]" class="story-text">
+				<span v-html="tmp[layer].infoboxes[data].text ? tmp[layer].infoboxes[data].text : 'Blah'"></span>
 			</div>
 		</div>
 		`

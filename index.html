@@ -162,7 +162,7 @@
 			<div v-if="player.tab==layer" v-bind:class="'col right fast tab'"  v-bind:style="[tmp[layer].style ? tmp[layer].style : {}, (tmp[layer].tabFormat && !Array.isArray(tmp[layer].tabFormat)) ? tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style : {}]">
 				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
 				<div v-if="!tmp[layer].tabFormat">
-					<lore v-if="tmp[layer].lore" :layer="layer"></lore>
+					<info-box v-if="tmp[layer].infoboxes" :layer="layer" :data="Object.keys(tmp[layer].infoboxes)[0]"></info-box>
 					<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
 					<div v-if="tmp[layer].type !== 'none'">
 						<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>

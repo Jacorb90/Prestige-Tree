@@ -109,7 +109,15 @@ function updateLayers(){
                 layers[layer].bars[thing].layer = layer
                 if (layers[layer].bars[thing].unlocked === undefined)
                     layers[layer].bars[thing].unlocked = true
-                
+            }  
+        }
+
+        if (layers[layer].infoboxes){
+            for (thing in layers[layer].infoboxes){
+                layers[layer].infoboxes[thing].id = thing
+                layers[layer].infoboxes[thing].layer = layer
+                if (layers[layer].infoboxes[thing].unlocked === undefined)
+                    layers[layer].infoboxes[thing].unlocked = true
             }  
         }
 

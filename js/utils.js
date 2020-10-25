@@ -106,6 +106,8 @@ function getStartPlayer() {
 		for (thing in extradata)
 			playerdata[thing] = extradata[thing]
 	}
+
+	playerdata.infoboxes = {}
 	for (layer in layers){
 		playerdata[layer] = layers[layer].startData()
 		playerdata[layer].buyables = getStartBuyables(layer)
@@ -124,7 +126,11 @@ function getStartPlayer() {
 			for (item in layers[layer].microtabs)
 			playerdata.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
 		}
-		playerdata[layer].loreHidden = false
+		if (layers[layer].infoboxes) {
+			if (playerdata.infoboxes[layer] == undefined) playerdata.infoboxes[layer] = {}
+			for (item in layers[layer].infoboxes)
+				playerdata.infoboxes[layer][item] = false
+		}
 	}
 	return playerdata
 }
