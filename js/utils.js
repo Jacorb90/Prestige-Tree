@@ -122,6 +122,7 @@ function getStartPlayer() {
 			for (item in layers[layer].microtabs)
 			playerdata.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
 		}
+		playerdata[layer].loreHidden = false
 	}
 	return playerdata
 }

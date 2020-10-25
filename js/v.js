@@ -72,9 +72,15 @@ function loadVue() {
 	Vue.component('lore', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="player.showStory"
-			v-bind:class="{ story: true }"
-			v-html="layers[layer].lore">
+		<div class="story" v-bind:style="{'border-color': tmp[layer].color}">
+			<button class="story-title" v-bind:style="{'background-color': tmp[layer].color}"
+				v-on:click="player[layer].loreHidden = player[layer].loreHidden !== true">
+				<span class="story-toggle">{{player[layer].loreHidden === true ? "+" : "-"}}</span>
+				{{layers[layer].name}}
+			</button>
+			<div v-if="player[layer].loreHidden !== true" class="story-text">
+				<span v-html="data ? data : layers[layer].lore"></span>
+			</div>
 		</div>
 		`
 	})

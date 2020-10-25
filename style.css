@@ -599,8 +599,33 @@ button > * {
 }
 
 .story {
-    max-width: 600px;
-    border: solid 5px;
-    padding: 8px;
+    width: 600px;
+    max-width: 95%;
+    border: solid 4px;
+    border-radius: 8px;
     margin-bottom: 8px;
+}
+
+.story-title {
+    text-align: left;
+    font-size: 24px;
+    color: black;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    padding: 2px;
+}
+
+.story-toggle {
+    border: none;
+    background: black;
+    color: white;
+    font-size: 20px;
+    pointer-events: none;
+    width: 1em;
+    display: inline-block;
+}
+
+.story-text {
+	padding: 2px;
 }
