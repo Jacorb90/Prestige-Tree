@@ -118,7 +118,8 @@ Key:
 
 - exponent: Used as described above.
 
-- base: **sometimes required**, required for "static" layers, used as described above.
+- base: **sometimes required**, required for "static" layers, used as described above. If absent, defaults to 2.
+        Must be greater than 1.
 
 - roundUpCost: **optional**, a bool, which is true if the resource cost needs to be rounded up.
             (use if the base resource is a "static" currency.)

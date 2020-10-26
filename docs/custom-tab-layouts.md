@@ -53,6 +53,8 @@ These are the existing components, but you can create more in v.js:
 
 - bar: Display a bar. The argument is the id of the bar to display.
 
+- infobox: Display an infobox. The argument is the id of the infobox to display.
+
 - toggle: A toggle button that toggles a bool value. The data is a pair that identifies what bool to toggle, [layer, id]
 
 

@@ -127,6 +127,7 @@ function updateLayers(){
         if(layers[layer].gainMult === undefined) layers[layer].gainMult = new Decimal(1)
         if(layers[layer].gainExp === undefined) layers[layer].gainExp = new Decimal(1)
         if(layers[layer].type === undefined) layers[layer].type = "none"
+        if(layers[layer].base === undefined || layers[layer].base <= 1) layers[layer].base = 2
 
         let row = layers[layer].row
         if(!ROW_LAYERS[row]) ROW_LAYERS[row] = {}

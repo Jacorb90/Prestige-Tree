@@ -1,5 +1,6 @@
 # The Modding Tree changelog:
 
+### v2.1.4 - 10/25/20
 - Added an infobox component. Thank you to thepaperpilot for this contribution!
 - Layer type is now optional, and defaults to "none".
 - Improved the look of bars and tab buttons.
