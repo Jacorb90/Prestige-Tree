@@ -239,11 +239,11 @@ function canCompleteChallenge(layer, x)
 			return !(player[lr][name].lt(readData(challenge.goal))) 
 		}
 		else {
-			return !(player[name].lt(challenge.cost))
+			return !(player[name].lt(challenge.goal))
 		}
 	}
 	else {
-		return !(player[layer].points.lt(challenge.cost))
+		return !(player[layer].points.lt(challenge.goal))
 	}
 
 }

@@ -144,7 +144,7 @@ h1, h2, h3, b, input {
 
 .barBorder {
 	border: 2px solid;
-	border-radius: 10%;
+	border-radius: 10px;
 	border-color: var(--color);
 	overflow: hidden;
 	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
@@ -153,7 +153,7 @@ h1, h2, h3, b, input {
 
 .overlayTextContainer {
 	z-index: 3;
-	border-radius: 10%;
+	border-radius: 10px;
 	vertical-align: middle;
 	display: flex;
 	justify-content: center;
@@ -180,7 +180,7 @@ h1, h2, h3, b, input {
 	cursor: pointer;
 	padding: 5px 20px 5px 20px;
 	margin: 5px 5px 5px 5px;
-	border-radius: 25%;
+	border-radius: 10px;
 	border: 2px solid;
 	border-color: rgba(0, 0, 0, 0.125);
 
