@@ -43,7 +43,10 @@ addLayer("c", {
         },
         infoboxes:{
             coolInfo: {
-                text: "momo"
+                title: "Lore",
+                titleStyle: {'color': '#FE0000'},
+                body: "DEEP LORE!",
+                bodyStyle: {'background-color': "#0000EE"}
             }
         },
         milestones: {

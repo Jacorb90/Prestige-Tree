@@ -57,7 +57,7 @@ function loadVue() {
 	Vue.component('column', {
 		props: ['layer', 'data'],
 		template: `
-		<div class="upgTable instant" >
+		<div class="upgTable instant">
 			<div class="upgCol">
 				<div v-for="item in data">
 					<div v-if="!Array.isArray(item)" v-bind:is="item" :layer= "layer" v-bind:style="tmp[layer].componentStyles[item]"></div>
@@ -72,14 +72,14 @@ function loadVue() {
 	Vue.component('infobox', {
 		props: ['layer', 'data'],
 		template: `
-		<div class="story instant" v-if="tmp[layer].infoboxes && tmp[layer].infoboxes[data]!== undefined && tmp[layer].infoboxes[data].unlocked" v-bind:style="{'border-color': tmp[layer].color, 'border-radius': player.infoboxes[layer][data] ? 0 : '8px'}">
-			<button class="story-title" v-bind:style="{'background-color': tmp[layer].color}"
+		<div class="story instant" v-if="tmp[layer].infoboxes && tmp[layer].infoboxes[data]!== undefined && tmp[layer].infoboxes[data].unlocked" v-bind:style="{'border-color': tmp[layer].color, 'border-radius': player.infoboxes[layer][data] ? 0 : '8px'}, tmp[layer].infoboxes[data].style">
+			<button class="story-title" v-bind:style="[{'background-color': tmp[layer].color}, tmp[layer].infoboxes[data].titleStyle]"
 				v-on:click="player.infoboxes[layer][data] = !player.infoboxes[layer][data]">
 				<span class="story-toggle">{{player.infoboxes[layer][data] ? "+" : "-"}}</span>
 				<span v-html="tmp[layer].infoboxes[data].title ? tmp[layer].infoboxes[data].title : (tmp[layer].name)"></span>
 			</button>
-			<div v-if="!player.infoboxes[layer][data]" class="story-text">
-				<span v-html="tmp[layer].infoboxes[data].text ? tmp[layer].infoboxes[data].text : 'Blah'"></span>
+			<div v-if="!player.infoboxes[layer][data]" class="story-text" v-bind:style="tmp[layer].infoboxes[data].bodyStyle">
+				<span v-html="tmp[layer].infoboxes[data].body ? tmp[layer].infoboxes[data].body : 'Blah'"></span>
 			</div>
 		</div>
 		`
