@@ -468,7 +468,7 @@ addLayer("f", {
 }, 
 )
 
-// A side layer with achievements
+// A side layer with achievements, with no prestige
 addLayer("a", {
         startData() { return {
             unlocked: true,
@@ -476,7 +476,6 @@ addLayer("a", {
         }},
         color: "yellow",
         resource: "achievement power", 
-        type: "none",
         row: "side",
         layerShown() {return true}, 
         tooltip() { // Optional, tooltip displays when the layer is locked

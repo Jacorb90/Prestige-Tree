@@ -1,5 +1,7 @@
 # The Modding Tree changelog:
 
+- Added an infobox component. Thank you to thepaperpilot for this contribution!
+- Layer type is now optional, and defaults to "none".
 - Fixed the "blank" component breaking if only specifying the height.
 - Fixed some numbers not displaying with enough digits.
 - Made a few more things able to be functions.

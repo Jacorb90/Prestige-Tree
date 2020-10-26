@@ -2,6 +2,8 @@
 
 Clickables are any kind of thing that you can click for an effect. They're a more generalized version of Buyables.
 
+DO NOT USE THESE TO MAKE THINGS THAT YOU CLICK REPEATEDLY FOR A BONUS BECAUSE THOSE ARE AWFUL.
+
 There are several differences between the two. One is that a buyable's saved data is its amount as a Decimal, while
 Clickables store a "state" which can be a number or string, but not Decimal, array, or object). 
 Buyables have a number of extra features which you can see on their page.

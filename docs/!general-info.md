@@ -22,23 +22,32 @@ that returns what the value should be at any given time.
 
 All display text can be basic HTML instead (But you can't use most Vue features there).
 
-## Table of Contents:
+# Table of Contents:
+
+## General:
 
 - [Getting Started](getting-started.md): Getting your own copy of the code set up with Github Desktop.
 - [Main mod info](main-mod-info.md): How to set up general things for your mod in mod.js.
 - [Basic layer breakdown](basic-layer-breakdown.md): Breaking down the components of a layer with minimal features.
 - [Layer features](layer-features.md): Explanations of all of the different properties that you can give a layer.
+- [Custom Tab Layouts](custom-tab-layouts.md): An optional way to give your tabs a different layout.
+                                                   You can even create entirely new components to use.
+- [Updating TMT](updating-tmt.md): Using Github Desktop to update your mod's version of TMT.
+
+## Common components
+
 - [Upgrades](upgrades.md): How to create upgrades for a layer.
 - [Milestones](milestones.md): How to create milestones for a layer.
-- [Challenges](challenges.md): How to create challenges for a layer.
 - [Buyables](buyables.md): Create rebuyable upgrades for your layer (with the option to make them respec-able).
                            Can be used to make Enhancers or Space Buildings.
 - [Clickables](clickables.md): A more generalized variant of buyables, for any kind of thing that is sometimes clickable.
                                Between these and Buyables, you can do just about anything.
+
+## Other components
+
+- [Challenges](challenges.md): How to create challenges for a layer.
 - [Bars](bars.md): Display some information as a progress bar, gague, or similar. They are highly customizable,
          and can be horizontal and vertical as well.
-- [Custom Tab Layouts](custom-tab-layouts.md): An optional way to give your tabs a different layout.
-                                                   You can even create entirely new components to use.
 - [Subtabs and Microtabs](subtabs-and-microtabs.md): Create subtabs for your tabs, as well as "microtab" components that you can put inside the tabs.
 - [Achievements](milestones.md): How to create achievements for a layer (or for the whole game).
-- [Updating TMT](updating-tmt.md): Using Github Desktop to update your mod's version of TMT.
+- [Infoboxes](infoboxes.md): Boxes containing text that can be shown or hidden.

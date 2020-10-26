@@ -1,4 +1,4 @@
-# Buyables
+# Bars
 
 Bars let you display information in a more direct way. It can be a progress bar, health bar, capacity gague, or anything else.
 
@@ -26,7 +26,7 @@ Features:
 
 - display(): **optional**, A function that returns text to be displayed on top of the bar, can use HTML.
 
-- unlocked(): **optional**, A function returning a bool to determine if the buyable is visible or not. Default is unlocked.
+- unlocked(): **optional**, A function returning a bool to determine if the bar is visible or not. Default is unlocked.
 
 - baseStyle, fillStyle, borderStyle, textStyle: **Optional**, Apply CSS to the unfilled portion, filled portion, border, and 
              display text on the bar, in the form of an object where the keys are CSS attributes, and the values are the

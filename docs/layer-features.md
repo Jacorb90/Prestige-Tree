@@ -46,8 +46,6 @@ Key:
 - effectDescription: **optional**, A function that returns a description of this effect.
                      If the text stays constant, it can just be a string.
 
-- lore: **optional**, Displays some text (can use basic HTML) in a box at the top of the layer tab, unless the player has hidden the lore in the settings.
-
 - layerShown(): A function returning a bool which determines if this layer's node should be visible on the tree.
                 It can also return "ghost", which will hide the layer, but its node will still take up space in the tree.
 
@@ -96,10 +94,13 @@ Key:
 - achievements: Kind of like milestones, but with a different display style and some other differences. Extra features are on the way at a later date!
     [Explanations are in a separate file.](achievements.md)
 
+- infoboxes: Displays some text in a box that can be shown or hidden.
+    [Explanations are in a separate file.](infoboxes.md)
+
 
 ## Prestige formula features
 
-- type: Determines which prestige formula you use.
+- type: **optional**, Determines which prestige formula you use. Defaults to "none".
     "normal": The amount of currency you gain is independent of its current amount (like Prestige).
         formula before bonuses is based on `baseResource^exponent`
     "static": The cost is dependent on your total after reset. 
