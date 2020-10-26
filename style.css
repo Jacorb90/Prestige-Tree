@@ -635,3 +635,7 @@ button > * {
     border-top-left-radius: 0;
     margin-bottom: -2px;
 }
+
+#treeTab td button {
+    margin: 0 10px 0 10px;
+}
