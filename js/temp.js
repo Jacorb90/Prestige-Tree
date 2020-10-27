@@ -91,7 +91,7 @@ function updateTempData(layerData, tmpData) {
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
 			let value = layerData[item]()
 			if (value !== value || value === decimalNaN){
-				if (NaNalert === true || confirm ("Invalid value found in tmp, named '" + item + "'. Please let the creator of this mknow! Would you like to try to auto-fix the save and keep going?")){
+				if (NaNalert === true || confirm ("Invalid value found in tmp, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
 					NaNalert = true
 					value = (value !== value ? 0 : decimalZero)
 				}

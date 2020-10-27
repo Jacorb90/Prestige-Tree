@@ -313,7 +313,9 @@ function loadVue() {
 			<div class="upgTable">
 				<tab-buttons :layer="layer" :data="tmp[layer].microtabs[data]" :name="data" v-bind:style="tmp[layer].componentStyles['tab-buttons']"></tab-buttons>
 			</div>
-			<column v-bind:style="tmp[layer].microtabs[data][player.subtabs[layer][data]].style" :layer="layer" :data="tmp[layer].microtabs[data][player.subtabs[layer][data]].content"></column>
+			<layer-tab v-if="tmp[layer].microtabs[data][player.subtabs[layer][data]].embedLayer" :layer="tmp[layer].microtabs[data][player.subtabs[layer][data]].embedLayer" ></layer-tab>
+
+			<column v-else  v-bind:style="tmp[layer].microtabs[data][player.subtabs[layer][data]].style" :layer="layer" :data="tmp[layer].microtabs[data][player.subtabs[layer][data]].content"></column>
 		</div>
 		`
 	})
@@ -386,7 +388,7 @@ function loadVue() {
 		template: `
 			<div class="upgRow">
 				<div v-for="tab in Object.keys(data)">
-					<button v-if="data[tab].unlocked == undefined || data[tab].unlocked" class="tabButton" v-bind:style="[{'border-color': tmp[layer].color}, tmp[layer].componentStyles['tab-button'], data[tab].buttonStyle]" v-on:click="player.subtabs[layer][name] = tab">{{tab}}</button>
+					<button v-if="data[tab].unlocked == undefined || data[tab].unlocked" v-bind:class="{tabButton: true, notify: (data[tab].embedLayer ? tmp[data[tab].embedLayer].notify : data[tab].shouldNotify)}" v-bind:style="[{'border-color': tmp[layer].color}, tmp[layer].componentStyles['tab-button'], data[tab].buttonStyle]" v-on:click="player.subtabs[layer][name] = tab">{{tab}}</button>
 				</div>
 			</div>
 		`
@@ -420,7 +422,46 @@ function loadVue() {
 			{{abb}}
 		</button>
 		`
+	},
+	
+	Vue.component('layer-tab', {
+		props: ['layer', 'back'],
+		template: `<div v-bind:style="[tmp[layer].style ? tmp[layer].style : {}, (tmp[layer].tabFormat && !Array.isArray(tmp[layer].tabFormat)) ? tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style : {}]">
+		<button v-if="back" class="back" v-on:click="showTab(back)">←</button><br><br><br>
+		<div v-if="!tmp[layer].tabFormat">
+			<info-box v-if="tmp[layer].infoboxes" :layer="layer" :data="Object.keys(tmp[layer].infoboxes)[0]"></info-box>
+			<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
+			<div v-if="tmp[layer].type !== 'none'">
+				<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>
+			</div>
+			<resource-display v-bind:style="tmp[layer].componentStyles['resource-display']" :layer="layer"></resource-display>
+			<milestones v-bind:style="tmp[layer].componentStyles.milestones" :layer="layer"></milestones>
+			<div v-if="Array.isArray(tmp[layer].midsection)">
+				<column :layer="layer" :data="tmp[layer].midsection"></column>
+			</div>
+			<clickables v-bind:style="tmp[layer].componentStyles['clickables']" :layer="layer"></clickables>
+			<buyables v-bind:style="tmp[layer].componentStyles.buyables" :layer="layer"></buyables>
+			<upgrades v-bind:style="tmp[layer].componentStyles['upgrades']" :layer="layer"></upgrades>
+			<challenges v-bind:style="tmp[layer].componentStyles['challenges']" :layer="layer"></challenges>
+			<br><br>
+		</div>
+		<div v-if="tmp[layer].tabFormat">
+			<div v-if="Array.isArray(tmp[layer].tabFormat)">
+				<column :layer="layer" :data="tmp[layer].tabFormat"></column>
+			</div>
+			<div v-else v-bind:style="[{'margin-top': '-50px'}]">
+				<div class="upgTable" v-bind:style="{'padding-top': '25px', 'margin-bottom': '24px'}">
+					<tab-buttons v-bind:style="tmp[layer].componentStyles['tab-buttons']" :layer="layer" :data="tmp[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
+				</div>
+				<column :layer="layer" :data="tmp[layer].tabFormat[player.subtabs[layer].mainTabs].content"></column>
+			</div>
+		</div></div>
+			`
 	})
+
+	
+
+	)
 
 
 	app = new Vue({

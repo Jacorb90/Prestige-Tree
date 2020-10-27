@@ -285,6 +285,7 @@ addLayer("c", {
         tabFormat: {
             "main tab": {
                 buttonStyle() {return  {'color': 'orange'}},
+                shouldNotify: true,
                 content:
                     ["main-display",
                     "prestige-button", "resource-display",

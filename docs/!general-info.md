@@ -43,5 +43,6 @@ While reading this documentation, the following key will be used when describing
 - [Challenges](challenges.md): How to create challenges for a layer.
 - [Bars](bars.md): Display some information as a progress bar, gauge, or similar. They are highly customizable, and can be horizontal and vertical as well.
 - [Subtabs and Microtabs](subtabs-and-microtabs.md): Create subtabs for your tabs, as well as "microtab" components that you can put inside the tabs.
+                        You can even use them to embed a layer inside another layer!
 - [Achievements](milestones.md): How to create achievements for a layer (or for the whole game).
 - [Infoboxes](infoboxes.md): Boxes containing text that can be shown or hidden.

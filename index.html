@@ -20,7 +20,7 @@
 		<div v-if="false" id="loadingSection" class="fullWidth">
 			<h1>Loading... (If this takes too long it means there was a serious error!)</h1>
 		</div>
-		<div class="vl" v-if="player.tab!='tree'&&player.tab!='gameEnded'"></div>
+		<div class="vl" v-if="player.navTab!= 'none' &&player.tab!='none'&&player.tab!='gameEnded'"></div>
 		<div v-if="player.tab=='gameEnded'" class="fullWidth">
 			<br>
 			<h2>{{modInfo.name}} {{VERSION.withoutName}}</h2><br><br>
@@ -41,11 +41,11 @@
 			<br>
 		</div>
 		<div v-if="player.tab=='changelog'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br><br><br>
+			<button class="back" onclick="showTab('none')">←</button><br><br><br>
 		</div>
 		
 		<div v-if="player.tab=='info'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br>
+			<button class="back" onclick="showTab('none')">←</button><br>
 			<h2>{{modInfo.name}}</h2>
 			<br>
 			<h3>{{VERSION.withName}}</h3>
@@ -72,7 +72,7 @@
 			<span v-for="key in hotkeys" v-if="player[key.layer].unlocked"><br>{{key.description}}</span>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
-			<button class="back" onclick="showTab('tree')">←</button><br>
+			<button class="back" onclick="showTab('none')">←</button><br>
 			<table>
 				<tr>
 					<td><button class="opt" onclick="save()">Save</button></td>
@@ -95,7 +95,7 @@
 				</tr> 
 			</table>
 		</div>
-		<div id="treeOverlay" class="treeOverlay" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.tab == 'tree', col: player.tab != 'tree', left: player.tab != 'tree'}">
+		<div id="treeOverlay" class="treeOverlay" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
 			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
 			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'"  class="overlayThing" onclick="showTab('info')"><br>i</div>
@@ -131,7 +131,7 @@
 		</div>
 
 
-		<div id="treeTab" style="z-index: 0" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.tab == 'tree', col: player.tab != 'tree', left: player.tab != 'tree'}">
+		<div v-if="player.navTab == 'tree' && player.tab!='gameEnded'" id="treeTab" style="z-index: 0" onscroll="resizeCanvas()" v-bind:class= "{ fullWidth: player.tab == 'none', col: player.tab != 'none', left: player.tab != 'none'}">
 			<br><br><br><br>
 			<div id="fakeHead" style="visibility: hidden;">
 				<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
@@ -152,43 +152,35 @@
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
 			<span v-for="(n, row) in (maxRow + 1)"><table>
-				<td v-if="player.tab=='tree'&& someLayerUnlocked(row) && row != 0" class="left"><br><br><img class="remove" src="remove.png" onclick="resetRow(row)"></img></td>
-				<td v-for="node in TREE_LAYERS[row]"><layer-node :layer='node.layer' :abb='tmp[node.layer].symbol'></layer-node></td>
-				<table><button class="treeNode hidden"></button></td></table>
+				<td v-for="node in TREE_LAYERS[row]">
+					<layer-node :layer='node.layer' :abb='tmp[node.layer].symbol'></layer-node>
+				</td>
+				<table><button class="treeNode hidden"></button></table>
 			</span>
 			<canvas id="treeCanvas" class="canvas"></canvas>
 		</div>
 		<div v-for="layer in LAYERS" >
-			<div v-if="player.tab==layer" v-bind:class="'col right fast tab'"  v-bind:style="[tmp[layer].style ? tmp[layer].style : {}, (tmp[layer].tabFormat && !Array.isArray(tmp[layer].tabFormat)) ? tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style : {}]">
-				<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-				<div v-if="!tmp[layer].tabFormat">
-					<info-box v-if="tmp[layer].infoboxes" :layer="layer" :data="Object.keys(tmp[layer].infoboxes)[0]"></info-box>
-					<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
-					<div v-if="tmp[layer].type !== 'none'">
-						<prestige-button v-bind:style="tmp[layer].componentStyles['prestige-button']" :layer="layer"></prestige-button>
-					</div>
-					<resource-display v-bind:style="tmp[layer].componentStyles['resource-display']" :layer="layer"></resource-display>
-					<milestones v-bind:style="tmp[layer].componentStyles.milestones" :layer="layer"></milestones>
-					<div v-if="Array.isArray(tmp[layer].midsection)">
-						<column :layer="layer" :data="tmp[layer].midsection"></column>
-					</div>
-					<clickables v-bind:style="tmp[layer].componentStyles['clickables']" :layer="layer"></clickables>
-					<buyables v-bind:style="tmp[layer].componentStyles.buyables" :layer="layer"></buyables>
-					<upgrades v-bind:style="tmp[layer].componentStyles['upgrades']" :layer="layer"></upgrades>
-					<challenges v-bind:style="tmp[layer].componentStyles['challenges']" :layer="layer"></challenges>
-					<br><br>
-				</div>
-				<div v-if="tmp[layer].tabFormat">
-					<div v-if="Array.isArray(tmp[layer].tabFormat)">
-						<column :layer="layer" :data="tmp[layer].tabFormat"></column>
-					</div>
-					<div v-else v-bind:style="[{'margin-top': '-50px'}]">
-						<div class="upgTable" v-bind:style="{'padding-top': '25px', 'margin-bottom': '24px'}">
-							<tab-buttons v-bind:style="tmp[layer].componentStyles['tab-buttons']" :layer="layer" :data="tmp[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
-						</div>
-						<column :layer="layer" :data="tmp[layer].tabFormat[player.subtabs[layer].mainTabs].content"></column>
-					</div>
-				</div>
+			<div v-if="player.navTab == 'none'" id="fakeHead" style="visibility: hidden;">
+				<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
+					<br>Dev Speed: {{format(player.devSpeed)}}x<br>
+				</span>
+				<span v-if="player.offTime !== undefined"  class="overlayThing">
+					<br>Offline Time: {{formatTime(player.offTime.remain)}}<br>
+				</span>
+				<span v-if="false && !player.keepGoing"  class="overlayThing">
+					<br>Reach {{formatWhole(ENDGAME)}} to beat the game!<br>
+				</span>
+				<br>
+				<span v-if="player.points.lt('1e1000')"  class="overlayThing">You have </span>
+				<h2  class="overlayThing" id="points">{{format(player.points)}}</h2>
+				<span v-if="player.points.lt('1e1e6')"  class="overlayThing"> {{modInfo.pointsName}}</span>
+				<br>
+				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
+				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
+			</div>
+
+			<div v-if="player.tab==layer" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}"> 
+				<layer-tab :layer="layer" :back="'none'"></layer-tab>
 			</div>
 		</div>
 	</div>

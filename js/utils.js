@@ -80,7 +80,8 @@ function save() {
 
 function startPlayerBase() {
 	return {
-		tab: "tree",
+		tab: modInfo.startTab,
+		navTab: modInfo.startNavTab,
 		time: Date.now(),
 		autosave: true,
 		notify: {},
@@ -224,7 +225,6 @@ function load() {
 	else player = Object.assign(getStartPlayer(), JSON.parse(atob(get)))
 	fixSave()
 
-	player.tab = "tree"
 	if (player.offlineProd) {
 		if (player.offTime === undefined) player.offTime = { remain: 0 }
 		player.offTime.remain += (Date.now() - player.time) / 1000
@@ -254,7 +254,7 @@ function NaNcheck(data) {
 			NaNcheck(data[item])
 		}
 		else if (data[item] !== data[item] || data[item] === decimalNaN){
-			if (NaNalert === true || confirm ("Invalid value found in player, named '" + item + "'. Please let the creator of this mknow! Would you like to try to auto-fix the save and keep going?")){
+			if (NaNalert === true || confirm ("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
 				NaNalert = true
 				data[item] = (data[item] !== data[item] ? 0 : decimalZero)
 			}
@@ -589,7 +589,7 @@ var onTreeTab = true
 function showTab(name) {
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
 
-	var toTreeTab = name == "tree"
+	var toTreeTab = name == "none"
 	player.tab = name
 	
 	if (toTreeTab != onTreeTab) {
@@ -609,7 +609,7 @@ function nodeShown(layer) {
 	if (tmp[layer].layerShown) return true
 	switch(layer) {
 		case "idk":
-			return player.l.unlocked
+			return player.idk.unlocked
 			break;
 	}
 	return false

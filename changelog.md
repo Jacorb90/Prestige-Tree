@@ -1,6 +1,10 @@
 # The Modding Tree changelog:
 
+- You can now embed a layer inside of a subtab or microtab!
+- Added support for hiding the tree tab (although some aspects are still lazy and WIP)
+- Added shouldNotify to subtab/microtab buttons. (You can make them highlighted)
 - NaN is now handled more intelligently.
+- Thank you to thepaperpilot for fixing errors in docs and the infobox appearance!
 
 ### v2.1.4 - 10/25/20
 - Added an infobox component. Thank you to thepaperpilot for this contribution!
