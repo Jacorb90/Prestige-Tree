@@ -1,4 +1,5 @@
 var tmp = {}
+var NaNalert = false;
 
 // Tmp will not call these
 var activeFunctions = [
@@ -88,7 +89,21 @@ function updateTempData(layerData, tmpData) {
 			updateTempData(layerData[item], tmpData[item])
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
-			Vue.set(tmpData, item, layerData[item]())
+			let value = layerData[item]()
+			if (value !== value || value === decimalNaN){
+				if (NaNalert === true || confirm ("Invalid value found in tmp, named '" + item + "'. Please let the creator of this mknow! Would you like to try to auto-fix the save and keep going?")){
+					NaNalert = true
+					value = (value !== value ? 0 : decimalZero)
+				}
+				else {
+					clearInterval(interval);
+					player.autosave = false;
+					NaNalert = true;
+				}
+			}
+
+
+			Vue.set(tmpData, item, value)
 		}
 	}	
 }

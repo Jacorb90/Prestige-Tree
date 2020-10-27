@@ -1,5 +1,7 @@
 # The Modding Tree changelog:
 
+- NaN is now handled more intelligently.
+
 ### v2.1.4 - 10/25/20
 - Added an infobox component. Thank you to thepaperpilot for this contribution!
 - Layer type is now optional, and defaults to "none".

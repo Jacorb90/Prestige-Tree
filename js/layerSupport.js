@@ -1,5 +1,9 @@
 var layers = {}
 
+const decimalZero = new Decimal(0)
+const decimalOne = new Decimal(1)
+const decimalNaN = new Decimal(NaN)
+
 function layerShown(layer){
     return layers[layer].layerShown();
 }

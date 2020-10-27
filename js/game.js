@@ -1,6 +1,5 @@
 var player;
 var needCanvasUpdate = true;
-var NaNalert = false;
 var gameEnded = false;
 
 // Don't change this
@@ -319,13 +318,6 @@ function gameLoop(diff) {
 		if (layers[layer].achievements) updateAchievements(layer)
 	}
 
-	if (player.hasNaN&&!NaNalert) {
-		clearInterval(interval);
-		player.autosave = false;
-		NaNalert = true;
-
-		alert("We have detected a corruption in your save. Please visit one of the discords in the info panel for help.")
-	}
 }
 
 function hardReset() {
@@ -358,5 +350,6 @@ var interval = setInterval(function() {
 	if (needCanvasUpdate) resizeCanvas();
 	updateTemp();
 	gameLoop(diff)
+	fixNaNs()
 	ticking = false
 }, 50)

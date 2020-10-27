@@ -241,6 +241,38 @@ function load() {
 	loadVue();
 }
 
+
+function fixNaNs() {
+	NaNcheck(player)
+}
+
+function NaNcheck(data) {
+	for (item in data){
+		if (data[item] == null) {
+		}
+		else if (Array.isArray(data[item])) {
+			NaNcheck(data[item])
+		}
+		else if (data[item] !== data[item] || data[item] === decimalNaN){
+			if (NaNalert === true || confirm ("Invalid value found in player, named '" + item + "'. Please let the creator of this mknow! Would you like to try to auto-fix the save and keep going?")){
+				NaNalert = true
+				data[item] = (data[item] !== data[item] ? 0 : decimalZero)
+			}
+			else {
+				clearInterval(interval);
+				player.autosave = false;
+				NaNalert = true;
+			}
+		}
+		else if (data[item] instanceof Decimal) { // Convert to Decimal
+		}
+		else if ((!!data[item]) && (data[item].constructor === Object)) {
+			NaNcheck(data[item])
+		}
+	}	
+}
+
+
 function exportSave() {
 	let str = btoa(JSON.stringify(player))
 	
