@@ -6,6 +6,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 	<script type="text/javascript" src="js/break_eternity.js"></script>
 	<script type="text/javascript" src="js/layerSupport.js"></script>
+	<script type="text/javascript" src="js/demo/demoTree.js"></script>
 	<script type="text/javascript" src="js/demo/demoLayers.js"></script>
 	<script type="text/javascript" src="js/demo/demoMod.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
@@ -153,7 +154,7 @@
 				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
-			<tree :data="TREE_LAYERS"></tree>
+			<tree :data="(treeLayout ? treeLayout : TREE_LAYERS)"></tree>
 		</div>
 		<div v-for="layer in LAYERS" >
 			<div v-if="player.navTab == 'none'" id="fakeHead" style="visibility: hidden;">

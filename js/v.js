@@ -414,14 +414,14 @@ function loadVue() {
 		<button v-if="nodeShown(layer)"
 			v-bind:id="layer"
 			v-on:click="function() {
-				showTab(layer)
+				layers[layer].onClick()
 			}"
 			v-bind:tooltip="
-				player[layer].unlocked ? (tmp[layer].tooltip ? tmp[layer].tooltip : 'I am a button!')
+				tmp[layer].canClick ? (tmp[layer].tooltip ? tmp[layer].tooltip : 'I am a button!')
 				: (tmp[layer].tooltipLocked ? tmp[layer].tooltipLocked : 'I am a button!')
 			"
 			v-bind:class="{
-				treeNode: size != 'small',
+				treeButton: size != 'small',
 				smallNode: size == 'small',
 				[layer]: true,
 				ghost: tmp[layer].layerShown == 'ghost',
@@ -430,9 +430,7 @@ function loadVue() {
 				notify: tmp[layer].notify,
 				can: tmp[layer].canClick,
 			}"
-			v-bind:style="[layerunlocked(layer) ? {
-				'background-color': tmp[layer].color,
-			} : {}, tmp[layer].nodeStyle]">
+			v-bind:style="[tmp[layer].canClick ? {'background-color': tmp[layer].color} : {}, tmp[layer].nodeStyle]">
 			{{abb}}
 		</button>
 		`
