@@ -149,16 +149,32 @@ function updateLayers(){
     }
     for (row in OTHER_LAYERS) {
         OTHER_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
+        for (layer in OTHER_LAYERS[row])
+            OTHER_LAYERS[row][layer] = OTHER_LAYERS[row][layer].layer 
     }
     for (row in TREE_LAYERS) {
         TREE_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
+            for (layer in TREE_LAYERS[row])
+            TREE_LAYERS[row][layer] = TREE_LAYERS[row][layer].layer
     }
+    let treeLayers2 = []
+    for (x = 0; x < maxRow + 1; x++) {
+        if (TREE_LAYERS[x]) treeLayers2.push(TREE_LAYERS[x])
+    }
+    TREE_LAYERS = treeLayers2
     updateHotkeys()
 }
 
 function addLayer(layerName, layerData){ // Call this to add layers from a different file!
     layers[layerName] = layerData
+    layers[layerName].isLayer = true
 }
+
+function addNode(layerName, layerData){ // Does the same thing
+    layers[layerName] = layerData
+    layers[layerName].isLayer = false
+}
+
 
 // If data is a function, return the result of calling it. Otherwise, return the data.
 function readData(data, args=null){

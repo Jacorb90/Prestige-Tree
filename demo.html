@@ -17,6 +17,8 @@
 </head>
 <body onload="load()">
 	<div id="app">
+		<canvas id="treeCanvas" class="canvas"></canvas>
+
 		<div v-if="false" id="loadingSection" class="fullWidth">
 			<h1>Loading... (If this takes too long it means there was a serious error!)</h1>
 		</div>
@@ -126,7 +128,7 @@
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
 			<div class="sideLayers" >
-				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node.layer' :abb='tmp[node.layer].symbol' :size="'small'"></layer-node></div>
+				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node' :abb='tmp[node].symbol' :size="'small'"></layer-node></div>
 			</div>
 		</div>
 
@@ -151,13 +153,7 @@
 				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
-			<span v-for="(n, row) in (maxRow + 1)"><table>
-				<td v-for="node in TREE_LAYERS[row]">
-					<layer-node :layer='node.layer' :abb='tmp[node.layer].symbol'></layer-node>
-				</td>
-				<table><button class="treeNode hidden"></button></table>
-			</span>
-			<canvas id="treeCanvas" class="canvas"></canvas>
+			<tree :data="TREE_LAYERS"></tree>
 		</div>
 		<div v-for="layer in LAYERS" >
 			<div v-if="player.navTab == 'none'" id="fakeHead" style="visibility: hidden;">

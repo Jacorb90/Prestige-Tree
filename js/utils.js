@@ -111,7 +111,9 @@ function getStartPlayer() {
 
 	playerdata.infoboxes = {}
 	for (layer in layers){
-		playerdata[layer] = layers[layer].startData()
+		playerdata[layer] = {}
+		if (layers[layer].startData) 
+			playerdata[layer] = layers[layer].startData()
 		playerdata[layer].buyables = getStartBuyables(layer)
 		if(playerdata[layer].clickables == undefined) playerdata[layer].clickables = getStartClickables(layer)
 		playerdata[layer].spentOnBuyables = new Decimal(0)
@@ -591,12 +593,7 @@ function showTab(name) {
 
 	var toTreeTab = name == "none"
 	player.tab = name
-	
-	if (toTreeTab != onTreeTab) {
-		document.getElementById("treeTab").className = toTreeTab ? "fullWidth" : "col left"
-		onTreeTab = toTreeTab
-		resizeCanvas()
-	}
+
 	delete player.notify[name]
 }
 
@@ -616,6 +613,7 @@ function nodeShown(layer) {
 }
 
 function layerunlocked(layer) {
+	if (tmp[layer] && tmp[layer].type == "none") return (player[layer].unlocked)
 	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].baseAmount.gte(tmp[layer].requires) && tmp[layer].layerShown))
 }
 

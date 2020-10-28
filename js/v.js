@@ -315,7 +315,7 @@ function loadVue() {
 			</div>
 			<layer-tab v-if="tmp[layer].microtabs[data][player.subtabs[layer][data]].embedLayer" :layer="tmp[layer].microtabs[data][player.subtabs[layer][data]].embedLayer" ></layer-tab>
 
-			<column v-else  v-bind:style="tmp[layer].microtabs[data][player.subtabs[layer][data]].style" :layer="layer" :data="tmp[layer].microtabs[data][player.subtabs[layer][data]].content"></column>
+			<column v-else v-bind:style="tmp[layer].microtabs[data][player.subtabs[layer][data]].style" :layer="layer" :data="tmp[layer].microtabs[data][player.subtabs[layer][data]].content"></column>
 		</div>
 		`
 	})
@@ -367,6 +367,20 @@ function loadVue() {
 		`
 	})
 
+	// Data is an array with the structure of the tree
+	Vue.component('tree', {
+		props: ['layer', 'data'],
+		template: `<div>
+		<span v-for="row in data"><table>
+			<td v-for="node in row">
+				<layer-node v-if="tmp[node].isLayer" :layer='node' :abb='tmp[node].symbol'></layer-node>
+				<button-node v-else :layer='node' :abb='tmp[node].symbol'></layer-node>
+			</td>
+			<tr><table><button class="treeNode hidden"></button></table></tr>
+		</span></div>
+
+	`
+	})
 
 	// These are for buyables, data is the id of the corresponding buyable
 	Vue.component('sell-one', {
@@ -391,6 +405,36 @@ function loadVue() {
 					<button v-if="data[tab].unlocked == undefined || data[tab].unlocked" v-bind:class="{tabButton: true, notify: (data[tab].embedLayer ? tmp[data[tab].embedLayer].notify : data[tab].shouldNotify)}" v-bind:style="[{'border-color': tmp[layer].color}, tmp[layer].componentStyles['tab-button'], data[tab].buttonStyle]" v-on:click="player.subtabs[layer][name] = tab">{{tab}}</button>
 				</div>
 			</div>
+		`
+	})
+
+	Vue.component('button-node', {
+		props: ['layer', 'abb', 'size'],
+		template: `
+		<button v-if="nodeShown(layer)"
+			v-bind:id="layer"
+			v-on:click="function() {
+				showTab(layer)
+			}"
+			v-bind:tooltip="
+				player[layer].unlocked ? (tmp[layer].tooltip ? tmp[layer].tooltip : 'I am a button!')
+				: (tmp[layer].tooltipLocked ? tmp[layer].tooltipLocked : 'I am a button!')
+			"
+			v-bind:class="{
+				treeNode: size != 'small',
+				smallNode: size == 'small',
+				[layer]: true,
+				ghost: tmp[layer].layerShown == 'ghost',
+				hidden: !tmp[layer].layerShown,
+				locked: !tmp[layer].canClick,
+				notify: tmp[layer].notify,
+				can: tmp[layer].canClick,
+			}"
+			v-bind:style="[layerunlocked(layer) ? {
+				'background-color': tmp[layer].color,
+			} : {}, tmp[layer].nodeStyle]">
+			{{abb}}
+		</button>
 		`
 	})
 
@@ -422,7 +466,7 @@ function loadVue() {
 			{{abb}}
 		</button>
 		`
-	},
+	})
 	
 	Vue.component('layer-tab', {
 		props: ['layer', 'back'],
@@ -461,7 +505,7 @@ function loadVue() {
 
 	
 
-	)
+	
 
 
 	app = new Vue({

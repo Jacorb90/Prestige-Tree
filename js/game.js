@@ -91,6 +91,7 @@ function canReset(layer)
 function rowReset(row, layer) {
 	for (lr in ROW_LAYERS[row]){
 		if(layers[lr].doReset) {
+
 			player[lr].activeChallenge = null // Exit challenges on any row reset on an equal or higher row
 			layers[lr].doReset(layer)
 		}
@@ -287,28 +288,28 @@ function gameLoop(diff) {
 
 	for (x = 0; x <= maxRow; x++){
 		for (item in TREE_LAYERS[x]) {
-			let layer = TREE_LAYERS[x][item].layer
+			let layer = TREE_LAYERS[x][item]
 			if (layers[layer].update) layers[layer].update(diff);
 		}
 	}
 
 	for (row in OTHER_LAYERS){
 		for (item in OTHER_LAYERS[row]) {
-			let layer = OTHER_LAYERS[row][item].layer
+			let layer = OTHER_LAYERS[row][item]
 			if (layers[layer].update) layers[layer].update(diff);
 		}
 	}	
 
 	for (x = maxRow; x >= 0; x--){
 		for (item in TREE_LAYERS[x]) {
-			let layer = TREE_LAYERS[x][item].layer
+			let layer = TREE_LAYERS[x][item]
 			if (layers[layer].automate) layers[layer].automate();
 		}
 	}
 
 	for (row in OTHER_LAYERS){
 		for (item in OTHER_LAYERS[row]) {
-			let layer = OTHER_LAYERS[row][item].layer
+			let layer = OTHER_LAYERS[row][item]
 			if (layers[layer].automate) layers[layer].automate();
 		}
 	}

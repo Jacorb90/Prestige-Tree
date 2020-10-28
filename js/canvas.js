@@ -17,9 +17,9 @@ function resizeCanvas() {
 	if (!retrieveCanvasData()) return
 	canvas.width = 0;
     canvas.height = 0;
-    canvas.width = document.getElementById("treeTab").scrollWidth;
-    canvas.height = document.getElementById("treeTab").scrollHeight;
-    drawTree();
+	canvas.width  = window.innerWidth;
+	canvas.height = window.innerHeight;
+		drawTree();
 }
 
 var colors = {
