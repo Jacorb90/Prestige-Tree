@@ -6,6 +6,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 	<script type="text/javascript" src="js/break_eternity.js"></script>
 	<script type="text/javascript" src="js/layerSupport.js"></script>
+	<script type="text/javascript" src="js/tree.js"></script>
 	<script type="text/javascript" src="js/layers.js"></script>
 	<script type="text/javascript" src="js/mod.js"></script>
 	<script type="text/javascript" src="js/temp.js"></script>
@@ -17,6 +18,8 @@
 </head>
 <body onload="load()">
 	<div id="app">
+		<canvas id="treeCanvas" class="canvas"></canvas>
+
 		<div v-if="false" id="loadingSection" class="fullWidth">
 			<h1>Loading... (If this takes too long it means there was a serious error!)</h1>
 		</div>
@@ -95,7 +98,7 @@
 				</tr> 
 			</table>
 		</div>
-		<div id="treeOverlay" class="treeOverlay" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
+		<div id="treeOverlay" class="treeOverlay" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
 			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
 			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'"  class="overlayThing" onclick="showTab('info')"><br>i</div>
@@ -107,7 +110,7 @@
 					<li><a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a></li>
 				</ul>
 			</div>
-			<div class="overlayThing" style="padding-bottom:7px; width: 90%">
+			<div class="overlayThing" v-if="player.tab!='gameEnded' && !(player.navTab == 'none' && (player.tab=='options' || player.tab=='info'))" style="padding-bottom:7px; width: 90%">
 				<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
 					<br>Dev Speed: {{format(player.devSpeed)}}x<br>
 				</span>
@@ -126,7 +129,7 @@
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
 			<div class="sideLayers" >
-				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node.layer' :abb='tmp[node.layer].symbol' :size="'small'"></layer-node></div>
+				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node' :abb='tmp[node].symbol' :size="'small'"></layer-node></div>
 			</div>
 		</div>
 
@@ -151,13 +154,7 @@
 				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
-			<span v-for="(n, row) in (maxRow + 1)"><table>
-				<td v-for="node in TREE_LAYERS[row]">
-					<layer-node :layer='node.layer' :abb='tmp[node.layer].symbol'></layer-node>
-				</td>
-				<table><button class="treeNode hidden"></button></table>
-			</span>
-			<canvas id="treeCanvas" class="canvas"></canvas>
+			<tree :data="(layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)"></tree>
 		</div>
 		<div v-for="layer in LAYERS" >
 			<div v-if="player.navTab == 'none'" id="fakeHead" style="visibility: hidden;">

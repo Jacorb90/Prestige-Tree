@@ -9,8 +9,6 @@ let modInfo = {
 	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
-	startTab: "none",
-	startNavTab: "tree",
 }
 
 // Set your version in num and name

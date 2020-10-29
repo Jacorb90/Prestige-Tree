@@ -7,7 +7,8 @@ function exponentialFormat(num, precision) {
 		m = new Decimal(1)
 		e = e.add(1)
 	}
-	return m.toStringWithDecimalPlaces(precision)+"e"+e.toStringWithDecimalPlaces(0)
+	e = (e.gte(10000) ? commaFormat(e, 0) : e.toStringWithDecimalPlaces(0))
+	return m.toStringWithDecimalPlaces(precision)+"e"+e
 }
 
 function commaFormat(num, precision) {
@@ -61,7 +62,9 @@ function formatWhole(decimal) {
 function formatTime(s) {
 	if (s<60) return format(s)+"s"
 	else if (s<3600) return formatWhole(Math.floor(s/60))+"m "+format(s%60)+"s"
-	else return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	else if (s<86400) return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	else if (s<31536000) return formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	else return formatWhole(Math.floor(s/31536000))+"y "+formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
 }
 
 function toPlaces(x, precision, maxAccepted) {
@@ -80,8 +83,8 @@ function save() {
 
 function startPlayerBase() {
 	return {
-		tab: modInfo.startTab,
-		navTab: modInfo.startNavTab,
+		tab: layoutInfo.startTab,
+		navTab: (layoutInfo.showTree ? "tree" : "none"),
 		time: Date.now(),
 		autosave: true,
 		notify: {},

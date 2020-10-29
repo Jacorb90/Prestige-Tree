@@ -98,7 +98,7 @@
 				</tr> 
 			</table>
 		</div>
-		<div id="treeOverlay" class="treeOverlay" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
+		<div id="treeOverlay" class="treeOverlay" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
 			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
 			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
 			<div id="info" v-if="player.tab!='info'"  class="overlayThing" onclick="showTab('info')"><br>i</div>
@@ -110,7 +110,7 @@
 					<li><a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a></li>
 				</ul>
 			</div>
-			<div class="overlayThing" style="padding-bottom:7px; width: 90%">
+			<div class="overlayThing" v-if="player.tab!='gameEnded' && !(player.navTab == 'none' && (player.tab=='options' || player.tab=='info'))" style="padding-bottom:7px; width: 90%">
 				<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
 					<br>Dev Speed: {{format(player.devSpeed)}}x<br>
 				</span>

@@ -7,9 +7,11 @@ Subtabs are defined by using the tab format like this, where each element of tab
 ```js
 tabFormat: {
     "Main tab": {
+        content: [tab format things],
         *subtab features*
     },
     "Other tab": {
+        content: [tab format things],
         *subtab features*
     },
     etc
@@ -22,9 +24,11 @@ Microtabs are defined similarly, and use the same features, but are defined in t
 microtabs: {
     stuff: {
         first: {
+            content: [tab format things],
             *subtab features*
         },
         second: {
+            content: [tab format things],
             *subtab features*
         }
     },
