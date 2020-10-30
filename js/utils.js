@@ -100,6 +100,7 @@ function startPlayerBase() {
 		showStory: true,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
+		gameEnded:false
 	}
 }
 
