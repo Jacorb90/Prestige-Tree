@@ -504,7 +504,8 @@ function loadVue() {
 	})
 
 	Vue.component('overlay-head', {
-		template: `			<div class="overlayThing" style="padding-bottom:7px; width: 90%">
+		template: `			
+		<div class="overlayThing" style="padding-bottom:7px; width: 90%">
 		<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
 			<br>Dev Speed: {{format(player.devSpeed)}}x<br>
 		</span>
