@@ -8,14 +8,12 @@ let modInfo = {
 	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
-	startTab: "none",
-	startNavTab: "tree",
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "2.1.3.1",
-	name: " We should have thought of this sooner!",
+	num: "2.2",
+	name: "Uprooted",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.

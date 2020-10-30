@@ -154,7 +154,7 @@
 				<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
 				<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
 			</div>
-			<tree :data="(treeLayout ? treeLayout : TREE_LAYERS)"></tree>
+			<tree :data="(layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)"></tree>
 		</div>
 		<div v-for="layer in LAYERS" >
 			<div v-if="player.navTab == 'none'" id="fakeHead" style="visibility: hidden;">

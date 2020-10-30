@@ -5,6 +5,7 @@
 - Added shouldNotify to subtab/microtab buttons. (You can make them highlighted)
 - Added commas to large exponents.
 - NaN is now handled more intelligently.
+- The "hide completed challenges" setting now only hides challenges at max completions.
 - Thank you to thepaperpilot for fixing errors in docs and the infobox appearance!
 
 ### v2.1.4 - 10/25/20

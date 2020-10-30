@@ -453,6 +453,10 @@ function hasChallenge(layer, id){
 	return (player[layer].challenges[id])
 }
 
+function maxedChallenge(layer, id){
+	return (player[layer].challenges[id] >= tmp[layer].challenges[id].completionLimit)
+}
+
 function challengeCompletions(layer, id){
 	return (player[layer].challenges[id])
 }
@@ -585,7 +589,7 @@ function inChallenge(layer, id){
 	if (challenge==id) return true
 
 	if (layers[layer].challenges[challenge].countsAs)
-		return tmp[layer].challenges[id].countsAs.includes(id)
+		return tmp[layer].challenges[challenge].countsAs.includes(id)
 }
 
 // ************ Misc ************

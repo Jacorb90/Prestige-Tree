@@ -1,9 +1,12 @@
 // treeLayout will override the default tree's layout if used
-var treeLayout = "";
-/*var treeLayout = [["f", "c"],
-        ["g", "spook", "h"]]
-*/
+var layoutInfo = {
+    startTab: "none",
+	showTree: true,
 
+    treeLayout: ""
+
+    
+}
 
 // A "ghost" layer which offsets f in the tree
 addNode("spook", {
