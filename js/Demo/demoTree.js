@@ -3,7 +3,7 @@ var layoutInfo = {
     startTab: "none",
 	showTree: true,
 
-    treeLayout: ""
+    //treeLayout: ""
 
     
 }
@@ -42,3 +42,7 @@ addNode("h", {
     onClick() {player.points = new Decimal(10)}
 }, 
 )
+
+addLayer("tree-tab", {
+    tabFormat: [["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]]
+})

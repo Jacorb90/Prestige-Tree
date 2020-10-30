@@ -13,3 +13,7 @@ addNode("spook", {
     layerShown: "ghost",
 }, 
 )
+
+addLayer("tree-tab", {
+    tabFormat: ["tree", function() {layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS}]
+})

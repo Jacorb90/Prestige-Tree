@@ -467,10 +467,11 @@ function loadVue() {
 	})
 	
 	Vue.component('layer-tab', {
-		props: ['layer', 'back'],
+		props: ['layer', 'back', 'spacing'],
 		template: `<div v-bind:style="[tmp[layer].style ? tmp[layer].style : {}, (tmp[layer].tabFormat && !Array.isArray(tmp[layer].tabFormat)) ? tmp[layer].tabFormat[player.subtabs[layer].mainTabs].style : {}]">
-		<button v-if="back" class="back" v-on:click="showTab(back)">←</button><br><br><br>
+		<div v-if="back"><button class="back" v-on:click="showTab(back)">←</button></div>
 		<div v-if="!tmp[layer].tabFormat">
+			<div v-if="spacing" v-bind:style="{'height': spacing}"></div>
 			<info-box v-if="tmp[layer].infoboxes" :layer="layer" :data="Object.keys(tmp[layer].infoboxes)[0]"></info-box>
 			<main-display v-bind:style="tmp[layer].componentStyles['main-display']" :layer="layer"></main-display>
 			<div v-if="tmp[layer].type !== 'none'">
@@ -488,10 +489,10 @@ function loadVue() {
 			<br><br>
 		</div>
 		<div v-if="tmp[layer].tabFormat">
-			<div v-if="Array.isArray(tmp[layer].tabFormat)">
+			<div v-if="Array.isArray(tmp[layer].tabFormat)"><div v-if="spacing" v-bind:style="{'height': spacing}"></div>
 				<column :layer="layer" :data="tmp[layer].tabFormat"></column>
 			</div>
-			<div v-else v-bind:style="[{'margin-top': '-50px'}]">
+			<div v-else>
 				<div class="upgTable" v-bind:style="{'padding-top': '25px', 'margin-bottom': '24px'}">
 					<tab-buttons v-bind:style="tmp[layer].componentStyles['tab-buttons']" :layer="layer" :data="tmp[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
 				</div>
@@ -502,7 +503,27 @@ function loadVue() {
 			`
 	})
 
-	
+	Vue.component('overlay-head', {
+		template: `			<div class="overlayThing" style="padding-bottom:7px; width: 90%">
+		<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
+			<br>Dev Speed: {{format(player.devSpeed)}}x<br>
+		</span>
+		<span v-if="player.offTime !== undefined"  class="overlayThing">
+			<br>Offline Time: {{formatTime(player.offTime.remain)}}<br>
+		</span>
+		<span v-if="false && !player.keepGoing"  class="overlayThing">
+			<br>Reach {{formatWhole(ENDGAME)}} to beat the game!<br>
+		</span>
+		<br>
+		<span v-if="player.points.lt('1e1000')"  class="overlayThing">You have </span>
+		<h2  class="overlayThing" id="points">{{format(player.points)}}</h2>
+		<span v-if="player.points.lt('1e1e6')"  class="overlayThing"> {{modInfo.pointsName}}</span>
+		<br>
+		<span v-if="canGenPoints()"  class="overlayThing">({{format(getPointGen())}}/sec)</span>
+		<div v-for="thing in tmp.displayThings" class="overlayThing"><span v-if="thing" v-html="thing"></span></div>
+	</div>
+	`
+	})
 
 	
 
