@@ -18,14 +18,14 @@
 
 </head>
 <body onload="load()">
-	<div id="app">
-		<canvas id="treeCanvas" class="canvas"></canvas>
+	<div id="app"> 
+		<canvas id="treeCanvas" class="canvas" v-if ="!(gameEnded && !player.keepGoing)"></canvas>
 
 		<div v-if="false" id="loadingSection" class="fullWidth">
-			<h1>Loading... (If this takes too long it means there was a serious error!)</h1>
+			<h1>Loading... (If this takes too long it means there was a serious error!)←</h1>
 		</div>
-		<div class="vl" v-if="player.navTab!= 'none' &&player.tab!='none'&&!player.gameEnded"></div>
-		<div v-if="player.gameEnded" class="fullWidth">
+		<div class="vl" v-if="player.navTab!= 'none' &&player.tab!='none'&&!(gameEnded && !player.keepGoing)"></div>
+		<div v-if="(gameEnded && !player.keepGoing)" class="fullWidth">
 			<br>
 			<h2>{{modInfo.name}} {{VERSION.withoutName}}</h2><br><br>
 			<h3>Congratulations! You have reached the end and beaten this game, but for now...</h3><br>
@@ -43,66 +43,12 @@
 			<br><br><br>
 			<h1>Oh, you are still reading this?</h1>
 			<br>
-		</div>
-		<div v-if="player.tab=='changelog'" class="col right">
-			<button class="back" onclick="showTab('none')">←</button><br><br><br>
-		</div>
+		</div>		
 		
-		<div v-if="player.tab=='info'" class="col right">
-			<button class="back" onclick="showTab('none')">←</button><br>
-			<h2>{{modInfo.name}}</h2>
-			<br>
-			<h3>{{VERSION.withName}}</h3>
-			<span v-if="modInfo.author">
-				<br>
-				Made by {{modInfo.author}}	
-			</span>
-			<br>
-			The Modding Tree {{TMT_VERSION.tmtNum}} by Acamaeda
-			<br>
-			The Prestige Tree made by Jacorb and Aarex
-			<br>
-			Original idea by papyrus (on discord)
-			<br><br>
-			<a v-bind:href="modInfo.changelogLink" target="_blank" class="link" >Changelog</a><br>
-			<span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></span>
-			<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
-			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
-			<br>
-			Note by Jacorb: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
-			<br><br>
-			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
-			<h3>Hotkeys</h3><br>
-			<span v-for="key in hotkeys" v-if="player[key.layer].unlocked"><br>{{key.description}}</span>
-		</div>
-		<div v-if="player.tab=='options'" class="col right">
-			<button class="back" onclick="showTab('none')">←</button><br>
-			<table>
-				<tr>
-					<td><button class="opt" onclick="save()">Save</button></td>
-					<td><button class="opt" onclick="toggleOpt('autosave')">Autosave: {{ player.autosave?"ON":"OFF" }}</button></td>
-					<td><button class="opt" onclick="hardReset()">HARD RESET</button></td>
-				</tr>
-				<tr>
-					<td><button class="opt" onclick="exportSave()">Export to clipboard</button></td>
-					<td><button class="opt" onclick="importSave()">Import</button></td>
-					<td><button class="opt" onclick="toggleOpt('offlineProd')">Offline Prod: {{ player.offlineProd?"ON":"OFF" }}</button></td>
-				</tr>
-				<tr>
-					<td><button class="opt" onclick="switchTheme()">Theme: {{ getThemeName() }}</button></td>
-					<td><button class="opt" onclick="adjustMSDisp()">Show Milestones: {{ player.msDisplay.toUpperCase() }}</button></td>
-					<td><button class="opt" onclick="toggleOpt('hqTree')">High-Quality Tree: {{ player.hqTree?"ON":"OFF" }}</button></td>
-				</tr>
-					<tr>
-						<td><button class="opt" onclick="toggleOpt('hideChallenges')">Completed Challenges: {{ player.hideChallenges?"HIDDEN":"SHOWN" }}</button></td>
-					<!--	<td><button class="opt" onclick="toggleOpt('oldStyle')">Style: {{ player.oldStyle?"v1.0":"NEW" }}</button></td>-->
-				</tr> 
-			</table>
-		</div>
-		<div id="treeOverlay" class="treeOverlay" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
+		<div id="treeOverlay" v-if="!(gameEnded && !player.keepGoing)" class="treeOverlay" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
 			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
-			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options'" src="options_wheel.png" onclick="showTab('options')"></img>
-			<div id="info" v-if="player.tab!='info'"  class="overlayThing" onclick="showTab('info')"><br>i</div>
+			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options-tab'" src="options_wheel.png" onclick="showTab('options-tab')"></img>
+			<div id="info" v-if="player.tab!='info-tab'"  class="overlayThing" onclick="showTab('info-tab')"><br>i</div>
 			<div id="discord" class="overlayThing">
 				<img onclick="window.open((modInfo.discordLink ? modInfo.discordLink : 'https://discord.gg/F3xveHV'),'mywindow')" src="discord.png"  target="_blank"></img>
 				<ul id="discord-links">
@@ -111,22 +57,22 @@
 					<li><a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a></li>
 				</ul>
 			</div>
-			<overlay-head v-if="!player.gameEnded && !(player.navTab == 'none' && (player.tab=='options' || player.tab=='info'))"></overlay-head>
+			<overlay-head v-if="!(gameEnded && !player.keepGoing)"></overlay-head>
 			<div class="sideLayers" >
 				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node' :abb='tmp[node].symbol' :size="'small'"></layer-node></div>
 			</div>
 		</div>
 
 
-		<div v-if="player.gameEnded" id="treeTab" style="z-index: 0" onscroll="resizeCanvas()" v-bind:class= "{ fullWidth: player.tab == 'none', col: player.tab != 'none', left: player.tab != 'none'}">
+		<div v-if="!(gameEnded && !player.keepGoing)" id="treeTab" style="z-index: 0" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
 			<br><br><br><br>
 			<overlay-head id="fakeHead" style="visibility: hidden;">
 			</overlay-head>
 
-			<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab"></layer-tab>
+			<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab" :back="(player.navTab == 'none' && tmp[player.tab].layer == 'side' || tmp[player.tab] == 'otherside') ? 'big' : 'none'"></layer-tab>
 
 		</div>
-		<div v-if="player.navTab !== 'none'" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
+		<div v-if="player.navTab !== 'none' && !(gameEnded && !player.keepGoing)" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
 			<div v-for="layer in LAYERS" >
 				<div v-if="player.tab==layer" > 
 					<layer-tab :layer="layer" :back="'none'" :spacing="'50px'"></layer-tab>

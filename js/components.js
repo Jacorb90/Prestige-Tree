@@ -403,6 +403,8 @@ function loadVue() {
 	Vue.component('layer-node', systemComponents['layer-node'])
 	Vue.component('layer-tab', systemComponents['layer-tab'])
 	Vue.component('overlay-head', systemComponents['overlay-head'])
+	Vue.component('info-tab', systemComponents['info-tab'])
+	Vue.component('options-tab', systemComponents['options-tab'])
 
 
 	app = new Vue({

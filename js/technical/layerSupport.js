@@ -197,3 +197,14 @@ const UP = 0
 const DOWN = 1
 const LEFT = 2
 const RIGHT = 3
+
+
+addLayer("info-tab", {
+    tabFormat: ["info-tab"],
+    row: "otherside"
+})
+
+addLayer("options-tab", {
+    tabFormat: ["options-tab"],
+    row: "otherside"
+})

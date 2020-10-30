@@ -84,7 +84,7 @@ function save() {
 function startPlayerBase() {
 	return {
 		tab: layoutInfo.startTab,
-		navTab: (layoutInfo.showTree ? "tree" : "none"),
+		navTab: (layoutInfo.showTree ? "tree-tab" : "none"),
 		time: Date.now(),
 		autosave: true,
 		notify: {},
@@ -100,7 +100,6 @@ function startPlayerBase() {
 		showStory: true,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
-		gameEnded:false
 	}
 }
 
@@ -118,6 +117,7 @@ function getStartPlayer() {
 		playerdata[layer] = {}
 		if (layers[layer].startData) 
 			playerdata[layer] = layers[layer].startData()
+		else playerdata[layer].unlocked = true
 		playerdata[layer].buyables = getStartBuyables(layer)
 		if(playerdata[layer].clickables == undefined) playerdata[layer].clickables = getStartClickables(layer)
 		playerdata[layer].spentOnBuyables = new Decimal(0)
@@ -603,6 +603,12 @@ function showTab(name) {
 	player.tab = name
 
 	delete player.notify[name]
+	needCanvasUpdate = true
+}
+
+function goBack() {
+	if (player.navTab !== "none") showTab("none")
+	else showTab(layoutInfo.startTab)
 }
 
 function notifyLayer(name) {
@@ -636,7 +642,7 @@ function layerunlocked(layer) {
 
 function keepGoing() {
 	player.keepGoing = true;
-	showTab("tree")
+	needCanvasUpdate = true;
 }
 
 function toNumber(x) {

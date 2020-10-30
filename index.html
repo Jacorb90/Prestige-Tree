@@ -44,31 +44,6 @@
 			<br>
 		</div>
 		<div v-if="player.tab=='info'" class="col right">
-			<button class="back" onclick="showTab('none')">←</button><br>
-			<h2>{{modInfo.name}}</h2>
-			<br>
-			<h3>{{VERSION.withName}}</h3>
-			<span v-if="modInfo.author">
-				<br>
-				Made by {{modInfo.author}}	
-			</span>
-			<br>
-			The Modding Tree {{TMT_VERSION.tmtNum}} by Acamaeda
-			<br>
-			The Prestige Tree made by Jacorb and Aarex
-			<br>
-			Original idea by papyrus (on discord)
-			<br><br>
-			<a v-bind:href="modInfo.changelogLink" target="_blank" class="link" >Changelog</a><br>
-			<span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></span>
-			<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
-			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
-			<br>
-			Note by Jacorb: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
-			<br><br>
-			Time Played: {{ formatTime(player.timePlayed) }}<br><br>
-			<h3>Hotkeys</h3><br>
-			<span v-for="key in hotkeys" v-if="player[key.layer].unlocked"><br>{{key.description}}</span>
 		</div>
 		<div v-if="player.tab=='options'" class="col right">
 			<button class="back" onclick="showTab('none')">←</button><br>
