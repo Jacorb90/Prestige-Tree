@@ -609,6 +609,15 @@ function notifyLayer(name) {
 	player.notify[name] = 1
 }
 
+function subtabShouldNotify(layer, family, id){
+	let subtab = {}
+	if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
+	else subtab = tmp[layer].microtabs[family][id]
+	if (player.subtabs[layer][family] === id) return false
+	else if (subtab.embedLayer) return tmp[subtab.embedLayer].notify
+	else return subtab.shouldNotify
+}
+
 function nodeShown(layer) {
 	if (tmp[layer].layerShown) return true
 	switch(layer) {

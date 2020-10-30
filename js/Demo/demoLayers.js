@@ -397,7 +397,6 @@ addLayer("f", {
         "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
         ["display-text", "Bork bork!"]
     ],
-
     // The following are only currently used for "custom" Prestige type:
     prestigeButtonText() { //Is secretly HTML
         if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"

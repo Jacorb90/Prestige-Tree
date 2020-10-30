@@ -61,6 +61,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 
 // Return true if the layer should be highlighted. By default checks for upgrades only.
 function shouldNotify(layer){
+	if (player.tab == layer || player.navTab == layer) return false
 	for (id in tmp[layer].upgrades){
 		if (!isNaN(id)){
 			if (canAffordUpgrade(layer, id) && !hasUpgrade(layer, id) && tmp[layer].upgrades[id].unlocked){
@@ -69,8 +70,8 @@ function shouldNotify(layer){
 		}
 	}
 
-	if (layers[layer].shouldNotify){
-		return layers[layer].shouldNotify()
+	if (tmp[layer].shouldNotify){
+		return tmp[layer].shouldNotify
 	}
 	else 
 		return false
