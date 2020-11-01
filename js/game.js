@@ -244,7 +244,7 @@ function canCompleteChallenge(layer, x)
 		}
 	}
 	else {
-		return !(player[layer].points.lt(challenge.goal))
+		return !(player.points.lt(challenge.goal))
 	}
 
 }
@@ -357,3 +357,5 @@ var interval = setInterval(function() {
 	fixNaNs()
 	ticking = false
 }, 50)
+
+setInterval(function() {needCanvasUpdate = true}, 500)

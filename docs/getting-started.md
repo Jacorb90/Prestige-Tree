@@ -35,7 +35,7 @@ The benefits of using Github:
 
 3. Open [mod.js](/js/mod.js) in VSCode, and look at the top part where it has a "modInfo" object. Fill in your mod's name to whatever you want, and change the id as well. (It can be any string value, and it's used to determine where the savefile is. Make it something that's probably unique, and don't change it again later or else it'll effectively wipe existing saves)
 
-4. Save [mod.js](/js/mod.js), and then reload [index.html](/index.html) in your browser. The title on the tab, as well as on the info page, will now be the ones you configured!
+4. Save [mod.js](/js/mod.js), and then reload [index.html](/index.html) in your browser. The title on the tab, as well as on the info page, will now be updated! You can repeat this process every time you change the code to test it quickly and easily. 
 
 5. Go back to Github Desktop. It's time to save your changes into the git system by making a "commit". This basically saves your work and creates a snapshot of what your code looks like at this moment, allowing you to look back at it later.
 
