@@ -47,6 +47,7 @@
 		
 		<div id="treeOverlay" v-if="!(gameEnded && !player.keepGoing)" class="treeOverlay" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
 			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
+			<button v-if= "player.navTab == 'none' && (tmp[player.tab].row == 'side' || tmp[player.tab].row == 'otherside')" class="other-back overlayThing" onclick="goBack()">←</button>
 			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options-tab'" src="options_wheel.png" onclick="showTab('options-tab')"></img>
 			<div id="info" v-if="player.tab!='info-tab'"  class="overlayThing" onclick="showTab('info-tab')"><br>i</div>
 			<div id="discord" class="overlayThing">
@@ -69,7 +70,7 @@
 			<overlay-head id="fakeHead" style="visibility: hidden;">
 			</overlay-head>
 
-			<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab" :back="(player.navTab == 'none' && tmp[player.tab].layer == 'side' || tmp[player.tab] == 'otherside') ? 'big' : 'none'"></layer-tab>
+			<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab" ></layer-tab>
 
 		</div>
 		<div v-if="player.navTab !== 'none' && !(gameEnded && !player.keepGoing)" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">

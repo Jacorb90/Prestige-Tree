@@ -14,6 +14,7 @@ addNode("spook", {
 }, 
 )
 
+
 addLayer("tree-tab", {
-    tabFormat: ["tree", function() {layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS}]
+    tabFormat: [["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]]
 })

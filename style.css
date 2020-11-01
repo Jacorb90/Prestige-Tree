@@ -74,6 +74,7 @@ h1, h2, h3, b, input {
 	font-family: "Lucida Console", "Courier New", monospace;
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
+	padding: 0;
 }
 
 
@@ -88,6 +89,8 @@ h1, h2, h3, b, input {
 	font-family: "Lucida Console", "Courier New", monospace;
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
+	padding: 0;
+
 }
 
 .smallNode {
@@ -101,6 +104,8 @@ h1, h2, h3, b, input {
 	font-family: "Lucida Console", "Courier New", monospace;
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
+	padding: 0;
+
 }
 
 
@@ -156,7 +161,7 @@ h1, h2, h3, b, input {
 
 .other-back {
 	position: absolute;
-	top: 10px;
+	top: 0px;
 	left: 60px;
 	background-color: transparent;
 	border: 1px solid transparent;

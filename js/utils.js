@@ -100,6 +100,7 @@ function startPlayerBase() {
 		showStory: true,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
+		lastSafeTab: (layoutInfo.showTree ? "none" : "layoutInfo.startTab")
 	}
 }
 
@@ -601,14 +602,14 @@ function showTab(name) {
 
 	var toTreeTab = name == "none"
 	player.tab = name
-
+	if (player.navTab == "none" && (tmp[name].row !== "side") && (tmp[name].row !== "otherside")) player.lastSafeTab = name
 	delete player.notify[name]
 	needCanvasUpdate = true
 }
 
 function goBack() {
 	if (player.navTab !== "none") showTab("none")
-	else showTab(layoutInfo.startTab)
+	else showTab(player.lastSafeTab)
 }
 
 function notifyLayer(name) {
