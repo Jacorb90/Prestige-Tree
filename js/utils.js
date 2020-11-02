@@ -612,6 +612,13 @@ function goBack() {
 	else showTab(player.lastSafeTab)
 }
 
+function layOver(obj1, obj2) {
+	for (let x in obj2) {
+		if (obj2[x] instanceof Object) layOver(obj1[x], obj2[x]);
+		else obj1[x] = obj2[x];
+	}
+}
+
 function notifyLayer(name) {
 	if (player.tab == name || !layerunlocked(name)) return
 	player.notify[name] = 1
