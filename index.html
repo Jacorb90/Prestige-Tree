@@ -1,778 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
-	<title>The Prestige Tree</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Prestige Tree is an incremental game based around a skill tree where each node is a prestige layer.
-		At the time of writing this, it has 7 rows of prestige layers, and 20 prestige layers.
-		The game is compatible with almost all playstyles and lasts anywhere from 6 hours to a week.">
-	<link id="styleStuff" rel="stylesheet" type="text/css" href="style.css" media="all" />
-	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" media="all">
-	<script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/remove-focus-outline@1.2.1/outline.min.js"></script>
-	<script defer src="js/break_eternity.js"></script>
-	<script defer src="js/temp.js"></script>
-	<script defer src="js/saves.js"></script>
-	<script defer src="js/layers.js"></script>
-	<script defer src="js/upgrades.js"></script>
-	<script defer src="js/challs.js"></script>
-	<script defer src="js/row_1.js"></script>
-	<script defer src="js/row_2.js"></script>
-	<script defer src="js/row_3.js"></script>
-	<script defer src="js/row_4.js"></script>
-	<script defer src="js/row_5.js"></script>
-	<script defer src="js/row_6.js"></script>
-	<script defer src="js/row_7.js"></script>
-	<script defer src="js/game.js"></script>
-	<script defer src="js/v.js"></script>
-	<script defer src="js/canvas.js"></script>
+
+	<link id="styleStuff" rel="stylesheet" type="text/css" href="style.css" />
+	<link rel="stylesheet" type="text/css" href="notification.css" />
+	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+	<script type="text/javascript" src="js/technical/break_eternity.js"></script>
+	<script type="text/javascript" src="js/technical/layerSupport.js"></script>
+	<script type="text/javascript" src="js/tree.js"></script>
+	<script type="text/javascript" src="js/sc.js"></script>
+	<script type="text/javascript" src="js/help.js"></script>
+	<script type="text/javascript" src="js/layers.js"></script>
+	<script type="text/javascript" src="js/mod.js"></script>
+	<script type="text/javascript" src="js/technical/temp.js"></script>
+	<script type="text/javascript" src="js/game.js"></script>
+	<script type="text/javascript" src="js/utils.js"></script>
+	<script type="text/javascript" src="js/technical/systemComponents.js"></script>
+	<script type="text/javascript" src="js/components.js"></script>
+	<script type="text/javascript" src="js/technical/canvas.js"></script>
 </head>
 <body onload="load()">
 	<div id="app">
+		<canvas id="treeCanvas" class="canvas" v-if ="!(gameEnded && !player.keepGoing)"></canvas>
+
 		<div v-if="false" id="loadingSection" class="fullWidth">
-			<h1>Loading...</h1>
+			<h1>Loading...<br></h1><br>If this takes too long, please let me know in <a style="font-size: 30px" href="https://discord.gg/ww5NQutTRK">my discord</a>.
 		</div>
-		<div style="display: none;" v-bind:style="{ display: 'block' }">
-			<div class="vl" v-if="player.tab!='tree'&&player.tab!='gameEnded'"></div>
-			<div v-if="player.tab=='gameEnded'" class="fullWidth">
+		<div v-bind:style="{display: 'block'}" style="display: none;">
+			<div class="vl" v-if="player.navTab!= 'none' &&player.tab!='none'&&!(gameEnded && !player.keepGoing)"></div>
+			<div v-if="(gameEnded && !player.keepGoing)" class="fullWidth">
 				<br>
-				<h2>Prestige Tree {{VERSION.withoutName}}</h2><br><br>
+				<h2>{{modInfo.name}} {{VERSION.withoutName}}</h2><br><br>
 				<h3>Congratulations! You have reached the end and beaten this game, but for now...</h3><br>
-				<h3>Please check the Discord to see there are new content updates!</h3><br><br>
+				<h3>Please check the Discord to see if there are new content updates!</h3><br><br>
 				<div v-if="!player.timePlayedReset">It took you {{formatTime(player.timePlayed)}} to beat the game.</div>
-				<div v-if="player.timePlayedReset">Make sure that you record the time in your stream or else your speedrun won't count! (this is due to a bug by the way)</div>
+				<div v-if="player.timePlayedReset">Make sure that you record the time in your stream or else your speedrun won't count!</div>
 				<br>
 				<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
 				<br><br><br>
-				<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Jacorb's Discord</a><br>
-				<a class="link" href="http://aarextiaokhiao.github.io/" target="_blank">Aarex's Home</a>
+				<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">The Prestige Tree Discord</a><br>
+				<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
 				<br><br>
-				If you would like to speedrun this, press Play Again and record your attempt, then submit it on my Discord Server in the channel #speedrun-submissions.
+				If you would like to speedrun this, press Play Again and record your attempt, then submit on the Discord Server in the channel #speedrun-submissions.
 				<br><br><br>
-				<h1>Oh, you are still reading this?</h1>
-				<br>
-				If you'd like, you can help out with beta testing!<br>
-				<a class="link">Test server</a> (Coming soon!)
-				<br><br>
-				For next update, there will be a bunch of new layers from Rows 5-7! Stay tuned!
 			</div>
-			<div v-if="player.tab=='changelog'" class="col right">
-				<button class="back" onclick="showTab('tree')">←</button><br>
-				<h3>v1.2: The Mechanical Update</h3>
-				<ul>
-					<li>Added a new row with 3 new layers (only 1 is made so far)</li>
-					<li>Balanced up to e1e11</li>
-					<li>Rebalanced the early parts of row 4 (again)</li>
-					<li>Reorganized some of the code stuff</li>
-					<li>Added v1.0 style option</li>
-					<li>Added a loading screen</li>
-					<li>Fixed some more bugs</li>
-				</ul><br>
-				<h3>v1.1: The Life Update</h3>
-				<ul>
-					<li>Added 4 new layers</li>
-					<li>Added some QoL displays</li>
-					<li>Added Aqua theme</li>
-					<li>Added HQ Tree option</li>
-					<li>Rebalanced early parts of rows 4 - 6</li>
-					<li>Balanced up to e280,000,000</li>
-					<li>Fixed some bugs</li>
-				</ul><br>
-				<h3>v1.0 Patch 1</h3>
-				<ul>
-					<li>Added an option to keep going at endgame</li>
-				</ul><br>
-				<div class="link" onclick="showTab('changelog_beta')">Alpha / Beta</div><br>
+
+			<!-- Notifications -->
+			<div class="notification-container">
+				<transition-group name="fade">
+					<div v-for="notification,index in activeNotifications" class="notification" v-bind:class="notification.type" v-bind:key="notification.id">
+						<h3>{{notification.title}}</h3><br>
+						<h2 v-html="notification.message"></h2>
+					</div>
+				</transition-group>
 			</div>
-			<div v-if="player.tab=='changelog_beta'" class="col right">
-				<button class="back" onclick="showTab('changelog')">←</button><br>
-				<h3>v1.0 Full Release</h3>
-				<ul>
-					<li>Converted Vue to production mode</li>
-					<li>Added an end screen at 1e40,000,000 Points</li>
-				</ul><br>
-				<h3>v1.0 Beta 4</h3>
-				<ul>
-					<li>Balanced up to 1e40,000,000 Points & 500,000 Super-Prestige Points</li>
-				</ul><br>
-				<h3>v1.0 Beta 3</h3>
-				<ul>
-					<li>Added a hotkey for the fourth Spell</li>
-					<li>Balanced up to 1e29,000,000 Points & 10,000 Super-Prestige Points</li>
-				</ul><br>
-				<h3>v1.0 Beta 2</h3>
-				<ul>
-					<li>Fixed a bug involving the fourth Spell</li>
-					<li>Added more Super-Prestige Upgrades</li>
-					<li>Balanced up to 1e26,000,000 Points & 250 Super-Prestige Points</li>
-				</ul><br>
-				<h3>v1.0 Beta 1</h3>
-				<ul>
-					<li>Implemented the Super-Prestige layer (unfinished)</li>
-					<li>Balanced up to 1e18,000,000 Points & 10 Super-Prestige Points</li>
-				</ul><br>
-				<h3>Beta v1.2</h3>
-				<ul>
-					<li>Balanced up to 1e15,000,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 13</h3>
-				<ul>
-					<li>Reduced a few upgrade costs</li>
-					<li>Balanced up to 1e11,000,000 Points, 5e23 Magic, and 3e20 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 12</h3>
-				<ul>
-					<li>Balanced up to 1e9,200,000 Points, 5e18 Magic, and 1e16 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 11</h3>
-				<ul>
-					<li>Balanced up to 1e7,650,000 Points, 1e16 Magic, and 4e13 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 10</h3>
-				<ul>
-					<li>Made a few visual fixes</li>
-					<li>Adjusted the 1,070 Generator upgrade to cost 1,068 Generators instead</li>
-					<li>Balanced up to 1e6,800,000 Points, 1e14 Magic, and 1.5e12 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 9</h3>
-				<ul>
-					<li>Added hints for h8 & h10</li>
-					<li>Added a new Magic milestone</li>
-					<li>Reduced offline time to 10% of its original amount</li>
-					<li>Balanced up to 1e6,000,000 Points, 3e12 Magic, and 1e11 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 8</h3>
-				<ul>
-					<li>Added a new milestone</li>
-					<li>Added a new Hindrance ;)</li>
-					<li>Balanced up to 1e5,500,000 Points, 2.5e10 Magic, and 2e9 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 7</h3>
-				<ul>
-					<li>Balanced up to 1e3,950,000 Points, 1,500,000 Magic, and 5,000,000 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 6</h3>
-				<ul>
-					<li>Fixed a bug with hotkeys</li>
-					<li>Balanced up to 1e3,000,000 Points, 80,000 Magic, and 160,000 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 5</h3>
-				<ul>
-					<li>Balanced up to 1e2,400,000 Points, 1,500 Magic, and 3,000 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 4</h3>
-				<ul>
-					<li>Implemented the final Hindrance</li>
-					<li>Balanced up to 1e2,000,000 Points, 200 Magic, and 200 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 3</h3>
-				<ul>
-					<li>Balanced up to 50 Magic and 50 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 2</h3>
-				<ul>
-					<li>Added 2 new upgrades and a few new milestones</li>
-					<li>Balanced up to 25 Magic and 25 Balance Energy</li>
-				</ul><br>
-				<h3>Beta v1.2 Alpha 1</h3>
-				<ul>
-					<li>Implemented the two Row 5 layers</li>
-					<li>Added a new option</li>
-					<li>Rebalanced a few things at the end of row 4</li>
-					<li>Balanced up to 1 of each Row 5 reset</li>
-				</ul><br>
-				<h3>Beta v1.1</h3>
-				<ul>
-					<li>Cleaned up a few things</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 21</h3>
-				<ul>
-					<li>Rebalanced from h10 to endgame (now ends at 1e920,000 Points unless you wanna grind)</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 20</h3>
-				<ul>
-					<li>Made h10 hidden until you beat h9</li>
-					<li>Rebalanced/fixed h10</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 19</h3>
-				<ul>
-					<li>Remade the offline progression system</li>
-					<li>Balanced up to 1e925,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 18</h3>
-				<ul>
-					<li>Added a new Hindrance (h10)</li>
-					<li>Balanced up to 1e800,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 17</h3>
-				<ul>
-					<li>Fixed a bug with unlocking Hyper-Boosters & Subspace</li>
-					<li>Balanced up to 1e710,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 16</h3>
-				<ul>
-					<li>Added a new Hindrance (h9)</li>
-					<li>Added a new Hyper-Booster milestone</li>
-					<li>Made the Space Building automation prioritize the rightmost buildings first</li>
-					<li>Balanced up to 1e690,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 15</h3>
-				<ul>
-					<li>Balanced up to 1e635,000 Points (don't worry, the crazy inflation stops here)</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 14</h3>
-				<ul>
-					<li>Implemented the fourth row 4 layer unlock</li>
-					<li>Balanced up to 1e240,000-1e250,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 13</h3>
-				<ul>
-					<li>Implemented Subspace & Hyper-Booster resets</li>
-					<li>Balanced up to 1e100,000 Points in either path</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 12</h3>
-				<ul>
-					<li>Balanced up to 1e20 Hindrance Spirit, 2e21 Quirks, and 1e72,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 11</h3>
-				<ul>
-					<li>Added a new Quirk Milestone</li>
-					<li>Balanced up to 1e15 Hindrance Spirit, 1e16 Quirks, and 1e42,500 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 10</h3>
-				<ul>
-					<li>Balanced up to 2e13 Hindrance Spirit & Quirks, and 1e31,000 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 9</h3>
-				<ul>
-					<li>Added a new option</li>
-					<li>Balanced up to 2e10 Hindrance Spirit & Quirks, and 1e27,500 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 8</h3>
-				<ul>
-					<li>Several bugfixes</li>
-					<li>Balanced up to 1e9 Hindrance Spirit & Quirks, and 1e25,750 Points</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 7</h3>
-				<ul>
-					<li>Reversed the order of the changelog</li>
-					<li>Added the fourth Hindrance</li>
-					<li>Balanced up to 50,000 Hindrance Spirit & Quirks</li>
-				</ul><br>
-				<h3>Beta v1.1 Alpha 6</h3>
-				<ul>
-					<li>Various bugfixes</li>
-					<li>Added the third Hindrance</li>
-					<li>Balanced up to 2,500 Hindrance Spirit & Quirks</li>
-				</ul><br><br>
-				<h3>Beta v1.1 Alpha 5</h3>
-				<ul>
-					<li>Add the second Hindrance</li>
-					<li>Balanced up to 200 Hindrance Spirit & Quirks</li>
-				</ul><br><br>
-				<h3>Beta v1.1 Alpha 4</h3>
-				<ul>
-					<li>Add the first Hindrance</li>
-					<li>Implemented some new milestones</li>
-					<li>Balanced up to 60 Hindrance Spirit & Quirks</li>
-				</ul><br><br>
-				<h3>Beta v1.1 Alpha 3</h3>
-				<ul>
-					<li>Fixed corruption bug</li>
-					<li>Implemented some new milestones</li>
-					<li>Balanced up to 15 Hindrance Spirit & 15 Quirks</li>
-				</ul><br><br>
-				<h3>Beta v1.1 Alpha 2</h3>
-				<ul>
-					<li>Implemented some new milestones</li>
-					<li>Balanced up to 5 Hindrance Spirit & 5 Quirks</li>
-				</ul><br><br>
-				<h3>Beta v1.1 Alpha 1</h3>
-				<ul>
-					<li>Add the framework for the first two row 4 layers</li>
-					<li>Balanced up to the second row 4 reset</li>
-				</ul><br><br>
-				<h3>Beta v1.01</h3>
-				<ul>
-					<li>Display Generator Power in the Space tab</li>
-					<li>Add a credits page in the info tab</li>
-					<li>Implemented a few minor QoL/visual fixes</li>
-				</ul><br><br>
-				<h3>Beta v1.0</h3>
-				<ul>
-					<li>Made sure any built-in saves had Auto-Save turned on</li>
-					<li>Fixed a visual bug for mobile users</li>
-					<li>Added a "time played" display in the info tab</li>
-					<li>Implemented a NaN check system</li>
-				</ul><br><br>
-				<h3>Alpha Build 10</h3>
-				<ul>
-					<li>Rebalanced the Super-Booster era (now up to 1e9,250 points)</li>
-					<li>Implemented a game version variable</li>
-				</ul><br><br>
-				<h3>Alpha Build 9</h3>
-				<ul>
-					<li>Fixed a visual bug with the Prestige Tree branches</li>
-					<li>Added a hotkey for Super-Boosters</li>
-					<li>Added a new Super-Booster milestone</li>
-					<li>Fixed a bug with hotkeys</li>
-					<li>Balanced up to 1e46,500 points</li>
-				</ul><br><br>
-				<h3>Alpha Build 8</h3>
-				<ul>
-					<li>Implemented Super-Boosters</li>
-					<li>Balanced up to 1e25,600 points</li>
-				</ul><br><br>
-				<h3>Alpha Build 7</h3>
-				<ul>
-					<li>Made the new upgrades from Alpha Build 6 shown at proper times</li>
-					<li>Balanced up to 1e4,175 points</li>
-					<li>Setup a temp variable system (to prevent lag later on)</li>
-				</ul><br><br>
-				<h3>Alpha Build 6</h3>
-				<ul>
-					<li>Made font work for Mac users</li>
-					<li>Added 1 new Space & Time milestone each</li>
-					<li>Balanced up to 1e3,375 points</li>
-				</ul><br><br>
-				<h3>Alpha Build 5</h3>
-				<ul>
-					<li>Balanced up to 1e920 with all prestige tree paths (before unlocking third row 3 layer)</li>
-				</ul><br><br>
-				<h3>Alpha Build 4</h3>
-				<ul>
-					<li>Implemented Auto-Boosters & Auto-Generators</li>
-					<li>Fixed a balancing issue with a certain prestige tree path (1e660 -> 1e600)</li>
-					<li>Added changelog</li>
-					<li>Balanced up to 1e700 with all prestige tree paths</li>
-				</ul><br><br>
-				<h3>Pre-Alpha Build 4</h3>
-				<ul>
-					<li>Implemented/balanced all row 1 & 2 prestige layers</li>
-					<li>Added the options/info menus</li>
-					<li>Balanced the row 3 prestige layers up to 1e560 points</li>
-				</ul><br><br>
-			</div>
-			<div v-if="player.tab=='info'" class="col right" style="overflow-x: hidden;">
-				<button class="back" onclick="showTab('tree')">←</button><br>
-				<h2>Prestige Tree</h2>
+
+
+			<div v-if="player.tab=='info'" class="col right">
+				<button class="back" onclick="showTab('none')">←</button><br>
+				<h2>{{modInfo.name}}</h2>
 				<br>
 				<h3>{{VERSION.withName}}</h3>
-				<br>
-				Made by Jacorb
-				<br>
-				With help by Aarex (made all of v1.1, planned most of v1.2)
-				<br>
-				Idea by papyrus (on discord)
-				<br><br>
-				<div class="link" onclick="showTab('changelog')">Changelog</div><br>
-				<a class="link">Test server</a> (Coming soon!)<br><br>
-				<a class="link" href="http://discord.gg/wwQfgPa" target="_blank">Jacorb's Discord</a><br>
-				<a class="link" href="http://aarextiaokhiao.github.io/" target="_blank">Aarex's Home</a>
-				<br>
-				Note: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+) and to let me know on <a href="https://discord.gg/wwQfgPa" target="_blank">my discord</a>.
-				<br><br>
-				Time Played: {{ formatTime(player.timePlayed) }}<br><br>
-				<h3>Hotkeys</h3><br>
-				<span v-if="player.p.unl"><br>P: Prestige reset</span>
-				<span v-if="player.b.unl"><br>B: Booster reset</span>
-				<span v-if="player.g.unl"><br>G: Generator reset</span>
-				<span v-if="player.t.unl"><br>T: Time reset</span>
-				<span v-if="player.e.unl"><br>E: Enhance reset</span>
-				<span v-if="player.s.unl"><br>S: Space reset</span>
-				<span v-if="player.sb.unl"><br>Shift+B: Super-Booster reset</span>
-				<span v-if="player.sg.unl"><br>Shift+G: Super-Generator reset</span>
-				<span v-if="player.h.unl"><br>H: Hindrance reset</span>
-				<span v-if="player.q.unl"><br>Q: Quirk reset</span>
-				<span v-if="player.hb.unl"><br>Ctrl+B: Hyper-Booster reset</span>
-				<span v-if="player.ss.unl"><br>Shift+S: Subspace reset</span>
-				<span v-if="player.m.unl"><br>M: Magic reset</span>
-				<span v-if="player.ba.unl"><br>A: Balance reset</span>
-				<span v-if="player.ps.unl"><br>Ctrl+P: Phantom Soul reset</span>
-				<span v-if="player.sp.unl"><br>Shift+P: Super-Prestige reset</span>
-				<span v-if="player.l.unl"><br>L: Life Essence reset</span>
-				<span v-if="player.hs.unl"><br>Ctrl+S: Hyperspace reset</span>
-				<span v-if="player.i.unl"><br>I: Imperium Brick reset</span>
-				<span v-if="player.mb.unl"><br>Shift+M: Mastery Brick reset</span>
-				<span v-if="player.ge.unl"><br>Ctrl+G: Gear reset</span>
-				<span v-if="player.ma.unl"><br>Ctrl+M: Machine reset</span>
-				<span v-if="player.m.unl">
+				<span v-if="modInfo.author">
 					<br>
-					<span v-for="i in tmp.spellsUnl"><br>{{i}}: Cast spell {{i}}</span>
+					Made by {{modInfo.author}}
 				</span>
+				<br>
+				The Modding Tree {{TMT_VERSION.tmtNum}} by Acamaeda
+				<br>
+				Original idea by papyrus#6977 (on discord)
+				<br><br>
+				Note: If anyone wishes to make a mod of this game, that is perfectly fine with me, just make sure to name it something different (ex: Prestige Tree NG+), and to make sure that the credit shown above is kept in-game.<br><br>
+				<a v-bind:href="modInfo.changelogLink" target="_blank" class="link" >Changelog</a><br>
+				<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">The Prestige Tree Discord</a><br>
+				<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
+				<a class="link pat" href="http://patreon.com/Jacorb90" target="_blank" v-bind:style="{'font-size': '18px'}">Donate</a><br>
+				<br><br>
+				Time Played: {{ formatTime(player.timePlayed) }}<br>
+				<span v-for="layer in LAYERS"><span v-if="player[layer].first!==undefined && player[layer].unlocked">First {{layer}} reset: {{formatTime(player[layer].first)}}<br></span></span><br>
+				<h3>Hotkeys</h3><br>
+				<span v-for="key in hotkeys" v-if="player[key.layer].unlocked"><br>{{key.description}}</span>
+				<br>Press - to Show Formulas
+			</div>
+			<div v-if="player.tab=='help' && (typeof help_data != 'undefined')" class="col right">
+				<div v-if="typeof tmp.helpTab == 'number'">
+					<button class="back" onclick="showTab('none')">←</button><br>
+					<div v-if="player.a.achievements.length==0">Why are you even here? You haven't started yet!</div>
+					<ul v-else><br><br><br><li v-for="data in tmp.helpData"><a v-if="data.unlocked" class="link" v-on:click="tmp.helpTab = data.id" v-html="data.title"></a><br></li></ul>
+				</div>
+				<div v-else>
+					<button class="back" onclick="tmp.helpTab = NaN">←</button><br>
+					<h2 v-html="tmp.helpData[tmp.helpTab].title"></h2><br><br>
+					<div v-html="tmp.helpData[tmp.helpTab].text"></div>
+				</div>
 			</div>
 			<div v-if="player.tab=='options'" class="col right">
-				<button class="back" onclick="showTab('tree')">←</button><br>
-				<table>
-					<tr>
-						<td><button class="opt" onclick="save()">Save</button></td>
-						<td><button class="opt" onclick="toggleOpt('autosave')">Autosave: {{ player.autosave?"ON":"OFF" }}</button></td>
-						<td><button class="opt" onclick="hardReset()">HARD RESET</button></td>
-					</tr>
-					<tr>
-						<td><button class="opt" onclick="exportSave()">Export to clipboard</button></td>
-						<td><button class="opt" onclick="importSave()">Import</button></td>
-						<td><button class="opt" onclick="toggleOpt('offlineProd')">Offline Prod: {{ player.offlineProd?"ON":"OFF" }}</button></td>
-					</tr>
-					<tr>
-						<td><button class="opt" onclick="switchTheme()">Theme: {{ getThemeName() }}</button></td>
-						<td><button class="opt" onclick="adjustMSDisp()">Show Milestones: {{ player.msDisplay.toUpperCase() }}</button></td>
-						<td><button v-if="!player.oldStyle" class="opt" onclick="toggleOpt('hqTree')">High-Quality Tree: {{ player.hqTree?"ON":"OFF" }}</button></td>
-					</tr>
-					<tr>
-						<td><button class="opt" onclick="toggleOpt('hideHindrances')">Completed Challenges: {{ player.hideHindrances?"HIDDEN":"SHOWN" }}</button></td>
-						<td><button class="opt" onclick="toggleOpt('oldStyle')">Style: {{ player.oldStyle?"v1.0":"NEW" }}</button></td>
-					</tr>
-				</table>
-			</div>
-			<div id="treeTab" v-if="player.tab!='gameEnded'" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.tab == 'tree', col: player.tab != 'tree', left: player.tab != 'tree'}">
-				<div id="version" onclick="showTab('changelog')">{{VERSION.withoutName}}</div>
-				<img id="optionWheel" v-if="player.tab!='options'" src="options_wheel.png" alt="Options" onclick="showTab('options')">
-				<div id="info" v-if="player.tab!='info'" onclick="showTab('info')"><br>i</div>
-				<!-- `rel=noopener` attr prevents reverse tabnabbing (https://owasp.org/www-community/attacks/Reverse_Tabnabbing) -->
-				<img id="discord" onclick="window.open('https://discord.gg/wwQfgPa','mywindow')" src="discord.png" alt="Discord" rel="noopener">
-				<span v-if="player.devSpeed && player.devSpeed != 1">
-					<br>Dev Speed: {{format(player.devSpeed)}}x<br>
-				</span>
-				<span v-if="player.offTime !== undefined">
-					<br>Offline Time: {{formatTime(player.offTime.remain)}}<br>
-				</span>
-				<span v-if="player.sp.unl && !player.keepGoing">
-					<br>Reach {{formatWhole(ENDGAME)}} to beat the game!<br>
-				</span>
-				<br>
-				<span v-if="player.points.lt('1e1000')">You have </span>
-				<h2 id="points">{{format(player.points)}}</h2>
-				<span v-if="player.points.lt('1e1e6')"> points</span>
-				<br><br><br><br><br>
-				<table>
-					<td><layer-node layer='p' abb='P'></layer-node></td>
-				</table><table>
-					<td><button class="treeNode hidden"></button></td>
-				</table><table>
-					<td><layer-node layer='b' abb='B'></layer-node></td>
-					<td><layer-node layer='g' abb='G'></layer-node></td>
-				</table><table>
-					<td><button class="treeNode hidden"></button></td>
-				</table><table>
-					<td><layer-node layer='sb' abb='SB'></layer-node></td>
-					<td><layer-node layer='t' abb='T'></layer-node></td>
-					<td><layer-node layer='e' abb='E'></layer-node></td>
-					<td><layer-node layer='s' abb='S'></layer-node></td>
-					<td><layer-node layer='sg' abb='SG'></layer-node></td>
-				</table><table>
-					<td><button class="treeNode hidden"></button></td>
-				</table><table>
-					<td><layer-node layer='hb' abb='HB'></layer-node></td>
-					<td><layer-node layer='h' abb='H'></layer-node></td>
-					<td><layer-node layer='q' abb='Q'></layer-node></td>
-					<td><layer-node layer='ss' abb='SS'></layer-node></td>
-				</table><table>
-					<td><button class="treeNode hidden"></button></td>
-				</table><table>
-					<td><layer-node layer='m' abb='M'></layer-node></td>
-					<td><layer-node layer='ps' abb='PS'></layer-node></td>
-					<td><layer-node layer='ba' abb='BA'></layer-node></td>
-				</table><table>
-					<td><button class="treeNode hidden"></button></td>
-				</table><table>
-					<td><layer-node layer='l' abb='L'></layer-node></td>
-					<td><layer-node layer='sp' abb='SP'></layer-node></td>
-					<td><layer-node layer='hs' abb='HS'></layer-node></td>
-					<td><layer-node layer='i' abb='I'></layer-node></td>
-				</table><table>
-					<td><button class="treeNode hidden"></button></td>
-				</table><table>
-					<td><layer-node layer='ge' abb='GE'></layer-node></td>
-					<td><layer-node layer='mb' abb='MB'></layer-node></td>
-					<td><layer-node layer='ma' abb='MA'></layer-node></td>
-				</table>
-				<canvas id="treeCanvas" class="canvas"></canvas>
-			</div>
-			<div v-for="layer in Object.keys(LAYER_DATA)">
-				<div v-if="player.tab==layer" class="col right">
-					<button class="back" onclick="showTab('tree')">←</button><br><br><br>
-					<span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:class="{ [layer+'_txt']: true }">{{formatWhole(player[layer].points)}}</h2> {{LAYER_DATA[layer].res}}<span v-if="LAYER_DATA[layer].eff">, {{tmp.layerEffs[layer]?LAYER_DATA[layer].effDesc(tmp.layerEffs[layer]):"???"}}</span>
-					<br><br>
-					<button v-if="LAYER_DATA[layer].type=='normal'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.layerReqs[layer]), can: tmp.layerAmt[layer].gte(tmp.layerReqs[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(1e3)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_DATA[layer].res}}<span v-if="tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br><br>Next at {{ (LAYER_DATA[layer].ceilAmt ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer])) }} {{ LAYER_DATA[layer].amtName }}</span></button>
-					<button v-if="LAYER_DATA[layer].type=='static'" v-bind:class="{ [layer]: true, reset: true, locked: tmp.layerAmt[layer].lt(tmp.nextAt[layer]), can: tmp.layerAmt[layer].gte(tmp.nextAt[layer]) }" v-on:click="doReset(layer)"><span v-if="player[layer].points.lt(10)">Reset for </span>+<b>{{formatWhole(tmp.resetGain[layer])}}</b> {{LAYER_DATA[layer].res}}<br><br><span v-if="player[layer].points.lt(10)">{{(tmp.layerAmt[layer].gte(tmp.nextAt[layer])&&LAYER_DATA[layer].canBuyMax())?"Next":"Req"}}: {{formatWhole(tmp.layerAmt[layer])}} / </span>{{(LAYER_DATA[layer].ceilAmt ? formatWhole(tmp.nextAtDisp[layer]) : format(tmp.nextAtDisp[layer]))}} {{ LAYER_DATA[layer].amtName }}</button>
-					<span v-if="LAYER_DATA[layer].type=='normal' && tmp.resetGain[layer].lt(100) && player[layer].points.lt(1e3)"><br>You have {{formatWhole(tmp.layerAmt[layer])}} {{LAYER_DATA[layer].amtName}}</span>
-					<br><br>
-					<span v-if="layer!='p'">Your best {{LAYER_DATA[layer].res}} is {{formatWhole(player[layer].best)}}<br></span>
-					<span v-if="player[layer].total">You have made a total of {{formatWhole(player[layer].total)}} {{LAYER_DATA[layer].res}}<br></span>
-					<div v-if="layer=='b'">
-						<table>
-							<tr v-if="milestoneShown(player.b.best.gte(8))"><td v-bind:class="{ milestone: player.b.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.b.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>8 Boosters</h3><br>Keep Prestige Upgrades on reset</td></tr>
-							<tr v-if="milestoneShown(player.b.best.gte(15))"><td v-bind:class="{ milestone: player.b.best.lt(15), milestoneDone: player.b.best.gte(15) }"><h3>15 Boosters</h3><br>You can buy max Boosters</td></tr>
-						</table>
+				<button class="back" onclick="showTab('none')">←</button><br>
+				<div class="upgTable" style="padding-top: 25px; margin-bottom: 24px;">
+					<div class="upgRow">
+						<div><button class="tabButton" style="border-color: white;" v-on:click="player.optTab='mainOpt'">Main Options</button></div>
+						<div><button class="tabButton" style="border-color: white;" v-on:click="player.optTab='displayOpt'">Display Options</button></div>
+						<div><button class="tabButton" style="border-color: white;" v-on:click="player.optTab='notifyOpt'">Node Glow Options</button></div>
 					</div>
-					<div v-if="layer=='g'">
-						<table>
-							<tr v-if="milestoneShown(player.g.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1))"><td v-bind:class="{ milestone: player.g.best.lt(8)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.g.best.gte(8)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>8 Generators</h3><br>Keep Prestige Upgrades on reset</td></tr>
-							<tr v-if="milestoneShown(player.g.best.gte(10))"><td v-bind:class="{ milestone: player.g.best.lt(10), milestoneDone: player.g.best.gte(10) }"><h3>10 Generators</h3><br>Gain 100% of Prestige Point gain every second</td></tr>
-							<tr v-if="milestoneShown(player.g.best.gte(15))"><td v-bind:class="{ milestone: player.g.best.lt(15), milestoneDone: player.g.best.gte(15) }"><h3>15 Generators</h3><br>You can buy max Generators</td></tr>
-						</table><br><br>
-						You have {{format(player.g.power)}} Generator Power, which multiplies Point gain by {{format(tmp.genPowEff)}}
-					</div>
-					<div v-if="layer=='e'">
-						<table>
-							<tr v-if="milestoneShown(player.e.best.gte(2))"><td v-bind:class="{ milestone: player.e.best.lt(2), milestoneDone: player.e.best.gte(2) }"><h3>2 enhance points</h3><br>Keep Booster/Generator milestones on reset</td></tr>
-							<tr v-if="milestoneShown(player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1))"><td v-bind:class="{ milestone: player.e.best.lt(10)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.e.best.gte(10)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>10 enhance points</h3><br>Keep Prestige Upgrades on reset</td></tr>
-						</table><br><br>
-						<button v-bind:class="{ upgBig: true, can: player.e.points.gte(getEnhancerCost()), locked: player.e.points.lt(getEnhancerCost()), e: true }" onclick="buyEnhancer()">Buy an Enhancer<br>Cost: {{formatWhole(getEnhancerCost())}} Enhance Points<br>Amount: {{formatWhole(player.e.enhancers.sub(tmp.subbedEnh))}}<br>Multiplies Prestige Point gain by {{format(tmp.enhEff)}}<br>Adds<span v-if="player.q.upgrades.includes(53)"> and multiplies</span> to base of Booster/Generator effects by {{format(tmp.enhEff2)}}</button>
-					</div>
-					<div v-if="layer=='t'">
-						<table>
-							<tr v-if="milestoneShown(player.t.best.gte(2))"><td v-bind:class="{ milestone: player.t.best.lt(2), milestoneDone: player.t.best.gte(2) }"><h3>2 time capsules</h3><br>Keep Booster/Generator milestones on reset</td></tr>
-							<tr v-if="milestoneShown(player.t.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1))"><td v-bind:class="{ milestone: player.t.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.t.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>3 time capsules</h3><br>Keep Prestige Upgrades on reset</td></tr>
-							<tr v-if="milestoneShown(player.t.best.gte(4))"><td v-bind:class="{ milestone: player.t.best.lt(4), milestoneDone: player.t.best.gte(4) }"><h3>4 time capsules</h3><br>Keep Booster Upgrades on all row 3 resets</td></tr>
-							<tr v-if="milestoneShown(player.t.best.gte(5), true)"><td v-bind:class="{ milestone: player.t.best.lt(5), milestoneDone: player.t.best.gte(5) }"><h3>5 time capsules</h3><br>Automatically purchase Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.t.best.gte(5)" class="smallUpg can b" onclick="toggleAuto('b')">{{player.b.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.t.best.gte(12))"><td v-bind:class="{ milestone: player.t.best.lt(12), milestoneDone: player.t.best.gte(12) }"><h3>12 time capsules</h3><br>Boosters reset nothing</td></tr>
-						</table><br><br>
-						You have {{format(player.t.energy)}} Time Energy, which multiplies Point gain & Prestige Point gain by {{format(tmp.timeEff)}}<br>
-						You have {{ format(player.b.points) }} Boosters<br><br>
-						<button v-bind:class="{ upgBig: true, can: (player.b.points.gte(getExtCapsuleCost())&&player.t.unl), locked: (player.b.points.lt(getExtCapsuleCost())||!player.t.unl), t: true }" onclick="buyExtCapsule()">Buy an extra Time Capsule<br>Cost: {{formatWhole(getExtCapsuleCost())}} Boosters<br>Amount: {{formatWhole(player.t.extCapsules)}}</button>
-					</div>
-					<div v-if="layer=='s'">
-						<table>
-							<tr v-if="milestoneShown(player.s.best.gte(2))"><td v-bind:class="{ milestone: player.s.best.lt(2), milestoneDone: player.s.best.gte(2) }"><h3>2 space energy</h3><br>Keep Booster/Generator milestones on reset</td></tr>
-							<tr v-if="milestoneShown(player.s.best.gte(3)||player.h.best.gte(1)||player.h.best.gte(1))"><td v-bind:class="{ milestone: player.s.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.s.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>3 space energy</h3><br>Keep Prestige Upgrades on reset</td></tr>
-							<tr v-if="milestoneShown(player.s.best.gte(4))"><td v-bind:class="{ milestone: player.s.best.lt(4), milestoneDone: player.s.best.gte(4) }"><h3>4 space energy</h3><br>Keep Generator Upgrades on all row 3 resets</td></tr>
-							<tr v-if="milestoneShown(player.s.best.gte(5), true)"><td v-bind:class="{ milestone: player.s.best.lt(5), milestoneDone: player.s.best.gte(5) }"><h3>5 space energy</h3><br>Automatically purchase Generators&nbsp;&nbsp;&nbsp;<button v-if="player.s.best.gte(5)" class="smallUpg can g" onclick="toggleAuto('g')">{{player.g.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.s.best.gte(12))"><td v-bind:class="{ milestone: player.s.best.lt(12), milestoneDone: player.s.best.gte(12) }"><h3>12 space energy</h3><br>Generators reset nothing</td></tr>
-						</table><br><br>
-						You have {{formatWhole(getSpace())}} Space remaining for Space Buildings.<br>
-						You have {{ format(player.g.power) }} Generator Power<br><br>
-						<button onclick="respecSpaceBuildings()" v-bind:class="{ longUpg: true, s: true, can: player.s.unl, locked: !player.s.unl }">Respec Space Buildings</button><br>
-						<div class="upgRow">
-							<div v-for="id in tmp.s.trueSbUnl">
-								<button v-bind:class="{ upg: true, can: (player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1)), locked: (!(player.g.power.gte(getSpaceBuildingCost(id))&&player.s.unl&&getSpace().gte(1))), s: true }" v-on:click="buyBuilding(id)"><h3>Building {{id}}</h3><br>{{getSpaceBuildingEffDesc(id)}}<br><br>Level: {{formatWhole(tmp.s.sb[id])}}<br>Cost: {{format(getSpaceBuildingCost(id))}} Generator Power</button><br><br>
-								<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, s: true, can: tmp.s.sb[id].gte(1), locked: tmp.s.sb[id].lt(1) }" v-on:click="destroyBuilding(id)">Destroy One</button><br>
-								<button v-if="player.q.best.gte(2500)" v-bind:class="{ longUpg: true, s: true, can: tmp.s.sb[id].gte(1), locked: tmp.s.sb[id].lt(1) }" v-on:click="destroyBuilding(id, true)">Destroy All</button>
-							</div>
-						</div>
-					</div>
-					<div v-if="layer=='sb'">
-						<table><tr v-if="milestoneShown(player.sb.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1))"><td v-bind:class="{ milestone: player.sb.best.lt(3)&&player.h.best.lt(1)&&player.q.best.lt(1), milestoneDone: player.sb.best.gte(3)||player.h.best.gte(1)||player.q.best.gte(1) }"><h3>3 Super-Boosters</h3><br>Keep Prestige Upgrades on reset</td></tr>
-						<tr v-if="milestoneShown(player.sb.best.gte(4))"><td v-bind:class="{ milestone: player.sb.best.lt(4), milestoneDone: player.sb.best.gte(4) }"><h3>4 Super-Boosters</h3><br>Keep Booster/Generator milestones on reset</td></tr></table>
-					</div>
-					<div v-if="layer=='sg'">
-						<table>
-							<tr v-if="milestoneShown(player.sg.best.gte(1))"><td v-bind:class="{ milestone: player.sg.best.lt(1), milestoneDone: player.sg.best.gte(1) }"><h3>1 Super-Generator</h3><br>You can buy max Super-Generators, and Super-Generators reset nothing</td></tr>
-							<tr v-if="milestoneShown(player.sg.best.gte(2), true)"><td v-bind:class="{ milestone: player.sg.best.lt(2), milestoneDone: player.sg.best.gte(2) }"><h3>2 Super-Generators</h3><br>Automatically purchase Super-Generators&nbsp;&nbsp;&nbsp;<button v-if="player.sg.best.gte(2)" class="smallUpg can sg" onclick="toggleAuto('sg')">{{player.sg.auto?"ON":"OFF"}}</button></td></tr>
-						</table><br><br>
-						You have {{format(player.sg.power)}} Super-Generator Power, which multiplies the Generator base by {{format(tmp.sGenPowEff)}}
-					</div>
-					<div v-if="layer=='h'">
-						<table><tr v-if="milestoneShown(player.h.best.gte(1))"><td v-bind:class="{ milestone: player.h.best.lt(1), milestoneDone: player.h.best.gte(1) }"><h3>1 Hindrance Spirit</h3><br>Keep Prestige Upgrades on all previous resets, and gain 100x more Enhance Points</td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(2))"><td v-bind:class="{ milestone: player.h.best.lt(2), milestoneDone: player.h.best.gte(2) }"><h3>2 Hindrance Spirit</h3><br>Keep all third row milestones on all fourth row resets, and start with your best-ever Space</td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(3))"><td v-bind:class="{ milestone: player.h.best.lt(3), milestoneDone: player.h.best.gte(3) }"><h3>3 Hindrance Spirit</h3><br>Keep Time, Enhance, and Space Upgrades on all fourth row resets</td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(4), true)"><td v-bind:class="{ milestone: player.h.best.lt(4), milestoneDone: player.h.best.gte(4) }"><h3>4 Hindrance Spirit</h3><br>Automatically purchase Extra Time Capsules&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(4)" class="smallUpg can t" onclick="toggleAuto('t', 'Cap')">{{player.t.autoCap?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(10))"><td v-bind:class="{ milestone: player.h.best.lt(10), milestoneDone: player.h.best.gte(10) }"><h3>10 Hindrance Spirit</h3><br>Keep Prestige & Super-Booster Upgrades on all fourth row resets</td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(15), true)"><td v-bind:class="{ milestone: player.h.best.lt(15), milestoneDone: player.h.best.gte(15) }"><h3>15 Hindrance Spirit</h3><br>Automatically purchase Super-Boosters&nbsp;&nbsp;&nbsp;<button v-if="player.h.best.gte(15)" class="smallUpg can sb" onclick="toggleAuto('sb')">{{player.sb.auto?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(25))"><td v-bind:class="{ milestone: player.h.best.lt(25), milestoneDone: player.h.best.gte(25) }"><h3>25 Hindrance Spirit</h3><br>Time resets reset nothing</td></tr>
-						<tr v-if="milestoneShown(player.h.best.gte(2500))"><td v-bind:class="{ milestone: player.h.best.lt(2500), milestoneDone: player.h.best.gte(2500) }"><h3>2,500 Hindrance Spirit</h3><br>Super-Boosters reset nothing</td></tr>
-						</table>
-					</div>
-					<div v-if="layer=='q'">
-						<table><tr v-if="milestoneShown(player.q.total.gte(1))"><td v-bind:class="{ milestone: player.q.total.lt(1), milestoneDone: player.q.total.gte(1) }"><h3>1 Total Quirk</h3><br>Keep Prestige Upgrades on all previous resets, and gain 100x more Enhance Points</td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(2))"><td v-bind:class="{ milestone: player.q.total.lt(2), milestoneDone: player.q.total.gte(2) }"><h3>2 Total Quirks</h3><br>You can buy max Time Capsules & Space Energy</td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(3))"><td v-bind:class="{ milestone: player.q.total.lt(3), milestoneDone: player.q.total.gte(3) }"><h3>3 Total Quirks</h3><br>Keep Space Buildings on all fourth row resets</td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(4), true)"><td v-bind:class="{ milestone: player.q.total.lt(4), milestoneDone: player.q.total.gte(4) }"><h3>4 Total Quirks</h3><br>Automatically purchase Enhancers&nbsp;&nbsp;&nbsp;<button v-if="player.q.total.gte(4)" class="smallUpg can e" onclick="toggleAuto('e')">{{player.e.auto?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(10), true)"><td v-bind:class="{ milestone: player.q.total.lt(10), milestoneDone: player.q.total.gte(10) }"><h3>10 Total Quirks</h3><br>Automatically purchase Time Capsules & Space Energy<br><button v-if="player.q.total.gte(10)" class="smallUpg can t" onclick="toggleAuto('t')">{{player.t.auto?"ON":"OFF"}}</button>&nbsp;<button v-if="player.q.total.gte(10)" class="smallUpg can s" onclick="toggleAuto('s')">{{player.s.auto?"ON":"OFF"}}</button></td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(15))"><td v-bind:class="{ milestone: player.q.total.lt(15), milestoneDone: player.q.total.gte(15) }"><h3>15 Total Quirks</h3><br>Gain 100% of Enhance Point gain every second</td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(25))"><td v-bind:class="{ milestone: player.q.total.lt(25), milestoneDone: player.q.total.gte(25) }"><h3>25 Total Quirks</h3><br>Space resets reset nothing</td></tr>
-						<tr v-if="milestoneShown(player.q.total.gte(2500))"><td v-bind:class="{ milestone: player.q.total.lt(2500), milestoneDone: player.q.total.gte(2500) }"><h3>2,500 Total Quirks</h3><br>You can destroy individual Space Buildings</td></tr>
-						</table><br><br>
-						You have {{format(player.q.energy)}} Quirk Energy (generated by Quirk Layers), which multiplies Point & Generator Power gain by {{format(tmp.quirkEff)}}<br>
-						<button v-bind:class="{ upgBig: true, can: player.q.points.gte(getQuirkLayerCost()), locked: player.q.points.lt(getQuirkLayerCost()), q: true }" onclick="buyQuirkLayer()">Increment your Quirk Layer<br>Cost: {{formatWhole(getQuirkLayerCost())}} Quirks<br>Layers: {{formatWhole(player.q.layers)}}</button>
-					</div>
-					<div v-if="layer=='hb'">
-						<table>
-							<tr v-if="milestoneShown(player.hb.best.gte(1))"><td v-bind:class="{ milestone: player.hb.best.lt(1), milestoneDone: player.hb.best.gte(1) }"><h3>1 Hyper-Booster</h3><br>You can buy max Super-Boosters</td></tr>
-						</table>
-					</div>
-					<div v-if="layer=='ss'">
-						<table>
-							<tr v-if="milestoneShown(player.ss.best.gte(1), true)"><td v-bind:class="{ milestone: player.ss.best.lt(1), milestoneDone: player.ss.best.gte(1) }"><h3>1 Subspace Energy</h3><br>Automatically purchase Space Buildings&nbsp;&nbsp;&nbsp;<button v-if="player.ss.best.gte(1)" class="smallUpg can s" onclick="toggleAuto('s', 'Build')">{{player.s.autoBuild?"ON":"OFF"}}</button></td></tr>
-						</table><br><br>
-						You have {{format(player.ss.subspace)}} Subspace, which provides you with {{formatWhole(tmp.ssEff1)}} extra Space, makes all Space Buildings {{format(tmp.ssEff2)}}x cheaper, and makes all Space Buildings {{format(tmp.ssEff3.sub(1).times(100))}}% stronger
-					</div>
-					<div v-if="layer=='m'">
-						<table>
-							<tr v-if="milestoneShown(player.m.total.gte(1))"><td v-bind:class="{ milestone: player.m.total.lt(1), milestoneDone: player.m.total.gte(1) }"><h3>1 total Magic</h3><br>Keep row 4 milestones on all resets</td></tr>
-							<tr v-if="milestoneShown(player.m.total.gte(2))"><td v-bind:class="{ milestone: player.m.total.lt(2), milestoneDone: player.m.total.gte(2) }"><h3>2 total Magic</h3><br>Keep Hindrance completions on all resets</td></tr>
-							<tr v-if="milestoneShown(player.m.total.gte(3))"><td v-bind:class="{ milestone: player.m.total.lt(3), milestoneDone: player.m.total.gte(3) }"><h3>3 total Magic</h3><br>Gain 100% of Hindrance Spirit & Quirk gain every second</td></tr>
-							<tr v-if="milestoneShown(player.m.total.gte(4), true)"><td v-bind:class="{ milestone: player.m.total.lt(4), milestoneDone: player.m.total.gte(4) }"><h3>4 total Magic</h3><br>Automatically purchase Hyper-Boosters & Subspace&nbsp;&nbsp;&nbsp;<button v-if="player.m.total.gte(4)" class="smallUpg can hb" onclick="toggleAuto('hb')">{{player.hb.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.m.total.gte(4)" class="smallUpg can ss" onclick="toggleAuto('ss')">{{player.ss.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.m.total.gte(50), true)"><td v-bind:class="{ milestone: player.m.total.lt(50), milestoneDone: player.m.total.gte(50) }"><h3>50 total Magic</h3><br>Automatically cast Spells&nbsp;&nbsp;&nbsp;<button v-if="player.m.total.gte(50)" class="smallUpg can m" onclick="toggleAuto('m')">{{player.m.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.m.total.gte(2.5e9))"><td v-bind:class="{ milestone: player.m.total.lt(2.5e9), milestoneDone: player.m.total.gte(2.5e9) }"><h3>2.5e9 total Magic</h3><br>Gain 100% of Hex gain every second, and Spells last 4x longer</td></tr>
-						</table><br><br>
-						<span v-if="player.sp.total.lt(2)">Note: Activating a Spell costs Magic.<br></span>
-						<div class="upgRow">
-							<div v-for="id in tmp.spellsUnl">
-								<button v-bind:class="{ upg: true, bought: spellActive(id), can: ((player.m.points.gte(player.m.toCast[id]))&&player.m.unl&&!spellActive(id)), locked: (!(player.m.points.gte(player.m.toCast[id])||spellActive(id))), m: true }" v-on:click="activateSpell(id)"><h3>{{SPELL_NAMES[id]}}</h3><br>{{getSpellDesc(id)}}<br><br>Time: {{formatTime(player.m.spellTimes[id])}}</button><br><br>
-								<div v-if="player.m.upgrades.includes(41)">
-									<input v-model="player.m.toCast[id]" v-on:focus="focused(true)" v-on:blur="focused(false)" v-on:change="updateToCast(id)"><br><br>
-								</div>
-							</div>
-						</div>
-						You have {{formatWhole(player.m.hexes)}} Hexes, which are multiplying Hindrance Spirit & Quirk gain by {{format(tmp.hexEff)}}
-					</div>
-					<div v-if="layer=='ba'">
-						<table>
-							<tr v-if="milestoneShown(player.ba.best.gte(1))"><td v-bind:class="{ milestone: player.ba.best.lt(1), milestoneDone: player.ba.best.gte(1) }"><h3>1 Balance Energy</h3><br>Keep row 4 milestones on all resets</td></tr>
-							<tr v-if="milestoneShown(player.ba.best.gte(2))"><td v-bind:class="{ milestone: player.ba.best.lt(2), milestoneDone: player.ba.best.gte(2) }"><h3>2 Balance Energy</h3><br>Keep Quirk Upgrades on all resets</td></tr>
-							<tr v-if="milestoneShown(player.ba.best.gte(3), true)"><td v-bind:class="{ milestone: player.ba.best.lt(3), milestoneDone: player.ba.best.gte(3) }"><h3>3 Balance Energy</h3><br>Automatically purchase Quirk Layers&nbsp;&nbsp;&nbsp;<button v-if="player.ba.best.gte(3)" class="smallUpg can q" onclick="toggleAuto('q')">{{player.q.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.ba.best.gte(5))"><td v-bind:class="{ milestone: player.ba.best.lt(5), milestoneDone: player.ba.best.gte(5) }"><h3>5 Balance Energy</h3><br>Keep Hyper-Booster & Subspace Upgrades on all resets</td></tr>
-							<tr v-if="milestoneShown(player.ba.best.gte(8))"><td v-bind:class="{ milestone: player.ba.best.lt(8), milestoneDone: player.ba.best.gte(8) }"><h3>8 Balance Energy</h3><br>You can buy max Hyper-Boosters & Subspace Energy, and Hyper-Boosters/Subspace Energy reset nothing</td></tr>
-						</table><br><br>
-						You have {{format(player.ba.power)}} Balance Power, which is multiplying Hindrance Spirit & Quirk gain by {{format(tmp.balEff)}}<br>
-						You have {{format(player.ba.positivity)}} Positivity and {{format(player.ba.negativity)}} Negativity, which are multiplying Balance Power gain by {{format(tmp.balEff2)}}
-					</div>
-					<div v-if="layer=='ps'">
-						<table>
-							<tr v-if="milestoneShown(player.ps.best.gte(2), true)"><td v-bind:class="{ milestone: player.ps.best.lt(5), milestoneDone: player.ps.best.gte(2) }"><h3>2 Phantom Souls</h3><br>Automatically purchase Phantom Souls&nbsp;&nbsp;&nbsp;<button v-if="player.ps.best.gte(2)" class="smallUpg can ps" onclick="toggleAuto('ps')">{{player.ps.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.ps.best.gte(5))"><td v-bind:class="{ milestone: player.ps.best.lt(5), milestoneDone: player.ps.best.gte(5) }"><h3>5 Phantom Souls</h3><br>You can buy max Phantom Souls, and Phantom Souls reset nothing</td></tr>
-						</table><br><br>
-					</div>
-					<div v-if="layer=='sp'">
-						<table>
-							<tr v-if="milestoneShown(player.sp.total.gte(1))"><td v-bind:class="{ milestone: player.sp.total.lt(1), milestoneDone: player.sp.total.gte(1) }"><h3>1 total Super-Prestige Point</h3><br>Upgrades of Rows 1-5 and Hindrances are kept on all resets</td></tr>
-							<tr v-if="milestoneShown(player.sp.total.gte(2), true)"><td v-bind:class="{ milestone: player.sp.total.lt(2), milestoneDone: player.sp.total.gte(2) }"><h3>2 total Super-Prestige Points</h3><br>Keep Magic Milestones on reset, Spells do not cost Magic, and Magic Upgrade 13's effect can be auto-set to your current Magic&nbsp;&nbsp;&nbsp;<button v-if="player.sp.total.gte(2)" class="smallUpg can m" onclick="toggleAuto('m', 'Ins')">{{player.m.autoIns?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.sp.total.gte(5))"><td v-bind:class="{ milestone: player.sp.total.lt(5), milestoneDone: player.sp.total.gte(5) }"><h3>5 total Super-Prestige Points</h3><br>Keep Balance Milestones on reset</td></tr>
-							<tr v-if="milestoneShown(player.sp.total.gte(10))"><td v-bind:class="{ milestone: player.sp.total.lt(10), milestoneDone: player.sp.total.gte(10) }"><h3>10 total Super-Prestige Points</h3><br>Gain 100% of Magic & Balance Power gain every second</td></tr>
-						</table>
-					</div>
-					<div v-if="layer=='l'">
-						<br><br>
-						You have {{format(player.l.power)}} Life Power (+{{format(LIFE_BOOSTERS.calcNewPower(1).sub(player.l.power))}}/s),<br>
-						which is translating to:
-						<div class="upgRow">
-							<div v-for="i in tmp.l.lbUnl">
-								<button v-bind:class="{ upgBig: true, l: true }"><h3>Life Booster {{i}}</h3><br>{{LIFE_BOOSTERS[i].effDesc(tmp.l.lbEff[i])}}<br><br>Boosters: {{formatWhole(tmp.l.lb[i])}}<br>Next at: {{formatWhole(LIFE_BOOSTERS.req(i).ceil())}} Phantom Souls</button>
-							</div>
-						</div>
-						You have {{formatWhole(player.ps.points)}} Phantom Souls, {{tmp.layerEffs["ps"]?LAYER_DATA["ps"].effDesc(tmp.layerEffs["ps"]):"???"}}
-					</div>
-					<div v-if="layer=='hs'">
-						<table>
-							<tr v-if="milestoneShown(player.hs.best.gte(2e4))"><td v-bind:class="{ milestone: player.hs.best.lt(2e4), milestoneDone: player.hs.best.gte(2e4) }"><h3>20,000 Hyperspace Energy</h3><br>Gain 1% of Super-Prestige Points gain every second</td></tr>
-							<tr v-if="milestoneShown(player.hs.best.gte(1e150))"><td v-bind:class="{ milestone: player.hs.best.lt(1e150), milestoneDone: player.hs.best.gte(1e150) }"><h3>1e150 Hyperspace Energy</h3><br>Space Buildings do not consume Space</td></tr>
-						</table>
-						<br><br>
-						You have {{formatWhole(player.ba.points)}} Balance Energy
-						<br>
-						<button v-on:click="HYPERSPACE.buy()" v-bind:class="{ upgBig: true, hs: true, can: HYPERSPACE.canBuy(), locked: !HYPERSPACE.canBuy() }">Buy a Hyperspace<br>Amount: {{formatWhole(player.hs.space.sub(player.hs.spent))}}<br><br>Cost: {{formatWhole(HYPERSPACE.cost().hs)}} Hyperspace Energy & {{formatWhole(HYPERSPACE.cost().ba)}} Balance Energy</button>
-						<br><br>
-						<button v-on:click="HYPERSPACE.respec()" v-bind:class="{ longUpg: true, hs: true, can: player.hs.unl, locked: !player.hs.unl }">Respec Super-Upgrades</button><br>
-						<div class="upgRow">
-							<div v-for="i in tmp.s.trueSbUnl">
-								<button v-on:click="HYPERSPACE.superUpg(i)" v-bind:class="{ upg: true, hs: true, can: HYPERSPACE.canSuperUpg(i), locked: !HYPERSPACE.canSuperUpg(i) }"><h3>Building {{i}}</h3><br>{{getSpaceBuildingEffDesc(i)}}<br><br>Super-Level: {{formatWhole(tmp.hs.su[i])}} / {{formatWhole(player.hs.superUpgradeCap)}}<br>({{format(tmp.hs.suEff[i].sub(1).times(100))}}% stronger)<br>Cost: 1 Hyperspace</button>
-							</div>
-						</div>
-						<br>
-						Get {{formatWhole(player.g.points)}} / {{formatWhole(HYPERSPACE.nextCapReq())}} Generators to increase the cap of Super-Upgrades
-					</div>
-					<div v-if="layer=='i'">
-						<table>
-							<tr v-if="milestoneShown(player.i.best.gte(3))"><td v-bind:class="{ milestone: player.i.best.lt(3), milestoneDone: player.i.best.gte(3) }"><h3>3 Imperium Bricks</h3><br>You can max out Imperium Bricks</td></tr>
-						</table>
-						<br><br>
-						You have {{formatWhole(player.i.lifeBricks)}} Life Bricks<br>
-						Next Life Brick is at {{format(player.l.power)}} / {{format(IMPERIUM.lifeReq())}} Life Power
-						<br><br>
-						<button v-if="tmp.s.sbUnl.gte(IMPERIUM.minSB)" v-on:click="IMPERIUM.build()" v-bind:class="{ upgBig: true, i: true, can: IMPERIUM.canBuild(), locked: !IMPERIUM.canBuild() }">
-							<h3>Imperium Buildings</h3><br>
-							<span v-if="tmp.s.sbUnl.lt(SPACE_BUILDINGS.max)">Build Space Building {{formatWhole(tmp.s.sbUnl.add(1))}}</span>
-							<span v-if="tmp.s.sbUnl.max(IMPERIUM.minSB).gte(SPACE_BUILDINGS.max)">Enhance<sup v-if="tmp.s.sbUnl.div(SPACE_BUILDINGS.max).gte(2)">{{formatWhole(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor())}}</sup> Space Building {{formatWhole(tmp.s.sbUnl.sub(tmp.s.sbUnl.div(SPACE_BUILDINGS.max).floor().times(SPACE_BUILDINGS.max)).add(1))}}</span>
-							<br>
-							Built Buildings: {{formatWhole(player.i.extraBuildings)}}
-							<br><br>
-							<span v-if="!player.i.building">Cost: {{IMPERIUM.cost().i}} Imperium Bricks & {{IMPERIUM.cost().l}} Life Bricks</span>
-							<span v-if="player.i.building">Progress: {{format(player.i.progress * 100)}}%<br>Your {{formatWhole(player.sg.points)}} Super-Generators speed up your progress by {{format(IMPERIUM.sgSpeedBoost())}}x<br><br>Click to cancel building</span>
-						</button>
-						<div v-if="tmp.s.sbUnl.lt(IMPERIUM.minSB)">Unlock Space Building 5 to build Imperium Buildings.</div>
-						<br>
-						Your Work is currently {{format(tmp.i.work)}}, which reduces the gain power of rows 1 - 5 by {{format(tmp.i.workEff)}}x
-						<span v-for="i in IMPERIUM.maxCollapseRows"><span v-if="IMPERIUM.collapsed(i)"><br>Your Work also collapses row {{i}} layers by {{format(tmp.i.collapse[i].times(100))}}%</span></span>
-					</div>
-					<div v-if="layer=='mb'">
-						<table>
-							<tr v-if="milestoneShown(player.mb.total.gte(1))"><td v-bind:class="{ milestone: player.mb.total.lt(1), milestoneDone: player.mb.total.gte(1) }"><h3>1 Total Mastery Brick</h3><br>Keep Milestones, Upgrades, and Hindrances of Rows 1-4 on Row 7 resets. Also keep Row 5 milestones on Row 7 resets.</td></tr>
-							<tr v-if="milestoneShown(player.mb.total.gte(2))"><td v-bind:class="{ milestone: player.mb.total.lt(2), milestoneDone: player.mb.total.gte(2) }"><h3>2 Total Mastery Bricks</h3><br>Keep Row 5 Upgrades and Row 6 Milestones on Row 7 resets.</td></tr>
-							<tr v-if="milestoneShown(player.mb.total.gte(3))"><td v-bind:class="{ milestone: player.mb.total.lt(3), milestoneDone: player.mb.total.gte(3) }"><h3>3 Total Mastery Bricks</h3><br>Keep Row 6 Upgrades on Row 7 resets, and gain 100% of Life Essence gain every second.</td></tr>
-							<tr v-if="milestoneShown(player.mb.total.gte(5))"><td v-bind:class="{ milestone: player.mb.total.lt(5), milestoneDone: player.mb.total.gte(5) }"><h3>5 Total Mastery Bricks</h3><br>Keep Imperium Buildings on Row 7 resets, and gain 100% of Hyperspace Energy gain every second.</td></tr>
-							<tr v-if="milestoneShown(player.mb.total.gte(8))"><td v-bind:class="{ milestone: player.mb.total.lt(8), milestoneDone: player.mb.total.gte(8) }"><h3>8 Total Mastery Bricks</h3><br>Keep Hyperspace and Super-Upgrades on Row 7 resets.</td></tr>
-							<tr v-if="milestoneShown(player.mb.total.gte(10), true)"><td v-bind:class="{ milestone: player.mb.total.lt(10), milestoneDone: player.mb.total.gte(10) }"><h3>10 Total Mastery Bricks</h3><br>Automate Imperium Bricks, Imperium resets nothing, and gain 100% of Super-Prestige Point gain on reset.&nbsp;&nbsp;&nbsp;<button v-if="player.mb.total.gte(10)" class="smallUpg can i" onclick="toggleAuto('i')">{{player.i.auto?"ON":"OFF"}}</button></td></tr>
-							<tr v-if="milestoneShown(player.mb.total.gte(32))"><td v-bind:class="{ milestone: player.mb.total.lt(32), milestoneDone: player.mb.total.gte(32) }"><h3>32 Total Mastery Bricks</h3><br>You can buy max Mastery Bricks</td></tr>
-						</table><br><br>
-						Note: Buying a Mastery Building can make others more expensive<br><br>
-						<button v-on:click="MASTERY.respec()" v-bind:class="{ longUpg: true, mb: true, can: player.mb.unl, locked: !player.mb.unl }">Respec Mastery Buildings</button><br>
-						<div class="upgRow">
-							<div><button onclick="unlockNewSpell()" v-bind:tooltip="MASTERY.tooltip(1)" v-bind:class="{ upgBig: true, mb: true, can: player.mb.points.gte(MASTERY.spellCost()), locked: player.mb.points.lt(MASTERY.spellCost()) }"><h3>Mastery Building 1</h3><br><div v-if="player.mb.extraSpells.lt(MAX_SPELLS-4)">Unlock a new Spell</div><div v-if="player.mb.extraSpells.gte(MAX_SPELLS-4)">Enhance all Spells</div><br>(Lvl {{formatWhole(player.mb.extraSpells)}})<br>Cost: {{ formatWhole(MASTERY.spellCost()) }} Mastery Bricks</button></div>
-							<div><button onclick="unlockNewLB()" v-bind:tooltip="MASTERY.tooltip(2)" v-bind:class="{ upgBig: true, mb: true, can: player.mb.points.gte(MASTERY.boosterCost()), locked: player.mb.points.lt(MASTERY.boosterCost()) }"><h3>Mastery Building 2</h3><br><div v-if="player.mb.extraBoosters.lt(LIFE_BOOSTERS.max-5)">Unlock a new Life Booster</div><div v-if="player.mb.extraBoosters.gte(LIFE_BOOSTERS.max-5)">Enhance all Life Boosters</div><br>(Lvl {{formatWhole(player.mb.extraBoosters)}})<br>Cost: {{ formatWhole(MASTERY.boosterCost()) }} Mastery Bricks</button></div>
-							<div><button onclick="unlockNewMachine()" v-bind:tooltip="MASTERY.tooltip(3)" v-if="player.ma.unl" v-bind:class="{ upgBig: true, mb: true, can: player.mb.points.gte(MASTERY.machineCost()), locked: player.mb.points.lt(MASTERY.machineCost()) }"><h3>Mastery Building 3</h3><br><div v-if="player.ma.built.lt(MACHINES.maxBuild)">Unlock a new Machine</div><div v-if="player.ma.built.gte(MACHINES.maxBuild)">Boost all Machines</div><br>(Lvl {{formatWhole(player.ma.built)}})<br>Cost: {{ formatWhole(MASTERY.machineCost()) }} Mastery Bricks</button></div>
-						</div>
-					</div>
-					<div v-if="layer=='ge'">
-						<table>
-							<tr v-if="milestoneShown(player.ge.best.gte(1e200))"><td v-bind:class="{ milestone: player.ge.best.lt(1e200), milestoneDone: player.ge.best.gte(1e200) }"><h3>1e200 Gears</h3><br>Gain 1% of Machine Power & Gear gain every second</td></tr>
-						</table>
-					</div>
-					<div v-if="layer=='ma'">
-						<table>
-							<tr v-if="milestoneShown(player.ma.best.gte(5))"><td v-bind:class="{ milestone: player.ma.best.lt(5), milestoneDone: player.ma.best.gte(5) }"><h3>5 Machine Power</h3><br>Imperium Buildings get built instantly.</td></tr>
-							<tr v-if="milestoneShown(player.ma.best.gte(1e15), true)"><td v-bind:class="{ milestone: player.ma.best.lt(1e15), milestoneDone: player.ma.best.gte(1e15) }"><h3>1e15 Machine Power</h3><br>Automate Hyperspace & Imperium Buildings.&nbsp;&nbsp;&nbsp;<button v-if="player.ma.best.gte(1e15)" class="smallUpg can hs" onclick="toggleAuto('hs')">{{player.hs.auto?"ON":"OFF"}}</button>&nbsp;&nbsp;&nbsp;<button v-if="player.ma.best.gte(1e15)" class="smallUpg can i" onclick="toggleAuto('i', 'Build')">{{player.i.autoBuild?"ON":"OFF"}}</button></td></tr>
-						</table><br>
-						<br><br><div v-if="player.ma.built.eq(0)&&player.ma.unl">Purchase <b>Mastery Building 3</b> to unleash the Machines</div>
-						<div class="upgRow">
-							<div v-for="x in MACHINES.max">
-								<div v-if="MACHINES[x].unl()" class="machine">
-									<br><br><h3>Machine {{x}}</h3><br><br><br>
-									{{MACHINES[x].reward}}<br>
-									Currently: {{MACHINES[x].effDisp(MACHINES[x].currently())}}
-								</div>
-							</div>
-						</div>
-						<br><br><button v-if="player.ma.unl" v-bind:class="{ ma: true, upgBig: true, locked: !MACHINES.canLvlUp(), can: MACHINES.canLvlUp() }" onclick="lvlUpMachines()">{{MACHINES.lvlUpDesc()}}<br>Cost: {{formatWhole(MACHINES.lvlCost('ma'))}} Machine Power & {{formatWhole(MACHINES.lvlCost('i'))}} Imperium Bricks</button>
-					</div>
-					<br><br>
-					<div v-if="LAYER_UPGS[layer]" class="upgTable">
-						<div v-for="row in LAYER_UPGS[layer].rows" class="upgRow">
-							<div v-for="col in LAYER_UPGS[layer].cols" class="upgAlign">
-								<button v-if="LAYER_UPGS[layer][row*10+col].unl()" v-on:click="buyUpg(layer, row*10+col)" v-bind:class="{ [layer]: true, upg: true, bought: player[layer].upgrades.includes(row*10+col), locked: (player[layer][LAYER_UPGS[layer].varType||'points'].lt(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)), can: (player[layer][LAYER_UPGS[layer].varType||'points'].gte(LAYER_UPGS[layer][row*10+col].cost)&&!player[layer].upgrades.includes(row*10+col)) }">{{ LAYER_UPGS[layer][row*10+col].desc }}<span v-if="LAYER_UPGS[layer][row*10+col].currently"><br>Currently: {{LAYER_UPGS[layer][row*10+col].effDisp(LAYER_UPGS[layer][row*10+col].currently())}}</span><br><br>Cost: {{ formatWhole(LAYER_UPGS[layer][row*10+col].cost) }} {{LAYER_UPGS[layer].res?LAYER_UPGS[layer].res:LAYER_DATA[layer].res}}</button>
-							</div>
-						</div>
-					</div>
-					<div v-if="LAYER_CHALLS[layer]&&player[layer].unl" class="upgTable">
-						<div v-if="player.ge.unl&&layer=='ge'"><br><br><h2>Mechanical Challenges</h2><br>
-						Note: Complete unique combinations of challenges to boost the challenge rewards!<br><br><br></div>
-						<div v-if="LAYER_CHALLS[layer].choose>1&&(player.ge.active!=''&&player.ge.active!==undefined&&player.ge.active!=[])"><br>{{format(LAYER_CHALLS[layer].res())}} / {{format(tmp.challActive[layer].goal||0)}} {{ LAYER_CHALLS[layer].resDisp }}<br><br></div>
-						<div v-for="row in LAYER_CHALLS[layer].rows" class="upgRow">
-							<div v-for="col in LAYER_CHALLS[layer].cols">
-								<div v-if="LAYER_CHALLS[layer][row*10+col].unl()&&!(player.hideHindrances&&(LAYER_CHALLS[layer].choose==1?player[layer].challs.includes(row*10+col):false))" v-bind:class="{hChall: true, done: player[layer].challs.includes(row*10+col), canComplete: (LAYER_CHALLS[layer].res().gte(LAYER_CHALLS[layer].choose>1?tmp.challActive[layer].goal:LAYER_CHALLS[layer][row*10+col].goal)&&tmp.challActive[layer][row*10+col]&&!player[layer].challs.includes(row*10+col))}">
-									<br><br><h3>{{LAYER_CHALLS[layer][row*10+col].name}}</h3><br>
-									<button v-bind:class="{ longUpg: true, can: (!(player[layer].choices?(player[layer].choices.length<LAYER_CHALLS[layer].choose?player[layer].choices.includes(row*10+col):(!player[layer].choices.includes(row*10+col))):false)), locked: (player[layer].choices?(player[layer].choices.length<LAYER_CHALLS[layer].choose?player[layer].choices.includes(row*10+col):(!player[layer].choices.includes(row*10+col))):false), [layer]: true }" v-on:click="startChall(layer, row*10+col)">{{(LAYER_CHALLS[layer].choose>1&&(player[layer].choices?(LAYER_CHALLS[layer].choose>player[layer].choices.length ):true))?((player[layer].choices?player[layer].choices.includes(row*10+col):false)?"Chosen":"Select"):((player[layer].choices?(!player[layer].choices.includes(row*10+col)):false)?("Not Chosen"):((LAYER_CHALLS[layer].choose>1?(player[layer].active||[]).includes(row*10+col):player[layer].active==(row*10+col))?(LAYER_CHALLS[layer].res().gte(LAYER_CHALLS[layer].choose>1?tmp.challActive[layer].goal:LAYER_CHALLS[layer][row*10+col].goal)?"Finish":"Exit Early"):(player[layer].challs.some(x => (x==row*10+col||(typeof x == "array" ? x.includes(row*10+col) : false)))?"Completed":"Start")))}}</button><br><br>
-									{{LAYER_CHALLS[layer][row*10+col].desc}}<br>
-									<span v-if="LAYER_CHALLS[layer].choose==1">Goal: {{format(LAYER_CHALLS[layer][row*10+col].goal)}} {{ LAYER_CHALLS[layer].resDisp }}</span><span v-if="LAYER_CHALLS[layer].choose>1">Unique Completions: {{formatWhole(tmp.challActive?tmp.challActive[layer].combos[row*10+col]:0)}}</span><br>
-									Reward: {{LAYER_CHALLS[layer][row*10+col].reward}}<br>
-									<span v-if="LAYER_CHALLS[layer][row*10+col].effDisp!==undefined">Currently: {{LAYER_CHALLS[layer][row*10+col].effDisp(LAYER_CHALLS[layer][row*10+col].currently())}}</span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<br><br>
 				</div>
+				<div v-if="player.optTab=='mainOpt'">
+					<table>
+						<tr>
+							<td><button class="opt" onclick="save()">Save</button></td>
+							<td><button class="opt" onclick="toggleOpt('autosave')">Autosave: {{ player.autosave?"ON":"OFF" }}</button></td>
+							<td><button class="opt" onclick="hardReset()">HARD RESET</button></td>
+						</tr>
+						<tr>
+							<td><button class="opt" onclick="exportSave()">Export to clipboard</button></td>
+							<td><button class="opt" onclick="importSave()">Import</button></td>
+							<td><button class="opt" onclick="toggleOpt('offlineProd')">Offline Prod: {{ player.offlineProd?"ON":"OFF" }}</button></td>
+						</tr>
+						<tr>
+							<td><button class="opt" onclick="showAllSaves()">All Save Files</button></td>
+							<td><button class="opt" onclick="toggleOpt('tapNerd')">"Nerd Mode" Activation: {{player.tapNerd?"ON TAP":"ON HOLD"}}</button></td>
+							<td></td>
+						</tr>
+					</table>
+				</div><div v-if="player.optTab=='displayOpt'">
+					<table>
+						<tr>
+							<td><button class="opt" onclick="switchTheme()">Theme: {{ getThemeName() }}</button></td>
+							<td><button class="opt" onclick="toggleOpt('oldStyle')">Style: {{ player.oldStyle?"v1.0":"NEW" }}</button></td>
+							<td><button v-bind:class="{opt: true, locked: player.oldStyle}" onclick="if (!player.oldStyle) toggleOpt('hqTree')">High-Quality Tree: {{ (player.hqTree&&!player.oldStyle)?"ON":"OFF" }}</button></td>
+						</tr>
+						<tr>
+							<td><button v-bind:class="{opt: true, locked: player.oldStyle}" onclick="if (!player.oldStyle) toggleOpt('grad')">Gradients: {{ (player.grad&&!player.oldStyle)?"ON":"OFF" }}</button></td>
+							<td><button class="opt" onclick="adjustMSDisp()">Show Milestones: {{ player.msDisplay.toUpperCase() }}</button></td>
+							<td><button class="opt" onclick="toggleOpt('milNotify')">Milestone Notifications: {{ player.milNotify?"ON":"OFF" }}</button></td>
+						</tr>
+						<tr>
+							<td><button v-bind:class="{opt: true, locked: player.oldStyle}" onclick="if (!player.oldStyle) toggleOpt('anim')">Animations: {{ (player.anim&&!player.oldStyle)?"ON":"OFF" }}</button></td>
+							<td><button class="opt" onclick="toggleOpt('hideChallenges')">Completed Challenges: {{ player.hideChallenges?"HIDDEN":"SHOWN" }}</button></td>
+							<td><button v-if="hasAchievement('a', 21)" class="opt" onclick="toggleOpt('scShown')">Softcap Node: {{player.scShown?"SHOWN":"HIDDEN"}}</button></td>
+						</tr>
+						<tr>
+							<td><button v-if="player.ma.unlocked" class="opt" onclick="toggleOpt('hideStars')">Mastery Stars: {{ player.hideStars?"HIDDEN":"SHOWN" }}</button></td>
+						</tr>
+					</table>
+				</div><div v-if="player.optTab=='notifyOpt'">
+					<table>
+						<tr>
+							<td><button class="opt" onclick="adjustGlow('slight')">White Glow: {{ player.slightGlow.toUpperCase() }}</button></td>
+							<td><button class="opt" onclick="toggleOpt('redGlowActive')">Red Glow: {{ player.redGlowActive?"ON":"OFF" }}</button></td>
+							<td><button v-if="player.s.unlocked" class="opt" onclick="adjustGlow('space')">Red Glow - Space Buildings: {{ player.spaceGlow.toUpperCase() }}</button></td>
+							<td><button v-if="player.o.unlocked" class="opt" onclick="adjustGlow('sol')">Red Glow - Solarity Buyables: {{ player.solGlow.toUpperCase() }}</button></td>
+							<td><button v-if="player.m.unlocked" class="opt" onclick="adjustGlow('maj')">Red Glow - Spells: {{ player.majGlow.toUpperCase() }}</button></td>
+						</tr>
+					</table>
+				</div><br><br>
+				<saves></saves>
+			</div>
+			<div id="treeOverlay" class="treeOverlay" v-if="player.tab!='gameEnded'" v-bind:class="{ fullWidth: (player.tab == 'tree' || player.tab == 'none'), col: (player.tab != 'tree' && player.tab != 'none'), left: (player.tab != 'tree' && player.tab != 'none')}">
+				<div id="version" class="overlayThing" style="margin-right: 25px">{{VERSION.withoutName}}</div>
+				<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options'" src="images/options_wheel.png" onclick="showTab('options')"></img>
+				<div id="info" v-if="player.tab!='info'"  class="overlayThing" onclick="showTab('info')"><br>i</div>
+				<div id="help" v-if="player.tab!='help' && (typeof help_data != 'undefined')"  class="overlayThing" onclick="showTab('help')"><br>?</div>
+				<div id="discord" class="overlayThing">
+					<img onclick="window.open((modInfo.discordLink ? modInfo.discordLink : 'http://discord.gg/wwQfgPa'),'mywindow')" src="images/discord.png"  target="_blank"></img>
+					<ul id="discord-links">
+						<li><a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Prestige Tree Discord</a></li>
+						<li><a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br></li>
+					</ul>
+				</div>
+				<div class="overlayThing" style="padding-bottom:7px; width: 90%;">
+					<span v-if="player.devSpeed && player.devSpeed != 1" class="overlayThing">
+						<br>Dev Speed: {{format(player.devSpeed)}}x<br>
+					</span>
+					<span v-if="player.offTime !== undefined && player.offTime !== null"  class="overlayThing">
+						<br>Offline Time: {{formatTime(player.offTime?player.offTime.remain:0)}}<br>
+					</span>
+					<span v-if="!player.keepGoing" class="overlayThing">
+						<br><span v-if="modInfo.specialEndgameText">{{modInfo.specialEndgameText}}</span><span v-if="!modInfo.specialEndgameText">Reach {{formatWhole(modInfo.endgame)+" "+modInfo.pointsName}} to beat the game!</span><br>
+					</span>
+					<br>
+					<span v-if="player.points.lt('1e1000')">You have </span>
+					<h2 id="points">{{format(player.points)}}</h2>
+					<span v-if="player.points.lt('1e1e6')"> {{modInfo.pointsName}}</span>
+					<br>
+					<span v-if="canGenPoints()">({{format(getPointGen())}}/sec)</span>
+					<div v-for="thing in tmp.displayThings"><span v-if="thing" v-html="thing"></span></div>
+				</div>
+				<div class="sideLayers" >
+					<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node' :abb='tmp[node].symbol' :size="'small'"></layer-node><br><button class='smallNode hidden'></button></div>
+				</div>
+			</div>
+
+
+			<div v-if="!(gameEnded && !player.keepGoing)" id="treeTab" style="z-index: 0" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
+				<br><br><br><br><br><br>
+				<overlay-head id="fakeHead" style="visibility: hidden;">
+				</overlay-head>
+
+				<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab"></layer-tab>
+
+			</div>
+			<div v-if="(player.navTab !== 'none' && player.tab !== 'tree' && LAYERS.includes(player.tab)) && !(gameEnded && !player.keepGoing)" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
+				<layer-tab :layer="player.tab" :back="'tree'" :spacing="'50px'"></layer-tab>
 			</div>
 		</div>
 	</div>
-	<script>
-		// Mod Identifier, for ~~btpt~~ any userscripts. Consider adding this to your mod!
-		const modInfo = {
-			name: "Prestige Tree",
-			id: "default"
-		}
-	</script>
 </body>
-</html>

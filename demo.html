@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<head>
+
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+	<script type="text/javascript" src="js/technical/break_eternity.js"></script>
+	<script type="text/javascript" src="js/technical/layerSupport.js"></script>
+	<script type="text/javascript" src="js/demo/demoTree.js"></script>
+	<script type="text/javascript" src="js/demo/demoLayers.js"></script>
+	<script type="text/javascript" src="js/demo/demoMod.js"></script>
+	<script type="text/javascript" src="js/technical/temp.js"></script>
+	<script type="text/javascript" src="js/game.js"></script>
+	<script type="text/javascript" src="js/utils.js"></script>
+	<script type="text/javascript" src="js/technical/systemComponents.js"></script>
+	<script type="text/javascript" src="js/components.js"></script>
+	<script type="text/javascript" src="js/technical/canvas.js"></script>
+
+</head>
+<body onload="load()">
+	<div id="app"> 
+		<canvas id="treeCanvas" class="canvas" v-if ="!(gameEnded && !player.keepGoing)"></canvas>
+
+		<div v-if="false" id="loadingSection" class="fullWidth">
+			<h1>Loading... (If this takes too long it means there was a serious error!)←</h1>
+		</div>
+		<div class="vl" v-if="player.navTab!= 'none' &&player.tab!='none'&&!(gameEnded && !player.keepGoing)"></div>
+		<div v-if="(gameEnded && !player.keepGoing)" class="fullWidth">
+			<br>
+			<h2>{{modInfo.name}} {{VERSION.withoutName}}</h2><br><br>
+			<h3>Congratulations! You have reached the end and beaten this game, but for now...</h3><br>
+			<h3>Please check the Discord to see if there are new content updates!</h3><br><br>
+			<div v-if="!player.timePlayedReset">It took you {{formatTime(player.timePlayed)}} to beat the game.</div>
+			<div v-if="player.timePlayedReset">Make sure that you record the time in your stream or else your speedrun won't count!</div>
+			<br>
+			<button class="longUpg can" onclick="hardReset(true)">Play Again</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="longUpg can" onclick="keepGoing()">Keep Going</button>
+			<br><br><br>
+			<span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></span>
+			<a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
+			<a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
+			<br><br>
+			If you would like to speedrun this, press Play Again and record your attempt, then submit on the Discord Server in the channel #speedrun-submissions.
+			<br><br><br>
+			<h1>Oh, you are still reading this?</h1>
+			<br>
+		</div>		
+		
+		<div id="treeOverlay" v-if="!(gameEnded && !player.keepGoing)" class="treeOverlay" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
+			<div id="version" class="overlayThing" style="margin-right: 13px">{{VERSION.withoutName}}</div>
+			<button v-if= "player.navTab == 'none' && (tmp[player.tab].row == 'side' || tmp[player.tab].row == 'otherside')" class="other-back overlayThing" onclick="goBack()">←</button>
+			<img id="optionWheel"  class="overlayThing" v-if="player.tab!='options-tab'" src="options_wheel.png" onclick="showTab('options-tab')"></img>
+			<div id="info" v-if="player.tab!='info-tab'"  class="overlayThing" onclick="showTab('info-tab')"><br>i</div>
+			<div id="discord" class="overlayThing">
+				<img onclick="window.open((modInfo.discordLink ? modInfo.discordLink : 'https://discord.gg/F3xveHV'),'mywindow')" src="discord.png"  target="_blank"></img>
+				<ul id="discord-links">
+					<li v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></li>
+					<li><a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br></li>
+					<li><a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a></li>
+				</ul>
+			</div>
+			<overlay-head v-if="!(gameEnded && !player.keepGoing)"></overlay-head>
+			<div class="sideLayers" >
+				<div v-for="node in OTHER_LAYERS['side']"><layer-node :layer='node' :abb='tmp[node].symbol' :size="'small'"></layer-node></div>
+			</div>
+		</div>
+
+
+		<div v-if="!(gameEnded && !player.keepGoing)" id="treeTab" style="z-index: 0" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: (player.tab == 'none' || player.navTab == 'none'), col: (player.tab !== 'none' && player.navTab !== 'none'), left: (player.tab !== 'none' && player.navTab !== 'none')}">
+			<br><br><br><br>
+			<overlay-head id="fakeHead" style="visibility: hidden;">
+			</overlay-head>
+
+			<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab" ></layer-tab>
+
+		</div>
+		<div v-if="player.navTab !== 'none' && !(gameEnded && !player.keepGoing)" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
+			<div v-for="layer in LAYERS" >
+				<div v-if="player.tab==layer" > 
+					<layer-tab :layer="layer" :back="'none'" :spacing="'50px'"></layer-tab>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
