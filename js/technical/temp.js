@@ -90,15 +90,15 @@ function updateTemp() {
 	}
 }
 
-function updateTempData(layerData, tmpData, layer, pre, pre2) {
+function updateTempData(layerData, tmpData, layer, pre, pre2, isArr) {
 	
 	for (item in layerData){
 		if ((item.toLowerCase().includes("display") || item.toLowerCase().includes("description") || (item == "unlocked" && pre2 != "upgrades")) && player.tab != layer) continue;
 		if (Array.isArray(layerData[item])) {
-			updateTempData(layerData[item], tmpData[item], layer, item, pre)
+			updateTempData(layerData[item], tmpData[item], layer, item, pre, true)
 		}
 		else if ((!!layerData[item]) && (layerData[item].constructor === Object)) {
-			updateTempData(layerData[item], tmpData[item], layer, item, pre)
+			updateTempData(layerData[item], tmpData[item], layer, item, pre, isArr)
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
 			let value = layerData[item]()
@@ -115,7 +115,7 @@ function updateTempData(layerData, tmpData, layer, pre, pre2) {
 			}
 
 
-			tmpData[item] = value
+			if (isArr) Vue.set(tmpData, item, value); else tmpData[item] = value
 		}
 	}	
 }
