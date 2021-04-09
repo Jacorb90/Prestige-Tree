@@ -851,6 +851,7 @@ function showTab(name) {
 	if (player.navTab == "none") player.lastSafeTab = name
 	player.notify[name] = false
 	needCanvasUpdate = true
+	updateTempData(layers[name], tmp[name], name)
 }
 
 function showNavTab(name) {

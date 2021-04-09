@@ -63,7 +63,7 @@ function updateTemp() {
 	if (tmp === undefined)
 		setupTemp()
 
-	updateTempData(layers, tmp)
+	for (layer in layers) {updateTempData(layers[layer], tmp[layer], layer)}
 
 	for (layer in layers){
 		tmp[layer].resetGain = getResetGain(layer)
@@ -86,18 +86,19 @@ function updateTemp() {
 	}
 	
 	if (typeof help_data != "undefined" && player.tab=='help') {
-		updateTempData(help_data, tmp.helpData);
+		updateTempData(help_data, tmp.helpData, "help");
 	}
 }
 
-function updateTempData(layerData, tmpData) {
+function updateTempData(layerData, tmpData, layer, pre, pre2, isArr) {
 	
 	for (item in layerData){
+		if ((item.toLowerCase().includes("display") || item.toLowerCase().includes("description") || (item == "unlocked" && pre2 != "upgrades")) && player.tab != layer) continue;
 		if (Array.isArray(layerData[item])) {
-			updateTempData(layerData[item], tmpData[item])
+			updateTempData(layerData[item], tmpData[item], layer, item, pre, true)
 		}
 		else if ((!!layerData[item]) && (layerData[item].constructor === Object)) {
-			updateTempData(layerData[item], tmpData[item])
+			updateTempData(layerData[item], tmpData[item], layer, item, pre, isArr)
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
 			let value = layerData[item]()
@@ -114,7 +115,7 @@ function updateTempData(layerData, tmpData) {
 			}
 
 
-			Vue.set(tmpData, item, value)
+			if (isArr) Vue.set(tmpData, item, value); else tmpData[item] = value
 		}
 	}	
 }
