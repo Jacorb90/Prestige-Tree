@@ -7896,13 +7896,14 @@ addLayer("at", {
 	row: "side",
 	layerShown() {return true},
 	tooltip: "Autobuyers",
-	tabFormat: ["main-display",
-		"milestones",],
+	milestonePopups: false,
 	milestones: {
 		0: {
+			requirementDescription: "Auto-Boosters",
+			effectDescription: "",
 			unlocked() { return player.t.best.gte(5) || hasAchievement("a", 71) },
-			effectDescription: "Auto-Boosters",
 			toggles: [["b", "auto"]],
+			done() {return true}
 		},
 	},
 })
