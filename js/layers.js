@@ -7900,15 +7900,15 @@ addLayer("at", {
 	milestones: {
 		0: {
 			requirementDescription: "Auto-Boosters",
-			unlocked() { return player.t.unlocked },
+			done() {return hasMilestone("t", 3)},
 			toggles: [["b", "auto"]],
-			done() {return hasMilestone("t", 3)}
+			unlocked() { return player.t.unlocked },
 		},
 		1: {
 			requirementDescription: "Auto-Generators",
-			unlocked() { return player.s.unlocked },
+			done() {return hasMilestone("s", 3)},
 			toggles: [["g", "auto"]],
-			done() {return hasMilestone("s", 3)}
+			unlocked() { return player.s.unlocked },
 		}
 	},
 })
