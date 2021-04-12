@@ -7932,13 +7932,13 @@ addLayer("at", {
 			requirementDescription: "Auto-Super Generators",
 			done() { return hasMilestone("q", 6) },
 			toggles: [["sg", "auto"]],
-			unlocked() { return player.q.unlocked },
+			unlocked() { return player.sg.unlocked },
 		},
 		6: {
 			requirementDescription: "Auto-Sace Buildings",
 			done() { return hasMilestone("q", 7) },
 			toggles: [["s", "autoBld"]],
-			unlocked() { return player.q.unlocked },
+			unlocked() { return player.sg.unlocked },
 		},
 		7: {
 			requirementDescription: "Auto-Quirk Layers",
