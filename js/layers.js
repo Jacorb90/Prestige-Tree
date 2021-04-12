@@ -7888,3 +7888,21 @@ addLayer("sc", {
 		}],
 	],
 }) 
+
+addLayer("at", {
+	startData() { return {unlocked: true}},
+	color: "cdffd2",
+	symbol: "AT",
+	row: "side",
+	layerShown() {return true},
+	tooltip: "Autobuyers",
+	tabFormat: ["main-display",
+		"milestones",],
+	milestones: {
+		0: {
+			unlocked() { return player.t.best.gte(5) || hasAchievement("a", 71) },
+			effectDescription: "Auto-Boosters",
+			toggles: [["b", "auto"]],
+		},
+	},
+})
