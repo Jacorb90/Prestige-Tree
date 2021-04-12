@@ -7894,9 +7894,29 @@ addLayer("at", {
 	color: "yellow",
 	symbol: "AT",
 	row: "side",
-	layerShown() {return player.t.unlocked || player.s.unlocked},
+	layerShown() {return true},
 	tooltip: "Autobuyers",
-	milestonePopups: false,
+	clickables: {
+		cols: 4,
+		rows: 5,
+		11: {
+			title: "Auto-Boosters",
+			display(){
+				if (!hasMilestone("t", 3)){
+					return "Locked";
+				}
+				else if (player.b.auto){
+					return "On";
+				}
+				else {
+					return "Off";
+				}
+			},
+			canClick() { return hasMilestone("t", 3) },
+			onClick() { player.b.auto = !player.b.auto },
+		},
+	},
+/* 	milestonePopups: false,
 	milestones: {
 		0: {
 			requirementDescription: "Auto-Boosters",
@@ -7988,5 +8008,5 @@ addLayer("at", {
 			toggles: [["hs", "auto"]],
 			unlocked() { return player.ma.unlocked },
 		},
-	},
+	}, */
 })
