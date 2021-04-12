@@ -7891,19 +7891,24 @@ addLayer("sc", {
 
 addLayer("at", {
 	startData() { return {unlocked: true}},
-	color: "cdffd2",
+	color: "yellow",
 	symbol: "AT",
 	row: "side",
-	layerShown() {return true},
+	layerShown() {return player.t.unlocked || player.s.unlocked},
 	tooltip: "Autobuyers",
 	milestonePopups: false,
 	milestones: {
 		0: {
 			requirementDescription: "Auto-Boosters",
-			effectDescription: "",
-			unlocked() { return player.t.best.gte(5) || hasAchievement("a", 71) },
+			unlocked() { return player.t.unlocked },
 			toggles: [["b", "auto"]],
-			done() {return true}
+			done() {return hasMilestone("t", 3)}
 		},
+		1: {
+			requirementDescription: "Auto-Generators",
+			unlocked() { return player.s.unlocked },
+			toggles: [["g", "auto"]],
+			done() {return hasMilestone("s", 3)}
+		}
 	},
 })
