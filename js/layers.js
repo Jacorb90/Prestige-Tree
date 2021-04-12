@@ -7901,6 +7901,7 @@ addLayer("at", {
 		rows: 5,
 		11: {
 			title: "Auto-Boosters",
+			color: "#6e64c4",
 			display(){
 				return player.b.auto?"On":"Off"
 			},
