@@ -7902,15 +7902,7 @@ addLayer("at", {
 		11: {
 			title: "Auto-Boosters",
 			display(){
-				if (!hasMilestone("t", 3)){
-					return "Locked";
-				}
-				else if (player.b.auto){
-					return "On";
-				}
-				else {
-					return "Off";
-				}
+				return player.b.auto?"On":"Off"
 			},
 			canClick() { return hasMilestone("t", 3) },
 			onClick() { player.b.auto = !player.b.auto },
