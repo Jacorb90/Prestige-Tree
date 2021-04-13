@@ -7897,8 +7897,8 @@ addLayer("at", {
 	layerShown() {return player.t.unlocked || player.s.unlocked},
 	tooltip: "Autobuyers",
 	clickables: {
-		cols: 4,
-		rows: 5,
+		cols: 5,
+		rows: 4,
 		11: {
 			title: "Boosters",
 			display(){
