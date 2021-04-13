@@ -7904,6 +7904,7 @@ addLayer("at", {
 			display(){
 				return hasMilestone("t", 3)?(player.b.auto?"On":"Off"):"Locked"
 			},
+			unlocked() { return player.t.unlocked },
 			canClick() { return hasMilestone("t", 3) },
 			onClick() { player.b.auto = !player.b.auto },
 			style: {"background-color" : "#6e64c4"},
@@ -7913,6 +7914,7 @@ addLayer("at", {
 			display(){
 				return hasMilestone("s", 3)?(player.g.auto?"On":"Off"):"Locked"
 			},
+			unlocked() { return player.s.unlocked },
 			canClick() { return hasMilestone("s", 3) },
 			onClick() { player.g.auto = !player.g.auto },
 			style: {"background-color" : "#a3d9a5"},
