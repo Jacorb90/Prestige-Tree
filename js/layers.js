@@ -7442,7 +7442,6 @@ addLayer("a", {
             unlocked: true,
         }},
         color: "yellow",
-		position: 0,
         row: "side",
         layerShown() {return true}, 
         tooltip() { // Optional, tooltip displays when the layer is locked
@@ -7871,7 +7870,6 @@ addLayer("sc", {
 	startData() { return {unlocked: true}},
 	color: "#e6ff69",
 	symbol: "SC",
-	position: (player.t.unlocked || player.s.unlocked)?2:1,
 	row: "side",
 	layerShown() { return hasAchievement("a", 21) && player.scShown },
 	tooltip: "Softcaps",
@@ -7895,7 +7893,6 @@ addLayer("at", {
 	startData() { return {unlocked: true}},
 	color: "yellow",
 	symbol: "AT",
-	position: 1,
 	row: "side",
 	layerShown() { return player.t.unlocked || player.s.unlocked },
 	tooltip: "Autobuyers",
