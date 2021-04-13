@@ -7897,8 +7897,8 @@ addLayer("at", {
 	layerShown() {return player.t.unlocked || player.s.unlocked},
 	tooltip: "Autobuyers",
 	clickables: {
-		cols: 5,
 		rows: 5,
+		cols: 4,
 		11: {
 			title: "Boosters",
 			display(){
@@ -7937,135 +7937,135 @@ addLayer("at", {
 			onClick() { player.t.autoExt = !player.t.autoExt },
 			style: {"background-color" : "#006609"},
 		},
-		21: {
-			title: "Time Capsules",
-			display(){
-				return hasMilestone("q", 3)?(player.t.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.q.unlocked },
-			canClick() { return hasMilestone("q", 3) },
-			onClick() { player.t.auto = !player.t.auto },
-			style: {"background-color" : "#006609"},
-		},
-		22: {
-			title: "Space Energy",
-			display(){
-				return hasMilestone("q", 3)?(player.s.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.q.unlocked },
-			canClick() { return hasMilestone("q", 3) },
-			onClick() { player.s.auto = !player.s.auto },
-			style: {"background-color" : "#dfdfdf"},
-		},
-		23: {
-			title: "Super Boosters",
-			display(){
-				return hasMilestone("q", 4)?(player.sb.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.q.unlocked },
-			canClick() { return hasMilestone("q", 4) },
-			onClick() { player.sb.auto = !player.sb.auto },
-			style: {"background-color" : "#504899"},
-		},
-		24: {
-			title: "Super Generators",
-			display(){
-				return hasMilestone("q", 6)?(player.sg.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.sg.unlocked },
-			canClick() { return hasMilestone("q", 6) },
-			onClick() { player.sg.auto = !player.sg.auto },
-			style: {"background-color" : "#248239"},
-		},
-		31: {
-			title: "Space Buildings",
-			display(){
-				return hasMilestone("q", 7)?(player.s.autoBld?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.sg.unlocked },
-			canClick() { return hasMilestone("q", 7) },
-			onClick() { player.s.autoBld = !player.s.autoBld },
-			style: {"background-color" : "#dfdfdf"},
-		},
-		32: {
-			title: "Quirk Layers",
-			display(){
-				return hasMilestone("ba", 1)?(player.q.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.ba.unlocked },
-			canClick() { return hasMilestone("ba", 1) },
-			onClick() { player.q.auto = !player.q.auto },
-			style: {"background-color" : "#c20282"},
-		},
-		33: {
-			title: "Subspace Energy",
-			display(){
-				return hasMilestone("ba", 2)?(player.ss.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.ba.unlocked },
-			canClick() { return hasMilestone("ba", 2) },
-			onClick() { player.ss.auto = !player.ss.auto },
-			style: {"background-color" : "#e8ffff"},
-		},
-		34: {
-			title: "Spells",
-			display(){
-				return hasMilestone("hn", 2)?(player.m.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.hn.unlocked },
-			canClick() { return hasMilestone("hn", 2) },
-			onClick() { player.m.auto = !player.m.auto },
-			style: {"background-color" : "#eb34c0"},
-		},
-		41: {
-			title: "Phantom Souls",
-			display(){
-				return hasMilestone("hn", 4)?(player.ps.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.hn.unlocked },
-			canClick() { return hasMilestone("hn", 4) },
-			onClick() { player.ps.auto = !player.ps.auto },
-			style: {"background-color" : "#b38fbf"},
-		},
-		42: {
-			title: "Wraiths",
-			display(){
-				return hasMilestone("hn", 5)?(player.ps.autoW?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.hn.unlocked },
-			canClick() { return hasMilestone("hn", 5) },
-			onClick() { player.ps.autoW = !player.ps.autoW },
-			style: {"background-color" : "#b38fbf"},
-		},
-		43: {
-			title: "Ghost Spirit",
-			display(){
-				return hasMilestone("ma", 0)?(player.ps.autoGhost?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.ma.unlocked },
-			canClick() { return hasMilestone("ma", 0) },
-			onClick() { player.ps.autoGhost = !player.ps.autoGhost },
-			style: {"background-color" : "#b38fbf"},
-		},
-		44: {
-			title: "Imperium Bricks",
-			display(){
-				return hasMilestone("ma", 4)?(player.i.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.ma.unlocked },
-			canClick() { return hasMilestone("ma", 4) },
-			onClick() { player.i.auto = !player.i.auto },
-			style: {"background-color" : "#e5dab7"},
-		},
-		51: {
-			title: "Hyperspace",
-			display(){
-				return hasMilestone("ma", 5)?(player.hs.auto?"On":"Off"):"Locked"
-			},
-			unlocked() { return player.ma.unlocked },
-			canClick() { return hasMilestone("ma", 5) },
-			onClick() { player.hs.auto = !player.hs.auto },
-			style: {"background-color" : "#dfdfff"},
-		},
+		// 21: {
+		// 	title: "Time Capsules",
+		// 	display(){
+		// 		return hasMilestone("q", 3)?(player.t.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.q.unlocked },
+		// 	canClick() { return hasMilestone("q", 3) },
+		// 	onClick() { player.t.auto = !player.t.auto },
+		// 	style: {"background-color" : "#006609"},
+		// },
+		// 22: {
+		// 	title: "Space Energy",
+		// 	display(){
+		// 		return hasMilestone("q", 3)?(player.s.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.q.unlocked },
+		// 	canClick() { return hasMilestone("q", 3) },
+		// 	onClick() { player.s.auto = !player.s.auto },
+		// 	style: {"background-color" : "#dfdfdf"},
+		// },
+		// 23: {
+		// 	title: "Super Boosters",
+		// 	display(){
+		// 		return hasMilestone("q", 4)?(player.sb.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.q.unlocked },
+		// 	canClick() { return hasMilestone("q", 4) },
+		// 	onClick() { player.sb.auto = !player.sb.auto },
+		// 	style: {"background-color" : "#504899"},
+		// },
+		// 24: {
+		// 	title: "Super Generators",
+		// 	display(){
+		// 		return hasMilestone("q", 6)?(player.sg.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.sg.unlocked },
+		// 	canClick() { return hasMilestone("q", 6) },
+		// 	onClick() { player.sg.auto = !player.sg.auto },
+		// 	style: {"background-color" : "#248239"},
+		// },
+		// 31: {
+		// 	title: "Space Buildings",
+		// 	display(){
+		// 		return hasMilestone("q", 7)?(player.s.autoBld?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.sg.unlocked },
+		// 	canClick() { return hasMilestone("q", 7) },
+		// 	onClick() { player.s.autoBld = !player.s.autoBld },
+		// 	style: {"background-color" : "#dfdfdf"},
+		// },
+		// 32: {
+		// 	title: "Quirk Layers",
+		// 	display(){
+		// 		return hasMilestone("ba", 1)?(player.q.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.ba.unlocked },
+		// 	canClick() { return hasMilestone("ba", 1) },
+		// 	onClick() { player.q.auto = !player.q.auto },
+		// 	style: {"background-color" : "#c20282"},
+		// },
+		// 33: {
+		// 	title: "Subspace Energy",
+		// 	display(){
+		// 		return hasMilestone("ba", 2)?(player.ss.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.ba.unlocked },
+		// 	canClick() { return hasMilestone("ba", 2) },
+		// 	onClick() { player.ss.auto = !player.ss.auto },
+		// 	style: {"background-color" : "#e8ffff"},
+		// },
+		// 34: {
+		// 	title: "Spells",
+		// 	display(){
+		// 		return hasMilestone("hn", 2)?(player.m.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.hn.unlocked },
+		// 	canClick() { return hasMilestone("hn", 2) },
+		// 	onClick() { player.m.auto = !player.m.auto },
+		// 	style: {"background-color" : "#eb34c0"},
+		// },
+		// 41: {
+		// 	title: "Phantom Souls",
+		// 	display(){
+		// 		return hasMilestone("hn", 4)?(player.ps.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.hn.unlocked },
+		// 	canClick() { return hasMilestone("hn", 4) },
+		// 	onClick() { player.ps.auto = !player.ps.auto },
+		// 	style: {"background-color" : "#b38fbf"},
+		// },
+		// 42: {
+		// 	title: "Wraiths",
+		// 	display(){
+		// 		return hasMilestone("hn", 5)?(player.ps.autoW?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.hn.unlocked },
+		// 	canClick() { return hasMilestone("hn", 5) },
+		// 	onClick() { player.ps.autoW = !player.ps.autoW },
+		// 	style: {"background-color" : "#b38fbf"},
+		// },
+		// 43: {
+		// 	title: "Ghost Spirit",
+		// 	display(){
+		// 		return hasMilestone("ma", 0)?(player.ps.autoGhost?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.ma.unlocked },
+		// 	canClick() { return hasMilestone("ma", 0) },
+		// 	onClick() { player.ps.autoGhost = !player.ps.autoGhost },
+		// 	style: {"background-color" : "#b38fbf"},
+		// },
+		// 44: {
+		// 	title: "Imperium Bricks",
+		// 	display(){
+		// 		return hasMilestone("ma", 4)?(player.i.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.ma.unlocked },
+		// 	canClick() { return hasMilestone("ma", 4) },
+		// 	onClick() { player.i.auto = !player.i.auto },
+		// 	style: {"background-color" : "#e5dab7"},
+		// },
+		// 51: {
+		// 	title: "Hyperspace",
+		// 	display(){
+		// 		return hasMilestone("ma", 5)?(player.hs.auto?"On":"Off"):"Locked"
+		// 	},
+		// 	unlocked() { return player.ma.unlocked },
+		// 	canClick() { return hasMilestone("ma", 5) },
+		// 	onClick() { player.hs.auto = !player.hs.auto },
+		// 	style: {"background-color" : "#dfdfff"},
+		// },
 	},
 })
