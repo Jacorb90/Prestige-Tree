@@ -7890,8 +7890,7 @@ addLayer("sc", {
 }) 
 
 addLayer("at", {
-	startData() { return {unlocked: false}},
-	requires() { return player.t.unlocked || player.s.unlocked },
+	startData() { return {unlocked: true}},
 	color: "yellow",
 	symbol: "AT",
 	row: "side",
