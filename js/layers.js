@@ -7898,7 +7898,7 @@ addLayer("at", {
 	tooltip: "Autobuyers",
 	clickables: {
 		cols: 5,
-		rows: 4,
+		rows: 5,
 		11: {
 			title: "Boosters",
 			display(){
