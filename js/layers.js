@@ -7890,11 +7890,11 @@ addLayer("sc", {
 }) 
 
 addLayer("at", {
-	startData() { return {unlocked: true}},
+	startData() { return {unlocked: (player.t.unlocked || player.s.unlocked)}},
 	color: "yellow",
 	symbol: "AT",
 	row: "side",
-	layerShown() {return true},
+	layerShown() {return (player.t.unlocked || player.s.unlocked)},
 	tooltip: "Autobuyers",
 	clickables: {
 		rows: 5,
