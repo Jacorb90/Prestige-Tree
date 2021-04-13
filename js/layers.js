@@ -7902,7 +7902,7 @@ addLayer("at", {
 		11: {
 			title: "Boosters",
 			display(){
-				return hasMilestone("t", 3)?(player.b.auto?"On":"Off"):"Locked"
+				return player.b.auto?"On":"Off"
 			},
 			canClick() { return hasMilestone("t", 3) },
 			onClick() { player.b.auto = !player.b.auto },
@@ -7911,7 +7911,7 @@ addLayer("at", {
 		12: {
 			title: "Generators",
 			display(){
-				return hasMilestone("s", 3)?(player.g.auto?"On":"Off"):"Locked"
+				return player.g.auto?"On":"Off"
 			},
 			canClick() { return hasMilestone("s", 3) },
 			onClick() { player.g.auto = !player.g.auto },
@@ -7920,7 +7920,7 @@ addLayer("at", {
 		13: {
 			title: "Enhancers",
 			display(){
-				return hasMilestone("q", 1)?(player.e.auto?"On":"Off"):"Locked"
+				return player.e.auto?"On":"Off"
 			},
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 1) },
@@ -7930,7 +7930,7 @@ addLayer("at", {
 		14: {
 			title: "Extra Time Capsules",
 			display(){
-				return hasMilestone("q", 1)?(player.t.autoExt?"On":"Off"):"Locked"
+				return player.t.autoExt?"On":"Off"
 			},
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 1) },
@@ -7940,7 +7940,7 @@ addLayer("at", {
 		21: {
 			title: "Time Capsules",
 			display(){
-				return hasMilestone("q", 3)?(player.t.auto?"On":"Off"):"Locked"
+				return player.t.auto?"On":"Off"
 			},
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 3) },
@@ -7950,7 +7950,7 @@ addLayer("at", {
 		22: {
 			title: "Space Energy",
 			display(){
-				return hasMilestone("q", 3)?(player.s.auto?"On":"Off"):"Locked"
+				return player.s.auto?"On":"Off"
 			},
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 3) },
@@ -7960,7 +7960,7 @@ addLayer("at", {
 		23: {
 			title: "Super Boosters",
 			display(){
-				return hasMilestone("q", 4)?(player.sb.auto?"On":"Off"):"Locked"
+				return player.sb.auto?"On":"Off"
 			},
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 4) },
@@ -7970,7 +7970,7 @@ addLayer("at", {
 		24: {
 			title: "Super Generators",
 			display(){
-				return hasMilestone("q", 6)?(player.sg.auto?"On":"Off"):"Locked"
+				return player.sg.auto?"On":"Off"
 			},
 			unlocked() { return player.sg.unlocked },
 			canClick() { return hasMilestone("q", 6) },
@@ -7980,7 +7980,7 @@ addLayer("at", {
 		31: {
 			title: "Space Buildings",
 			display(){
-				return hasMilestone("q", 7)?(player.s.autoBld?"On":"Off"):"Locked"
+				return player.s.autoBld?"On":"Off"
 			},
 			unlocked() { return player.sg.unlocked },
 			canClick() { return hasMilestone("q", 7) },
@@ -7990,7 +7990,7 @@ addLayer("at", {
 		32: {
 			title: "Quirk Layers",
 			display(){
-				return hasMilestone("ba", 1)?(player.q.auto?"On":"Off"):"Locked"
+				return player.q.auto?"On":"Off"
 			},
 			unlocked() { return player.ba.unlocked },
 			canClick() { return hasMilestone("ba", 1) },
@@ -8000,7 +8000,7 @@ addLayer("at", {
 		33: {
 			title: "Subspace Energy",
 			display(){
-				return hasMilestone("ba", 2)?(player.ss.auto?"On":"Off"):"Locked"
+				return player.ss.auto?"On":"Off"
 			},
 			unlocked() { return player.ba.unlocked },
 			canClick() { return hasMilestone("ba", 2) },
@@ -8010,7 +8010,7 @@ addLayer("at", {
 		34: {
 			title: "Spells",
 			display(){
-				return hasMilestone("hn", 2)?(player.m.auto?"On":"Off"):"Locked"
+				return player.m.auto?"On":"Off"
 			},
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 2) },
@@ -8020,7 +8020,7 @@ addLayer("at", {
 		41: {
 			title: "Phantom Souls",
 			display(){
-				return hasMilestone("hn", 4)?(player.ps.auto?"On":"Off"):"Locked"
+				return player.ps.auto?"On":"Off"
 			},
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 4) },
@@ -8030,7 +8030,7 @@ addLayer("at", {
 		42: {
 			title: "Wraiths",
 			display(){
-				return hasMilestone("hn", 5)?(player.ps.autoW?"On":"Off"):"Locked"
+				return player.ps.autoW?"On":"Off"
 			},
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 5) },
@@ -8040,7 +8040,7 @@ addLayer("at", {
 		43: {
 			title: "Ghost Spirit",
 			display(){
-				return hasMilestone("ma", 0)?(player.ps.autoGhost?"On":"Off"):"Locked"
+				return player.ps.autoGhost?"On":"Off"
 			},
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 0) },
@@ -8050,7 +8050,7 @@ addLayer("at", {
 		44: {
 			title: "Imperium Bricks",
 			display(){
-				return hasMilestone("ma", 4)?(player.i.auto?"On":"Off"):"Locked"
+				return player.i.auto?"On":"Off"
 			},
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 4) },
@@ -8060,7 +8060,7 @@ addLayer("at", {
 		51: {
 			title: "Hyperspace",
 			display(){
-				return hasMilestone("ma", 5)?(player.hs.auto?"On":"Off"):"Locked"
+				return player.hs.auto?"On":"Off"
 			},
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 5) },
