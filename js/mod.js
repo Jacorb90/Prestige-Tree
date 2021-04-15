@@ -8,15 +8,15 @@ let modInfo = {
 	changelogLink: "https://github.com/Jacorb90/Prestige-Tree/blob/master/changelog.md",
     offlineLimit: 1,  // In hours
     initialStartPoints: new Decimal(10), // Used for hard resets and new players
-	endgame: new Decimal("e1e15"),
-	// specialEndgameText: "v1.2 Beta 28 Endgame: e1e15 Points",
+	endgame: new Decimal(1/0),
+	specialEndgameText: "v1.3 Beta 1 Endgame: e1.395e15 Points",
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.2",
-	patch: 1,
-	name: "Mechanical Mastery",
+	num: "1.3",
+	beta: 1,
+	name: "The Expansion Update",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -78,7 +78,8 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(modInfo.endgame)
+	if (modInfo.endgame.eq(1/0)) return false;
+	else return player.points.gte(modInfo.endgame)
 }
 
 
