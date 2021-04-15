@@ -199,7 +199,7 @@
 				<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab"></layer-tab>
 
 			</div>
-			<div v-if="(player.navTab !== 'none' && player.tab !== 'tree' && LAYERS.includes(player.tab)) && !(gameEnded && !player.keepGoing)" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
+			<div v-if="(player.navTab !== 'none' && player.tab !== 'tree' && LAYERS.includes(player.tab)) && !(gameEnded && !player.keepGoing)" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
 				<layer-tab :layer="player.tab" :back="'tree'" :spacing="'50px'"></layer-tab>
 			</div>
 		</div>

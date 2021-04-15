@@ -957,11 +957,16 @@ addLayer("t", {
 			if (hasUpgrade("t", 33) && player.i.buyables[12].gte(4)) mult = mult.times(upgradeEffect("t", 33));
 			return mult;
 		},
+		nonExtraTCPow() {
+			let pow = new Decimal(1);
+			if (player.en.unlocked) pow = pow.times(tmp.en.twEff);
+			return pow;
+		},
 		effect() { 
 			if (!unl(this.layer)) return {gain: new Decimal(0), limit: new Decimal(0)};
 			else return {
-				gain: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3).pow(tmp.t.effBasePow), player.t.points.plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(player.t.points.plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enGainMult).max(0),
-				limit: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effLimBaseMult).times(2).pow(tmp.t.effBasePow), player.t.points.plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(100).times(player.t.points.plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enCapMult).max(0),
+				gain: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3).pow(tmp.t.effBasePow), player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enGainMult).max(0),
+				limit: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effLimBaseMult).times(2).pow(tmp.t.effBasePow), player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(100).times(player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enCapMult).max(0),
 			}
 		},
 		effect2() {
@@ -2476,6 +2481,7 @@ addLayer("sb", {
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes('b'):false) && hasUpgrade("b", 13)) base = base.times(upgradeEffect("b", 13).max(1));
 			base = base.times(tmp.n.dustEffs.blue);
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false) && hasChallenge("h", 12)) base = base.times(player.hs.points.plus(1));
+			if (player.en.unlocked) base = base.pow(tmp.en.swEff);
 			return base
 		},
 		effect() {
@@ -2725,7 +2731,7 @@ addLayer("h", {
 				goal() { return new Decimal(player.ma.current=="h"?"e5e8":"1e3550") },
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
-				rewardDescription() { return "Add 0.25 to the Super Booster base"+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false)?(" and multiply it by your Hyperspace Energy."):"")+"." },
+				rewardDescription() { return "Add 0.25 to the Super Booster base"+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false)?(" and multiply it by your Hyperspace Energy"):"")+"." },
 			},
 			21: {
 				name: "Out of Room",
@@ -3534,6 +3540,7 @@ addLayer("o", {
 			if (hasUpgrade("hn", 25)) exp = exp.times(upgradeEffect("hn", 25));
 			if (player.n.buyables[11].gte(4)) exp = exp.times(buyableEffect("o", 32));
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) exp = exp.times(player.sb.points.times(0.5/100).plus(1))
+			if (player.en.unlocked) exp = exp.plus(tmp.en.owEff);
 			return exp;
 		}, // Prestige currency exponent
         gainMult() { // Calculate the multiplier for main currency from bonuses
@@ -7262,7 +7269,7 @@ addLayer("mc", {
 		clickables: {
 			rows: 2,
 			cols: 2,
-			activeLimit() { return hasAchievement("a", 133)?2:1 },
+			activeLimit() { return hasAchievement("a", 141)?4:(hasAchievement("a", 133)?2:1) },
 			11: {
 				title: "CPU",
 				display() { 
@@ -7437,6 +7444,152 @@ addLayer("mc", {
 		},
 })
 
+addLayer("en", {
+		name: "energy", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "EN", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			total: new Decimal(0),
+			stored: new Decimal(0),
+			target: 0,
+			tw: new Decimal(0),
+			ow: new Decimal(0),
+			sw: new Decimal(0),
+			first: 0,
+        }},
+        color: "#fbff05",
+		nodeStyle() {return {
+			"background-color": (((player.en.unlocked||canReset("en"))&&!(Array.isArray(tmp.ma.canBeMastered)&&player.ma.selectionActive&&tmp[this.layer].row<tmp.ma.rowLimit&&!tmp.ma.canBeMastered.includes(this.layer)))?"#fbff05":"#bf8f8f"),
+        }},
+        resource: "energy", // Name of prestige currency
+        type: "custom", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+		baseResource: "solarity",
+		baseAmount() { return player.o.points },
+		req: new Decimal("1e15000"),
+		requires() { return this.req },
+		exp() { return Decimal.add(.8, tmp.en.clickables[11].eff) },
+		exponent() { return tmp[this.layer].exp },
+		gainMult() {
+			let mult = new Decimal(1);
+			return mult;
+		},
+		getResetGain() {
+			let gain = player.o.points.div(tmp.en.req).plus(1).log2().pow(tmp.en.exp);
+			return gain.times(tmp.en.gainMult).floor();
+		},
+		resetGain() { return this.getResetGain() },
+		getNextAt() {
+			let gain = tmp.en.getResetGain.div(tmp.en.gainMult).plus(1)
+			return Decimal.pow(2, gain.root(tmp.en.exp)).times(tmp.en.req);
+		},
+		passiveGeneration() { return false },
+		canReset() {
+			return player.o.points.gte(tmp.en.req) && tmp.en.getResetGain.gt(0) && player.en.points.eq(0)
+		},
+		dispGainFormula() {
+			let start = tmp.en.req;
+			let exp = tmp.en.exp;
+			return "log2(x / "+format(start)+")^"+format(exp)
+		},
+		prestigeButtonText() {
+			if (tmp.nerdMode) return "Gain Formula: "+tmp.en.dispGainFormula;
+			else return `${ player.en.points.lt(1e3) ? (tmp.en.resetDescription !== undefined ? tmp.en.resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp.en.getResetGain)}</b> ${tmp.en.resource} ${tmp.en.resetGain.lt(100) && player.en.points.lt(1e3) ? `<br><br>Next at ${format(tmp.en.nextAt)}` : ""}`
+		},
+		prestigeNotify() {
+			if (!canReset("en")) return false;
+			if (tmp.en.getResetGain.gte(player.o.points.times(0.1).max(1)) && !tmp.en.passiveGeneration) return true;
+			else return false;
+		},
+		tooltip() { return formatWhole(player.en.points)+" Energy" },
+		tooltipLocked() { return "Reach "+formatWhole(tmp.en.req)+" Solarity to unlock (You have "+formatWhole(player.o.points)+" Solarity)" },
+        row: 4, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "N", description: "Press Shift+N to Energy Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (resettingLayer==this.layer) player.en.target = player.en.target%3+1;
+			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
+				keep.push("tw");
+				keep.push("sw");
+				keep.push("ow");
+			}
+			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+        layerShown(){return player.mc.unlocked },
+        branches: ["sb","o"],
+		update(diff) {
+			if (!player[this.layer].unlocked) return;
+			let subbed = new Decimal(0);
+			if (player.en.points.gt(0)) {
+				subbed = player.en.points.times(Decimal.sub(1, Decimal.pow(0.75, diff))).plus(diff);
+				player.en.points = player.en.points.times(Decimal.pow(0.75, diff)).sub(diff).max(0);
+			}
+			switch(player.en.target) {
+				case 1: 
+					player.en.tw = player.en.tw.pow(1.5).plus(subbed).root(1.5);
+					break;
+				case 2: 
+					player.en.ow = player.en.ow.pow(1.5).plus(subbed).root(1.5);
+					break;
+				case 3: 
+					player.en.sw = player.en.sw.pow(4).plus(subbed).root(4);
+					break;
+			}
+		},
+		storageLimit() { return player.en.total.div(2) },
+		twEff() { return player.en.tw.plus(1).log10().plus(1).log10().times(10).plus(1).pow(4) },
+		owEff() { return player.en.ow.plus(1).log10().plus(1).log10().times(40).pow(1.8) },
+		swEff() { return player.en.sw.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank",
+			"milestones",
+			"blank", "blank", 
+			"clickables",
+			"blank", "blank",
+			["row", [
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==1?"#e1ffde;":"#8cfa82;")+"'>"+(player.en.target==1?"TIME WATTS":"Time Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #8cfa82;'>"+formatWhole(player.en.tw)+"</h4><br><br>Strengthens Non-Extra Time Capsules by <span style='color: #8cfa82; font-weight: bold; font-size: 20px;'>"+format(tmp.en.twEff.sub(1).times(100))+"</span>%" }]], {width: "100%"}],
+			]], "blank", "blank", ["row", [
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==2?"#fff0d9":"#ffd187;")+"'>"+(player.en.target==2?"SOLAR WATTS":"Solar Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #ffd187;'>"+formatWhole(player.en.ow)+"</h4><br><br>Adds <span style='color: #ffd187; font-weight: bold; font-size: 20px;'>"+format(tmp.en.owEff)+"</span> to Solarity gain exponent" }]], {width: "50%"}],
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==3?"#dbfcff;":"#8cf5ff;")+"'>"+(player.en.target==3?"SUPER WATTS":"Super Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #8cf5ff;'>"+formatWhole(player.en.sw)+"</h4><br><br>Strengthens Super Boosters by <span style='color: #8cf5ff; font-weight: bold: font-size: 20px;'>"+format(tmp.en.swEff.sub(1).times(100))+"</span>%" }]], {width: "50%"}],
+			]],
+			"blank", "blank", "blank",
+		],
+		clickables: {
+			rows: 1,
+			cols: 2,
+			11: {
+				title: "Store Energy",
+				display(){
+					return "Stored Energy: <span style='font-size: 20px; font-weight: bold;'>"+formatWhole(player.en.stored)+" / "+formatWhole(tmp.en.storageLimit)+"</span><br><br>"+(tmp.nerdMode?("Effect Formula: log(log(x+1)+1)/5"):("Increases Energy gain exponent by <span style='font-size: 20px; font-weight: bold;'>"+format(tmp.en.clickables[11].eff)+"</span>"))
+				},
+				eff() { return player.en.stored.plus(1).log10().plus(1).log10().div(5) },
+				unlocked() { return player.en.unlocked },
+				canClick() { return player.en.unlocked && player.en.points.gt(0) },
+				onClick() { 
+					player.en.stored = player.en.stored.plus(player.en.points).min(tmp.en.storageLimit);
+					player.en.points = new Decimal(0);
+				},
+				style: {width: "160px", height: "160px"},
+			},
+			12: {
+				title: "Release Energy",
+				display: "",
+				unlocked() { return player.en.unlocked },
+				canClick() { return player.en.unlocked && player.en.stored.gt(0) },
+				onClick() { 
+					player.en.points = player.en.points.plus(player.en.stored);
+					player.en.stored = new Decimal(0);
+				},
+				style: {width: "80px", height: "80px"},
+			},
+		},
+})
+
 addLayer("a", {
         startData() { return {
             unlocked: true,
@@ -7448,7 +7601,7 @@ addLayer("a", {
             return ("Achievements")
         },
         achievements: {
-            rows: 13,
+            rows: 14,
             cols: 5,
             11: {
                 name: "All that progress is gone!",
@@ -7632,7 +7785,7 @@ addLayer("a", {
 			65: {
 				name: "The Blood Moon",
 				unlocked() { return hasAchievement("a", 111) },
-				done() { return player.ma.mastered.includes("o")&&player.ma.mastered.includes("s") },
+				done() { return player.ma.mastered.includes("o")&&player.ma.mastered.includes("ss") },
 				tooltip: "Master Solarity & Subspace.",
 				image: "images/achs/65.png",
 			},
@@ -7818,8 +7971,8 @@ addLayer("a", {
 			125: {
 				name: "Baseless Property",
 				unlocked() { return hasAchievement("a", 111) },
-				done() { return player.points.gte("e2.5e13") && player.ss.best.eq(0) && player.q.buyables[11].eq(0) && player.sb.best.eq(0) && player.sg.best.eq(0) && player.t.best.eq(0) && player.s.best.eq(0) && player.e.buyables[11].eq(0) && player.t.buyables[11].eq(0) && player.b.best.eq(0) && player.g.best.eq(0) && inChallenge("h", 42) },
-				tooltip: 'Reach e2.5e13 Points while in the "Productionless" Hindrance and without Subspace Energy, Quirk Layers, any Row 3 currencies or buyables (except Enhance Points & Space Buildings), Boosters, or Generators.',
+				done() { return player.points.gte("e2.5e13") && inChallenge("h", 42) },
+				tooltip: 'Reach e2.5e13 Points while in the "Productionless" Hindrance.',
 				image: "images/achs/125.png",
 			},
 			131: {
@@ -7852,6 +8005,12 @@ addLayer("a", {
 				done() { return player.points.gte("ee15") },
 				tooltip: "Reach e1e15 Points.",
 				image: "images/achs/135.png",
+			},
+			141: {
+				name: "Powerful Mind",
+				done() { return player.en.unlocked /* or Neurons unlocked */ },
+				tooltip: "Unlock Energy. Reward: You can have all parts of The Motherboard active at once",
+				image: "images/achs/141.png",
 			},
 		},
 		tabFormat: [
@@ -7889,10 +8048,10 @@ addLayer("sc", {
 	],
 }) 
 
-addLayer("at", {
+addLayer("ab", {
 	startData() { return {unlocked: true}},
 	color: "yellow",
-	symbol: "AT",
+	symbol: "AB",
 	row: "side",
 	layerShown() { return player.t.unlocked || player.s.unlocked },
 	tooltip: "Autobuyers",

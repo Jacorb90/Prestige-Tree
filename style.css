@@ -822,6 +822,16 @@ button > * {
 	transform: rotate(35deg);
 }
 
+.en.grad:not(.locked):not(.bought) {
+	background: radial-gradient(#eaff00, #d6ff30, #eaff00, #d6ff30);
+	background-size: 100% 50%;
+	text-shadow: 0px 0px 7px #556125;
+}
+
+.en.anim:not(.locked):not(.bought) {
+	animation: energy 10s linear infinite;
+}
+
 @keyframes honour {
 	0% {
 		background-position: 0% 0%;
@@ -854,6 +864,16 @@ button > * {
 		background-size: 200%;
 	}
 }
+
+@keyframes energy {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: 0% 400%;
+	}
+}
+
 
 .popup {
 	display: block;

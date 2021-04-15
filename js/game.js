@@ -317,7 +317,7 @@ VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "
 
 
 
-function gameLoop(diff) {
+function gameLoop(diff) {	
 	styleCooldown = Math.max(styleCooldown-diff, 0);
 	
 	if (isEndgame() || gameEnded) gameEnded = 1
@@ -341,7 +341,7 @@ function gameLoop(diff) {
 			let layer = TREE_LAYERS[x][item]
 			if (!player[layer].unlocked) player[layer].first += diff;
 			if (!unl(layer)) continue;
-			let speed = (x<6)?tmp.row1to6spd:new Decimal(1)
+			let speed = (x<6&&layer!="en")?tmp.row1to6spd:new Decimal(1)
 			if (tmp[layer].passiveGeneration) generatePoints(layer, speed.times(diff*tmp[layer].passiveGeneration));
 			if (layers[layer].update) layers[layer].update(speed.times(diff));
 		}
