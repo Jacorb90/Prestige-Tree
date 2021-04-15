@@ -4182,7 +4182,7 @@ addLayer("m", {
 			if (!player.m.unlocked) return;
 			if (player.m.auto && hasMilestone("hn", 2) && player.m.distrAll && player.ma.current!="m") layers.m.castAllSpells(true, diff);
 			for (let i=11;i<=(10+tmp.m.spellsUnlocked);i++) {
-				if (tmp.m.buyables[i].unlocked && player.m.auto && hasMilestone("hn", 2) && !player.m.distrAll && player.ma.current!="m") {
+				if (tmp.m.buyables[i].unlocked && player.m.auto && hasMilestone("hn", 2) && (!player.m.distrAll||tmp.t.effect2.gt(1)) && player.ma.current!="m") {
 					player.m.spellInputs[i] = (player.m.spellTimes[i].gt(0)?player.m.spellInputs[i].max(tmp.m.spellInputAmt):tmp.m.spellInputAmt);
                     player.m.hexes = player.m.hexes.plus(softcap("hexGain", tmp.m.hexGain.times(player.m.spellInputs[i]).times(diff)));
 					player.m.spellTimes[i] = tmp.m.spellTime;
