@@ -2,6 +2,7 @@
 
 ### v1.3: The Expansion Update
 - Added "EN" layer
+- Added the next section of achievements
 
 ### v1.2: Mechanical Mastery
 - Ported the "MA", "GE", and "MC" layers

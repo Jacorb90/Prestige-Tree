@@ -7452,6 +7452,7 @@ addLayer("en", {
             unlocked: false,
 			points: new Decimal(0),
 			best: new Decimal(0),
+			bestOnReset: new Decimal(0),
 			total: new Decimal(0),
 			stored: new Decimal(0),
 			target: 0,
@@ -7474,6 +7475,7 @@ addLayer("en", {
 		exponent() { return tmp[this.layer].exp },
 		gainMult() {
 			let mult = new Decimal(1);
+			if (hasMilestone("en", 0)) mult = mult.times(2);
 			return mult;
 		},
 		getResetGain() {
@@ -7485,9 +7487,9 @@ addLayer("en", {
 			let gain = tmp.en.getResetGain.div(tmp.en.gainMult).plus(1)
 			return Decimal.pow(2, gain.root(tmp.en.exp)).times(tmp.en.req);
 		},
-		passiveGeneration() { return false },
+		passiveGeneration() { return hasMilestone("en", 0)?0.1:0 },
 		canReset() {
-			return player.o.points.gte(tmp.en.req) && tmp.en.getResetGain.gt(0) && player.en.points.eq(0)
+			return player.o.points.gte(tmp.en.req) && tmp.en.getResetGain.gt(0) && (hasMilestone("en", 0)?player.en.points.lt(tmp.en.getResetGain):player.en.points.eq(0))
 		},
 		dispGainFormula() {
 			let start = tmp.en.req;
@@ -7519,6 +7521,7 @@ addLayer("en", {
 			}
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
+		onPrestige(gain) { player.en.bestOnReset = player.en.bestOnReset.max(gain) },
         layerShown(){return player.mc.unlocked },
         branches: ["sb","o"],
 		update(diff) {
@@ -7559,6 +7562,13 @@ addLayer("en", {
 			]],
 			"blank", "blank", "blank",
 		],
+		milestones: {
+			0: {
+				requirementDescription: "8,750 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(8750) },
+				effectDescription: "Gain 10% of Energy gain every second, you can always Energy reset when under 100% of Energy gain, and Energy gain is doubled.",
+			},
+		},
 		clickables: {
 			rows: 1,
 			cols: 2,
@@ -7583,6 +7593,7 @@ addLayer("en", {
 				canClick() { return player.en.unlocked && player.en.stored.gt(0) },
 				onClick() { 
 					player.en.points = player.en.points.plus(player.en.stored);
+					player.en.best = player.en.best.max(player.en.points);
 					player.en.stored = new Decimal(0);
 				},
 				style: {width: "80px", height: "80px"},
