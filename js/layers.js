@@ -6822,7 +6822,7 @@ addLayer("ma", {
 			let rows = player.ma.mastered.map(x => tmp[x].row)
 			let realRows = rows.filter(y => Object.keys(ROW_LAYERS[y]).every(z => player.ma.mastered.includes(z)));
 			let furthestRow = Math.max(...realRows)+((player.ma.current !== null)?0:1);
-			let m = Object.keys(layers).filter(x => (tmp[x].row<=furthestRow&&(tmp.ma.specialReqs[x]?tmp.ma.specialReqs[x].every(y => player.ma.mastered.includes(y)):true))||player.ma.mastered.includes(x));
+			let m = Object.keys(layers).filter(x => (tmp[x].row<=furthestRow&&tmp.ma.masteryGoal[x]!==undefined&&(tmp.ma.specialReqs[x]?tmp.ma.specialReqs[x].every(y => player.ma.mastered.includes(y)):true))||player.ma.mastered.includes(x));
 			if (player.ma.current !== null) m.push(player.ma.current);
 			
 			return m;
