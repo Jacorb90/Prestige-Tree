@@ -220,7 +220,7 @@ function loadVue() {
 	Vue.component('toggle', {
 		props: ['data', 'type'],
 		template: `
-		<button class="smallUpg can" v-bind:style="{'background-color': tmp[((type=='multi')?(data.layer):(data[0]))].color}" v-on:click="toggleAuto(data)">{{(type=='multi')?(player[data.layer][data.varName]):(player[data[0]][data[1]]?"ON":"OFF")}}</button>
+		<button class="smallUpg can" v-bind:style="{'background-color': (player[data[0]][data[1]]?tmp[((type=='multi')?(data.layer):(data[0]))].color:'#666666')}" v-on:click="toggleAuto(data)">{{(type=='multi')?(player[data.layer][data.varName]):(player[data[0]][data[1]]?"ON":"OFF")}}</button>
 		`
 	})
 

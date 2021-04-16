@@ -6923,6 +6923,7 @@ addLayer("ge", {
             mult = new Decimal(1);
 			if (player.mc.unlocked) mult = mult.times(clickableEffect("mc", 12));
 			if (player.mc.upgrades.includes(11)) mult = mult.times(buyableEffect("mc", 12));
+			if (hasMilestone("ge", 2)) mult = mult.times(player.en.total);
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -6932,7 +6933,7 @@ addLayer("ge", {
         hotkeys: [
             {key: "E", description: "Press Shift+E to Gear Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
         ],
-		passiveGeneration() { return false },
+		passiveGeneration() { return hasMilestone("ge", 2)?0.01:0 },
         doReset(resettingLayer){ 
 			let keep = [];
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
@@ -7186,6 +7187,12 @@ addLayer("ge", {
 				unlocked() { return player.ge.best.gte(1e6) },
 				done() { return player.ge.best.gte(2e22) },
 				effectDescription: "Gear Upgrade costs increase independently.",
+			},
+			2: {
+				requirementDescription: "5e47 Gears & 25,000,000 Total Energy",
+				unlocked() { return player.en.unlocked },
+				done() { return player.en.unlocked && player.ge.best.gte(5e47) && player.en.total.gte(25e6) },
+				effectDescription: "Total Energy multiplies Gear gain, and gain 1% of Gear gain every second.",
 			},
 		},
 })
@@ -7476,6 +7483,7 @@ addLayer("en", {
 		gainMult() {
 			let mult = new Decimal(1);
 			if (hasMilestone("en", 0)) mult = mult.times(2);
+			if (hasMilestone("en", 2)) mult = mult.times(player.o.points.plus(1).log10().plus(1).log10().plus(1));
 			return mult;
 		},
 		getResetGain() {
@@ -7518,6 +7526,7 @@ addLayer("en", {
 				keep.push("tw");
 				keep.push("sw");
 				keep.push("ow");
+				if (hasMilestone("en", 1)) keep.push("milestones");
 			}
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
@@ -7530,6 +7539,7 @@ addLayer("en", {
 			if (player.en.points.gt(0)) {
 				subbed = player.en.points.times(Decimal.sub(1, Decimal.pow(0.75, diff))).plus(diff);
 				player.en.points = player.en.points.times(Decimal.pow(0.75, diff)).sub(diff).max(0);
+				if (hasMilestone("en", 1)) player.en.stored = player.en.stored.plus(subbed.div(5));
 			}
 			switch(player.en.target) {
 				case 1: 
@@ -7568,6 +7578,16 @@ addLayer("en", {
 				done() { return player.en.bestOnReset.gte(8750) },
 				effectDescription: "Gain 10% of Energy gain every second, you can always Energy reset when under 100% of Energy gain, and Energy gain is doubled.",
 			},
+			1: {
+				requirementDescription: "22,500 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(22500) },
+				effectDescription: "20% of Energy that's lost over time becomes stored, Energy milestones are kept on all resets up to Row 7 (except ???), and when below 1, the Stored Energy effect is square rooted.",
+			},
+			2: {
+				requirementDescription: "335,000 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(335e3) },
+				effectDescription() { return "Energy gain is multiplied by the double-log of your Solarity ("+format(player.o.points.plus(1).log10().plus(1).log10().plus(1))+"x)." },
+			},
 		},
 		clickables: {
 			rows: 1,
@@ -7577,7 +7597,11 @@ addLayer("en", {
 				display(){
 					return "Stored Energy: <span style='font-size: 20px; font-weight: bold;'>"+formatWhole(player.en.stored)+" / "+formatWhole(tmp.en.storageLimit)+"</span><br><br>"+(tmp.nerdMode?("Effect Formula: log(log(x+1)+1)/5"):("Increases Energy gain exponent by <span style='font-size: 20px; font-weight: bold;'>"+format(tmp.en.clickables[11].eff)+"</span>"))
 				},
-				eff() { return player.en.stored.plus(1).log10().plus(1).log10().div(5) },
+				eff() { 
+					let e = player.en.stored.plus(1).log10().plus(1).log10().div(5);
+					if (hasMilestone("en", 1) && e.lt(1)) e = e.sqrt();
+					return e;
+				},
 				unlocked() { return player.en.unlocked },
 				canClick() { return player.en.unlocked && player.en.points.gt(0) },
 				onClick() { 
@@ -8077,7 +8101,7 @@ addLayer("ab", {
 			unlocked() { return player.t.unlocked },
 			canClick() { return hasMilestone("t", 3) },
 			onClick() { player.b.auto = !player.b.auto },
-			style: {"background-color" : "#6e64c4"},
+			style: {"background-color"() { return player.b.auto?"#6e64c4":"#666666" }},
 		},
 		12: {
 			title: "Generators",
@@ -8087,7 +8111,7 @@ addLayer("ab", {
 			unlocked() { return player.s.unlocked },
 			canClick() { return hasMilestone("s", 3) },
 			onClick() { player.g.auto = !player.g.auto },
-			style: {"background-color" : "#a3d9a5"},
+			style: {"background-color"() { return player.g.auto?"#a3d9a5":"#666666" }},
 		},
 		13: {
 			title: "Enhancers",
@@ -8097,7 +8121,7 @@ addLayer("ab", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 1) },
 			onClick() { player.e.auto = !player.e.auto },
-			style: {"background-color" : "#b82fbd"},
+			style: {"background-color"() { return player.e.auto?"#b82fbd":"#666666" }},
 		},
 		14: {
 			title: "Extra Time Capsules",
@@ -8107,7 +8131,7 @@ addLayer("ab", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 1) },
 			onClick() { player.t.autoExt = !player.t.autoExt },
-			style: {"background-color" : "#006609"},
+			style: {"background-color"() { return player.t.autoExt?"#006609":"#666666" }},
 		},
 		21: {
 			title: "Time Capsules",
@@ -8117,7 +8141,7 @@ addLayer("ab", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 3) },
 			onClick() { player.t.auto = !player.t.auto },
-			style: {"background-color" : "#006609"},
+			style: {"background-color"() { return player.t.auto?"#006609":"#666666" }},
 		},
 		22: {
 			title: "Space Energy",
@@ -8127,7 +8151,7 @@ addLayer("ab", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 3) },
 			onClick() { player.s.auto = !player.s.auto },
-			style: {"background-color" : "#dfdfdf"},
+			style: {"background-color"() { return player.s.auto?"#dfdfdf":"#666666" }},
 		},
 		23: {
 			title: "Super Boosters",
@@ -8137,7 +8161,7 @@ addLayer("ab", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 4) },
 			onClick() { player.sb.auto = !player.sb.auto },
-			style: {"background-color" : "#504899"},
+			style: {"background-color"() { return player.sb.auto?"#504899":"#666666" }},
 		},
 		24: {
 			title: "Super Generators",
@@ -8147,7 +8171,7 @@ addLayer("ab", {
 			unlocked() { return player.sg.unlocked },
 			canClick() { return hasMilestone("q", 6) },
 			onClick() { player.sg.auto = !player.sg.auto },
-			style: {"background-color" : "#248239"},
+			style: {"background-color"() { return player.sg.auto?"#248239":"#666666" }},
 		},
 		31: {
 			title: "Space Buildings",
@@ -8157,7 +8181,7 @@ addLayer("ab", {
 			unlocked() { return player.sg.unlocked },
 			canClick() { return hasMilestone("q", 7) },
 			onClick() { player.s.autoBld = !player.s.autoBld },
-			style: {"background-color" : "#dfdfdf"},
+			style: {"background-color"() { return player.s.autoBld?"#dfdfdf":"#666666" }},
 		},
 		32: {
 			title: "Quirk Layers",
@@ -8167,7 +8191,7 @@ addLayer("ab", {
 			unlocked() { return player.ba.unlocked },
 			canClick() { return hasMilestone("ba", 1) },
 			onClick() { player.q.auto = !player.q.auto },
-			style: {"background-color" : "#c20282"},
+			style: {"background-color"() { return player.q.auto?"#c20282":"#666666" }},
 		},
 		33: {
 			title: "Subspace Energy",
@@ -8177,7 +8201,7 @@ addLayer("ab", {
 			unlocked() { return player.ba.unlocked },
 			canClick() { return hasMilestone("ba", 2) },
 			onClick() { player.ss.auto = !player.ss.auto },
-			style: {"background-color" : "#e8ffff"},
+			style: {"background-color"() { return player.ss.auto?"#e8ffff":"#666666" }},
 		},
 		34: {
 			title: "Spells",
@@ -8187,7 +8211,7 @@ addLayer("ab", {
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 2) },
 			onClick() { player.m.auto = !player.m.auto },
-			style: {"background-color" : "#eb34c0"},
+			style: {"background-color"() { return player.m.auto?"#eb34c0":"#666666" }},
 		},
 		41: {
 			title: "Phantom Souls",
@@ -8197,7 +8221,7 @@ addLayer("ab", {
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 4) },
 			onClick() { player.ps.auto = !player.ps.auto },
-			style: {"background-color" : "#b38fbf"},
+			style: {"background-color"() { return player.ps.auto?"#b38fbf":"#666666" }},
 		},
 		42: {
 			title: "Wraiths",
@@ -8207,7 +8231,7 @@ addLayer("ab", {
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 5) },
 			onClick() { player.ps.autoW = !player.ps.autoW },
-			style: {"background-color" : "#b38fbf"},
+			style: {"background-color"() { return player.ps.autoW?"#b38fbf":"#666666" }},
 		},
 		43: {
 			title: "Ghost Spirit",
@@ -8217,7 +8241,7 @@ addLayer("ab", {
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 0) },
 			onClick() { player.ps.autoGhost = !player.ps.autoGhost },
-			style: {"background-color" : "#b38fbf"},
+			style: {"background-color"() { return player.ps.autoGhost?"#b38fbf":"#666666" }},
 		},
 		44: {
 			title: "Imperium Bricks",
@@ -8227,7 +8251,7 @@ addLayer("ab", {
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 4) },
 			onClick() { player.i.auto = !player.i.auto },
-			style: {"background-color" : "#e5dab7"},
+			style: {"background-color"() { return player.i.auto?"#e5dab7":"#666666" }},
 		},
 		51: {
 			title: "Hyperspace",
@@ -8237,7 +8261,7 @@ addLayer("ab", {
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 5) },
 			onClick() { player.hs.auto = !player.hs.auto },
-			style: {"background-color" : "#dfdfff"},
+			style: {"background-color"() { return player.hs.auto?"#dfdfff":"#666666" }},
 		},
 	},
 })
