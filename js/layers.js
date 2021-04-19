@@ -7725,7 +7725,7 @@ addLayer("ne", {
                     let data = tmp[this.layer].buyables[this.id];
 					let cost = data.cost;
 					let amt = player[this.layer].buyables[this.id];
-                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^(x^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Neuron gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
+                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^(x^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
 					return display;
                 },
                 unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
@@ -7746,7 +7746,7 @@ addLayer("ne", {
 			0: {
 				requirementDescription: "2,750 Signals",
 				done() { return player.ne.signals.gte(2750) || player.ne.milestones.includes(0) },
-				effectDescription() { return "Subspace Energy multiplies Neuron gain ("+format(player.ss.points.plus(1).sqrt())+"x), and unlock The Neural Network" },
+				effectDescription() { return "Subspace Energy multiplies Signal gain ("+format(player.ss.points.plus(1).sqrt())+"x), and unlock The Neural Network" },
 			},
 			1: {
 				requirementDescription: "50,000 Signals",
