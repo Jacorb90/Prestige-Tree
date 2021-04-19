@@ -7235,6 +7235,7 @@ addLayer("mc", {
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1);
 			if (player.mc.upgrades.includes(11)) mult = mult.times(buyableEffect("mc", 12));
+			if (hasMilestone("mc", 0)) mult = mult.times(player.ne.thoughts.max(1));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -7244,7 +7245,7 @@ addLayer("mc", {
         hotkeys: [
             {key: "c", description: "Press C to Machine Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
         ],
-		passiveGeneration() { return false },
+		passiveGeneration() { return hasMilestone("mc", 0)?0.01:0 },
         doReset(resettingLayer){ 
 			let keep = [];
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
@@ -7264,6 +7265,7 @@ addLayer("mc", {
 				content: ["main-display",
 				"prestige-button",
 				"resource-display", "blank",
+				"milestones",
 				"blank", 
 				"respec-button", "blank", ["buyable", 11],
 			]},
@@ -7279,6 +7281,14 @@ addLayer("mc", {
 				unlocked() { return player.mc.upgrades.includes(11) },
 				buttonStyle() { return {'background-color': '#c76e6b', "border-color": "#c76e6b", color: "black"} },
 				content: ["blank", ["buyable", 12]],
+			},
+		},
+		milestones: {
+			0: {
+				requirementDescription: "125,000,000 Machine Parts & 1e9 Signals",
+				unlocked() { return player.ne.unlocked && player.mc.unlocked },
+				done() { return player.ne.unlocked && ((player.mc.best.gte(1.25e8) && player.ne.signals.gte(1e9)) || player.mc.milestones.includes(0)) },
+				effectDescription: "Thoughts multiply Machine Part gain, and gain 1% of Machine Part gain every second.",
 			},
 		},
 		clickables: {
@@ -7484,7 +7494,7 @@ addLayer("en", {
         type: "custom", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
 		baseResource: "solarity",
 		baseAmount() { return player.o.points },
-		req() { return player[this.layer].unlockOrder>0?new Decimal(1/0):new Decimal("1e15000") },
+		req() { return (player[this.layer].unlockOrder>0&&!player.en.unlocked)?new Decimal("1e15825"):new Decimal("1e15000") },
 		requires() { return this.req() },
 		increaseUnlockOrder: ["ne"],
 		exp() { return Decimal.add(.8, tmp.en.clickables[11].eff) },
@@ -7647,7 +7657,7 @@ addLayer("ne", {
 			thoughts: new Decimal(0),
         }},
         color: "#ded9ff",
-        requires() { return player[this.layer].unlockOrder>0?new Decimal(1/0):new Decimal("1e1000000") }, // Can be a function that takes requirement increases into account
+        requires() { return (player[this.layer].unlockOrder>0&&!player.ne.unlocked)?new Decimal("1e1160000"):new Decimal("1e1000000") }, // Can be a function that takes requirement increases into account
 		increaseUnlockOrder: ["en"],
         resource: "neurons", // Name of prestige currency
         baseResource: "subspace", // Name of resource prestige is based on
@@ -7674,23 +7684,27 @@ addLayer("ne", {
 			}
             if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
-		effect() { return player[this.layer].points.div(2).plus(1).pow(0.75).sub(1) },
+		effect() {
+			let eff = player[this.layer].points.div(2).plus(1).pow(0.75).sub(1);
+			if (hasMilestone("ne", 3)) eff = eff.times(Decimal.pow(1.5, player[this.layer].points.sqrt()).plus(player[this.layer].points));
+			return eff;
+		},
 		effectDescription() { return "which multiply Signal gain speed by <h2 style='color: #ded9ff; text-shadow: #ded9ff 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>." },
 		autoPrestige() { return false },
         layerShown(){return player.mc.unlocked},
         branches: ["ss", "sg"],
 		update(diff) {
 			if (player.ne.unlocked && player.ne.activeChallenge==11) {
-				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min(tmp.ne.signalLim);
+				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min(hasMilestone("ne", 4)?(1/0):tmp.ne.signalLim);
 				if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
-					player.ne.signals = new Decimal(0);
+					if (!hasMilestone("ne", 4)) player.ne.signals = new Decimal(0);
 					player.ne.thoughts = player.ne.thoughts.plus(1);
 				}
 			}
 		},
-		signalLim() { return Decimal.pow(5, player.ne.thoughts).times(100) },
+		signalLim() { return Decimal.pow((hasMilestone("ne", 4)?2:(hasMilestone("ne", 3)?2.5:(hasMilestone("ne", 2)?3:5))), player.ne.thoughts).times(100) },
 		thoughtEff1() { return player.ne.thoughts.plus(1).log10().plus(1).pow(hasMilestone("ne", 1)?2:1) },
-		thoughtEff2() { return Decimal.pow("1e800", player.ne.thoughts.pow(.75)) },
+		thoughtEff2() { return Decimal.pow("1e800", player.ne.thoughts.pow(.75)).pow(hasMilestone("ne", 2)?2:1) },
 		challenges: {
 			rows: 1,
 			cols: 1,
@@ -7704,11 +7718,12 @@ addLayer("ne", {
 				gainMult() { 
 					let mult = tmp.ne.effect.times(player.ne.signals.plus(1).log10().plus(1));
 					if (hasMilestone("ne", 0)) mult = mult.times(player.ss.points.plus(1).sqrt());
+					if (hasMilestone("ne", 2)) mult = mult.times(player.ne.points.max(1));
 					return mult;
 				},
 				amt() { return Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor() },
 				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
-				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: 1e800^(thoughts^0.75))":format(tmp.ne.thoughtEff2)+"x") },
+				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x") },
 				style() { return {'background-color': "#484659", filter: "brightness("+(100+player.ne.signals.plus(1).log10().div(tmp.ne.signalLim.plus(1).log10()).times(50).toNumber())+"%)", color: "white", 'border-radius': "25px", height: "400px", width: "400px"}},
 			},
 		},
@@ -7725,7 +7740,7 @@ addLayer("ne", {
                     let data = tmp[this.layer].buyables[this.id];
 					let cost = data.cost;
 					let amt = player[this.layer].buyables[this.id];
-                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^(x^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Neuron gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
+                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^(x^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
 					return display;
                 },
                 unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
@@ -7746,12 +7761,27 @@ addLayer("ne", {
 			0: {
 				requirementDescription: "2,750 Signals",
 				done() { return player.ne.signals.gte(2750) || player.ne.milestones.includes(0) },
-				effectDescription() { return "Subspace Energy multiplies Neuron gain ("+format(player.ss.points.plus(1).sqrt())+"x), and unlock The Neural Network" },
+				effectDescription() { return "Subspace Energy multiplies Signal gain ("+format(player.ss.points.plus(1).sqrt())+"x), and unlock The Neural Network" },
 			},
 			1: {
 				requirementDescription: "50,000 Signals",
 				done() { return player.ne.signals.gte(5e4) || player.ne.milestones.includes(1) },
 				effectDescription() { return "The first Thought effect is squared, and Neuron milestones are kept on all resets up to Row 7 (except ???)" },
+			},
+			2: {
+				requirementDescription: "3,000,000 Signals",
+				done() { return player.ne.signals.gte(3e6) || player.ne.milestones.includes(2) },
+				effectDescription() { return "The Thought requirement increases slower (5x -> 3x), the second Thought effect is squared, and multiply Signal gain by your Neurons" },
+			},
+			3: {
+				requirementDescription: "150,000,000 Signals",
+				done() { return player.ne.signals.gte(1.5e8) || player.ne.milestones.includes(3) },
+				effectDescription() { return "The Thought requirement increases even slower (3x -> 2.5x), and the Neuron effect uses a better formula (becomes exponential instead of sub-linear)" },
+			},
+			4: {
+				requirementDescription: "2.5e9 Signals",
+				done() { return player.ne.signals.gte(2.5e9) || player.ne.milestones.includes(4) },
+				effectDescription() { return "The Thought requirement increases even slower (2.5x -> 2x), and getting a Thought does not reset Signals" },
 			},
 		},
 		tabFormat: ["main-display",
@@ -8185,6 +8215,12 @@ addLayer("a", {
 				done() { return player.en.unlocked || player.ne.unlocked },
 				tooltip: "Unlock Energy or Neurons. Reward: You can have all parts of The Motherboard active at once",
 				image: "images/achs/141.png",
+			},
+			142: {
+				name: "Failed Error",
+				done() { return player.en.sw.gte(104) },
+				tooltip: "Reach 104 Super Watts",
+				image: "images/achs/142.png",
 			},
 		},
 		tabFormat: [
