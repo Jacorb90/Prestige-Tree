@@ -174,11 +174,23 @@ function updateLayers(){
 function addLayer(layerName, layerData){ // Call this to add layers from a different file!
     layers[layerName] = layerData
     layers[layerName].isLayer = true
+	
+	// Making challenge buttons responsive
+	if (layers[layerName].challenges) for (let r=1;r<=layers[layerName].challenges.rows;r++) for (let c=1;c<=layers[layerName].challenges.cols;c++) {
+		let id = r*10+c;
+		layers[layerName].challenges[id].buttonText = function() { return (player[this.layer].activeChallenge==(this.id)?(canCompleteChallenge(this.layer, this.id)?"Finish":"Exit Early"):(hasChallenge(this.layer, this.id)?"Completed":"Start")) };
+	}
 }
 
 function addNode(layerName, layerData){ // Does the same thing
     layers[layerName] = layerData
     layers[layerName].isLayer = false
+	
+	// Making challenge buttons responsive
+	if (layers[layerName].challenges) for (let r=1;r<=layers[layerName].challenges.rows;r++) for (let c=1;c<=layers[layerName].challenges.cols;c++) {
+		let id = r*10+c;
+		layers[layerName].challenges[id].buttonText = function() { return (player[this.layer].activeChallenge==(this.id)?(canCompleteChallenge(this.layer, this.id)?"Finish":"Exit Early"):(hasChallenge(this.layer, this.id)?"Completed":"Start")) };
+	}
 }
 
 

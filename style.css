@@ -832,6 +832,12 @@ button > * {
 	animation: energy 10s linear infinite;
 }
 
+.ne.grad:not(.locked):not(.bought) {
+	background: repeating-radial-gradient(circle, #c9d2ff 0%, #ffd1f7 2%);
+	background-size: 100% 100%;
+	background-position: center;
+}
+
 @keyframes honour {
 	0% {
 		background-position: 0% 0%;

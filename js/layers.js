@@ -67,6 +67,8 @@ addLayer("p", {
 				description: "Prestige Points boost Point generation.",
 				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?10:1).pow(tmp.h.costExp11) },
 				effect() {
+					if (inChallenge("ne", 11)) return new Decimal(1);
+					
 					let eff = player.p.points.plus(2).pow(0.5);
 					if (hasUpgrade("g", 14)) eff = eff.pow(1.5);
 					if (hasUpgrade("g", 24)) eff = eff.pow(1.4666667);
@@ -79,11 +81,14 @@ addLayer("p", {
 					if (hasUpgrade("hn", 14)) eff = eff.pow(1.05);
 					if (hasUpgrade("b", 34) && player.i.buyables[12].gte(1)) eff = eff.pow(upgradeEffect("b", 34));
 					if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) eff = eff.pow(1.1);
+					
 					return eff;
 				},
 				unlocked() { return hasUpgrade("p", 11) },
 				effectDisplay() { return format(tmp.p.upgrades[12].effect)+"x" },
 				formula() { 
+					if (inChallenge("ne", 11)) return "DISABLED";
+				
 					let exp = new Decimal(0.5*(hasUpgrade("g", 14)?1.5:1)*(hasUpgrade("g", 24)?1.4666667:1));
 					if (hasUpgrade("g", 34) && player.i.buyables[12].gte(2)) exp = exp.times(1.4333333);
 					if (hasUpgrade("b", 34) && player.i.buyables[12].gte(1)) exp = exp.times(upgradeEffect("b", 34));
@@ -334,11 +339,11 @@ addLayer("b", {
 			return power;
 		},
 		effect() {
-			if (!unl(this.layer)) return new Decimal(1);
+			if ((!unl(this.layer))||inChallenge("ne", 11)) return new Decimal(1);
 			return Decimal.pow(tmp.b.effectBase, player.b.points.plus(tmp.sb.spectralTotal)).max(0).times(hasUpgrade("p", 43)?tmp.q.enEff:1);
 		},
 		effectDescription() {
-			return "which are boosting Point generation by "+format(tmp.b.effect)+"x"+(tmp.nerdMode?("\n ("+format(tmp.b.effectBase)+"x each)"):"")
+			return "which are boosting Point generation by "+format(tmp.b.effect)+"x"+(tmp.nerdMode?(inChallenge("ne", 11)?"\n (DISABLED)":("\n ("+format(tmp.b.effectBase)+"x each)")):"")
 		},
 		doReset(resettingLayer) {
 			let keep = [];
@@ -590,7 +595,7 @@ addLayer("g", {
 			return base;
 		},
 		effect() {
-			if (!unl(this.layer)) return new Decimal(0);
+			if ((!unl(this.layer))||inChallenge("ne", 11)) return new Decimal(0);
 			let eff = Decimal.pow(this.effBase(), player.g.points.plus(tmp.sg.spectralTotal)).sub(1).max(0);
 			if (hasUpgrade("g", 21)) eff = eff.times(upgradeEffect("g", 21));
 			if (hasUpgrade("g", 25)) eff = eff.times(upgradeEffect("g", 25));
@@ -601,7 +606,7 @@ addLayer("g", {
 			return eff;
 		},
 		effectDescription() {
-			return "which are generating "+format(tmp.g.effect)+" Generator Power/sec"+(tmp.nerdMode?("\n ("+format(tmp.g.effBase)+"x each)"):"")
+			return "which are generating "+format(tmp.g.effect)+" Generator Power/sec"+(tmp.nerdMode?(inChallenge("ne", 11)?"\n (DISABLED)":("\n ("+format(tmp.g.effBase)+"x each)")):"")
 		},
 		extraAmtDisplay() {
 			if (tmp.sg.spectralTotal.eq(0)) return "";
@@ -2558,6 +2563,7 @@ addLayer("sg", {
 			if (hasUpgrade("hn", 52)) base = base.times(buyableEffect("o", 12));
 			if (player.mc.unlocked) base = base.times(clickableEffect("mc", 21));
 			if (tmp.m.buyables[16].unlocked) base = base.times(buyableEffect("m", 16));
+			if (player.ne.unlocked) base = base.times(tmp.ne.thoughtEff2);
 			return base;
 		},
 		effect() {
@@ -3900,6 +3906,7 @@ addLayer("ss", {
 		base() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.1:1.15) },
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
+			if (player.ne.unlocked) mult = mult.div(tmp.ne.thoughtEff1);
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -3916,6 +3923,7 @@ addLayer("ss", {
 			if (tmp.q.impr[42].unlocked) base = base.times(improvementEffect("q", 42));
 			if (hasUpgrade("hn", 35)) base = base.times(upgradeEffect("hn", 35));
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) base = base.times(Decimal.pow(1e10, player.ss.points));
+			if (player.ne.unlocked) base = base.times(tmp.ne.thoughtEff2);
 			
 			if (hasUpgrade("t", 41) && player.i.buyables[12].gte(4)) base = base.pow(1.5);
 			return base;
@@ -6820,7 +6828,7 @@ addLayer("ma", {
 			if (!player.ma.selectionActive) return [];
 			if (player.ma.mastered.length==0) return ["p"];
 			let rows = player.ma.mastered.map(x => tmp[x].row)
-			let realRows = rows.filter(y => Object.keys(ROW_LAYERS[y]).every(z => player.ma.mastered.includes(z)));
+			let realRows = rows.filter(y => Object.keys(ROW_LAYERS[y]).every(z => player.ma.mastered.includes(z) || tmp.ma.masteryGoal[z]===undefined));
 			let furthestRow = Math.max(...realRows)+((player.ma.current !== null)?0:1);
 			let m = Object.keys(layers).filter(x => (tmp[x].row<=furthestRow&&tmp.ma.masteryGoal[x]!==undefined&&(tmp.ma.specialReqs[x]?tmp.ma.specialReqs[x].every(y => player.ma.mastered.includes(y)):true))||player.ma.mastered.includes(x));
 			if (player.ma.current !== null) m.push(player.ma.current);
@@ -7476,8 +7484,9 @@ addLayer("en", {
         type: "custom", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
 		baseResource: "solarity",
 		baseAmount() { return player.o.points },
-		req: new Decimal("1e15000"),
-		requires() { return this.req },
+		req() { return player[this.layer].unlockOrder>0?new Decimal(1/0):new Decimal("1e15000") },
+		requires() { return this.req() },
+		increaseUnlockOrder: ["ne"],
 		exp() { return Decimal.add(.8, tmp.en.clickables[11].eff) },
 		exponent() { return tmp[this.layer].exp },
 		gainMult() {
@@ -7517,7 +7526,7 @@ addLayer("en", {
 		tooltipLocked() { return "Reach "+formatWhole(tmp.en.req)+" Solarity to unlock (You have "+formatWhole(player.o.points)+" Solarity)" },
         row: 4, // Row the layer is in on the tree (0 is the first row)
         hotkeys: [
-            {key: "N", description: "Press Shift+N to Energy Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+            {key: "y", description: "Press Y to Energy Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
         ],
         doReset(resettingLayer){ 
 			let keep = [];
@@ -7623,6 +7632,136 @@ addLayer("en", {
 				style: {width: "80px", height: "80px"},
 			},
 		},
+})
+
+addLayer("ne", {
+		name: "neurons", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "NE", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 4, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			first: 0,
+			signals: new Decimal(0),
+			thoughts: new Decimal(0),
+        }},
+        color: "#ded9ff",
+        requires() { return player[this.layer].unlockOrder>0?new Decimal(1/0):new Decimal("1e1000000") }, // Can be a function that takes requirement increases into account
+		increaseUnlockOrder: ["en"],
+        resource: "neurons", // Name of prestige currency
+        baseResource: "subspace", // Name of resource prestige is based on
+        baseAmount() {return player.ss.subspace}, // Get the current amount of baseResource
+        type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+        exponent: new Decimal(2.5), // Prestige currency exponent
+		base: new Decimal("1e10000"),
+        gainMult() { // Calculate the multiplier for main currency from bonuses
+            mult = new Decimal(1)
+            return mult
+        },
+		canBuyMax() { return false },
+        row: 4, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "u", description: "Press U to Neuron Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+		resetsNothing() { return false },
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
+				keep.push("thoughts")
+				keep.push("buyables")
+				if (hasMilestone("en", 1)) keep.push("milestones");
+			}
+            if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+		effect() { return player[this.layer].points.div(2).plus(1).pow(0.75).sub(1) },
+		effectDescription() { return "which multiply Signal gain speed by <h2 style='color: #ded9ff; text-shadow: #ded9ff 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>." },
+		autoPrestige() { return false },
+        layerShown(){return player.mc.unlocked},
+        branches: ["ss", "sg"],
+		update(diff) {
+			if (player.ne.unlocked && player.ne.activeChallenge==11) {
+				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min(tmp.ne.signalLim);
+				if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
+					player.ne.signals = new Decimal(0);
+					player.ne.thoughts = player.ne.thoughts.plus(1);
+				}
+			}
+		},
+		signalLim() { return Decimal.pow(5, player.ne.thoughts).times(100) },
+		thoughtEff1() { return player.ne.thoughts.plus(1).log10().plus(1).pow(hasMilestone("ne", 1)?2:1) },
+		thoughtEff2() { return Decimal.pow("1e800", player.ne.thoughts.pow(.75)) },
+		challenges: {
+			rows: 1,
+			cols: 1,
+			11: {
+				name: "The Brain",
+				challengeDescription: "Prestige Upgrade 2, Boosters, & Generators are disabled.<br>",
+				unlocked() { return player.ne.unlocked && player.ne.points.gt(0) },
+				goal() { return new Decimal(1/0) },
+				currencyDisplayName: "",
+				currencyInternalName: "points",
+				gainMult() { 
+					let mult = tmp.ne.effect.times(player.ne.signals.plus(1).log10().plus(1));
+					if (hasMilestone("ne", 0)) mult = mult.times(player.ss.points.plus(1).sqrt());
+					return mult;
+				},
+				amt() { return Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor() },
+				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
+				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: 1e800^(thoughts^0.75))":format(tmp.ne.thoughtEff2)+"x") },
+				style() { return {'background-color': "#484659", filter: "brightness("+(100+player.ne.signals.plus(1).log10().div(tmp.ne.signalLim.plus(1).log10()).times(50).toNumber())+"%)", color: "white", 'border-radius': "25px", height: "400px", width: "400px"}},
+			},
+		},
+		buyables: {
+			rows: 1,
+			cols: 1,
+			11: {
+				title: "The Neural Network",
+				cost(x=player[this.layer].buyables[this.id]) {
+					return Decimal.pow(4, x.pow(1.2)).times(2e4);
+				},
+				effect() { return player[this.layer].buyables[this.id].div(3).plus(1) },
+				display() { // Everything else displayed in the buyable button after the title
+                    let data = tmp[this.layer].buyables[this.id];
+					let cost = data.cost;
+					let amt = player[this.layer].buyables[this.id];
+                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^(x^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Neuron gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
+					return display;
+                },
+                unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
+                canAfford() {
+					if (!tmp[this.layer].buyables[this.id].unlocked) return false;
+					let cost = tmp[this.layer].buyables[this.id].cost
+                    return player[this.layer].unlocked && player.ne.signals.gte(cost);
+				},
+                buy() { 
+					player.ne.signals = player.ne.signals.sub(tmp[this.layer].buyables[this.id].cost)
+					player.ne.buyables[this.id] = player.ne.buyables[this.id].plus(1);
+                },
+                style: {'height':'250px', 'width':'250px', 'background-color'() { return tmp.ne.buyables[11].canAfford?'#a2cade':'#bf8f8f' }, "border-color": "#a2cade"},
+				autoed() { return false },
+			},
+		},
+		milestones: {
+			0: {
+				requirementDescription: "2,750 Signals",
+				done() { return player.ne.signals.gte(2750) || player.ne.milestones.includes(0) },
+				effectDescription() { return "Subspace Energy multiplies Neuron gain ("+format(player.ss.points.plus(1).sqrt())+"x), and unlock The Neural Network" },
+			},
+			1: {
+				requirementDescription: "50,000 Signals",
+				done() { return player.ne.signals.gte(5e4) || player.ne.milestones.includes(1) },
+				effectDescription() { return "The first Thought effect is squared, and Neuron milestones are kept on all resets up to Row 7 (except ???)" },
+			},
+		},
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank", 
+			"milestones", "blank", "blank",
+			"challenges", "blank",
+			"buyables",
+			"blank", "blank", "blank",
+		],
 })
 
 addLayer("a", {
@@ -8043,8 +8182,8 @@ addLayer("a", {
 			},
 			141: {
 				name: "Powerful Mind",
-				done() { return player.en.unlocked /* or Neurons unlocked */ },
-				tooltip: "Unlock Energy. Reward: You can have all parts of The Motherboard active at once",
+				done() { return player.en.unlocked || player.ne.unlocked },
+				tooltip: "Unlock Energy or Neurons. Reward: You can have all parts of The Motherboard active at once",
 				image: "images/achs/141.png",
 			},
 		},
