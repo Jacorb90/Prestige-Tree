@@ -124,6 +124,7 @@ function startPlayerBase() {
 		spaceGlow: "normal",
 		solGlow: "normal",
 		majGlow: "uncasted",
+		shellGlow: true,
 		scShown: true,
 		oldStyle: false,
 		hideStars: false,

@@ -98,7 +98,7 @@ function shouldNotify(layer){
 				} else if (layer=="m") {
 					if (player.majGlow=="never" || (player.m.auto && hasMilestone("hn", 2))) continue;
 					if (player.majGlow=="uncasted") if (Object.values(player.m.spellTimes).some(x => Decimal.eq(x, 0))) continue;
-				}
+				} else if (layer=="mc" && id==11 && !player.shellGlow) continue;
 				return true
 			}
 		}

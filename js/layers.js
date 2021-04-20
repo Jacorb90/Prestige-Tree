@@ -7484,6 +7484,7 @@ addLayer("en", {
 			tw: new Decimal(0),
 			ow: new Decimal(0),
 			sw: new Decimal(0),
+			mw: new Decimal(0),
 			first: 0,
         }},
         color: "#fbff05",
@@ -7503,6 +7504,7 @@ addLayer("en", {
 			let mult = new Decimal(1);
 			if (hasMilestone("en", 0)) mult = mult.times(2);
 			if (hasMilestone("en", 2)) mult = mult.times(player.o.points.plus(1).log10().plus(1).log10().plus(1));
+			if (player.ne.unlocked && hasMilestone("ne", 5)) mult = mult.times(tmp.ne.thoughtEff3);
 			return mult;
 		},
 		getResetGain() {
@@ -7540,11 +7542,12 @@ addLayer("en", {
         ],
         doReset(resettingLayer){ 
 			let keep = [];
-			if (resettingLayer==this.layer) player.en.target = player.en.target%3+1;
+			if (resettingLayer==this.layer) player.en.target = player.en.target%(hasMilestone("en", 3)?4:3)+1;
 			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
 				keep.push("tw");
 				keep.push("sw");
 				keep.push("ow");
+				keep.push("mw");
 				if (hasMilestone("en", 1)) keep.push("milestones");
 			}
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
@@ -7570,12 +7573,16 @@ addLayer("en", {
 				case 3: 
 					player.en.sw = player.en.sw.pow(4).plus(subbed).root(4);
 					break;
+				case 4: 
+					if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(7).plus(subbed).root(7);
+					break;
 			}
 		},
 		storageLimit() { return player.en.total.div(2) },
 		twEff() { return player.en.tw.plus(1).log10().plus(1).log10().times(10).plus(1).pow(4) },
 		owEff() { return player.en.ow.plus(1).log10().plus(1).log10().times(40).pow(1.8) },
 		swEff() { return player.en.sw.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
+		mwEff() { return hasMilestone("en", 3)?player.en.mw.plus(1).log10().plus(1).log10().div(5).plus(1).pow(2):new Decimal(1) },
 		tabFormat: ["main-display",
 			"prestige-button",
 			"resource-display", "blank",
@@ -7585,10 +7592,12 @@ addLayer("en", {
 			"blank", "blank",
 			["row", [
 				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==1?"#e1ffde;":"#8cfa82;")+"'>"+(player.en.target==1?"TIME WATTS":"Time Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #8cfa82;'>"+formatWhole(player.en.tw)+"</h4><br><br>Strengthens Non-Extra Time Capsules by <span style='color: #8cfa82; font-weight: bold; font-size: 20px;'>"+format(tmp.en.twEff.sub(1).times(100))+"</span>%" }]], {width: "100%"}],
-			]], "blank", "blank", ["row", [
+				]], "blank", "blank", ["row", [
 				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==2?"#fff0d9":"#ffd187;")+"'>"+(player.en.target==2?"SOLAR WATTS":"Solar Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #ffd187;'>"+formatWhole(player.en.ow)+"</h4><br><br>Adds <span style='color: #ffd187; font-weight: bold; font-size: 20px;'>"+format(tmp.en.owEff)+"</span> to Solarity gain exponent" }]], {width: "50%"}],
 				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==3?"#dbfcff;":"#8cf5ff;")+"'>"+(player.en.target==3?"SUPER WATTS":"Super Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #8cf5ff;'>"+formatWhole(player.en.sw)+"</h4><br><br>Strengthens Super Boosters by <span style='color: #8cf5ff; font-weight: bold: font-size: 20px;'>"+format(tmp.en.swEff.sub(1).times(100))+"</span>%" }]], {width: "50%"}],
-			]],
+				]], "blank", "blank", ["row", [
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==4?"#f4deff;":"#d182ff;")+"'>"+(player.en.target==4?"MIND WATTS":"Mind Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #d182ff;'>"+formatWhole(player.en.mw)+"</h4><br><br>Strengthens Thought effects by <span style='color: #d182ff; font-weight: bold; font-size: 20px;'>"+format(tmp.en.mwEff.sub(1).times(100))+"</span>%, and multiplies Signal gain by <span style='color: #d182ff; font-weight: bold; font-size: 20px;'>"+format(tmp.en.mwEff.pow(40))+"</span>x" }]], {width: "75%"}],
+			], function() { return {display: hasMilestone("en", 3)?"none":""} }],
 			"blank", "blank", "blank",
 		],
 		milestones: {
@@ -7606,6 +7615,12 @@ addLayer("en", {
 				requirementDescription: "335,000 Energy in one reset",
 				done() { return player.en.bestOnReset.gte(335e3) },
 				effectDescription() { return "Energy gain is multiplied by the double-log of your Solarity ("+format(player.o.points.plus(1).log10().plus(1).log10().plus(1))+"x)." },
+			},
+			3: {
+				unlocked() { return player.en.unlocked && player.ne.unlocked },
+				requirementDescription: "250,000,000 Total Energy & 26 Thoughts",
+				done() { return (player.en.total.gte(2.5e8) && player.ne.thoughts.gte(26)) || player.en.milestones.includes(3) },
+				effectDescription() { return "Unlock Mind Watts." },
 			},
 		},
 		clickables: {
@@ -7655,6 +7670,7 @@ addLayer("ne", {
 			first: 0,
 			signals: new Decimal(0),
 			thoughts: new Decimal(0),
+			auto: false,
         }},
         color: "#ded9ff",
         requires() { return (player[this.layer].unlockOrder>0&&!player.ne.unlocked)?new Decimal("1e1160000"):new Decimal("1e1000000") }, // Can be a function that takes requirement increases into account
@@ -7674,7 +7690,7 @@ addLayer("ne", {
         hotkeys: [
             {key: "u", description: "Press U to Neuron Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
         ],
-		resetsNothing() { return false },
+		resetsNothing() { return player.ne.auto },
         doReset(resettingLayer){ 
 			let keep = [];
 			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
@@ -7690,7 +7706,7 @@ addLayer("ne", {
 			return eff;
 		},
 		effectDescription() { return "which multiply Signal gain speed by <h2 style='color: #ded9ff; text-shadow: #ded9ff 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>." },
-		autoPrestige() { return false },
+		autoPrestige() { return player.ne.auto },
         layerShown(){return player.mc.unlocked},
         branches: ["ss", "sg"],
 		update(diff) {
@@ -7703,8 +7719,14 @@ addLayer("ne", {
 			}
 		},
 		signalLim() { return Decimal.pow((hasMilestone("ne", 4)?2:(hasMilestone("ne", 3)?2.5:(hasMilestone("ne", 2)?3:5))), player.ne.thoughts).times(100) },
-		thoughtEff1() { return player.ne.thoughts.plus(1).log10().plus(1).pow(hasMilestone("ne", 1)?2:1) },
-		thoughtEff2() { return Decimal.pow("1e800", player.ne.thoughts.pow(.75)).pow(hasMilestone("ne", 2)?2:1) },
+		thoughtPower() {
+			let pow = new Decimal(1);
+			if (player.en.unlocked && hasMilestone("en", 3)) pow = pow.times(tmp.en.mwEff);
+			return pow;
+		},
+		thoughtEff1() { return player.ne.thoughts.times(tmp.ne.thoughtPower).plus(1).log10().plus(1).pow(hasMilestone("ne", 1)?2:1) },
+		thoughtEff2() { return Decimal.pow("1e800", player.ne.thoughts.times(tmp.ne.thoughtPower).pow(.75)).pow(hasMilestone("ne", 2)?2:1) },
+		thoughtEff3() { return Decimal.pow(1.2, player.ne.thoughts.times(hasMilestone("ne", 5)?tmp.ne.thoughtPower:0).sqrt()) },
 		challenges: {
 			rows: 1,
 			cols: 1,
@@ -7719,12 +7741,20 @@ addLayer("ne", {
 					let mult = tmp.ne.effect.times(player.ne.signals.plus(1).log10().plus(1));
 					if (hasMilestone("ne", 0)) mult = mult.times(player.ss.points.plus(1).sqrt());
 					if (hasMilestone("ne", 2)) mult = mult.times(player.ne.points.max(1));
+					if (player.en.unlocked && hasMilestone("en", 3)) mult = mult.times(tmp.en.mwEff.pow(40));
 					return mult;
 				},
 				amt() { return Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor() },
 				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
-				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x") },
+				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects"+(tmp.ne.thoughtPower.eq(1)?"":(" (Power: "+format(tmp.ne.thoughtPower.times(100))+"%)"))+"<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x")+(hasMilestone("ne", 5)?("<br>Multiply Energy gain by "+(tmp.nerdMode?" (Formula: (1.2^sqrt(thoughts)))":(format(tmp.ne.thoughtEff3)+"x"))):"") },
 				style() { return {'background-color': "#484659", filter: "brightness("+(100+player.ne.signals.plus(1).log10().div(tmp.ne.signalLim.plus(1).log10()).times(50).toNumber())+"%)", color: "white", 'border-radius': "25px", height: "400px", width: "400px"}},
+				onStart(testInput=false) {
+					if (testInput && player.ne.auto) {
+						doReset("m", true);
+						player.ne.activeChallenge = 11;
+						updateTemp();
+					}
+				},
 			},
 		},
 		buyables: {
@@ -7733,6 +7763,7 @@ addLayer("ne", {
 			11: {
 				title: "The Neural Network",
 				cost(x=player[this.layer].buyables[this.id]) {
+					if (x.gte(10)) x = Decimal.pow(10, x.log10().pow(2));
 					return Decimal.pow(4, x.pow(1.2)).times(2e4);
 				},
 				effect() { return player[this.layer].buyables[this.id].div(3).plus(1) },
@@ -7740,7 +7771,7 @@ addLayer("ne", {
                     let data = tmp[this.layer].buyables[this.id];
 					let cost = data.cost;
 					let amt = player[this.layer].buyables[this.id];
-                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^(x^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
+                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^("+(amt.gte(10)?"10^(log(x)^2)":"x")+"^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
 					return display;
                 },
                 unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
@@ -7782,6 +7813,13 @@ addLayer("ne", {
 				requirementDescription: "2.5e9 Signals",
 				done() { return player.ne.signals.gte(2.5e9) || player.ne.milestones.includes(4) },
 				effectDescription() { return "The Thought requirement increases even slower (2.5x -> 2x), and getting a Thought does not reset Signals" },
+			},
+			5: {
+				unlocked() { return player.en.unlocked && player.ne.unlocked },
+				requirementDescription: "8 Neurons & 2,500,000 Energy in one reset",
+				done() { return player.ne.best.gte(8) && player.en.bestOnReset.gte(2.5e6) },
+				effectDescription() { return "Neurons reset nothing, and unlock Auto-Neurons & a third Thought effect." },
+				toggles: [["ne", "auto"]],
 			},
 		},
 		tabFormat: ["main-display",
@@ -8437,6 +8475,16 @@ addLayer("ab", {
 			canClick() { return hasMilestone("ma", 5) },
 			onClick() { player.hs.auto = !player.hs.auto },
 			style: {"background-color"() { return player.hs.auto?"#dfdfff":"#666666" }},
+		},
+		52: {
+			title: "Neurons",
+			display() {
+				return hasMilestone("ne", 5)?(player.ne.auto?"On":"Off"):"Locked"
+			},
+			unlocked() { return player.ne.unlocked && player.en.unlocked },
+			canClick() { return hasMilestone("ne", 5) },
+			onClick() { player.ne.auto = !player.ne.auto },
+			style: {"background-color"() { return player.ne.auto?"#ded9ff":"#666666" }},
 		},
 	},
 })
