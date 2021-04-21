@@ -7696,7 +7696,7 @@ addLayer("ne", {
 			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
 				keep.push("thoughts")
 				keep.push("buyables")
-				if (hasMilestone("en", 1)) keep.push("milestones");
+				if (hasMilestone("ne", 1)) keep.push("milestones");
 			}
             if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
