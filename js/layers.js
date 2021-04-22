@@ -7571,10 +7571,10 @@ addLayer("en", {
 					player.en.ow = player.en.ow.pow(1.5).plus(subbed).root(1.5);
 					break;
 				case 3: 
-					player.en.sw = player.en.sw.pow(4).plus(subbed).root(4);
+					player.en.sw = player.en.sw.pow(hasMilestone("en", 4)?2.5:4).plus(subbed).root(hasMilestone("en", 4)?2.5:4);
 					break;
 				case 4: 
-					if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(7).plus(subbed).root(7);
+					if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(hasMilestone("en", 4)?5.5:7).plus(subbed).root(hasMilestone("en", 4)?5.5:7);
 					break;
 			}
 		},
@@ -7621,6 +7621,12 @@ addLayer("en", {
 				requirementDescription: "250,000,000 Total Energy & 26 Thoughts",
 				done() { return (player.en.total.gte(2.5e8) && player.ne.thoughts.gte(26)) || player.en.milestones.includes(3) },
 				effectDescription() { return "Unlock Mind Watts." },
+			},
+			4: {
+				unlocked() { return hasMilestone("en", 3) },
+				requirementDescription: "10,000,000 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(1e7) },
+				effectDescription() { return "The Mind Watt & Super Watt gain roots are decreased by 1.5" },
 			},
 		},
 		clickables: {
@@ -7742,6 +7748,7 @@ addLayer("ne", {
 					if (hasMilestone("ne", 0)) mult = mult.times(player.ss.points.plus(1).sqrt());
 					if (hasMilestone("ne", 2)) mult = mult.times(player.ne.points.max(1));
 					if (player.en.unlocked && hasMilestone("en", 3)) mult = mult.times(tmp.en.mwEff.pow(40));
+					if (hasAchievement("a", 143)) mult = mult.times(3);
 					return mult;
 				},
 				amt() { return Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor() },
@@ -8257,8 +8264,14 @@ addLayer("a", {
 			142: {
 				name: "Failed Error",
 				done() { return player.en.sw.gte(104) },
-				tooltip: "Reach 104 Super Watts",
+				tooltip: "Reach 104 Super Watts.",
 				image: "images/achs/142.png",
+			},
+			143: {
+				name: "Big Brain",
+				done() { return inChallenge("ne", 11) && player.points.gte("e5e11") },
+				tooltip: "Reach e5e11 Points while in The Brain. Reward: Triple Signal gain",
+				image: "images/achs/143.png",
 			},
 		},
 		tabFormat: [
