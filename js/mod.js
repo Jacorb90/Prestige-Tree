@@ -16,7 +16,7 @@ let modInfo = {
 let VERSION = {
 	num: "1.3",
 	beta: 7,
-	patch: 1,
+	patch: 2,
 	name: "The Expansion Update",
 }
 
