@@ -2800,11 +2800,16 @@ addLayer("h", {
 					if (target.gte(20)) target = target.sub(19).root(1.95).plus(19);
 					target = target.div(tmp.h.challenges[this.id].scalePower).plus(1).floor();
 					player.h.challenges[this.id] = Math.min(Math.max(player.h.challenges[this.id], target.toNumber()), tmp[this.layer].challenges[this.id].completionLimit);
+					if (isNaN(player.h.challenges[this.id])) player.h.challenges[this.id] = 0;
 				},
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription() { return "<b>Timeless</b> completions boost Super Generator Power gain based on your time "+(hasUpgrade("ss", 33)?"playing this game.":"in this Row 4 reset.") },
-				rewardEffect() { return Decimal.div(9, Decimal.add((hasUpgrade("ss", 33)?(player.timePlayed||0):player.q.time), 1).cbrt().pow(hasUpgrade("ss", 23)?(-1):1)).plus(1).pow(challengeCompletions("h", 31)).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?5:1) },
+				rewardEffect() { 
+					let eff = Decimal.div(9, Decimal.add((hasUpgrade("ss", 33)?(player.timePlayed||0):player.q.time), 1).cbrt().pow(hasUpgrade("ss", 23)?(-1):1)).plus(1).pow(challengeCompletions("h", 31)).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?5:1);
+					if (!eff.eq(eff)) eff = new Decimal(1);
+					return eff;
+				},
 				rewardDisplay() { return format(this.rewardEffect())+"x" },
 				formula() { return "(9"+(hasUpgrade("ss", 23)?"*":"/")+"cbrt(time+1)+1)^completions" },
 			},
@@ -2838,11 +2843,16 @@ addLayer("h", {
 					if (target.gte(3)) target = target.plus(.96);
 					target = target.div(tmp.h.challenges[this.id].scalePower).plus(1).floor();
 					player.h.challenges[this.id] = Math.min(Math.max(player.h.challenges[this.id], target.toNumber()), tmp[this.layer].challenges[this.id].completionLimit);
+					if (isNaN(player.h.challenges[this.id])) player.h.challenges[this.id] = 0;
 				},
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription: "<b>Option D</b> completions multiply the Time Energy gain base.",
-				rewardEffect() { return softcap("option_d", Decimal.pow(100, Decimal.pow(challengeCompletions("h", 32), 2))).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)) },
+				rewardEffect() { 
+					let eff = softcap("option_d", Decimal.pow(100, Decimal.pow(challengeCompletions("h", 32), 2))).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1));
+					if (!eff.eq(eff)) eff = new Decimal(1);
+					return eff;
+				},
 				rewardDisplay() { return format(tmp.h.challenges[32].rewardEffect)+"x" },
 				formula: "100^(completions^2)",
 				unlocked() { return tmp.ps.buyables[11].effects.hindr },
@@ -7305,7 +7315,11 @@ addLayer("mc", {
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Kinetic Energy multiplies Mech-Energy gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (kineticEnergy+1)^(1-1/sqrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).sqrt()))) },
+				effect() { 
+					let eff = Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).sqrt())));
+					if (!eff.eq(eff)) return new Decimal(1);
+					return eff;
+				},
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7722,11 +7736,13 @@ addLayer("ne", {
         branches: ["ss", "sg"],
 		update(diff) {
 			if (player.ne.unlocked && player.ne.activeChallenge==11) {
-				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min(hasMilestone("ne", 4)?(1/0):tmp.ne.signalLim);
-				if (hasMilestone("id", 0)) player.ne.thoughts = player.ne.thoughts.max(tmp.ne.thoughtTarg);
-				else if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
-					if (!hasMilestone("ne", 4)) player.ne.signals = new Decimal(0);
-					player.ne.thoughts = player.ne.thoughts.plus(1);
+				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min((hasMilestone("ne", 4)||hasMilestone("id", 0))?(1/0):tmp.ne.signalLim);
+				if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
+					if (hasMilestone("id", 0)) player.ne.thoughts = player.ne.thoughts.max(tmp.ne.thoughtTarg);
+					else {
+						if (!hasMilestone("ne", 4)) player.ne.signals = new Decimal(0);
+						player.ne.thoughts = player.ne.thoughts.plus(1);
+					}
 				}
 			}
 		},
@@ -7763,7 +7779,11 @@ addLayer("ne", {
 					if (hasAchievement("a", 143)) mult = mult.times(3);
 					return mult;
 				},
-				amt() { return Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor() },
+				amt() { 
+					let a = Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor();
+					if (!a.eq(a)) return new Decimal(0);
+					return a;
+				},
 				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
 				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects"+(tmp.ne.thoughtPower.eq(1)?"":(" (Power: "+format(tmp.ne.thoughtPower.times(100))+"%)"))+"<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x")+(hasMilestone("ne", 5)?("<br>Multiply Energy gain by "+(tmp.nerdMode?" (Formula: (1.2^sqrt(thoughts)))":(format(tmp.ne.thoughtEff3)+"x"))):"") },
 				style() { return {'background-color': "#484659", filter: "brightness("+(100+player.ne.signals.plus(1).log10().div(tmp.ne.signalLim.plus(1).log10()).times(50).toNumber())+"%)", color: "white", 'border-radius': "25px", height: "400px", width: "400px"}},
@@ -7797,11 +7817,10 @@ addLayer("ne", {
                 unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
                 canAfford() {
 					if (!tmp[this.layer].buyables[this.id].unlocked) return false;
-					let cost = tmp[this.layer].buyables[this.id].cost
-                    return player[this.layer].unlocked && player.ne.signals.gte(cost);
+                    return player[this.layer].unlocked && player.ne.signals.gte(layers[this.layer].buyables[this.id].cost());
 				},
                 buy() { 
-					player.ne.signals = player.ne.signals.sub(tmp[this.layer].buyables[this.id].cost)
+					player.ne.signals = player.ne.signals.sub(tmp[this.layer].buyables[this.id].cost).max(0)
 					player.ne.buyables[this.id] = player.ne.buyables[this.id].plus(1);
                 },
                 style: {'height':'250px', 'width':'250px', 'background-color'() { return tmp.ne.buyables[11].canAfford?'#a2cade':'#bf8f8f' }, "border-color": "#a2cade"},

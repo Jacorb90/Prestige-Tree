@@ -402,6 +402,7 @@ function NaNcheck(data) {
 			NaNcheck(data[item])
 		}
 		else if (data[item] !== data[item] || data[item] === decimalNaN){
+			console.log("DATA: "+JSON.stringify(data));
 			if (NaNalert === true || confirm ("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
 				NaNalert = true
 				data[item] = (data[item] !== data[item] ? 0 : decimalZero)
