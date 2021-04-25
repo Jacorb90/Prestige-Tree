@@ -838,6 +838,13 @@ button > * {
 	background-position: center;
 }
 
+.id.grad:not(.locked):not(.bought) {
+	background: repeating-radial-gradient(circle, #faf3c0 0%, #ffdb63 72.5%, #faf3c0 20%);
+	background-size: 100% 100%;
+	background-position: center;
+	animation: idea 20s ease infinite;
+}
+
 @keyframes honour {
 	0% {
 		background-position: 0% 0%;
@@ -877,6 +884,21 @@ button > * {
 	}
 	100% {
 		background-position: 0% 400%;
+	}
+}
+
+@keyframes idea {
+	0% {
+		filter: brightness(100%);
+	}
+	25% {
+		filter: brightness(125%);
+	}
+	75% {
+		filter: brightness(75%);
+	}
+	100% {
+		filter: brightness(100%);
 	}
 }
 

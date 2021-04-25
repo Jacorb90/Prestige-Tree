@@ -6741,7 +6741,7 @@ addLayer("ma", {
 			if (player.ma.mastered.includes("e")) desc += "<h2>Enhance</h2><br><br><ul><li>Enhance gain exponent is increased (0.02 -> 0.025)</li><li>The second Enhancer effect is raised to the power of 100</li><li><b>Enhanced Prestige</b> also affects Point gain, and it is raised ^1.5</li><li><b>Enter the E-Space</b> is 250% stronger</li><li><b>Monstrous Growth</b>'s base is much better (1.1 -> 1e2,000)</li><li><b>To the Next Level</b> is cubed</li></ul><br><br>";
 			if (player.ma.mastered.includes("s")) desc += "<h2>Space</h2><br><br><ul><li>Space cost base is reduced (1e10 -> 10)</li><li>Base Space cost exponent is reduced (1.85 -> 1.4)</li><li>Space Building Power is divided by 3.85, but Space Buildings cost scale 5x slower</li></ul><br><br>";
 			if (player.ma.mastered.includes("sb")) desc += "<h2>Super Boosters</h2><br><br><ul><li>Super Booster cost base is reduced (1.05 -> 1.025)</li><li>Base Super Booster cost exponent is reduced (1.25 -> 1.075)</li><li>The Super Booster cost is divided by 1.333</li><li>Super Boosters provide Spectral Boosters</li></ul><br><br>";
-			if (player.ma.mastered.includes("sg")) desc += "<h2>Super Generators</h2><br><br><ul><li>Super Generator cost base is reduced (1.05 -> 1.04)</li><li>Base Super Booster cost exponent is reduced (1.25 -> 1.225)</li><li>The Super Generator cost is divided by 1.1</li><li>The Super Generator Power effect is squared</li><li>Super Generators give Spectral Generators over time</li></ul><br><br>";
+			if (player.ma.mastered.includes("sg")) desc += "<h2>Super Generators</h2><br><br><ul><li>Super Generator cost base is reduced (1.05 -> 1.04)</li><li>Base Super Generator cost exponent is reduced (1.25 -> 1.225)</li><li>The Super Generator cost is divided by 1.1</li><li>The Super Generator Power effect is squared</li><li>Super Generators give Spectral Generators over time</li></ul><br><br>";
 			if (player.ma.mastered.includes("q")) desc += "<h2>Quirks</h2><br><br><ul><li>Quirk gain exponent is increased (7.5e-3 -> 8e-3)</li><li>The Quirk Energy effect softcap start is raised ^1.5</li><li>The Quirk Layer cost base is raised ^0.75</li><li><b>Millennial Abilities</b> is 50% stronger</li><li>Bought Decary Space Building Levels add free Quirk Improvements (equal to the Level/4)</li></ul><br><br>";
 			if (player.ma.mastered.includes("h")) desc += "<h2>Hindrances</h2><br><br><ul><li>Hindrance Spirit gain exponent is increased (0.125 -> 0.2)</li><li>The Hindrance Spirit effect softcap is much weaker (exponent to the 4th root -> exponent to the 2.5th root)</li><li>Unlock a Hindrance milestone</li><li><b>Speed Demon</b> has a secondary effect</li><li><b>Out of Room</b>'s effect is 40% stronger</li><li><b>Timeless</b> & <b>Option D</b> no longer have a completion limit</li><li><b>Timeless</b>'s effect is raised ^5</li><li><b>Productionless</b>'s reduction to the Quirk Layer cost base is stronger (0.15 -> 0.2)</li></ul><br><br>";
 			if (player.ma.mastered.includes("o")) desc += "<h2>Solarity</h2><br><br><ul><li>The Solarity gain exponent is increased by 0.5% for every Super Booster you have (additive)</li><li>The Solar Energy gain exponent limit is increased to 0.15, but beyond 0.1 it grows much slower</li><li>Solar Energy's second effect is 10% stronger</li><li>Solar Power is increased by 20% for every OoM of Solarity you have</li><li>Solarity buyable gain is raised ^2.6</li><li>All effects of the first row of Solarity buyables are raised ^1.1</li><li><b>Convectional Energy</b>'s effect is raised ^25</li><li>All effects of the second row of Solarity buyables are multiplied by 1.4</li><li>All effects of the third row of Solarity buyables are multiplied by 1.9</li></ul><br><br>";
@@ -7251,7 +7251,7 @@ addLayer("mc", {
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
         layerShown(){return player.ma.unlocked },
-        branches: ["hs", "i"],
+        branches: ["hs", "i", "id"],
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
 			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
@@ -7291,6 +7291,11 @@ addLayer("mc", {
 				effectDescription: "Thoughts multiply Machine Part gain, and gain 1% of Machine Part gain every second.",
 			},
 		},
+		motherboardMult() {
+			let mult = new Decimal(1);
+			if (player.id.unlocked) mult = mult.times(tmp.id.revEff);
+			return mult;
+		},
 		clickables: {
 			rows: 2,
 			cols: 2,
@@ -7300,7 +7305,7 @@ addLayer("mc", {
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Kinetic Energy multiplies Mech-Energy gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (kineticEnergy+1)^(1-1/sqrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).sqrt()))) },
+				effect() { return Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).sqrt()))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7321,7 +7326,7 @@ addLayer("mc", {
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Phantom Souls multiply Gear gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (phantomSouls+1)^(1-1/sqrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.ps.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).sqrt()))) },
+				effect() { return Decimal.pow(player.ps.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).sqrt()))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7343,7 +7348,7 @@ addLayer("mc", {
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Solarity multiplies the Super Generator base by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (solarity+1)^("+formatWhole(tmp.mc.clickables[this.id].effExp)+"-"+formatWhole(tmp.mc.clickables[this.id].effExp)+"/((log(activeMechEnergy+1)+1)^0.125)))":"");
 				},
 				effExp() { return hasAchievement("a", 133)?3:1 },
-				effect() { return Decimal.pow(player.o.points.plus(1), Decimal.sub(tmp.mc.clickables[this.id].effExp, Decimal.div(tmp.mc.clickables[this.id].effExp, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).root(8)))) },
+				effect() { return Decimal.pow(player.o.points.plus(1), Decimal.sub(tmp.mc.clickables[this.id].effExp, Decimal.div(tmp.mc.clickables[this.id].effExp, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).root(8)))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7364,7 +7369,7 @@ addLayer("mc", {
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Hyperspace Energy multiplies Balance Energy gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (hyperspaceEnergy+1)^(1-1/cbrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.hs.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).cbrt()))) },
+				effect() { return Decimal.pow(player.hs.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).cbrt()))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7543,7 +7548,7 @@ addLayer("en", {
         doReset(resettingLayer){ 
 			let keep = [];
 			if (resettingLayer==this.layer) player.en.target = player.en.target%(hasMilestone("en", 3)?4:3)+1;
-			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
+			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, AI, Civilizations, & Row 8 layer
 				keep.push("tw");
 				keep.push("sw");
 				keep.push("ow");
@@ -7699,7 +7704,7 @@ addLayer("ne", {
 		resetsNothing() { return player.ne.auto },
         doReset(resettingLayer){ 
 			let keep = [];
-			if (layers[resettingLayer].row<7) {// Will completely be reset by: Robots, Ideas, AI, Civilizations, & Row 8 layer
+			if (layers[resettingLayer].row<7&&resettingLayer!="id") {// Will completely be reset by: Ideas, AI, Civilizations, & Row 8 layer
 				keep.push("thoughts")
 				keep.push("buyables")
 				if (hasMilestone("ne", 1)) keep.push("milestones");
@@ -7718,13 +7723,20 @@ addLayer("ne", {
 		update(diff) {
 			if (player.ne.unlocked && player.ne.activeChallenge==11) {
 				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min(hasMilestone("ne", 4)?(1/0):tmp.ne.signalLim);
-				if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
+				if (hasMilestone("id", 0)) player.ne.thoughts = player.ne.thoughts.max(tmp.ne.thoughtTarg);
+				else if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
 					if (!hasMilestone("ne", 4)) player.ne.signals = new Decimal(0);
 					player.ne.thoughts = player.ne.thoughts.plus(1);
 				}
 			}
 		},
-		signalLim() { return Decimal.pow((hasMilestone("ne", 4)?2:(hasMilestone("ne", 3)?2.5:(hasMilestone("ne", 2)?3:5))), player.ne.thoughts).times(100) },
+		signalLimThresholdInc() {
+			let inc = new Decimal(hasMilestone("ne", 4)?2:(hasMilestone("ne", 3)?2.5:(hasMilestone("ne", 2)?3:5)));
+			if (player.id.unlocked) inc = inc.sub(tmp.id.effect);
+			return inc;
+		},
+		signalLim() { return Decimal.pow(tmp[this.layer].signalLimThresholdInc, player.ne.thoughts).times(100) },
+		thoughtTarg() { return player.ne.signals.div(100).max(1).log(tmp[this.layer].signalLimThresholdInc).plus(1).floor() },
 		thoughtPower() {
 			let pow = new Decimal(1);
 			if (player.en.unlocked && hasMilestone("en", 3)) pow = pow.times(tmp.en.mwEff);
@@ -7769,8 +7781,9 @@ addLayer("ne", {
 			cols: 1,
 			11: {
 				title: "The Neural Network",
+				ss() { return hasMilestone("id", 0)?12:10 },
 				cost(x=player[this.layer].buyables[this.id]) {
-					if (x.gte(10)) x = Decimal.pow(10, x.log10().pow(2));
+					if (x.gte(tmp[this.layer].buyables[this.id].ss)) x = Decimal.pow(tmp[this.layer].buyables[this.id].ss, x.log(tmp[this.layer].buyables[this.id].ss).pow(hasMilestone("id", 0)?Math.sqrt(2):2));
 					return Decimal.pow(4, x.pow(1.2)).times(2e4);
 				},
 				effect() { return player[this.layer].buyables[this.id].div(3).plus(1) },
@@ -7778,7 +7791,7 @@ addLayer("ne", {
                     let data = tmp[this.layer].buyables[this.id];
 					let cost = data.cost;
 					let amt = player[this.layer].buyables[this.id];
-                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?" (Cost Formula: 4^("+(amt.gte(10)?"10^(log(x)^2)":"x")+"^1.2)*2e4)":"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
+                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?(" (Cost Formula: 4^("+(amt.gte(data.ss)?(formatWhole(data.ss)+"^(log"+formatWhole(data.ss)+"(x)^"+format(hasMilestone("id", 0)?Math.sqrt(2):2)+")"):"x")+"^1.2)*2e4)"):"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
 					return display;
                 },
                 unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
@@ -7804,7 +7817,7 @@ addLayer("ne", {
 			1: {
 				requirementDescription: "50,000 Signals",
 				done() { return player.ne.signals.gte(5e4) || player.ne.milestones.includes(1) },
-				effectDescription() { return "The first Thought effect is squared, and Neuron milestones are kept on all resets up to Row 7 (except ???)" },
+				effectDescription() { return "The first Thought effect is squared, and Neuron milestones are kept on all resets up to Row 7 (except Ideas)" },
 			},
 			2: {
 				requirementDescription: "3,000,000 Signals",
@@ -7823,8 +7836,8 @@ addLayer("ne", {
 			},
 			5: {
 				unlocked() { return player.en.unlocked && player.ne.unlocked },
-				requirementDescription: "8 Neurons & 2,500,000 Energy in one reset",
-				done() { return player.ne.best.gte(8) && player.en.bestOnReset.gte(2.5e6) },
+				requirementDescription() { return "8 Neurons"+(player.id.unlocked?"":" & 2,500,000 Energy in one reset") },
+				done() { return player.ne.best.gte(8) && (player.id.unlocked||player.en.bestOnReset.gte(2.5e6)) },
 				effectDescription() { return "Neurons reset nothing, and unlock Auto-Neurons & a third Thought effect." },
 				toggles: [["ne", "auto"]],
 			},
@@ -7837,6 +7850,66 @@ addLayer("ne", {
 			"buyables",
 			"blank", "blank", "blank",
 		],
+})
+
+addLayer("id", {
+		name: "ideas", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "ID", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 4, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			first: 0,
+        }},
+        color: "#fad682",
+        requires() { return new Decimal(44) }, // Can be a function that takes requirement increases into account
+        resource: "ideas", // Name of prestige currency
+        baseResource: "thoughts", // Name of resource prestige is based on
+        baseAmount() {return player.ne.thoughts}, // Get the current amount of baseResource
+		roundUpCost: true,
+        type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+        exponent: new Decimal(1.5), // Prestige currency exponent
+		base: new Decimal(1.2),
+		effect() { return Decimal.sub(0.95, Decimal.div(0.95, player.id.points.plus(1).log10().plus(1))) },
+		effectDescription() { return "which reduce the Thought threshold's increase by <h2 style='color: #fad682; text-shadow: #fad682 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>"+(tmp.nerdMode?" (0.95-0.95/(log(x+1)+1)).":".") },
+		rev() { return player.ne.signals.plus(1).log10().div(10).pow(.75).times(player.id.points).pow(hasMilestone("id", 0)?2:1).floor() },
+		revEff() { return Decimal.pow(1e25, tmp.id.rev.pow(.95)) },
+        gainMult() { // Calculate the multiplier for main currency from bonuses
+            mult = new Decimal(1)
+            return mult
+        },
+        gainExp() { // Calculate the exponent on main currency from bonuses
+            return new Decimal(1)
+        },
+		canBuyMax() { return false },
+        row: 5, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "I", description: "Press Shift+I to Idea Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+		resetsNothing() { return false },
+        doReset(resettingLayer){ 
+			let keep = [];
+            if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+		autoPrestige() { return false },
+        layerShown(){return player.en.unlocked&&player.ne.unlocked},
+        branches: ["ne"],
+		update(diff) {},
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank", 
+			"milestones", "blank", "blank",
+			["display-text", function() { return "Revelations: <h2>"+formatWhole(tmp.id.rev)+"</h2>"+(tmp.nerdMode?(hasMilestone("id", 0)?" ((ideas^2)*(log(signals+1)/10)^1.5)":" (ideas*(log(signals+1)/10)^0.75)"):" (based on Ideas & Signals)") }],
+			["display-text", function() { return "Effect: Multiply Motherboard part amounts by <h2>"+format(tmp.id.revEff)+"</h2>"+(tmp.nerdMode?" (1e25^(x^0.95))":".") } ], "blank",
+		],
+		milestones: {
+			0: {
+				requirementDescription: "2 Ideas & 2 Revelations",
+				done() { return player.id.points.gte(2) && tmp.id.rev.gte(2) },
+				effectDescription: "Neural Network cost scaling starts 2 purchases later & is 50% weaker, Thoughts can be gained in bulk, and Revelations are squared.",
+			},
+		},
 })
 
 addLayer("a", {
