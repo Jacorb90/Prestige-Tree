@@ -7266,6 +7266,11 @@ addLayer("mc", {
 			if (!player[this.layer].unlocked) return;
 			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
 		},
+		mechEnMult() {
+			let mult = new Decimal(1);
+			if (player.id.unlocked) mult = mult.times(tmp.id.revEff);
+			return mult;
+		},
 		mechPer() { return tmp.mc.buyables[11].effect.pow(tmp.mc.buyables[11].buffExp).times(clickableEffect("mc", 11)) },
 		decayPower() { return player.mc.mechEn.plus(1).log10().plus(1).pow(-2) },
 		mechEff() { return Decimal.pow(10, player.mc.mechEn.plus(1).log10().root(4).div(2)) },
@@ -7281,7 +7286,7 @@ addLayer("mc", {
 			]},
 			"The Motherboard": {
 				buttonStyle() { return {'background-color': '#c99a6b', color: "black"} },
-				content: ["blank", ["display-text", function() { return "Each Gear Rotation provides "+format(tmp.mc.mechPer)+" Mech-Energy, which adds to <h3>"+format(player.mc.mechEn)+" Mech-Energy</h3>" }],
+				content: ["blank", ["display-text", function() { return "Each Gear Rotation provides "+format(tmp.mc.mechPer)+" Mech-Energy, which adds to <h3>"+format(player.mc.mechEn.times(tmp.mc.mechEnMult))+" Mech-Energy</h3>" }],
 				"blank", ["display-text", function() { return tmp.mc.decayPower.eq(1)?"":("Due to inadequate storage, Mech-Energy is being lost by "+format(tmp.mc.decayPower.pow(-1).log10())+" OoMs per second.") }],
 				"blank", ["display-text", function() { return "Your Mech-Energy is multiplying Gear Speed by "+format(tmp.mc.mechEff)+(tmp.nerdMode?" (Formula: 10^((log(x+1)^0.25)/2))":"") }],
 				"blank", ["upgrade", 11], "blank",
@@ -7301,11 +7306,6 @@ addLayer("mc", {
 				effectDescription: "Thoughts multiply Machine Part gain, and gain 1% of Machine Part gain every second.",
 			},
 		},
-		motherboardMult() {
-			let mult = new Decimal(1);
-			if (player.id.unlocked) mult = mult.times(tmp.id.revEff);
-			return mult;
-		},
 		clickables: {
 			rows: 2,
 			cols: 2,
@@ -7316,7 +7316,7 @@ addLayer("mc", {
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Kinetic Energy multiplies Mech-Energy gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (kineticEnergy+1)^(1-1/sqrt(log(activeMechEnergy+1)+1)))":"");
 				},
 				effect() { 
-					let eff = Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).sqrt())));
+					let eff = Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).sqrt())));
 					if (!eff.eq(eff)) return new Decimal(1);
 					return eff;
 				},
@@ -7330,7 +7330,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "11", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7340,7 +7340,7 @@ addLayer("mc", {
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Phantom Souls multiply Gear gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (phantomSouls+1)^(1-1/sqrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.ps.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).sqrt()))) },
+				effect() { return Decimal.pow(player.ps.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).sqrt()))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7351,7 +7351,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "12", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7362,7 +7362,7 @@ addLayer("mc", {
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Solarity multiplies the Super Generator base by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (solarity+1)^("+formatWhole(tmp.mc.clickables[this.id].effExp)+"-"+formatWhole(tmp.mc.clickables[this.id].effExp)+"/((log(activeMechEnergy+1)+1)^0.125)))":"");
 				},
 				effExp() { return hasAchievement("a", 133)?3:1 },
-				effect() { return Decimal.pow(player.o.points.plus(1), Decimal.sub(tmp.mc.clickables[this.id].effExp, Decimal.div(tmp.mc.clickables[this.id].effExp, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).root(8)))) },
+				effect() { return Decimal.pow(player.o.points.plus(1), Decimal.sub(tmp.mc.clickables[this.id].effExp, Decimal.div(tmp.mc.clickables[this.id].effExp, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).root(8)))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7373,7 +7373,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "21", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7383,7 +7383,7 @@ addLayer("mc", {
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Hyperspace Energy multiplies Balance Energy gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (hyperspaceEnergy+1)^(1-1/cbrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.hs.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).times(tmp.mc.motherboardMult).log10().plus(1).cbrt()))) },
+				effect() { return Decimal.pow(player.hs.points.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).cbrt()))) },
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7394,7 +7394,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "22", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7728,6 +7728,7 @@ addLayer("ne", {
 		effect() {
 			let eff = player[this.layer].points.div(2).plus(1).pow(0.75).sub(1);
 			if (hasMilestone("ne", 3)) eff = eff.times(Decimal.pow(1.5, player[this.layer].points.sqrt()).plus(player[this.layer].points));
+			if (hasMilestone("id", 1)) eff = eff.pow(2);
 			return eff;
 		},
 		effectDescription() { return "which multiply Signal gain speed by <h2 style='color: #ded9ff; text-shadow: #ded9ff 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>." },
@@ -7756,6 +7757,7 @@ addLayer("ne", {
 		thoughtPower() {
 			let pow = new Decimal(1);
 			if (player.en.unlocked && hasMilestone("en", 3)) pow = pow.times(tmp.en.mwEff);
+			if (hasMilestone("id", 1)) pow = pow.times(1.2);
 			return pow;
 		},
 		thoughtEff1() { return player.ne.thoughts.times(tmp.ne.thoughtPower).plus(1).log10().plus(1).pow(hasMilestone("ne", 1)?2:1) },
@@ -7888,7 +7890,7 @@ addLayer("id", {
         baseAmount() {return player.ne.thoughts}, // Get the current amount of baseResource
 		roundUpCost: true,
         type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-        exponent: new Decimal(1.5), // Prestige currency exponent
+        exponent: new Decimal(1.4), // Prestige currency exponent
 		base: new Decimal(1.2),
 		effect() { return Decimal.sub(0.95, Decimal.div(0.95, player.id.points.plus(1).log10().plus(1))) },
 		effectDescription() { return "which reduce the Thought threshold's increase by <h2 style='color: #fad682; text-shadow: #fad682 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>"+(tmp.nerdMode?" (0.95-0.95/(log(x+1)+1)).":".") },
@@ -7896,6 +7898,7 @@ addLayer("id", {
 		revEff() { return Decimal.pow(1e25, tmp.id.rev.pow(.95)) },
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
+			if (hasMilestone("id", 2)) mult = mult.div(player.ne.points.plus(1).log10().plus(1));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -7920,13 +7923,25 @@ addLayer("id", {
 			"resource-display", "blank", 
 			"milestones", "blank", "blank",
 			["display-text", function() { return "Revelations: <h2>"+formatWhole(tmp.id.rev)+"</h2>"+(tmp.nerdMode?(hasMilestone("id", 0)?" ((ideas^2)*(log(signals+1)/10)^1.5)":" (ideas*(log(signals+1)/10)^0.75)"):" (based on Ideas & Signals)") }],
-			["display-text", function() { return "Effect: Multiply Motherboard part amounts by <h2>"+format(tmp.id.revEff)+"</h2>"+(tmp.nerdMode?" (1e25^(x^0.95))":".") } ], "blank",
+			["display-text", function() { return "Effect: Multiply Mech-Energy by <h2>"+format(tmp.id.revEff)+"</h2>"+(tmp.nerdMode?" (1e25^(x^0.95))":".") } ], "blank",
 		],
 		milestones: {
 			0: {
 				requirementDescription: "2 Ideas & 2 Revelations",
 				done() { return player.id.points.gte(2) && tmp.id.rev.gte(2) },
 				effectDescription: "Neural Network cost scaling starts 2 purchases later & is 50% weaker, Thoughts can be gained in bulk, and Revelations are squared.",
+			},
+			1: {
+				unlocked() { return hasMilestone("id", 0) },
+				requirementDescription: "2 Ideas & 8 Revelations",
+				done() { return player.id.points.gte(2) && tmp.id.rev.gte(8) },
+				effectDescription: "The Neuron effect is squared, and Thought effects are all 20% stronger.",
+			},
+			2: {
+				unlocked() { return hasMilestone("id", 1) },
+				requirementDescription: "3 Ideas & 22 Revelations",
+				done() { return player.id.points.gte(3) && tmp.id.rev.gte(22) },
+				effectDescription() { return "The Idea cost is divided based on your Neurons (/"+format(player.ne.points.plus(1).log10().plus(1))+")" },
 			},
 		},
 })
@@ -8364,6 +8379,12 @@ addLayer("a", {
 				done() { return inChallenge("ne", 11) && player.points.gte("e5e11") },
 				tooltip: "Reach e5e11 Points while in The Brain. Reward: Triple Signal gain",
 				image: "images/achs/143.png",
+			},
+			144: {
+				name: "Scrappy Toes",
+				done() { return player.mc.points.gte(1e11) },
+				tooltip: "Reach 1e11 Machine Parts.",
+				image: "images/achs/144.png",
 			},
 		},
 		tabFormat: [
