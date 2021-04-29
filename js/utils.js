@@ -66,11 +66,14 @@ function formatWhole(decimal, reallyWhole=false) {
 }
 
 function formatTime(s) {
-	if (s<60) return format(s)+"s"
-	else if (s<3600) return formatWhole(Math.floor(s/60))+"m "+format(s%60)+"s"
-	else if (s<86400) return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
-	else if (s<31536000) return formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
-	else return formatWhole(Math.floor(s/31536000))+"y "+formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	s = new Decimal(s);
+	if (s.gte(1/0)) return "Forever"
+	else if (s.lt(60)) return format(s)+"s"
+	else if (s.lt(3600)) return formatWhole(s.div(60).floor())+"m "+format(s.toNumber()%60)+"s"
+	else if (s.lt(86400)) return formatWhole(s.div(3600).floor())+"h "+format(s.div(60).floor().toNumber()%60)+"m"
+	else if (s.lt(31536000)) return formatWhole(s.div(84600).floor())+"d " + formatWhole(s.div(3600).floor().toNumber()%24)+"h"
+	else if (s.lt(31536000000)) return formatWhole(s.div(31536000).floor())+"y "+formatWhole(s.div(84600).floor().toNumber()%365)+"d"
+	else return formatWhole(s.div(31536000).floor())+"y"
 }
 
 function toPlaces(x, precision, maxAccepted) {
