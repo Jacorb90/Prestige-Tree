@@ -7526,6 +7526,7 @@ addLayer("en", {
 			if (hasMilestone("en", 2)) mult = mult.times(player.o.points.plus(1).log10().plus(1).log10().plus(1));
 			if (player.ne.unlocked && hasMilestone("ne", 5)) mult = mult.times(tmp.ne.thoughtEff3);
 			if (player.r.unlocked) mult = mult.times(tmp.r.producerEff);
+			if (hasMilestone("r", 0)) mult = mult.times(player.r.maxMinibots.max(1));
 			return mult;
 		},
 		getResetGain() {
@@ -7584,7 +7585,14 @@ addLayer("en", {
 				player.en.points = player.en.points.times(Decimal.pow(0.75, diff)).sub(diff).max(0);
 				if (hasMilestone("en", 1)) player.en.stored = player.en.stored.plus(subbed.div(5));
 			}
-			switch(player.en.target) {
+			if (hasMilestone("r", 1)) {
+				subbed = subbed.times(player.r.total.max(1));
+				player.en.tw = player.en.tw.pow(1.5).plus(subbed.div(player.en.target==1?1:3)).root(1.5);
+				player.en.ow = player.en.ow.pow(1.5).plus(subbed.div(player.en.target==2?1:3)).root(1.5);
+				player.en.sw = player.en.sw.pow(hasMilestone("en", 4)?2.5:4).plus(subbed.div(player.en.target==3?1:3)).root(hasMilestone("en", 4)?2.5:4);
+				if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(hasMilestone("en", 4)?5.5:7).plus(subbed.div(player.en.target==4?1:3)).root(hasMilestone("en", 4)?5.5:7);
+				
+			} else switch(player.en.target) {
 				case 1: 
 					player.en.tw = player.en.tw.pow(1.5).plus(subbed).root(1.5);
 					break;
@@ -7738,7 +7746,7 @@ addLayer("ne", {
         layerShown(){return player.mc.unlocked},
         branches: ["ss", "sg"],
 		update(diff) {
-			if (player.ne.unlocked && player.ne.activeChallenge==11) {
+			if (player.ne.unlocked && (player.ne.activeChallenge==11||hasAchievement("a", 151))) {
 				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min((hasMilestone("ne", 4)||hasMilestone("id", 0))?(1/0):tmp.ne.signalLim);
 				if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
 					if (hasMilestone("id", 0)) player.ne.thoughts = player.ne.thoughts.max(tmp.ne.thoughtTarg);
@@ -7781,15 +7789,16 @@ addLayer("ne", {
 					if (hasMilestone("ne", 2)) mult = mult.times(player.ne.points.max(1));
 					if (player.en.unlocked && hasMilestone("en", 3)) mult = mult.times(tmp.en.mwEff.pow(40));
 					if (hasAchievement("a", 143)) mult = mult.times(3);
+					if (hasMilestone("r", 0)) mult = mult.times(player.r.maxMinibots.max(1));
 					return mult;
 				},
 				amt() { 
-					let a = Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(11).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor();
+					let a = Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(player.ne.activeChallenge==11?11:14).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor();
 					if (!a.eq(a)) return new Decimal(0);
 					return a;
 				},
-				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
-				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11)?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects"+(tmp.ne.thoughtPower.eq(1)?"":(" (Power: "+format(tmp.ne.thoughtPower.times(100))+"%)"))+"<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x")+(hasMilestone("ne", 5)?("<br>Multiply Energy gain by "+(tmp.nerdMode?" (Formula: (1.2^sqrt(thoughts)))":(format(tmp.ne.thoughtEff3)+"x"))):"") },
+				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11||hasAchievement("a", 151))?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
+				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11||hasAchievement("a", 151))?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects"+(tmp.ne.thoughtPower.eq(1)?"":(" (Power: "+format(tmp.ne.thoughtPower.times(100))+"%)"))+"<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x")+(hasMilestone("ne", 5)?("<br>Multiply Energy gain by "+(tmp.nerdMode?" (Formula: (1.2^sqrt(thoughts)))":(format(tmp.ne.thoughtEff3)+"x"))):"") },
 				style() { return {'background-color': "#484659", filter: "brightness("+(100+player.ne.signals.plus(1).log10().div(tmp.ne.signalLim.plus(1).log10()).times(50).toNumber())+"%)", color: "white", 'border-radius': "25px", height: "400px", width: "400px"}},
 				onStart(testInput=false) {
 					if (testInput && player.ne.auto) {
@@ -8070,7 +8079,9 @@ addLayer("r", {
 		tabFormat: ["main-display",
 			"prestige-button",
 			"resource-display", "blank",
+			"milestones",
 			"blank", "blank", 
+			["clickable", 16], "blank",
 			["row", [
 				["column", [
 					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.breeders)+"<br>Breeders</h3><br><br><br>" }], "blank",
@@ -8115,8 +8126,8 @@ addLayer("r", {
 		growTime() { return player.r.allotted.growers.lt(1)?new Decimal(1/0):Decimal.div(30, player.r.allotted.growers.log10().plus(1)) },
 		producerEff() { return player.r.allotted.producers.pow(1.5).div(4).plus(1) },
 		clickables: {
-			rows: 3,
-			cols: 5,
+			rows: 2,
+			cols: 6,
 			11: {
 				title: "+1",
 				unlocked() { return player.r.unlocked },
@@ -8166,6 +8177,21 @@ addLayer("r", {
 					player.r.points = player.r.points.sub(1).max(0);
 				},
 				style: {width: "50px", height: "50px"},
+			},
+			16: {
+				title: "Distribute",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(5) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					let spendEach = player.r.points.div(5).floor()
+					player.r.allotted.breeders = player.r.allotted.breeders.plus(spendEach);
+					player.r.allotted.farmers = player.r.allotted.farmers.plus(spendEach);
+					player.r.allotted.builders = player.r.allotted.builders.plus(spendEach);
+					player.r.allotted.growers = player.r.allotted.growers.plus(spendEach);
+					player.r.allotted.producers = player.r.allotted.producers.plus(spendEach);
+					player.r.points = player.r.points.sub(spendEach.times(5)).max(0);
+				},
+				style: {width: "120px", height: "50px"},
 			},
 			21: {
 				title: "50%",
@@ -8221,6 +8247,18 @@ addLayer("r", {
 					player.r.points = player.r.points.sub(spend).max(0);
 				},
 				style: {width: "50px", height: "50px"},
+			},
+		},
+		milestones: {
+			0: {
+				requirementDescription: "50 Total Robots",
+				done() { return player.r.total.gte(50) },
+				effectDescription: "Minibots multiply Energy & Signal gain.",
+			},
+			1: {
+				requirementDescription: "100 Total Robots",
+				done() { return player.r.total.gte(100) },
+				effectDescription: "Non-selected Watts are still generated (but 3x slower), and Total Robots multiply Watt generation speed",
 			},
 		},
 })
@@ -8668,7 +8706,7 @@ addLayer("a", {
 			151: {
 				name: "Planning for Success",
 				done() { return player.id.unlocked && player.r.unlocked },
-				tooltip: "Unlock Robots & Ideas. Reward: Permanently keep Energy milestones 1-3 & 5",
+				tooltip: "Unlock Robots & Ideas. Reward: Permanently keep Energy milestones 1-3 & 5, and gain Signals while outside The Brain at a reduced rate.",
 				image: "images/achs/151.png",
 			},
 		},
