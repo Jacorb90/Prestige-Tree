@@ -8728,6 +8728,7 @@ addLayer("a", {
 			},
 			151: {
 				name: "Planning for Success",
+				unlocked() { return hasAchievement("a", 111) },
 				done() { return player.id.unlocked && player.r.unlocked },
 				tooltip: "Unlock Robots & Ideas. Reward: Permanently keep Energy milestones 1-3 & 5, and gain Signals while outside The Brain at a reduced rate.",
 				image: "images/achs/151.png",
