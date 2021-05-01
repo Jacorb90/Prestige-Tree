@@ -7652,7 +7652,7 @@ addLayer("en", {
 				effectDescription() { return "Unlock Mind Watts." },
 			},
 			4: {
-				unlocked() { return hasMilestone("en", 3) },
+				unlocked() { return hasMilestone("en", 3) || hasAchievement("a", 151) },
 				requirementDescription: "10,000,000 Energy in one reset",
 				done() { return player.en.bestOnReset.gte(1e7) || hasAchievement("a", 151) },
 				effectDescription() { return "The Mind Watt & Super Watt gain roots are decreased by 1.5" },
@@ -7738,7 +7738,8 @@ addLayer("ne", {
 		effect() {
 			let eff = player[this.layer].points.div(2).plus(1).pow(0.75).sub(1);
 			if (hasMilestone("ne", 3)) eff = eff.times(Decimal.pow(1.5, player[this.layer].points.sqrt()).plus(player[this.layer].points));
-			if (hasMilestone("id", 1)) eff = eff.pow(2);
+			if (hasMilestone("ne", 6)) eff = eff.pow(2);
+			if (hasMilestone("id", 1)) eff = eff.pow(2).times(player[this.layer].buyables[11].max(1));
 			return eff;
 		},
 		effectDescription() { return "which multiply Signal gain speed by <h2 style='color: #ded9ff; text-shadow: #ded9ff 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>." },
@@ -7872,6 +7873,12 @@ addLayer("ne", {
 				done() { return player.ne.best.gte(8) && (player.id.unlocked||player.en.bestOnReset.gte(2.5e6)) },
 				effectDescription() { return "Neurons reset nothing, and unlock Auto-Neurons & a third Thought effect." },
 				toggles: [["ne", "auto"]],
+			},
+			6: {
+				unlocked() { return player.id.unlocked },
+				requirementDescription: "1e21 Signals",
+				done() { return player.ne.signals.gte(1e21) || player.ne.milestones.includes(6) },
+				effectDescription() { return "The Neuron effect is squared & multiplied by your Neural Network level" },
 			},
 		},
 		tabFormat: ["main-display",
@@ -8025,7 +8032,7 @@ addLayer("r", {
 		},
 		prestigeButtonText() {
 			if (tmp.nerdMode) return "Gain Formula: "+tmp.r.dispGainFormula;
-			else return `${ player.r.points.lt(1e3) ? (tmp.r.resetDescription !== undefined ? tmp.r.resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp.r.getResetGain)}</b> ${tmp.r.resource} ${tmp.r.resetGain.lt(100) && player.r.points.lt(1e3) ? `<br><br>Next at ${format(tmp.r.nextAt)}` : ""}`
+			else return `${ player.r.points.lt(1e3) ? (tmp.r.resetDescription !== undefined ? tmp.r.resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp.r.getResetGain)}</b> ${tmp.r.resource} ${tmp.r.resetGain.lt(100) && player.r.points.lt(1e3) ? `<br><br>Next at ${format(tmp.r.nextAt)} Energy` : ""}`
 		},
 		prestigeNotify() {
 			if (!canReset("r")) return false;
@@ -8086,7 +8093,7 @@ addLayer("r", {
 				["column", [
 					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.breeders)+"<br>Breeders</h3><br><br><br>" }], "blank",
 					["row", [["clickable", 11], ["clickable", 21]]], "blank", "blank",
-					["display-text", function() { return "Next Minibot at "+format(tmp.r.nextMinibot)+" Total Energy"+(tmp.nerdMode?" (Formula: log(EN/1e5 * breeders^3) ^ (2/3))":".") }],
+					["display-text", function() { return "Next Minibot at "+format(tmp.r.nextMinibot)+" Total Energy"+(tmp.nerdMode?" (Formula: log(EN/1e5 * breeders^"+formatWhole(tmp.r.breederExp)+") ^ (2/3))":".") }],
 				], {width: "9em"}],
 				["column", [
 					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.farmers)+"<br>Farmers</h3><br>(Req: 1 Breeder)<br><br>" }], "blank",
@@ -8111,13 +8118,18 @@ addLayer("r", {
 			], function() { return {display: player.r.unlocked?"":"none"} }], "blank", "blank",
 			["display-text", function() { return "You have <h2 style='color: #00ccff; text-shadow: 0px 0px 7px #00ccff;'>"+formatWhole(tmp.r.minibots)+" / "+formatWhole(tmp.r.minibotCap)+"</h2> Minibots" }],
 		],
+		breederExp() {
+			let exp = new Decimal(3);
+			if (hasMilestone("r", 2)) exp = exp.times(2);
+			return exp;
+		},
 		nextMinibot() { 
 			if (player.r.allotted.breeders.lt(1)||tmp.r.totalMinibots.gte(tmp.r.minibotCap.plus(player.r.spentMinibots))) return new Decimal(1/0);
-			else return Decimal.pow(10, tmp.r.totalMinibots.plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(3));
+			else return Decimal.pow(10, tmp.r.totalMinibots.plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(tmp.r.breederExp));
 		},
 		totalMinibots() { 
 			if (player.r.allotted.breeders.lt(1)) return new Decimal(0);
-			else return player.en.total.times(player.r.allotted.breeders.pow(3)).div(1e5).max(1).log10().root(1.5).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots));
+			else return player.en.total.times(player.r.allotted.breeders.pow(tmp.r.breederExp)).div(1e5).max(1).log10().root(1.5).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots));
 		},
 		minibots() { return player.r.maxMinibots.sub(player.r.spentMinibots).max(0) },
 		deathTime() { return player.r.fuel.plus(1).log2().div(3).plus(1).times(20) },
@@ -8253,12 +8265,17 @@ addLayer("r", {
 			0: {
 				requirementDescription: "50 Total Robots",
 				done() { return player.r.total.gte(50) },
-				effectDescription: "Minibots multiply Energy & Signal gain.",
+				effectDescription: "Minibots multiply Energy & Signal gain",
 			},
 			1: {
 				requirementDescription: "100 Total Robots",
 				done() { return player.r.total.gte(100) },
 				effectDescription: "Non-selected Watts are still generated (but 3x slower), and Total Robots multiply Watt generation speed",
+			},
+			2: {
+				requirementDescription: "360 Total Robots",
+				done() { return player.r.total.gte(360) },
+				effectDescription: "Effective Breeders are squared",
 			},
 		},
 })
@@ -8702,6 +8719,12 @@ addLayer("a", {
 				done() { return player.mc.points.gte(1e11) },
 				tooltip: "Reach 1e11 Machine Parts.",
 				image: "images/achs/144.png",
+			},
+			145: {
+				name: "Dizzy Whirl",
+				done() { return player.ge.rotations.gte(2.5e19) && player.ge.boosted.eq(0) },
+				tooltip: "Reach 2.5e19 Revolutions without any Gear Upgrades.",
+				image: "images/achs/145.png",
 			},
 			151: {
 				name: "Planning for Success",
