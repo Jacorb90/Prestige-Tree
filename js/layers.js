@@ -7987,6 +7987,7 @@ addLayer("r", {
 			},
 			maxMinibots: new Decimal(0),
 			spentMinibots: new Decimal(0),
+			grownMinibots: new Decimal(0),
 			fuel: new Decimal(0),
 			buildings: new Decimal(1),
 			growTime: new Decimal(0),
@@ -8010,6 +8011,7 @@ addLayer("r", {
 		exponent() { return tmp[this.layer].exp },
 		gainMult() {
 			let mult = new Decimal(1);
+			if (hasMilestone("r", 3)) mult = mult.times(2);
 			return mult;
 		},
 		getResetGain() {
@@ -8050,6 +8052,7 @@ addLayer("r", {
 			if (layers[resettingLayer].row==5||layers[resettingLayer].row==6) {
 				player.r.maxMinibots = new Decimal(0);
 				player.r.spentMinibots = new Decimal(0);
+				player.r.grownMinibots = new Decimal(0);
 				player.r.fuel = new Decimal(0);
 				player.r.buildings = new Decimal(1);
 				player.r.growTime = new Decimal(0);
@@ -8072,7 +8075,9 @@ addLayer("r", {
 			if (Decimal.gte(player.r.deathTime, tmp.r.deathTime)) {
 				let bulk = player.r.growTime.div(tmp.r.growTime).min(tmp.r.minibots).floor();
 				player.r.deathTime = new Decimal(0);
-				if (tmp.r.minibots.gt(0)) player.r.spentMinibots = player.r.spentMinibots.plus(bulk);
+				if (tmp.r.minibots.gt(0)) {
+					player.r.spentMinibots = player.r.spentMinibots.plus(bulk);
+				}
 			}
 			if (Decimal.gte(player.r.growTime, tmp.r.growTime)) {
 				let bulk = player.r.growTime.div(tmp.r.growTime).min(tmp.r.minibots).floor();
@@ -8080,6 +8085,7 @@ addLayer("r", {
 				if (tmp.r.minibots.gt(0)) {
 					addPoints("r", bulk);
 					player.r.spentMinibots = player.r.spentMinibots.plus(bulk);
+					player.r.grownMinibots = player.r.grownMinibots.plus(bulk);
 				}
 			}
 		},
@@ -8103,7 +8109,7 @@ addLayer("r", {
 				["column", [
 					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.builders)+"<br>Builders</h3><br>(Req: 1 Breeder)<br><br>" }], "blank",
 					["row", [["clickable", 13], ["clickable", 23]]], "blank", "blank",
-					["display-text", function() { return "Buildings: "+formatWhole(player.r.buildings.floor())+", which caps your Minibots at "+formatWhole(tmp.r.minibotCap)+(tmp.nerdMode?" (Formula: x^1.5+2)":"")+" and multiplies Gear gain by "+formatWhole(tmp.r.buildingEff)+(tmp.nerdMode?" (Formula: (x-1)^3*100+1)":".") }],
+					["display-text", function() { return "Buildings: "+formatWhole(player.r.buildings.floor())+", which caps your Minibots at "+formatWhole(tmp.r.minibotCap)+(tmp.nerdMode?" (Formula: log2(x)+3)":"")+" and multiplies Gear gain by "+formatWhole(tmp.r.buildingEff)+(tmp.nerdMode?" (Formula: (x-1)^3*100+1)":".") }],
 				], {width: "9em"}],
 				["column", [
 					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.growers)+"<br>Growth Experts</h3><br>(Req: 1 Breeder)<br>" }], "blank",
@@ -8125,18 +8131,21 @@ addLayer("r", {
 		},
 		nextMinibot() { 
 			if (player.r.allotted.breeders.lt(1)||tmp.r.totalMinibots.gte(tmp.r.minibotCap.plus(player.r.spentMinibots))) return new Decimal(1/0);
-			else return Decimal.pow(10, tmp.r.totalMinibots.plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(tmp.r.breederExp));
+			else return Decimal.pow(10, tmp.r.totalMinibots.sub(hasMilestone("r", 3)?player.r.grownMinibots.div(2):0).plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(tmp.r.breederExp));
 		},
 		totalMinibots() { 
 			if (player.r.allotted.breeders.lt(1)) return new Decimal(0);
-			else return player.en.total.times(player.r.allotted.breeders.pow(tmp.r.breederExp)).div(1e5).max(1).log10().root(1.5).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots));
+			else return player.en.total.times(player.r.allotted.breeders.pow(tmp.r.breederExp)).div(1e5).max(1).log10().root(1.5).plus(hasMilestone("r", 3)?player.r.grownMinibots.div(2):0).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots))
 		},
 		minibots() { return player.r.maxMinibots.sub(player.r.spentMinibots).max(0) },
 		deathTime() { return player.r.fuel.plus(1).log2().div(3).plus(1).times(20) },
 		minibotCap() { return player.r.buildings.floor().max(1).log2().plus(3).floor() },
 		buildingEff() { return player.r.buildings.sub(1).max(0).floor().pow(3).times(100).plus(1) },
 		growTime() { return player.r.allotted.growers.lt(1)?new Decimal(1/0):Decimal.div(30, player.r.allotted.growers.log10().plus(1)) },
-		producerEff() { return player.r.allotted.producers.pow(1.5).div(4).plus(1) },
+		producerEff() { 
+			let mult = hasMilestone("r", 3) ? player.r.grownMinibots.div(4).plus(1) : new Decimal(1);
+			return player.r.allotted.producers.pow(1.5).div(4).plus(1).times(mult);
+		},
 		clickables: {
 			rows: 2,
 			cols: 6,
@@ -8276,6 +8285,11 @@ addLayer("r", {
 				requirementDescription: "360 Total Robots",
 				done() { return player.r.total.gte(360) },
 				effectDescription: "Effective Breeders are squared",
+			},
+			3: {
+				requirementDescription: "500 Total Robots",
+				done() { return player.r.total.gte(500) },
+				effectDescription: "Double Robot gain, and when a Minibot is transformed into a Robot, the requirement for the next Minibot is reduced by 0.5 levels & the Producer effect is 25% stronger (additive)",
 			},
 		},
 })
