@@ -633,6 +633,7 @@ addLayer("g", {
 			if (hasUpgrade("q", 13)) exp = exp.times(1.25);
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) exp = exp.times(1.05);
 			if (player.mc.upgrades.includes(11)) exp = exp.times(buyableEffect("mc", 12));
+			if (hasAchievement("a", 152)) exp = exp.times(1.4);
 			return exp;
 		},
 		powerEff() {
@@ -3543,7 +3544,7 @@ addLayer("o", {
 		},
         requires() { 
 			let req = new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 62))?16:14).sub(tmp.o.solEnEff);
-			if (hasUpgrade("ba", 23)) req = req.div(tmp.ba.posBuff);
+			if (hasUpgrade("ba", 23)) req = req.div(tmp.ba.posBuff.max(1));
 			return req;
 		},
         resource: "solarity", // Name of prestige currency
@@ -7587,6 +7588,7 @@ addLayer("en", {
 			}
 			if (hasMilestone("r", 1)) {
 				subbed = subbed.times(player.r.total.max(1));
+				if (hasMilestone("r", 4) && tmp.r) subbed = subbed.times(tmp.r.producerEff.max(1));
 				player.en.tw = player.en.tw.pow(1.5).plus(subbed.div(player.en.target==1?1:3)).root(1.5);
 				player.en.ow = player.en.ow.pow(1.5).plus(subbed.div(player.en.target==2?1:3)).root(1.5);
 				player.en.sw = player.en.sw.pow(hasMilestone("en", 4)?2.5:4).plus(subbed.div(player.en.target==3?1:3)).root(hasMilestone("en", 4)?2.5:4);
@@ -7791,6 +7793,7 @@ addLayer("ne", {
 					if (player.en.unlocked && hasMilestone("en", 3)) mult = mult.times(tmp.en.mwEff.pow(40));
 					if (hasAchievement("a", 143)) mult = mult.times(3);
 					if (hasMilestone("r", 0)) mult = mult.times(player.r.maxMinibots.max(1));
+					if (hasMilestone("r", 4) && tmp.r) mult = mult.times(tmp.r.producerEff.max(1));
 					return mult;
 				},
 				amt() { 
@@ -8291,6 +8294,12 @@ addLayer("r", {
 				done() { return player.r.total.gte(500) },
 				effectDescription: "Double Robot gain, and when a Minibot is transformed into a Robot, the requirement for the next Minibot is reduced by 0.5 levels & the Producer effect is 25% stronger (additive)",
 			},
+			4: {
+				unlocked() { return player.id.unlocked },
+				requirementDescription: "2,000 Total Robots",
+				done() { return player.r.total.gte(2e3) },
+				effectDescription: "Triple Robot gain, and the Producer effect also multiplies Watt generation speed & Signal gain",
+			},
 		},
 })
 
@@ -8736,16 +8745,22 @@ addLayer("a", {
 			},
 			145: {
 				name: "Dizzy Whirl",
+				unlocked() { return hasAchievement("a", 111) },
 				done() { return player.ge.rotations.gte(2.5e19) && player.ge.boosted.eq(0) },
-				tooltip: "Reach 2.5e19 Revolutions without any Gear Upgrades.",
+				tooltip: "Reach 2.5e19 Gear Rotations without any Gear Upgrades.",
 				image: "images/achs/145.png",
 			},
 			151: {
 				name: "Planning for Success",
-				unlocked() { return hasAchievement("a", 111) },
 				done() { return player.id.unlocked && player.r.unlocked },
 				tooltip: "Unlock Robots & Ideas. Reward: Permanently keep Energy milestones 1-3 & 5, and gain Signals while outside The Brain at a reduced rate.",
 				image: "images/achs/151.png",
+			},
+			152: {
+				name: "Slight Importance",
+				done() { return player.g.power.gte("ee12") },
+				tooltip: "Reach e1e12 Generator Power. Reward: The Generator Power effect is raised ^1.4.",
+				image: "images/achs/152.png",
 			},
 		},
 		tabFormat: [
