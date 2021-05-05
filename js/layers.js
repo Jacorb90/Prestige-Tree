@@ -7436,7 +7436,7 @@ addLayer("mc", {
 					let n = b.pow(2).times(4).plus(b.times(36)).plus(c.times(80)).plus(81).sqrt().sub(11).div(2).plus(1).floor();
                     player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].max(n)
 					if (n.sub(b).eq(1)) player.mc.points = player.mc.points.sub(tmp[this.layer].buyables[this.id].cost);
-					else player.mc.points = player.mc.points.sub(b.sub(n).sub(1).times(b.plus(n).plus(10)).times(-0.05).floor()).max(0);
+					//else player.mc.points = player.mc.points.sub(b.sub(n).sub(1).times(b.plus(n).plus(10)).times(-0.05).floor()).max(0);
                 },
                 style: {'height':'200px', 'width':'200px'},
 				autoed() { return false },
