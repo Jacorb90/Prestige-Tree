@@ -9,14 +9,13 @@ let modInfo = {
     offlineLimit: 1,  // In hours
     initialStartPoints: new Decimal(10), // Used for hard resets and new players
 	endgame: new Decimal(1/0),
-	specialEndgameText: "v1.3 Beta 14 Patch 1 Endgame: e3.9e15 Points",
+	specialEndgameText: "v1.3 Beta 15 Endgame: ??? Points",
 }
 
 // Set your version in num and name
 let VERSION = {
 	num: "1.3",
-	beta: 14,
-	patch: 1,
+	beta: 15,
 	name: "The Expansion Update",
 }
 
@@ -24,7 +23,7 @@ let VERSION = {
 // (The ones here are examples, all official functions are already taken care of)
 var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything", "castAllSpells", "completeInBulk", "startMastery", "completeMastery"]
 
-var alwaysKeepTheseVariables = ["primeMiles", "auto", "autoExt", "autoBld", "autoW", "autoGhost", "keepPosNeg", "distrAll", "spellInput", "pseudoUpgs", "maxToggle"]
+var alwaysKeepTheseVariables = ["primeMiles", "auto", "autoExt", "autoBld", "autoW", "autoGhost", "autoSE", "keepPosNeg", "distrAll", "spellInput", "pseudoUpgs", "maxToggle"]
 
 function getStartPoints(){
     return new Decimal(modInfo.initialStartPoints)

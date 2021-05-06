@@ -7228,6 +7228,7 @@ addLayer("mc", {
 			total: new Decimal(0),
 			first: 0,
 			mechEn: new Decimal(0),
+			autoSE: false,
         }},
         color: "#c99a6b",
 		nodeStyle() { return {
@@ -7267,6 +7268,7 @@ addLayer("mc", {
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
 			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
+			if (hasMilestone("id", 3) && player.mc.autoSE) layers.mc.buyables[11].max();
 		},
 		mechEnMult() {
 			let mult = new Decimal(1);
@@ -7438,8 +7440,13 @@ addLayer("mc", {
 					if (n.sub(b).eq(1)) player.mc.points = player.mc.points.sub(tmp[this.layer].buyables[this.id].cost);
 					else player.mc.points = player.mc.points.sub(n.sub(b).times(b.plus(n).plus(10)).times(0.05).max(n.sub(b)).div(tmp[this.layer].buyables[this.id].costDiv).floor()).max(0);
                 },
+				max() {
+					let c = player.mc.points.times(tmp[this.layer].buyables[this.id].costDiv);
+					let n = c.sub(.5).times(10).plus(1).floor().max(0);
+                    player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].max(n);
+				},
                 style: {'height':'200px', 'width':'200px'},
-				autoed() { return false },
+				autoed() { return hasMilestone("id", 3) && player.mc.autoSE },
 			},
 			12: {
 				title: "The Core",
@@ -7794,6 +7801,7 @@ addLayer("ne", {
 					if (hasAchievement("a", 143)) mult = mult.times(3);
 					if (hasMilestone("r", 0)) mult = mult.times(player.r.maxMinibots.max(1));
 					if (hasMilestone("r", 4) && tmp.r) mult = mult.times(tmp.r.producerEff.max(1));
+					if (hasMilestone("id", 3) && tmp.mc) mult = mult.times(Decimal.pow(2, player.mc.buyables[11].max(1).log10()));
 					return mult;
 				},
 				amt() { 
@@ -7968,6 +7976,13 @@ addLayer("id", {
 				requirementDescription: "3 Ideas & 22 Revelations",
 				done() { return player.id.points.gte(3) && tmp.id.rev.gte(22) },
 				effectDescription() { return "The Idea cost is divided based on your Neurons (/"+format(player.ne.points.plus(1).log10().plus(1))+")" },
+			},
+			3: {
+				unlocked() { return hasMilestone("id", 2) },
+				requirementDescription: "6 Ideas & 245 Revelations",
+				done() { return player.id.points.gte(6) && tmp.id.rev.gte(245) },
+				effectDescription() { return "Unlock Auto-Shell Expansion, which is much more efficient than normal purchasing, and each OoM of Shell Expansions double Signal gain ("+format(Decimal.pow(2, player.mc.buyables[11].max(1).log10()))+"x)." },
+				toggles: [["mc", "autoSE"]],
 			},
 		},
 })
@@ -8762,6 +8777,12 @@ addLayer("a", {
 				tooltip: "Reach e1e12 Generator Power. Reward: The Generator Power effect is raised ^1.4.",
 				image: "images/achs/152.png",
 			},
+			153: {
+				name: "Crowned Royally",
+				done() { return player.hn.points.gte(Decimal.pow(10, 1e8)) },
+				tooltip: "Reach e100,000,000 Honour.",
+				image: "images/achs/153.png",
+			},
 		},
 		tabFormat: [
 			"blank", 
@@ -8987,6 +9008,16 @@ addLayer("ab", {
 			canClick() { return hasMilestone("ne", 5) },
 			onClick() { player.ne.auto = !player.ne.auto },
 			style: {"background-color"() { return player.ne.auto?"#ded9ff":"#666666" }},
+		},
+		53: {
+			title: "Shell Expansion",
+			display() {
+				return hasMilestone("id", 3)?(player.mc.autoSE?"On":"Off"):"Locked"
+			},
+			unlocked() { return player.id.unlocked && player.mc.unlocked },
+			canClick() { return hasMilestone("id", 3) },
+			onClick() { player.mc.autoSE = !player.mc.autoSE },
+			style: {"background-color"() { return player.mc.autoSE?"#c99a6b":"#666666" }},
 		},
 	},
 })
