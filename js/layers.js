@@ -3868,7 +3868,7 @@ addLayer("o", {
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
 					return ("Sacrifice all of your Solarity for "+formatWhole(data.gain)+" Thermonuclear Reactants\n"+
-					"Req: 1e500 Solarity\n"+
+					"Req: 1e750 Solarity\n"+
 					"Amount: "+formatWhole(player[this.layer].buyables[this.id])+((tmp.o.multiplyBuyables||new Decimal(1)).eq(1)?"":(" x "+format(tmp.o.multiplyBuyables)))+"\n"+
 					(tmp.nerdMode?("Formula: log(log(log(x+1)+1)+1)/3"):("Effect: Add "+format(data.effect.times(100))+"% to Solar Power, Space Building Power, & Hyper Building Power.")))
 				},
@@ -6944,6 +6944,7 @@ addLayer("ge", {
 			if (player.mc.upgrades.includes(11)) mult = mult.times(buyableEffect("mc", 12));
 			if (hasMilestone("ge", 2)) mult = mult.times(player.en.total.max(1));
 			if (player.r.unlocked) mult = mult.times(tmp.r.buildingEff);
+			if (hasMilestone("id", 5) && tmp.id) mult = mult.times(tmp.id.rev.max(1));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -7943,7 +7944,7 @@ addLayer("id", {
         type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
         exponent: new Decimal(1.4), // Prestige currency exponent
 		base: new Decimal(1.2),
-		effect() { return Decimal.sub(0.95, Decimal.div(0.95, player.id.points.plus(1).log10().plus(1))) },
+		effect() { return Decimal.sub(0.95, Decimal.div(0.95, player.id.points.plus(1).log10().times(hasMilestone("id", 4)?1.5:1).times(hasMilestone("id", 5)?1.75:1).plus(1))) },
 		effectDescription() { return "which reduce the Thought threshold's increase by <h2 style='color: #fad682; text-shadow: #fad682 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>"+(tmp.nerdMode?" (0.95-0.95/(log(x+1)+1)).":".") },
 		rev() { return player.ne.signals.plus(1).log10().div(10).pow(.75).times(player.id.points).pow(hasMilestone("id", 0)?2:1).floor() },
 		revEff() { return Decimal.pow(1e25, tmp.id.rev.pow(.95)) },
@@ -8010,8 +8011,14 @@ addLayer("id", {
 				unlocked() { return hasUpgrade("ai", 22) },
 				requirementDescription: "132 Revelations",
 				done() { return (tmp.id.rev.gte(132)||hasMilestone("id", 4))&&hasUpgrade("ai", 22) },
-				effectDescription: "Unlock Auto-Ideas, and you can buy max Ideas.",
+				effectDescription: "Unlock Auto-Ideas, you can buy max Ideas, & the Idea effect is 50% more effective.",
 				toggles: [["id", "auto"]],
+			},
+			5: {
+				unlocked() { return hasUpgrade("id", 22) },
+				requirementDescription: "1,800 Revelations",
+				done() { return (tmp.id.rev.gte(1800)||hasMilestone("id", 5))&&hasUpgrade("ai", 22) },
+				effectDescription: "The Idea effect is 75% more effective, and Revelations multiply Gear & Building gain.",
 			},
 		},
 })
@@ -8119,7 +8126,7 @@ addLayer("r", {
 			if (!player[this.layer].unlocked) return;
 			player.r.maxMinibots = player.r.maxMinibots.max(tmp.r.totalMinibots);
 			player.r.fuel = player.r.fuel.pow(1.5).plus(player.r.allotted.farmers.div(4).times(diff)).root(1.5);
-			player.r.buildings = player.r.buildings.pow(2).plus(player.r.allotted.builders.div(3).times(diff)).sqrt();
+			player.r.buildings = player.r.buildings.pow(2).plus(player.r.allotted.builders.times((hasMilestone("id", 5)&&tmp.id)?tmp.id.rev.max(1):1).div(3).times(diff)).sqrt();
 			if (tmp.r.minibots.gt(0)) {
 				player.r.deathTime = player.r.deathTime.plus(diff);
 				player.r.growTime = player.r.growTime.plus(diff);
@@ -8492,7 +8499,7 @@ addLayer("ai", {
 			},
 			22: {
 				title: "Node BB",
-				description: "Triple Superintelligence gain, start with 4 Ideas, and unlock a new Idea milestone.",
+				description: "Triple Superintelligence gain, start with 4 Ideas, and unlock two new Idea milestones.",
 				multiRes: [
 					{
 						cost: new Decimal(50),
@@ -9033,6 +9040,12 @@ addLayer("a", {
 				done() { return player.ai.unlocked },
 				tooltip: "Unlock AI. Reward: Permanently keep Neuron milestone 6, Robot milestones 2 & 5, & Idea milestone 4.",
 				image: "images/achs/161.png",
+			},
+			162: {
+				name: "What a useless feature!",
+				done() { return tmp.id.rev.gte(1650) && player.ai.upgrades.length==0 },
+				tooltip: "Reach 1,650 Revelations without any AI Nodes.",
+				image: "images/achs/162.png",
 			},
 		},
 		tabFormat: [

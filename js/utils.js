@@ -942,7 +942,7 @@ function updateMilestones(layer){
 		let done = layers[layer].milestones[id].done();
 		if (!player[layer].primeMiles.includes(id) && done) {
 			player[layer].primeMiles.push(id);
-			if (player.milNotify && !player[layer].milestones.includes(id)) addNotification("milestone", layers[layer].milestones[id].requirementDescription, "Milestone Gotten!");
+			if (player.milNotify && !player[layer].milestones.includes(id)) addNotification("milestone", tmp[layer].milestones[id].requirementDescription, "Milestone Gotten!");
 		}
 		if (!(player[layer].milestones.includes(id)) && done) {
 			player[layer].milestones.push(id)
