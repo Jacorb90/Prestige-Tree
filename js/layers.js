@@ -8015,7 +8015,7 @@ addLayer("id", {
 				toggles: [["id", "auto"]],
 			},
 			5: {
-				unlocked() { return hasUpgrade("id", 22) },
+				unlocked() { return hasUpgrade("ai", 22) },
 				requirementDescription: "1,800 Revelations",
 				done() { return (tmp.id.rev.gte(1800)||hasMilestone("id", 5))&&hasUpgrade("ai", 22) },
 				effectDescription: "The Idea effect is 75% more effective, and Revelations multiply Gear & Building gain.",
