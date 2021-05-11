@@ -981,7 +981,7 @@ addLayer("t", {
 			return Decimal.pow(1.01, c.sqrt());
 		},
 		effectDescription() {
-			return "which are generating "+format(tmp.t.effect.gain)+" Time Energy/sec, but with a limit of "+format(tmp.t.effect.limit)+" Time Energy"+(tmp.nerdMode?("\n("+format(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3))+"x gain each, "+format(tmp.t.effBaseMult.times(2))+"x limit each)"):"")+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?(", and which multiply the speed of all layers in Rows 1-6 by "+format(tmp.t.effect2)+(tmp.nerdMode?(" (1.01^sqrt(x))"):"")):"")
+			return "which are generating "+format(tmp.t.effect.gain)+" Time Energy/sec, but with a limit of "+format(tmp.t.effect.limit)+" Time Energy"+(tmp.nerdMode?("\n("+format(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3))+"x gain each, "+format(tmp.t.effBaseMult.times(2))+"x limit each)"):"")+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?(", and which multiply the speed of all layers before Mastery by "+format(tmp.t.effect2)+(tmp.nerdMode?(" (1.01^sqrt(x))"):"")):"")
 		},
 		enEff() {
 			if (!unl(this.layer)) return new Decimal(1);
@@ -9152,6 +9152,12 @@ addLayer("a", {
 				done() { return player.hn.points.gte(Decimal.pow(10, 1e8)) },
 				tooltip: "Reach e100,000,000 Honour.",
 				image: "images/achs/153.png",
+			},
+			154: {
+				name: "Floating Prism",
+				done() { return player.ne.thoughts.gte(625) && player.ne.points.lt(player.id.points) },
+				tooltip: "Reach 625 Thoughts while having less Neurons than Ideas.",
+				image: "images/achs/154.png",
 			},
 			161: {
 				name: "The World is Ours!",
