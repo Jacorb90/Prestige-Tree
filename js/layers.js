@@ -6947,6 +6947,7 @@ addLayer("ge", {
 			if (hasMilestone("ge", 2)) mult = mult.times(player.en.total.max(1));
 			if (player.r.unlocked) mult = mult.times(tmp.r.buildingEff);
 			if (hasMilestone("id", 5) && tmp.id) mult = mult.times(tmp.id.rev.max(1));
+			if (hasUpgrade("ai", 33)) mult = mult.times(upgradeEffect("ai", 33));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -7269,6 +7270,7 @@ addLayer("mc", {
             mult = new Decimal(1);
 			if (player.mc.upgrades.includes(11)) mult = mult.times(buyableEffect("mc", 12));
 			if (hasMilestone("mc", 0)) mult = mult.times(player.ne.thoughts.max(1));
+			if (hasUpgrade("ai", 33)) mult = mult.times(upgradeEffect("ai", 33));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -7452,7 +7454,11 @@ addLayer("mc", {
 				cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
                     return x.div(10).plus(0.5).div(tmp[this.layer].buyables[this.id].costDiv).ceil();
                 },
-				buffExp() { return hasAchievement("a", 132)?25:5 },
+				buffExp() { 
+					let exp = hasAchievement("a", 132)?25:5;
+					if (hasUpgrade("ai", 33)) exp *= 100;
+					return exp;
+				},
 				effect() { return player[this.layer].buyables[this.id].plus(1).sqrt() },
 				display() { // Everything else displayed in the buyable button after the title
                     let data = tmp[this.layer].buyables[this.id];
@@ -7977,9 +7983,9 @@ addLayer("id", {
         type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
         exponent: new Decimal(1.4), // Prestige currency exponent
 		base: new Decimal(1.2),
-		effect() { return Decimal.sub(0.95, Decimal.div(0.95, player.id.points.plus(1).log10().times(hasMilestone("id", 4)?1.5:1).times(hasMilestone("id", 5)?1.75:1).plus(1))) },
+		effect() { return Decimal.sub((hasAchievement("a", 155)?0.005:0)+(hasUpgrade("ai", 32)?0.99:0.95), Decimal.div(0.95, player.id.points.plus(1).log10().times(hasMilestone("id", 4)?1.5:1).times(hasMilestone("id", 5)?1.75:1).plus(1))) },
 		effectDescription() { return "which reduce the Thought threshold's increase by <h2 style='color: #fad682; text-shadow: #fad682 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>"+(tmp.nerdMode?" (0.95-0.95/(log(x+1)+1)).":".") },
-		rev() { return player.ne.signals.plus(1).log10().div(10).pow(.75).times(player.id.points).pow(hasMilestone("id", 0)?2:1).floor() },
+		rev() { return player.ne.signals.plus(1).log10().div(10).pow(.75).times(player.id.points).pow(hasMilestone("id", 0)?2:1).times(hasUpgrade("ai", 32)?1.5:1).floor() },
 		revEff() { return Decimal.pow(1e25, tmp.id.rev.pow(.95)) },
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
@@ -8104,6 +8110,7 @@ addLayer("r", {
 			let mult = new Decimal(1);
 			if (hasMilestone("r", 3)) mult = mult.times(2);
 			if (player.ai.unlocked && tmp.ai) mult = mult.times(tmp.ai.conscEff1);
+			if (hasUpgrade("ai", 33)) mult = mult.times(upgradeEffect("ai", 33));
 			return mult;
 		},
 		getResetGain() {
@@ -8228,13 +8235,19 @@ addLayer("r", {
 			if (hasMilestone("r", 2)) exp = exp.times(2);
 			return exp;
 		},
+		reduceMinibotReqMult() {
+			let mult = new Decimal(0);
+			if (hasMilestone("r", 3)) mult = mult.plus(.5);
+			if (hasUpgrade("ai", 23)) mult = mult.plus(.5);
+			return mult;
+		},
 		nextMinibot() { 
 			if (player.r.allotted.breeders.lt(1)||tmp.r.totalMinibots.gte(tmp.r.minibotCap.plus(player.r.spentMinibots))) return new Decimal(1/0);
-			else return Decimal.pow(10, tmp.r.totalMinibots.sub(hasMilestone("r", 3)?player.r.grownMinibots.div(2):0).plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(tmp.r.breederExp));
+			else return Decimal.pow(10, tmp.r.totalMinibots.sub(player.r.grownMinibots.times(tmp.r.reduceMinibotReqMult)).plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(tmp.r.breederExp));
 		},
 		totalMinibots() { 
 			if (player.r.allotted.breeders.lt(1)) return new Decimal(0);
-			else return player.en.total.times(player.r.allotted.breeders.pow(tmp.r.breederExp)).div(1e5).max(1).log10().root(1.5).plus(hasMilestone("r", 3)?player.r.grownMinibots.div(2):0).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots))
+			else return player.en.total.times(player.r.allotted.breeders.pow(tmp.r.breederExp)).div(1e5).max(1).log10().root(1.5).plus(player.r.grownMinibots.times(tmp.r.reduceMinibotReqMult)).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots))
 		},
 		minibots() { return player.r.maxMinibots.sub(player.r.spentMinibots).max(0) },
 		deathTime() { return player.r.fuel.plus(1).log2().div(3).plus(1).times(20).div(hasUpgrade("ai", 21)?20:1) },
@@ -8243,6 +8256,7 @@ addLayer("r", {
 		growTime() { return player.r.allotted.growers.lt(1)?new Decimal(1/0):Decimal.div(30, player.r.allotted.growers.log10().plus(1)).div(hasUpgrade("ai", 21)?5:1) },
 		producerEff() { 
 			let mult = hasMilestone("r", 3) ? player.r.grownMinibots.div(4).plus(1) : new Decimal(1);
+			if (hasUpgrade("ai", 23)) mult = mult.times(player.r.grownMinibots.times(.4).plus(1));
 			return player.r.allotted.producers.pow(1.5).div(4).plus(1).times(mult);
 		},
 		clickables: {
@@ -8566,16 +8580,16 @@ addLayer("ai", {
 			},
 			23: {
 				title: "Node BC",
-				description: "???",
+				description: "When a Minibot grows up into a Robot, the requirement for the next Minibot is reduced by 0.5 more levels & the Producer effect is 40% stronger (additive).",
 				multiRes: [
 					{
-						cost: new Decimal(1/0),
+						cost: new Decimal(500),
 					},
 					{
 						currencyDisplayName: "artificial consciousness",
 						currencyInternalName: "consc",
 						currencyLayer: "ai",
-						cost: new Decimal(1/0),
+						cost: new Decimal(199000),
 					},
 				],
 				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
@@ -8600,16 +8614,16 @@ addLayer("ai", {
 			},
 			32: {
 				title: "Node CB",
-				description: "???",
+				description: "The Idea effect is increased by 0.04, and gain 50% more Revelations.",
 				multiRes: [
 					{
-						cost: new Decimal(1/0),
+						cost: new Decimal(500),
 					},
 					{
 						currencyDisplayName: "artificial consciousness",
 						currencyInternalName: "consc",
 						currencyLayer: "ai",
-						cost: new Decimal(1/0),
+						cost: new Decimal(199000),
 					},
 				],
 				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
@@ -8617,20 +8631,23 @@ addLayer("ai", {
 			},
 			33: {
 				title: "Node CC",
-				description: "???",
+				description: "Superintelligence boosts Gear, Machine Part, & Robot gain, & Shell Expansion's boost to Mech-Energy gain is raised ^100.",
 				multiRes: [
 					{
-						cost: new Decimal(1/0),
+						cost: new Decimal(1500),
 					},
 					{
 						currencyDisplayName: "artificial consciousness",
 						currencyInternalName: "consc",
 						currencyLayer: "ai",
-						cost: new Decimal(1/0),
+						cost: new Decimal(790000),
 					},
 				],
 				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
 				style: {height: '150px', width: '150px'},
+				effect() { return player.ai.points.plus(1).pow(1.5) },
+				effectDisplay() { return format(tmp.ai.upgrades[33].effect)+"x" },
+				formula: "(x+1)^1.5",
 			},
 		},
 		buyables: {
@@ -9158,6 +9175,13 @@ addLayer("a", {
 				done() { return player.ne.thoughts.gte(625) && player.ne.points.lt(player.id.points) },
 				tooltip: "Reach 625 Thoughts while having less Neurons than Ideas.",
 				image: "images/achs/154.png",
+			},
+			155: {
+				name: "Epic Big Brain",
+				unlocked() { return hasAchievement("a", 111) },
+				done() { return player.ne.thoughts.gte(1000) },
+				tooltip: "Reach 1,000 Thoughts. Reward: The Idea effect is increased by 0.005.",
+				image: "images/achs/155.png",
 			},
 			161: {
 				name: "The World is Ours!",
