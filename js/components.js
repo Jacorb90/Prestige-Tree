@@ -16,6 +16,14 @@ function loadVue() {
 				<span class="instant"  v-html="data"></span>
 			`
 		})
+		
+	// data = a function returning the content (actually HTML)
+	Vue.component('tall-display-text', {
+			props: ['layer', 'data'],
+			template: `
+				<div class="instant"  v-html="data" style="height: 100%;"></div>
+			`
+		})
 
 	// Blank space, data = optional height in px or pair with width and height in px
 	Vue.component('blank', {
