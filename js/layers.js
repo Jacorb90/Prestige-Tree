@@ -8523,7 +8523,11 @@ addLayer("ai", {
 						cost: new Decimal(5),
 					},
 				],
-				unlocked() { return player.ai.unlocked && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked },
 				style: {height: '150px', width: '150px'},
 			},
 			12: {
@@ -8540,7 +8544,11 @@ addLayer("ai", {
 						cost: new Decimal(180),
 					},
 				],
-				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) },
 				style: {height: '150px', width: '150px'},
 			},
 			13: {
@@ -8557,7 +8565,11 @@ addLayer("ai", {
 						cost: new Decimal(48e3),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
 				style: {height: '150px', width: '150px'},
 			},
 			14: {
@@ -8574,7 +8586,11 @@ addLayer("ai", {
 						cost: new Decimal(5e8),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
 				style: {height: '150px', width: '150px'},
 			},
 			21: {
@@ -8591,7 +8607,11 @@ addLayer("ai", {
 						cost: new Decimal(190),
 					},
 				],
-				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) },
 				style: {height: '150px', width: '150px'},
 			},
 			22: {
@@ -8608,7 +8628,11 @@ addLayer("ai", {
 						cost: new Decimal(2e3),
 					},
 				],
-				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) },
 				style: {height: '150px', width: '150px'},
 			},
 			23: {
@@ -8622,10 +8646,14 @@ addLayer("ai", {
 						currencyDisplayName: "artificial consciousness",
 						currencyInternalName: "consc",
 						currencyLayer: "ai",
-						cost: new Decimal(199000),
+						cost: new Decimal(196000),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
 				style: {height: '150px', width: '150px'},
 			},
 			31: {
@@ -8642,7 +8670,11 @@ addLayer("ai", {
 						cost: new Decimal(48e3),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
 				style: {height: '150px', width: '150px'},
 			},
 			32: {
@@ -8656,10 +8688,14 @@ addLayer("ai", {
 						currencyDisplayName: "artificial consciousness",
 						currencyInternalName: "consc",
 						currencyLayer: "ai",
-						cost: new Decimal(199000),
+						cost: new Decimal(196000),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
 				style: {height: '150px', width: '150px'},
 			},
 			33: {
@@ -8676,7 +8712,11 @@ addLayer("ai", {
 						cost: new Decimal(790000),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
 				style: {height: '150px', width: '150px'},
 				effect() { return player.ai.points.plus(1).pow(1.5) },
 				effectDisplay() { return format(tmp.ai.upgrades[33].effect)+"x" },
@@ -8696,7 +8736,11 @@ addLayer("ai", {
 						cost: new Decimal(5e8),
 					},
 				],
-				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 && (player.ai.upgrades.length<tmp.ai.nodeSlots||hasUpgrade("ai", this.id)) },
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
 				style: {height: '150px', width: '150px'},
 				effect() { return Decimal.pow(1.05, player.ma.points) },
 				effectDisplay() { return format(tmp.ai.upgrades[41].effect)+"x" },

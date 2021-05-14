@@ -615,9 +615,10 @@ function respecBuyables(layer) {
 	updateBuyableTemp(layer)
 }
 
-function canAffordUpgrade(layer, id) {
+function canAffordUpgrade(layer, id, skipAfford=false) {
 	let upg = tmp[layer].upgrades[id]
-	if (upg.multiRes) {
+	if (layers[layer].upgrades[id].canAfford!==undefined && !skipAfford) return upg.canAfford;
+	else if (upg.multiRes) {
 		for (let i=0;i<upg.multiRes.length;i++) {
 			let cost = upg.multiRes[i].cost
 			if (!canAffordPurchase(layer, upg.multiRes[i], cost)) return false;
