@@ -8498,9 +8498,11 @@ addLayer("ai", {
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
 			player.ai.time = player.ai.time.plus(diff);
-			player.ai.consc = player.ai.consc.plus(tmp.ai.buyables[11].effect.times(diff)).div(Decimal.pow(tmp.ai.divConsc, diff));
+			//player.ai.consc = player.ai.consc.plus(tmp.ai.buyables[11].effect.times(diff)).div(Decimal.pow(tmp.ai.divConsc, diff));
+			if (tmp.ai.divConsc.lte(1.00001)) player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(diff));
+			else player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(0.001).sub(player.ai.consc.mul(tmp.ai.divConsc.pow(0.001).sub(1))).mul(tmp.ai.divConsc.pow(0.001).sub(1).recip().mul(Decimal.sub(1, tmp.ai.divConsc.pow(0.001).recip().pow(diff*1000)))))
 		},
-		divConsc() { return player.ai.time.plus(1).log10().plus(1).sqrt() },
+		divConsc() { return player.ai.time.plus(1).log10().plus(1).sqrt()},
 		conscEff1() { return player.ai.consc.plus(1) },
 		conscEff2() { return player.ai.consc.plus(1).log(3).plus(1) },
 		tabFormat: ["main-display",
