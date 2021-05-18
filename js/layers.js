@@ -7295,7 +7295,9 @@ addLayer("mc", {
         branches: ["hs", "i", "id"],
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
-			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
+			//player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
+			let decayPower = tmp.mc.decayPower.recip();
+			player.mc.mechEn = player.mc.mechEn.add(player.ge.rotations.times(tmp.mc.mechPer).mul(0.001).sub(player.mc.mechEn.mul(decayPower.pow(0.001).sub(1))).mul(decayPower.pow(0.001).sub(1).recip().mul(Decimal.sub(1, tmp.mc.decayPower.pow(diff)))))
 			if (hasMilestone("id", 3) && player.mc.autoSE) layers.mc.buyables[11].max();
 			if (hasMilestone("mc", 1) && player.mc.auto) {
 				player.mc.clickables[11] = player.mc.clickables[11].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
