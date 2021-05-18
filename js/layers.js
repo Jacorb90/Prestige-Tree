@@ -6956,7 +6956,9 @@ addLayer("ge", {
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
-            return new Decimal(1)
+            let exp = new Decimal(1)
+			if (hasUpgrade("ai", 34)) exp = exp.times(1.2);
+			return exp;
         },
         row: 6, // Row the layer is in on the tree (0 is the first row)
         hotkeys: [
@@ -7647,13 +7649,14 @@ addLayer("en", {
 				player.en.points = player.en.points.times(Decimal.pow(0.75, diff)).sub(diff).max(0);
 				if (hasMilestone("en", 1)) player.en.stored = player.en.stored.plus(subbed.div(5));
 			}
+			let sw_mw_exp = hasUpgrade("ai", 34)?0.8:1
 			if (hasMilestone("r", 1)) {
 				subbed = subbed.times(player.r.total.max(1));
 				if (hasMilestone("r", 4) && tmp.r) subbed = subbed.times(tmp.r.producerEff.max(1));
 				player.en.tw = player.en.tw.pow(1.5).plus(subbed.div(player.en.target==1?1:3)).root(1.5);
 				player.en.ow = player.en.ow.pow(1.5).plus(subbed.div(player.en.target==2?1:3)).root(1.5);
-				player.en.sw = player.en.sw.pow(hasMilestone("en", 4)?2.5:4).plus(subbed.div(player.en.target==3?1:3)).root(hasMilestone("en", 4)?2.5:4);
-				if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(hasMilestone("en", 4)?5.5:7).plus(subbed.div(player.en.target==4?1:3)).root(hasMilestone("en", 4)?5.5:7);
+				player.en.sw = player.en.sw.pow(sw_mw_exp*(hasMilestone("en", 4)?2.5:4)).plus(subbed.div(player.en.target==3?1:3)).root(sw_mw_exp*(hasMilestone("en", 4)?2.5:4));
+				if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(sw_mw_exp*(hasMilestone("en", 4)?5.5:7)).plus(subbed.div(player.en.target==4?1:3)).root(sw_mw_exp*(hasMilestone("en", 4)?5.5:7));
 				
 			} else switch(player.en.target) {
 				case 1: 
@@ -7663,10 +7666,10 @@ addLayer("en", {
 					player.en.ow = player.en.ow.pow(1.5).plus(subbed).root(1.5);
 					break;
 				case 3: 
-					player.en.sw = player.en.sw.pow(hasMilestone("en", 4)?2.5:4).plus(subbed).root(hasMilestone("en", 4)?2.5:4);
+					player.en.sw = player.en.sw.pow(sw_mw_exp*(hasMilestone("en", 4)?2.5:4)).plus(subbed).root(sw_mw_exp*(hasMilestone("en", 4)?2.5:4));
 					break;
 				case 4: 
-					if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(hasMilestone("en", 4)?5.5:7).plus(subbed).root(hasMilestone("en", 4)?5.5:7);
+					if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(sw_mw_exp*(hasMilestone("en", 4)?5.5:7)).plus(subbed).root(sw_mw_exp*(hasMilestone("en", 4)?5.5:7));
 					break;
 			}
 		},
@@ -8481,6 +8484,7 @@ addLayer("ai", {
             mult = new Decimal(1);
 			if (hasUpgrade("ai", 22)) mult = mult.times(3);
 			if (hasUpgrade("ai", 41)) mult = mult.times(upgradeEffect("ai", 41));
+			if (hasUpgrade("ai", 43)) mult = mult.times(upgradeEffect("ai", 43));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -8499,12 +8503,12 @@ addLayer("ai", {
 			}
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
-        layerShown(){return player.ma.unlocked },
+        layerShown(){return player.r.unlocked && player.id.unlocked },
         branches: ["r", ["id", 3]],
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
 			player.ai.time = player.ai.time.plus(diff);
-			//player.ai.consc = player.ai.consc.plus(tmp.ai.buyables[11].effect.times(diff)).div(Decimal.pow(tmp.ai.divConsc, diff));
+			// player.ai.consc = player.ai.consc.plus(tmp.ai.buyables[11].effect.times(diff)).div(Decimal.pow(tmp.ai.divConsc, diff));
 			if (tmp.ai.divConsc.lte(1.00001)) player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(diff));
 			else player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(0.001).sub(player.ai.consc.mul(tmp.ai.divConsc.pow(0.001).sub(1))).mul(tmp.ai.divConsc.pow(0.001).sub(1).recip().mul(Decimal.sub(1, tmp.ai.divConsc.pow(0.001).recip().pow(diff*1000)))))
 		},
@@ -8762,6 +8766,27 @@ addLayer("ai", {
 				effectDisplay() { return format(tmp.ai.upgrades[33].effect)+"x" },
 				formula: "(x+1)^1.5",
 			},
+			34: {
+				title: "Node CD",
+				description: "Super Watts, Mind Watts, & Gear gain are raised ^1.2.",
+				multiRes: [
+					{
+						cost: new Decimal(5e4),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(1e10),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+			},
 			41: {
 				title: "Node DA",
 				description: "Mastery boosts Superintelligence gain.",
@@ -8809,6 +8834,30 @@ addLayer("ai", {
 				effect() { return Decimal.pow(100, player.ai.upgrades.length) },
 				effectDisplay() { return format(tmp.ai.upgrades[42].effect)+"x" },
 				formula: "100^x",
+			},
+			43: {
+				title: "Node DC",
+				description: "Ideas boosts Superintelligence gain.",
+				multiRes: [
+					{
+						cost: new Decimal(5e4),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(1e10),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+				effect() { return Decimal.pow(1.075, player.id.points) },
+				effectDisplay() { return format(tmp.ai.upgrades[43].effect)+"x" },
+				formula: "1.075^x",
 			},
 		},
 		buyables: {
