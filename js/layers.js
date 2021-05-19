@@ -7003,9 +7003,9 @@ addLayer("ge", {
 			player.ge.autoTime = player.ge.autoTime.plus(diff);
 			if (player.ge.auto && hasMilestone("ge", 3) && player.ge.autoTime.gte(.5)) {
 				player.ge.autoTime = new Decimal(0);
-				layers.ge.clickables[11].onClick();
-				layers.ge.clickables[12].onClick();
-				layers.ge.clickables[13].onClick();
+				if (layers.ge.clickables[11].canClick()) layers.ge.clickables[11].onClick();
+				if (layers.ge.clickables[12].canClick()) layers.ge.clickables[12].onClick();
+				if (layers.ge.clickables[13].canClick()) layers.ge.clickables[13].onClick();
 			}
 		},
 		rotEff() {
@@ -9051,6 +9051,7 @@ addLayer("c", {
 				cap() { 
 					let cap = player.c.points.sub(4).max(0);
 					cap = cap.plus(player.c.points.div(5).sub(1).max(0).floor().times(2));
+					cap = cap.plus(player.c.points.div(12).max(0).floor());
 					return cap;
 				},
 				display() { // Everything else displayed in the buyable button after the title
@@ -9632,6 +9633,13 @@ addLayer("a", {
 				done() { return player.c.buyables[11].gte(1) },
 				tooltip() { return "Get a Population of at least 1. Reward: Always have the first & fifth Idea milestones, and each Population decreases the Civilization requirement by 2 (-"+formatWhole(player.c.buyables[11].times(2).min(100))+", caps at -100)." },
 				image: "images/achs/164.png",
+			},
+			165: {
+				name: "Option F?",
+				unlocked() { return hasAchievement("a", 111) },
+				done() { return player.h.challenges[32]>=1e6 },
+				tooltip: "Complete Option D at least 1,000,000 times.",
+				image: "images/achs/165.png",
 			},
 		},
 		tabFormat: [
