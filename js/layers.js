@@ -3143,7 +3143,7 @@ addLayer("q", {
 			12: {
 				title: "Back To Row 2",
 				description: "Total Quirks multiply the Booster/Generator bases.",
-				cost() { return player.q.time.plus(1).pow(1.4).times(500).pow(player.ma.current=="q"?(Math.pow(this.id, this.id/10)*(this.id-10)*1.15):1) },
+				cost() { return player.q.time.plus(1).pow(1.4).times(500).pow(player.ma.current=="q"?(Math.pow(this.id, this.id/10)*(this.id-10)):1) },
 				costFormula: "500*(time+1)^1.4",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3166,7 +3166,7 @@ addLayer("q", {
 			14: {
 				title: "Row 4 Synergy",
 				description: "Hindrance Spirit & Quirks boost each other's gain.",
-				cost() { return player.q.time.plus(1).pow(2.4).times(1e6).pow(player.ma.current=="q"?(this.id*8):1) },
+				cost() { return player.q.time.plus(1).pow(2.4).times(1e6).pow(player.ma.current=="q"?(this.id*6):1) },
 				costFormula: "1e6*(time+1)^2.4",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3204,7 +3204,7 @@ addLayer("q", {
 			21: {
 				title: "Quirk City",
 				description: "Super Boosters multiply each Quirk Layer's production.",
-				cost() { return player.q.time.plus(1).pow(3.2).times(1e8).pow(player.ma.current=="q"?(this.id*2.5):1) },
+				cost() { return player.q.time.plus(1).pow(3.2).times(1e8).pow(player.ma.current=="q"?(this.id*1.5):1) },
 				costFormula: "1e8*(time+1)^3.2",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3217,7 +3217,7 @@ addLayer("q", {
 			22: {
 				title: "Infinite Possibilities",
 				description: "Total Quirks provide free Extra Time Capsules, Enhancers, & Space Buildings.",
-				cost() { return player.q.time.plus(1).pow(4.2).times(2e11).pow(player.ma.current=="q"?(this.id*4):1) },
+				cost() { return player.q.time.plus(1).pow(4.2).times(2e11).pow(player.ma.current=="q"?(this.id*2):1) },
 				costFormula: "2e11*(time+1)^4.2",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3240,7 +3240,7 @@ addLayer("q", {
 			24: {
 				title: "Exponential Madness",
 				description: "The first Time Energy effect & the first Enhancer effect are raised ^7.5.",
-				cost() { return player.q.time.plus(1).pow(6.8).times(1e24).pow(player.ma.current=="q"?(this.id*2):1) },
+				cost() { return player.q.time.plus(1).pow(6.8).times(1e24).pow(player.ma.current=="q"?(this.id*1.95):1) },
 				costFormula: "1e24*(time+1)^6.8",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3266,7 +3266,7 @@ addLayer("q", {
 			31: {
 				title: "Scale Softening",
 				description: "Post-12 scaling for static layers in rows 2-3 starts later based on your Quirk Layers.",
-				cost() { return player.q.time.plus(1).pow(8.4).times(1e48).pow(player.ma.current=="q"?(this.id/1.2):1) },
+				cost() { return player.q.time.plus(1).pow(8.4).times(1e48).pow(player.ma.current=="q"?(this.id/1.25):1) },
 				costFormula: "1e48*(time+1)^8.4",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3279,7 +3279,7 @@ addLayer("q", {
 			32: {
 				title: "Quinary Superspace",
 				description: "The Quinary Space Building's effect is twice as strong.",
-				cost() { return player.q.time.plus(1).pow(10).times(1e58).pow(player.ma.current=="q"?(this.id/1.5):1) },
+				cost() { return player.q.time.plus(1).pow(10).times(1e58).pow(player.ma.current=="q"?(this.id/1.6):1) },
 				costFormula: "1e58*(time+1)^10",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3289,7 +3289,7 @@ addLayer("q", {
 			33: {
 				title: "Generated Progression",
 				description: "Unlock Super Generators.",
-				cost() { return player.q.time.plus(1).pow(12).times(1e81).pow(player.ma.current=="q"?(this.id/1.8):1) },
+				cost() { return player.q.time.plus(1).pow(12).times(1e81).pow(player.ma.current=="q"?(this.id/1.85):1) },
 				costFormula: "1e81*(time+1)^12",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3299,7 +3299,7 @@ addLayer("q", {
 			34: {
 				title: "Booster Madness",
 				description: "Anything that adds to the Booster base also multiplies it at a reduced rate.",
-				cost() { return player.q.time.plus(1).pow(15).times(2.5e94).pow(player.ma.current=="q"?(this.id/1.8):1) },
+				cost() { return player.q.time.plus(1).pow(15).times(2.5e94).pow(player.ma.current=="q"?(this.id/1.85):1) },
 				costFormula: "2.5e94*(time+1)^15",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3337,7 +3337,7 @@ addLayer("q", {
 			42: {
 				title: "Improvement Boost",
 				description: "Unlock 3 more Quirk Improvements.",
-				cost() { return new Decimal((player.ma.current=="q")?"1e3700":1e150) },
+				cost() { return new Decimal((player.ma.current=="q")?"1e3675":1e150) },
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
 				currencyLayer: "q",
