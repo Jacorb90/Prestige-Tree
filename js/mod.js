@@ -8,22 +8,21 @@ let modInfo = {
 	changelogLink: "https://github.com/Jacorb90/Prestige-Tree/blob/master/changelog.md",
     offlineLimit: 1,  // In hours
     initialStartPoints: new Decimal(10), // Used for hard resets and new players
-	endgame: new Decimal("e1e15"),
-	// specialEndgameText: "v1.2 Beta 28 Endgame: e1e15 Points",
+	endgame: new Decimal("e3.14e16"),
+	// specialEndgameText: "v1.3 Endgame: e3.14e16 Points",
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.2",
-	patch: 1,
-	name: "Mechanical Mastery",
+	num: "1.3",
+	name: "The Expansion Update",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
-var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything", "castAllSpells", "completeInBulk", "startMastery", "completeMastery"]
+var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "buyMax", "onPurchase", "blowUpEverything", "castAllSpells", "completeInBulk", "startMastery", "completeMastery"]
 
-var alwaysKeepTheseVariables = ["primeMiles", "auto", "autoExt", "autoBld", "autoW", "autoGhost", "keepPosNeg", "distrAll", "spellInput", "pseudoUpgs", "maxToggle"]
+var alwaysKeepTheseVariables = ["primeMiles", "auto", "autoExt", "autoBld", "autoW", "autoGhost", "autoSE", "autoNN", "keepPosNeg", "distrAll", "spellInput", "pseudoUpgs", "maxToggle"]
 
 function getStartPoints(){
     return new Decimal(modInfo.initialStartPoints)
@@ -78,7 +77,8 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(modInfo.endgame)
+	if (modInfo.endgame.eq(1/0)) return false;
+	else return player.points.gte(modInfo.endgame)
 }
 
 

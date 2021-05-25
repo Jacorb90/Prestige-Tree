@@ -98,7 +98,7 @@ function shouldNotify(layer){
 				} else if (layer=="m") {
 					if (player.majGlow=="never" || (player.m.auto && hasMilestone("hn", 2))) continue;
 					if (player.majGlow=="uncasted") if (Object.values(player.m.spellTimes).some(x => Decimal.eq(x, 0))) continue;
-				}
+				} else if (layer=="mc" && id==11 && !player.shellGlow) continue;
 				return true
 			}
 		}
@@ -269,6 +269,7 @@ function startChallenge(layer, x) {
 	}
 
 	updateChallengeTemp(layer)
+	app.$forceUpdate();
 }
 
 function canCompleteChallenge(layer, x)
@@ -317,7 +318,7 @@ VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "
 
 
 
-function gameLoop(diff) {
+function gameLoop(diff) {	
 	styleCooldown = Math.max(styleCooldown-diff, 0);
 	
 	if (isEndgame() || gameEnded) gameEnded = 1
@@ -341,7 +342,7 @@ function gameLoop(diff) {
 			let layer = TREE_LAYERS[x][item]
 			if (!player[layer].unlocked) player[layer].first += diff;
 			if (!unl(layer)) continue;
-			let speed = (x<6)?tmp.row1to6spd:new Decimal(1)
+			let speed = (x<6&&layer!="en"&&layer!="ne"&&layer!="id"&&layer!="r")?tmp.row1to6spd:new Decimal(1)
 			if (tmp[layer].passiveGeneration) generatePoints(layer, speed.times(diff*tmp[layer].passiveGeneration));
 			if (layers[layer].update) layers[layer].update(speed.times(diff));
 		}

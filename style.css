@@ -822,6 +822,29 @@ button > * {
 	transform: rotate(35deg);
 }
 
+.en.grad:not(.locked):not(.bought) {
+	background: radial-gradient(#eaff00, #d6ff30, #eaff00, #d6ff30);
+	background-size: 100% 50%;
+	text-shadow: 0px 0px 7px #556125;
+}
+
+.en.anim:not(.locked):not(.bought) {
+	animation: energy 10s linear infinite;
+}
+
+.ne.grad:not(.locked):not(.bought) {
+	background: repeating-radial-gradient(circle, #c9d2ff 0%, #ffd1f7 2%);
+	background-size: 100% 100%;
+	background-position: center;
+}
+
+.id.grad:not(.locked):not(.bought) {
+	background: repeating-radial-gradient(circle, #faf3c0 0%, #ffdb63 72.5%, #faf3c0 20%);
+	background-size: 100% 100%;
+	background-position: center;
+	animation: idea 20s ease infinite;
+}
+
 @keyframes honour {
 	0% {
 		background-position: 0% 0%;
@@ -854,6 +877,31 @@ button > * {
 		background-size: 200%;
 	}
 }
+
+@keyframes energy {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: 0% 400%;
+	}
+}
+
+@keyframes idea {
+	0% {
+		filter: brightness(100%);
+	}
+	25% {
+		filter: brightness(125%);
+	}
+	75% {
+		filter: brightness(75%);
+	}
+	100% {
+		filter: brightness(100%);
+	}
+}
+
 
 .popup {
 	display: block;

@@ -93,7 +93,7 @@ function updateTemp() {
 function updateTempData(layerData, tmpData, layer, pre, pre2, isArr) {
 	
 	for (item in layerData){
-		if ((item.toLowerCase().includes("display") || item.toLowerCase().includes("description") || (item == "unlocked" && pre2 != "upgrades")) && player.tab != layer) continue;
+		if ((item.toLowerCase().includes("display") || (item.toLowerCase().includes("tabformat")&&layer!="tree-tab") || item.toLowerCase().includes("description") || (item == "unlocked" && pre2 != "upgrades")) && player.tab != layer) continue;
 		if (Array.isArray(layerData[item])) {
 			updateTempData(layerData[item], tmpData[item], layer, item, pre, true)
 		}

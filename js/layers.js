@@ -67,6 +67,8 @@ addLayer("p", {
 				description: "Prestige Points boost Point generation.",
 				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?10:1).pow(tmp.h.costExp11) },
 				effect() {
+					if (inChallenge("ne", 11)) return new Decimal(1);
+					
 					let eff = player.p.points.plus(2).pow(0.5);
 					if (hasUpgrade("g", 14)) eff = eff.pow(1.5);
 					if (hasUpgrade("g", 24)) eff = eff.pow(1.4666667);
@@ -79,11 +81,14 @@ addLayer("p", {
 					if (hasUpgrade("hn", 14)) eff = eff.pow(1.05);
 					if (hasUpgrade("b", 34) && player.i.buyables[12].gte(1)) eff = eff.pow(upgradeEffect("b", 34));
 					if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) eff = eff.pow(1.1);
+					
 					return eff;
 				},
 				unlocked() { return hasUpgrade("p", 11) },
 				effectDisplay() { return format(tmp.p.upgrades[12].effect)+"x" },
 				formula() { 
+					if (inChallenge("ne", 11)) return "DISABLED";
+				
 					let exp = new Decimal(0.5*(hasUpgrade("g", 14)?1.5:1)*(hasUpgrade("g", 24)?1.4666667:1));
 					if (hasUpgrade("g", 34) && player.i.buyables[12].gte(2)) exp = exp.times(1.4333333);
 					if (hasUpgrade("b", 34) && player.i.buyables[12].gte(1)) exp = exp.times(upgradeEffect("b", 34));
@@ -334,11 +339,11 @@ addLayer("b", {
 			return power;
 		},
 		effect() {
-			if (!unl(this.layer)) return new Decimal(1);
+			if ((!unl(this.layer))||inChallenge("ne", 11)) return new Decimal(1);
 			return Decimal.pow(tmp.b.effectBase, player.b.points.plus(tmp.sb.spectralTotal)).max(0).times(hasUpgrade("p", 43)?tmp.q.enEff:1);
 		},
 		effectDescription() {
-			return "which are boosting Point generation by "+format(tmp.b.effect)+"x"+(tmp.nerdMode?("\n ("+format(tmp.b.effectBase)+"x each)"):"")
+			return "which are boosting Point generation by "+format(tmp.b.effect)+"x"+(tmp.nerdMode?(inChallenge("ne", 11)?"\n (DISABLED)":("\n ("+format(tmp.b.effectBase)+"x each)")):"")
 		},
 		doReset(resettingLayer) {
 			let keep = [];
@@ -590,7 +595,7 @@ addLayer("g", {
 			return base;
 		},
 		effect() {
-			if (!unl(this.layer)) return new Decimal(0);
+			if ((!unl(this.layer))||inChallenge("ne", 11)) return new Decimal(0);
 			let eff = Decimal.pow(this.effBase(), player.g.points.plus(tmp.sg.spectralTotal)).sub(1).max(0);
 			if (hasUpgrade("g", 21)) eff = eff.times(upgradeEffect("g", 21));
 			if (hasUpgrade("g", 25)) eff = eff.times(upgradeEffect("g", 25));
@@ -601,7 +606,7 @@ addLayer("g", {
 			return eff;
 		},
 		effectDescription() {
-			return "which are generating "+format(tmp.g.effect)+" Generator Power/sec"+(tmp.nerdMode?("\n ("+format(tmp.g.effBase)+"x each)"):"")
+			return "which are generating "+format(tmp.g.effect)+" Generator Power/sec"+(tmp.nerdMode?(inChallenge("ne", 11)?"\n (DISABLED)":("\n ("+format(tmp.g.effBase)+"x each)")):"")
 		},
 		extraAmtDisplay() {
 			if (tmp.sg.spectralTotal.eq(0)) return "";
@@ -628,6 +633,7 @@ addLayer("g", {
 			if (hasUpgrade("q", 13)) exp = exp.times(1.25);
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) exp = exp.times(1.05);
 			if (player.mc.upgrades.includes(11)) exp = exp.times(buyableEffect("mc", 12));
+			if (hasAchievement("a", 152)) exp = exp.times(1.4);
 			return exp;
 		},
 		powerEff() {
@@ -957,11 +963,16 @@ addLayer("t", {
 			if (hasUpgrade("t", 33) && player.i.buyables[12].gte(4)) mult = mult.times(upgradeEffect("t", 33));
 			return mult;
 		},
+		nonExtraTCPow() {
+			let pow = new Decimal(1);
+			if (player.en.unlocked) pow = pow.times(tmp.en.twEff);
+			return pow;
+		},
 		effect() { 
 			if (!unl(this.layer)) return {gain: new Decimal(0), limit: new Decimal(0)};
 			else return {
-				gain: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3).pow(tmp.t.effBasePow), player.t.points.plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(player.t.points.plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enGainMult).max(0),
-				limit: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effLimBaseMult).times(2).pow(tmp.t.effBasePow), player.t.points.plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(100).times(player.t.points.plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enCapMult).max(0),
+				gain: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3).pow(tmp.t.effBasePow), player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enGainMult).max(0),
+				limit: Decimal.pow(tmp.t.effBaseMult.times(tmp.t.effLimBaseMult).times(2).pow(tmp.t.effBasePow), player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).plus(tmp.t.freeExtraTimeCapsules)).sub(1).max(0).times(100).times(player.t.points.times(tmp.t.nonExtraTCPow).plus(player.t.buyables[11]).gt(0)?1:0).times(tmp.t.enCapMult).max(0),
 			}
 		},
 		effect2() {
@@ -970,7 +981,7 @@ addLayer("t", {
 			return Decimal.pow(1.01, c.sqrt());
 		},
 		effectDescription() {
-			return "which are generating "+format(tmp.t.effect.gain)+" Time Energy/sec, but with a limit of "+format(tmp.t.effect.limit)+" Time Energy"+(tmp.nerdMode?("\n("+format(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3))+"x gain each, "+format(tmp.t.effBaseMult.times(2))+"x limit each)"):"")+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?(", and which multiply the speed of all layers in Rows 1-6 by "+format(tmp.t.effect2)+(tmp.nerdMode?(" (1.01^sqrt(x))"):"")):"")
+			return "which are generating "+format(tmp.t.effect.gain)+" Time Energy/sec, but with a limit of "+format(tmp.t.effect.limit)+" Time Energy"+(tmp.nerdMode?("\n("+format(tmp.t.effBaseMult.times(tmp.t.effGainBaseMult).times(3))+"x gain each, "+format(tmp.t.effBaseMult.times(2))+"x limit each)"):"")+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?(", and which multiply the speed of all layers before Mastery by "+format(tmp.t.effect2)+(tmp.nerdMode?(" (1.01^sqrt(x))"):"")):"")
 		},
 		enEff() {
 			if (!unl(this.layer)) return new Decimal(1);
@@ -2476,6 +2487,8 @@ addLayer("sb", {
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes('b'):false) && hasUpgrade("b", 13)) base = base.times(upgradeEffect("b", 13).max(1));
 			base = base.times(tmp.n.dustEffs.blue);
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false) && hasChallenge("h", 12)) base = base.times(player.hs.points.plus(1));
+			if (player.en.unlocked) base = base.pow(tmp.en.swEff);
+			if (player.c.unlocked && tmp.c) base = base.pow(tmp.c.eff5);
 			return base
 		},
 		effect() {
@@ -2552,6 +2565,7 @@ addLayer("sg", {
 			if (hasUpgrade("hn", 52)) base = base.times(buyableEffect("o", 12));
 			if (player.mc.unlocked) base = base.times(clickableEffect("mc", 21));
 			if (tmp.m.buyables[16].unlocked) base = base.times(buyableEffect("m", 16));
+			if (player.ne.unlocked) base = base.times(tmp.ne.thoughtEff2);
 			return base;
 		},
 		effect() {
@@ -2725,7 +2739,7 @@ addLayer("h", {
 				goal() { return new Decimal(player.ma.current=="h"?"e5e8":"1e3550") },
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
-				rewardDescription() { return "Add 0.25 to the Super Booster base"+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false)?(" and multiply it by your Hyperspace Energy."):"")+"." },
+				rewardDescription() { return "Add 0.25 to the Super Booster base"+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false)?(" and multiply it by your Hyperspace Energy"):"")+"." },
 			},
 			21: {
 				name: "Out of Room",
@@ -2788,11 +2802,16 @@ addLayer("h", {
 					if (target.gte(20)) target = target.sub(19).root(1.95).plus(19);
 					target = target.div(tmp.h.challenges[this.id].scalePower).plus(1).floor();
 					player.h.challenges[this.id] = Math.min(Math.max(player.h.challenges[this.id], target.toNumber()), tmp[this.layer].challenges[this.id].completionLimit);
+					if (isNaN(player.h.challenges[this.id])) player.h.challenges[this.id] = 0;
 				},
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription() { return "<b>Timeless</b> completions boost Super Generator Power gain based on your time "+(hasUpgrade("ss", 33)?"playing this game.":"in this Row 4 reset.") },
-				rewardEffect() { return Decimal.div(9, Decimal.add((hasUpgrade("ss", 33)?(player.timePlayed||0):player.q.time), 1).cbrt().pow(hasUpgrade("ss", 23)?(-1):1)).plus(1).pow(challengeCompletions("h", 31)).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?5:1) },
+				rewardEffect() { 
+					let eff = Decimal.div(9, Decimal.add((hasUpgrade("ss", 33)?(player.timePlayed||0):player.q.time), 1).cbrt().pow(hasUpgrade("ss", 23)?(-1):1)).plus(1).pow(challengeCompletions("h", 31)).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?5:1);
+					if (!eff.eq(eff)) eff = new Decimal(1);
+					return eff;
+				},
 				rewardDisplay() { return format(this.rewardEffect())+"x" },
 				formula() { return "(9"+(hasUpgrade("ss", 23)?"*":"/")+"cbrt(time+1)+1)^completions" },
 			},
@@ -2826,11 +2845,16 @@ addLayer("h", {
 					if (target.gte(3)) target = target.plus(.96);
 					target = target.div(tmp.h.challenges[this.id].scalePower).plus(1).floor();
 					player.h.challenges[this.id] = Math.min(Math.max(player.h.challenges[this.id], target.toNumber()), tmp[this.layer].challenges[this.id].completionLimit);
+					if (isNaN(player.h.challenges[this.id])) player.h.challenges[this.id] = 0;
 				},
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription: "<b>Option D</b> completions multiply the Time Energy gain base.",
-				rewardEffect() { return softcap("option_d", Decimal.pow(100, Decimal.pow(challengeCompletions("h", 32), 2))).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)) },
+				rewardEffect() { 
+					let eff = softcap("option_d", Decimal.pow(100, Decimal.pow(challengeCompletions("h", 32), 2))).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1));
+					if (!eff.eq(eff)) eff = new Decimal(1);
+					return eff;
+				},
 				rewardDisplay() { return format(tmp.h.challenges[32].rewardEffect)+"x" },
 				formula: "100^(completions^2)",
 				unlocked() { return tmp.ps.buyables[11].effects.hindr },
@@ -3119,7 +3143,7 @@ addLayer("q", {
 			12: {
 				title: "Back To Row 2",
 				description: "Total Quirks multiply the Booster/Generator bases.",
-				cost() { return player.q.time.plus(1).pow(1.4).times(500).pow(player.ma.current=="q"?(Math.pow(this.id, this.id/10)*(this.id-10)*1.15):1) },
+				cost() { return player.q.time.plus(1).pow(1.4).times(500).pow(player.ma.current=="q"?(Math.pow(this.id, this.id/10)*(this.id-10)):1) },
 				costFormula: "500*(time+1)^1.4",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3142,7 +3166,7 @@ addLayer("q", {
 			14: {
 				title: "Row 4 Synergy",
 				description: "Hindrance Spirit & Quirks boost each other's gain.",
-				cost() { return player.q.time.plus(1).pow(2.4).times(1e6).pow(player.ma.current=="q"?(this.id*8):1) },
+				cost() { return player.q.time.plus(1).pow(2.4).times(1e6).pow(player.ma.current=="q"?(this.id*6):1) },
 				costFormula: "1e6*(time+1)^2.4",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3180,7 +3204,7 @@ addLayer("q", {
 			21: {
 				title: "Quirk City",
 				description: "Super Boosters multiply each Quirk Layer's production.",
-				cost() { return player.q.time.plus(1).pow(3.2).times(1e8).pow(player.ma.current=="q"?(this.id*2.5):1) },
+				cost() { return player.q.time.plus(1).pow(3.2).times(1e8).pow(player.ma.current=="q"?(this.id*1.5):1) },
 				costFormula: "1e8*(time+1)^3.2",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3193,7 +3217,7 @@ addLayer("q", {
 			22: {
 				title: "Infinite Possibilities",
 				description: "Total Quirks provide free Extra Time Capsules, Enhancers, & Space Buildings.",
-				cost() { return player.q.time.plus(1).pow(4.2).times(2e11).pow(player.ma.current=="q"?(this.id*4):1) },
+				cost() { return player.q.time.plus(1).pow(4.2).times(2e11).pow(player.ma.current=="q"?(this.id*2):1) },
 				costFormula: "2e11*(time+1)^4.2",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3216,7 +3240,7 @@ addLayer("q", {
 			24: {
 				title: "Exponential Madness",
 				description: "The first Time Energy effect & the first Enhancer effect are raised ^7.5.",
-				cost() { return player.q.time.plus(1).pow(6.8).times(1e24).pow(player.ma.current=="q"?(this.id*2):1) },
+				cost() { return player.q.time.plus(1).pow(6.8).times(1e24).pow(player.ma.current=="q"?(this.id*1.95):1) },
 				costFormula: "1e24*(time+1)^6.8",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3242,7 +3266,7 @@ addLayer("q", {
 			31: {
 				title: "Scale Softening",
 				description: "Post-12 scaling for static layers in rows 2-3 starts later based on your Quirk Layers.",
-				cost() { return player.q.time.plus(1).pow(8.4).times(1e48).pow(player.ma.current=="q"?(this.id/1.2):1) },
+				cost() { return player.q.time.plus(1).pow(8.4).times(1e48).pow(player.ma.current=="q"?(this.id/1.25):1) },
 				costFormula: "1e48*(time+1)^8.4",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3255,7 +3279,7 @@ addLayer("q", {
 			32: {
 				title: "Quinary Superspace",
 				description: "The Quinary Space Building's effect is twice as strong.",
-				cost() { return player.q.time.plus(1).pow(10).times(1e58).pow(player.ma.current=="q"?(this.id/1.5):1) },
+				cost() { return player.q.time.plus(1).pow(10).times(1e58).pow(player.ma.current=="q"?(this.id/1.6):1) },
 				costFormula: "1e58*(time+1)^10",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3265,7 +3289,7 @@ addLayer("q", {
 			33: {
 				title: "Generated Progression",
 				description: "Unlock Super Generators.",
-				cost() { return player.q.time.plus(1).pow(12).times(1e81).pow(player.ma.current=="q"?(this.id/1.8):1) },
+				cost() { return player.q.time.plus(1).pow(12).times(1e81).pow(player.ma.current=="q"?(this.id/1.85):1) },
 				costFormula: "1e81*(time+1)^12",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3275,7 +3299,7 @@ addLayer("q", {
 			34: {
 				title: "Booster Madness",
 				description: "Anything that adds to the Booster base also multiplies it at a reduced rate.",
-				cost() { return player.q.time.plus(1).pow(15).times(2.5e94).pow(player.ma.current=="q"?(this.id/1.8):1) },
+				cost() { return player.q.time.plus(1).pow(15).times(2.5e94).pow(player.ma.current=="q"?(this.id/1.85):1) },
 				costFormula: "2.5e94*(time+1)^15",
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
@@ -3313,7 +3337,7 @@ addLayer("q", {
 			42: {
 				title: "Improvement Boost",
 				description: "Unlock 3 more Quirk Improvements.",
-				cost() { return new Decimal((player.ma.current=="q")?"1e3700":1e150) },
+				cost() { return new Decimal((player.ma.current=="q")?"1e3675":1e150) },
 				currencyDisplayName: "quirk energy",
 				currencyInternalName: "energy",
 				currencyLayer: "q",
@@ -3521,7 +3545,7 @@ addLayer("o", {
 		},
         requires() { 
 			let req = new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 62))?16:14).sub(tmp.o.solEnEff);
-			if (hasUpgrade("ba", 23)) req = req.div(tmp.ba.posBuff);
+			if (hasUpgrade("ba", 23)) req = req.div(tmp.ba.posBuff.max(1));
 			return req;
 		},
         resource: "solarity", // Name of prestige currency
@@ -3534,6 +3558,7 @@ addLayer("o", {
 			if (hasUpgrade("hn", 25)) exp = exp.times(upgradeEffect("hn", 25));
 			if (player.n.buyables[11].gte(4)) exp = exp.times(buyableEffect("o", 32));
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) exp = exp.times(player.sb.points.times(0.5/100).plus(1))
+			if (player.en.unlocked) exp = exp.plus(tmp.en.owEff);
 			return exp;
 		}, // Prestige currency exponent
         gainMult() { // Calculate the multiplier for main currency from bonuses
@@ -3844,7 +3869,7 @@ addLayer("o", {
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
 					return ("Sacrifice all of your Solarity for "+formatWhole(data.gain)+" Thermonuclear Reactants\n"+
-					"Req: 1e500 Solarity\n"+
+					"Req: 1e750 Solarity\n"+
 					"Amount: "+formatWhole(player[this.layer].buyables[this.id])+((tmp.o.multiplyBuyables||new Decimal(1)).eq(1)?"":(" x "+format(tmp.o.multiplyBuyables)))+"\n"+
 					(tmp.nerdMode?("Formula: log(log(log(x+1)+1)+1)/3"):("Effect: Add "+format(data.effect.times(100))+"% to Solar Power, Space Building Power, & Hyper Building Power.")))
 				},
@@ -3893,6 +3918,7 @@ addLayer("ss", {
 		base() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.1:1.15) },
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
+			if (player.ne.unlocked) mult = mult.div(tmp.ne.thoughtEff1);
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -3909,6 +3935,7 @@ addLayer("ss", {
 			if (tmp.q.impr[42].unlocked) base = base.times(improvementEffect("q", 42));
 			if (hasUpgrade("hn", 35)) base = base.times(upgradeEffect("hn", 35));
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) base = base.times(Decimal.pow(1e10, player.ss.points));
+			if (player.ne.unlocked) base = base.times(tmp.ne.thoughtEff2);
 			
 			if (hasUpgrade("t", 41) && player.i.buyables[12].gte(4)) base = base.pow(1.5);
 			return base;
@@ -4096,7 +4123,7 @@ addLayer("ss", {
 addLayer("m", {
 		name: "magic", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "M", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -4175,7 +4202,7 @@ addLayer("m", {
 			if (!player.m.unlocked) return;
 			if (player.m.auto && hasMilestone("hn", 2) && player.m.distrAll && player.ma.current!="m") layers.m.castAllSpells(true, diff);
 			for (let i=11;i<=(10+tmp.m.spellsUnlocked);i++) {
-				if (tmp.m.buyables[i].unlocked && player.m.auto && hasMilestone("hn", 2) && !player.m.distrAll && player.ma.current!="m") {
+				if (tmp.m.buyables[i].unlocked && player.m.auto && hasMilestone("hn", 2) && (!player.m.distrAll||tmp.t.effect2.gt(1)) && player.ma.current!="m") {
 					player.m.spellInputs[i] = (player.m.spellTimes[i].gt(0)?player.m.spellInputs[i].max(tmp.m.spellInputAmt):tmp.m.spellInputAmt);
                     player.m.hexes = player.m.hexes.plus(softcap("hexGain", tmp.m.hexGain.times(player.m.spellInputs[i]).times(diff)));
 					player.m.spellTimes[i] = tmp.m.spellTime;
@@ -4480,7 +4507,7 @@ addLayer("m", {
 addLayer("ba", {
 		name: "balance", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "BA", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 3, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -4795,7 +4822,7 @@ addLayer("ba", {
 addLayer("ps", {
 		name: "phantom souls", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "PS", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -4860,6 +4887,7 @@ addLayer("ps", {
 			let mult = new Decimal(1);
 			if (tmp.ps.buyables[11].effects.damned) mult = mult.times(tmp.ps.buyables[11].effects.damned||1);
 			if (player.i.buyables[11].gte(1)) mult = mult.times(buyableEffect("s", 16));
+			if (player.c.unlocked) mult = mult.times(tmp.c.eff4);
 			return mult.times(tmp.n.dustEffs.purple);
 		},
 		soulGain() {
@@ -5114,7 +5142,7 @@ addLayer("ps", {
 addLayer("hn", {
 		name: "honour", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "HN", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -5725,7 +5753,7 @@ addLayer("hn", {
 addLayer("n", {
 		name: "nebula", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "N", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -5762,6 +5790,7 @@ addLayer("n", {
 			if (hasUpgrade("q", 45) && player.i.buyables[12].gte(6)) mult = mult.times(200);
 			if (player.ge.unlocked) mult = mult.times(tmp.ge.rotEff);
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("i"):false) mult = mult.times(Decimal.pow(10, player.i.nb));
+			if (hasUpgrade("ai", 24)) mult = mult.times(upgradeEffect("ai", 24));
             return mult
         },
 		passiveGeneration() { return (hasMilestone("ma", 3)&&player.ma.current!="n")?1:0 },
@@ -5953,7 +5982,7 @@ addLayer("n", {
 addLayer("hs", {
 		name: "hyperspace", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "HS", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 3, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -6042,6 +6071,7 @@ addLayer("hs", {
 			if (player.ma.unlocked) pow = pow.plus(tmp.ma.effect.max(1).log10().div(40));
 			if (hasAchievement("a", 113)) pow = pow.plus(.1);
 			if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) pow = pow.plus(player.hs.buyables[11].div(1000))
+			if (player.c.unlocked && tmp.c) pow = pow.plus(tmp.c.eff1);
 			return pow;
 		},
 		buyables: {
@@ -6394,7 +6424,7 @@ addLayer("hs", {
 addLayer("i", {
 		name: "imperium", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "I", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 3, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 4, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -6651,7 +6681,7 @@ addLayer("i", {
 addLayer("ma", {
 		name: "mastery", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "MA", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -6684,6 +6714,7 @@ addLayer("ma", {
 			if (hasAchievement("a", 131)) mult = mult.div(1.1);
 			if (hasAchievement("a", 95)) mult = mult.div(1.15);
 			if (hasAchievement("a", 134)) mult = mult.times(Decimal.pow(.999925, player.ps.points));
+			if (hasAchievement("a", 163)) mult = mult.div(Decimal.pow(1.1, player.a.achievements.filter(x => x>160).length));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -6726,7 +6757,7 @@ addLayer("ma", {
 			if (player.ma.mastered.includes("e")) desc += "<h2>Enhance</h2><br><br><ul><li>Enhance gain exponent is increased (0.02 -> 0.025)</li><li>The second Enhancer effect is raised to the power of 100</li><li><b>Enhanced Prestige</b> also affects Point gain, and it is raised ^1.5</li><li><b>Enter the E-Space</b> is 250% stronger</li><li><b>Monstrous Growth</b>'s base is much better (1.1 -> 1e2,000)</li><li><b>To the Next Level</b> is cubed</li></ul><br><br>";
 			if (player.ma.mastered.includes("s")) desc += "<h2>Space</h2><br><br><ul><li>Space cost base is reduced (1e10 -> 10)</li><li>Base Space cost exponent is reduced (1.85 -> 1.4)</li><li>Space Building Power is divided by 3.85, but Space Buildings cost scale 5x slower</li></ul><br><br>";
 			if (player.ma.mastered.includes("sb")) desc += "<h2>Super Boosters</h2><br><br><ul><li>Super Booster cost base is reduced (1.05 -> 1.025)</li><li>Base Super Booster cost exponent is reduced (1.25 -> 1.075)</li><li>The Super Booster cost is divided by 1.333</li><li>Super Boosters provide Spectral Boosters</li></ul><br><br>";
-			if (player.ma.mastered.includes("sg")) desc += "<h2>Super Generators</h2><br><br><ul><li>Super Generator cost base is reduced (1.05 -> 1.04)</li><li>Base Super Booster cost exponent is reduced (1.25 -> 1.225)</li><li>The Super Generator cost is divided by 1.1</li><li>The Super Generator Power effect is squared</li><li>Super Generators give Spectral Generators over time</li></ul><br><br>";
+			if (player.ma.mastered.includes("sg")) desc += "<h2>Super Generators</h2><br><br><ul><li>Super Generator cost base is reduced (1.05 -> 1.04)</li><li>Base Super Generator cost exponent is reduced (1.25 -> 1.225)</li><li>The Super Generator cost is divided by 1.1</li><li>The Super Generator Power effect is squared</li><li>Super Generators give Spectral Generators over time</li></ul><br><br>";
 			if (player.ma.mastered.includes("q")) desc += "<h2>Quirks</h2><br><br><ul><li>Quirk gain exponent is increased (7.5e-3 -> 8e-3)</li><li>The Quirk Energy effect softcap start is raised ^1.5</li><li>The Quirk Layer cost base is raised ^0.75</li><li><b>Millennial Abilities</b> is 50% stronger</li><li>Bought Decary Space Building Levels add free Quirk Improvements (equal to the Level/4)</li></ul><br><br>";
 			if (player.ma.mastered.includes("h")) desc += "<h2>Hindrances</h2><br><br><ul><li>Hindrance Spirit gain exponent is increased (0.125 -> 0.2)</li><li>The Hindrance Spirit effect softcap is much weaker (exponent to the 4th root -> exponent to the 2.5th root)</li><li>Unlock a Hindrance milestone</li><li><b>Speed Demon</b> has a secondary effect</li><li><b>Out of Room</b>'s effect is 40% stronger</li><li><b>Timeless</b> & <b>Option D</b> no longer have a completion limit</li><li><b>Timeless</b>'s effect is raised ^5</li><li><b>Productionless</b>'s reduction to the Quirk Layer cost base is stronger (0.15 -> 0.2)</li></ul><br><br>";
 			if (player.ma.mastered.includes("o")) desc += "<h2>Solarity</h2><br><br><ul><li>The Solarity gain exponent is increased by 0.5% for every Super Booster you have (additive)</li><li>The Solar Energy gain exponent limit is increased to 0.15, but beyond 0.1 it grows much slower</li><li>Solar Energy's second effect is 10% stronger</li><li>Solar Power is increased by 20% for every OoM of Solarity you have</li><li>Solarity buyable gain is raised ^2.6</li><li>All effects of the first row of Solarity buyables are raised ^1.1</li><li><b>Convectional Energy</b>'s effect is raised ^25</li><li>All effects of the second row of Solarity buyables are multiplied by 1.4</li><li>All effects of the third row of Solarity buyables are multiplied by 1.9</li></ul><br><br>";
@@ -6813,9 +6844,9 @@ addLayer("ma", {
 			if (!player.ma.selectionActive) return [];
 			if (player.ma.mastered.length==0) return ["p"];
 			let rows = player.ma.mastered.map(x => tmp[x].row)
-			let realRows = rows.filter(y => Object.keys(ROW_LAYERS[y]).every(z => player.ma.mastered.includes(z)));
+			let realRows = rows.filter(y => Object.keys(ROW_LAYERS[y]).every(z => player.ma.mastered.includes(z) || tmp.ma.masteryGoal[z]===undefined));
 			let furthestRow = Math.max(...realRows)+((player.ma.current !== null)?0:1);
-			let m = Object.keys(layers).filter(x => (tmp[x].row<=furthestRow&&(tmp.ma.specialReqs[x]?tmp.ma.specialReqs[x].every(y => player.ma.mastered.includes(y)):true))||player.ma.mastered.includes(x));
+			let m = Object.keys(layers).filter(x => (tmp[x].row<=furthestRow&&tmp.ma.masteryGoal[x]!==undefined&&(tmp.ma.specialReqs[x]?tmp.ma.specialReqs[x].every(y => player.ma.mastered.includes(y)):true))||player.ma.mastered.includes(x));
 			if (player.ma.current !== null) m.push(player.ma.current);
 			
 			return m;
@@ -6885,7 +6916,7 @@ addLayer("ma", {
 addLayer("ge", {
 		name: "gears", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "GE", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -6898,6 +6929,8 @@ addLayer("ge", {
 			shrinkPower: new Decimal(0),
 			boosted: new Decimal(0),
 			maxToggle: false,
+			auto: false,
+			autoTime: new Decimal(0),
         }},
         color: "#bfbfbf",
 		nodeStyle() { return {
@@ -6916,16 +6949,23 @@ addLayer("ge", {
             mult = new Decimal(1);
 			if (player.mc.unlocked) mult = mult.times(clickableEffect("mc", 12));
 			if (player.mc.upgrades.includes(11)) mult = mult.times(buyableEffect("mc", 12));
+			if (hasMilestone("ge", 2)) mult = mult.times(player.en.total.max(1));
+			if (player.r.unlocked) mult = mult.times(tmp.r.buildingEff);
+			if (hasMilestone("id", 5) && tmp.id) mult = mult.times(tmp.id.rev.max(1));
+			if (hasUpgrade("ai", 33)) mult = mult.times(upgradeEffect("ai", 33));
+			if (hasUpgrade("ai", 44)) mult = mult.times(upgradeEffect("ai", 44));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
-            return new Decimal(1)
+            let exp = new Decimal(1)
+			if (hasUpgrade("ai", 34)) exp = exp.times(1.2);
+			return exp;
         },
         row: 6, // Row the layer is in on the tree (0 is the first row)
         hotkeys: [
             {key: "E", description: "Press Shift+E to Gear Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
         ],
-		passiveGeneration() { return false },
+		passiveGeneration() { return hasMilestone("ge", 2)?0.01:0 },
         doReset(resettingLayer){ 
 			let keep = [];
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
@@ -6937,7 +6977,7 @@ addLayer("ge", {
 			}
         },
         layerShown(){return player.ma.unlocked },
-        branches: ["n"],
+        branches: ["n", "r"],
 		tabFormat: ["main-display",
 			"prestige-button",
 			"resource-display", "blank",
@@ -6950,7 +6990,7 @@ addLayer("ge", {
 			"blank", "blank",
 			["clickable", 21],
 			"blank", "blank",
-			["row", [["column", [["raw-html", function() { return "<h3>Teeth: "+formatWhole(tmp.ge.teeth, true)+"</h3>" }], "blank", ["clickable", 11]], {"background-color": "#b0babf", color: "black", width: "12vw", padding: "10px", margin: "0 auto", "height": "250px"}], ["column", [["raw-html", function() { return "<h3>Kinetic Energy: "+format(player.ge.energy)+" J</h3><br><br>Velocity: "+format(tmp.ge.speed)+"m/s"+(tmp.nerdMode?" (sqrt(x))":"") }], "blank", ["clickable", 12]], {"background-color": "#dec895", color: "black", width: "12vw", padding: "10px", margin: "0 auto", "height": "250px"}], ["column", [["raw-html", function() { return "<h3>Tooth Size: "+format(tmp.ge.toothSize)+"m</h3><br><br>" }], "blank", ["clickable", 13]], {"background-color": "#bfa1b8", color: "black", width: "12vw", padding: "10px", margin: "0 auto", "height": "250px"}]]], "blank",
+			["row", [["column", [["raw-html", function() { return "<h3>Teeth: "+(hasMilestone("ge", 3)?format(tmp.ge.teeth):formatWhole(tmp.ge.teeth, true))+"</h3>" }], "blank", ["clickable", 11]], {"background-color": "#b0babf", color: "black", width: "12vw", padding: "10px", margin: "0 auto", "height": "250px"}], ["column", [["raw-html", function() { return "<h3>Kinetic Energy: "+format(player.ge.energy)+" J</h3><br><br>Velocity: "+format(tmp.ge.speed)+"m/s"+(tmp.nerdMode?" (sqrt(x))":"") }], "blank", ["clickable", 12]], {"background-color": "#dec895", color: "black", width: "12vw", padding: "10px", margin: "0 auto", "height": "250px"}], ["column", [["raw-html", function() { return "<h3>Tooth Size: "+format(tmp.ge.toothSize)+"m</h3><br><br>" }], "blank", ["clickable", 13]], {"background-color": "#bfa1b8", color: "black", width: "12vw", padding: "10px", margin: "0 auto", "height": "250px"}]]], "blank",
 			["buyable", 11], "blank",
 		],
 		update(diff) {
@@ -6960,6 +7000,13 @@ addLayer("ge", {
 			player.ge.toothPower = player.ge.toothPower.plus(factor.times(diff));
 			player.ge.shrinkPower = player.ge.shrinkPower.plus(factor.times(diff));
 			player.ge.rotations = player.ge.rotations.plus(tmp.ge.rps.times(diff));
+			player.ge.autoTime = player.ge.autoTime.plus(diff);
+			if (player.ge.auto && hasMilestone("ge", 3) && player.ge.autoTime.gte(.5)) {
+				player.ge.autoTime = new Decimal(0);
+				if (layers.ge.clickables[11].canClick()) layers.ge.clickables[11].onClick();
+				if (layers.ge.clickables[12].canClick()) layers.ge.clickables[12].onClick();
+				if (layers.ge.clickables[13].canClick()) layers.ge.clickables[13].onClick();
+			}
 		},
 		rotEff() {
 			return softcap("rotEff", player.ge.rotations.round().plus(1).pow(5));
@@ -6985,7 +7032,9 @@ addLayer("ge", {
 			return player.ge.energy.sqrt();
 		},
 		teeth() {
-			return player.ge.toothPower.pow(1.5).plus(100).div(tmp.ge.clickables[11].unlocked?tmp.ge.clickables[11].effect:1).floor().max(1);
+			let t = player.ge.toothPower.pow(1.5).plus(100).div(tmp.ge.clickables[11].unlocked?tmp.ge.clickables[11].effect:1);
+			if (hasMilestone("ge", 3)) return t.max(0);
+			else return t.floor().max(1);
 		},
 		toothSize() {
 			return player.ge.shrinkPower.plus(1).pow(-0.5).div(tmp.ge.clickables[13].effect).times(player.mc.unlocked?tmp.mc.buyables[11].effect.pow(hasAchievement("a", 125)?(-1):1):1);
@@ -7016,6 +7065,7 @@ addLayer("ge", {
 				power() {
 					let pow = new Decimal(1);
 					if (hasAchievement("a", 124)) pow = pow.times(1.2);
+					if (hasUpgrade("ai", 14)) pow = pow.times(1.111);
 					return pow;
 				},
 				cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
@@ -7023,7 +7073,7 @@ addLayer("ge", {
 					return Decimal.pow(125, x.pow(1.425)).times(1e3).div(tmp.ge.buyables[this.id].costDiv)
                 },
 				effectPer() { return Decimal.div(tmp.ge.buyables[this.id].power, 2) },
-				effect() { return Decimal.mul(tmp[this.layer].buyables[this.id].effectPer, player[this.layer].buyables[this.id].plus(tmp.ge.buyables[this.id].free)) },
+				effect() { return Decimal.mul(tmp[this.layer].buyables[this.id].effectPer, player[this.layer].buyables[this.id].plus(tmp.ge.buyables[this.id].free).times(hasUpgrade("ai", 13)?1.5:1)) },
 				display() { // Everything else displayed in the buyable button after the title
                     let data = tmp[this.layer].buyables[this.id];
 					let cost = data.cost;
@@ -7040,7 +7090,7 @@ addLayer("ge", {
                     player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
 					player.ge.boosted = new Decimal(0);
 					for (let i=11;i<=13;i++) player.ge.clickables[i] = "";
-					doReset("ge", true);
+					if (!hasMilestone("ge", 3)) doReset("ge", true);
                 },
                 buyMax() {
 					// later :)
@@ -7180,13 +7230,26 @@ addLayer("ge", {
 				done() { return player.ge.best.gte(2e22) },
 				effectDescription: "Gear Upgrade costs increase independently.",
 			},
+			2: {
+				requirementDescription: "5e47 Gears & 25,000,000 Total Energy",
+				unlocked() { return player.en.unlocked },
+				done() { return player.en.unlocked && player.ge.best.gte(5e47) && player.en.total.gte(25e6) },
+				effectDescription: "Total Energy multiplies Gear gain, and gain 1% of Gear gain every second.",
+			},
+			3: {
+				requirementDescription: "1e141 Gears",
+				unlocked() { return hasUpgrade("ai", 13) },
+				done() { return hasUpgrade("ai", 13) && player.ge.best.gte(1e141) },
+				effectDescription: "Teeth can be partial (can go below 1), Gear Evolution does not force a Row 7 reset, and unlock Auto-Gear Upgrades.",
+				toggles: [["ge", "auto"]],
+			},
 		},
 })
 
 addLayer("mc", {
 		name: "machines", // This is optional, only used in a few places, If absent it just uses the layer id.
         symbol: "MC", // This appears on the layer's node. Default is the id with the first letter capitalized
-        position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        position: 3, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: false,
 			points: new Decimal(0),
@@ -7194,6 +7257,8 @@ addLayer("mc", {
 			total: new Decimal(0),
 			first: 0,
 			mechEn: new Decimal(0),
+			autoSE: false,
+			auto: false,
         }},
         color: "#c99a6b",
 		nodeStyle() { return {
@@ -7213,6 +7278,8 @@ addLayer("mc", {
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1);
 			if (player.mc.upgrades.includes(11)) mult = mult.times(buyableEffect("mc", 12));
+			if (hasMilestone("mc", 0)) mult = mult.times(player.ne.thoughts.max(1));
+			if (hasUpgrade("ai", 33)) mult = mult.times(upgradeEffect("ai", 33));
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -7222,19 +7289,32 @@ addLayer("mc", {
         hotkeys: [
             {key: "c", description: "Press C to Machine Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
         ],
-		passiveGeneration() { return false },
+		passiveGeneration() { return hasMilestone("mc", 0)?0.01:0 },
         doReset(resettingLayer){ 
 			let keep = [];
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
         layerShown(){return player.ma.unlocked },
-        branches: ["hs", "i"],
+        branches: ["hs", "i", "id"],
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
 			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
+			if (hasMilestone("id", 3) && player.mc.autoSE) layers.mc.buyables[11].max();
+			if (hasMilestone("mc", 1) && player.mc.auto) {
+				player.mc.clickables[11] = player.mc.clickables[11].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
+				player.mc.clickables[12] = player.mc.clickables[12].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
+				player.mc.clickables[21] = player.mc.clickables[21].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
+				player.mc.clickables[22] = player.mc.clickables[22].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
+			}
+		},
+		mechEnMult() {
+			let mult = new Decimal(1);
+			if (player.id.unlocked) mult = mult.times(tmp.id.revEff);
+			if (player.c.unlocked) mult = mult.times(tmp.c.eff4);
+			return mult;
 		},
 		mechPer() { return tmp.mc.buyables[11].effect.pow(tmp.mc.buyables[11].buffExp).times(clickableEffect("mc", 11)) },
-		decayPower() { return player.mc.mechEn.plus(1).log10().plus(1).pow(-2) },
+		decayPower() { return player.mc.mechEn.plus(1).log10().div(hasUpgrade("ai", 31)?2:1).plus(1).pow(-2) },
 		mechEff() { return Decimal.pow(10, player.mc.mechEn.plus(1).log10().root(4).div(2)) },
 		tabFormat: {
 			"The Shell": {
@@ -7242,12 +7322,13 @@ addLayer("mc", {
 				content: ["main-display",
 				"prestige-button",
 				"resource-display", "blank",
+				"milestones",
 				"blank", 
 				"respec-button", "blank", ["buyable", 11],
 			]},
 			"The Motherboard": {
 				buttonStyle() { return {'background-color': '#c99a6b', color: "black"} },
-				content: ["blank", ["display-text", function() { return "Each Gear Rotation provides "+format(tmp.mc.mechPer)+" Mech-Energy, which adds to <h3>"+format(player.mc.mechEn)+" Mech-Energy</h3>" }],
+				content: ["blank", ["display-text", function() { return "Each Gear Rotation provides "+format(tmp.mc.mechPer)+" Mech-Energy, which adds to <h3>"+format(player.mc.mechEn.times(tmp.mc.mechEnMult))+" Mech-Energy</h3>" }],
 				"blank", ["display-text", function() { return tmp.mc.decayPower.eq(1)?"":("Due to inadequate storage, Mech-Energy is being lost by "+format(tmp.mc.decayPower.pow(-1).log10())+" OoMs per second.") }],
 				"blank", ["display-text", function() { return "Your Mech-Energy is multiplying Gear Speed by "+format(tmp.mc.mechEff)+(tmp.nerdMode?" (Formula: 10^((log(x+1)^0.25)/2))":"") }],
 				"blank", ["upgrade", 11], "blank",
@@ -7259,16 +7340,36 @@ addLayer("mc", {
 				content: ["blank", ["buyable", 12]],
 			},
 		},
+		milestones: {
+			0: {
+				requirementDescription: "125,000,000 Machine Parts & 1e9 Signals",
+				unlocked() { return player.ne.unlocked && player.mc.unlocked },
+				done() { return player.ne.unlocked && ((player.mc.best.gte(1.25e8) && player.ne.signals.gte(1e9)) || player.mc.milestones.includes(0)) },
+				effectDescription: "Thoughts multiply Machine Part gain, and gain 1% of Machine Part gain every second.",
+			},
+			1: {
+				requirementDescription: "1e50,000 Mech-Energy",
+				unlocked() { return hasUpgrade("ai", 31) },
+				done() { return hasUpgrade("ai", 31) && player.mc.mechEn.times(tmp.mc.mechEnMult).gte("1e50000") },
+				effectDescription: "CPU's effect is raised ^25, and unlock Auto-Motherboard.",
+				toggles: [["mc", "auto"]],
+			},
+		},
 		clickables: {
 			rows: 2,
 			cols: 2,
-			activeLimit() { return hasAchievement("a", 133)?2:1 },
+			activeLimit() { return hasAchievement("a", 141)?4:(hasAchievement("a", 133)?2:1) },
 			11: {
 				title: "CPU",
 				display() { 
 					return "Active Mech-Energy: "+format(player.mc.clickables[this.id])+"<br><br>Currently: Kinetic Energy multiplies Mech-Energy gain by "+format(tmp.mc.clickables[this.id].effect)+(tmp.nerdMode?" (Formula: (kineticEnergy+1)^(1-1/sqrt(log(activeMechEnergy+1)+1)))":"");
 				},
-				effect() { return Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).sqrt()))) },
+				effect() { 
+					let eff = Decimal.pow(player.ge.energy.plus(1), Decimal.sub(1, Decimal.div(1, Decimal.add(player.mc.clickables[this.id], 1).log10().plus(1).sqrt())));
+					if (hasMilestone("mc", 1)) eff = eff.pow(25);
+					if (!eff.eq(eff)) return new Decimal(1);
+					return eff;
+				},
 				unlocked() { return player.mc.unlocked },
 				canClick() { return player.mc.unlocked },
 				onClick() {
@@ -7279,7 +7380,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "11", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7300,7 +7401,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "12", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7322,7 +7423,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "21", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7343,7 +7444,7 @@ addLayer("mc", {
 							doReset("mc", true);
 						}
 					}
-					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn);
+					player.mc.clickables[this.id] = player.mc.clickables[this.id].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 					player.mc.mechEn = new Decimal(0);
 				},
 				style: {id: "22", "height": "200px", "width": "200px", "background-color": function() { return new Decimal(player.mc.clickables[this.id]).eq(0)?"#c99a6b":"#6ccc81" }},
@@ -7363,7 +7464,11 @@ addLayer("mc", {
 				cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
                     return x.div(10).plus(0.5).div(tmp[this.layer].buyables[this.id].costDiv).ceil();
                 },
-				buffExp() { return hasAchievement("a", 132)?25:5 },
+				buffExp() { 
+					let exp = hasAchievement("a", 132)?25:5;
+					if (hasUpgrade("ai", 33)) exp *= 100;
+					return exp;
+				},
 				effect() { return player[this.layer].buyables[this.id].plus(1).sqrt() },
 				display() { // Everything else displayed in the buyable button after the title
                     let data = tmp[this.layer].buyables[this.id];
@@ -7383,10 +7488,15 @@ addLayer("mc", {
 					let n = b.pow(2).times(4).plus(b.times(36)).plus(c.times(80)).plus(81).sqrt().sub(11).div(2).plus(1).floor();
                     player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].max(n)
 					if (n.sub(b).eq(1)) player.mc.points = player.mc.points.sub(tmp[this.layer].buyables[this.id].cost);
-					else player.mc.points = player.mc.points.sub(b.sub(n).sub(1).times(b.plus(n).plus(10)).times(-0.05).floor()).max(0);
+					else player.mc.points = player.mc.points.sub(n.sub(b).times(b.plus(n).plus(10)).times(0.05).max(n.sub(b)).div(tmp[this.layer].buyables[this.id].costDiv).floor()).max(0);
                 },
+				max() {
+					let c = player.mc.points.times(tmp[this.layer].buyables[this.id].costDiv);
+					let n = c.sub(.5).times(10).plus(1).floor().max(0);
+                    player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].max(n);
+				},
                 style: {'height':'200px', 'width':'200px'},
-				autoed() { return false },
+				autoed() { return hasMilestone("id", 3) && player.mc.autoSE },
 			},
 			12: {
 				title: "The Core",
@@ -7437,6 +7547,1591 @@ addLayer("mc", {
 		},
 })
 
+addLayer("en", {
+		name: "energy", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "EN", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			bestOnReset: new Decimal(0),
+			total: new Decimal(0),
+			stored: new Decimal(0),
+			target: 0,
+			tw: new Decimal(0),
+			ow: new Decimal(0),
+			sw: new Decimal(0),
+			mw: new Decimal(0),
+			first: 0,
+        }},
+        color: "#fbff05",
+		nodeStyle() {return {
+			"background-color": (((player.en.unlocked||canReset("en"))&&!(Array.isArray(tmp.ma.canBeMastered)&&player.ma.selectionActive&&tmp[this.layer].row<tmp.ma.rowLimit&&!tmp.ma.canBeMastered.includes(this.layer)))?"#fbff05":"#bf8f8f"),
+        }},
+        resource: "energy", // Name of prestige currency
+        type: "custom", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+		baseResource: "solarity",
+		baseAmount() { return player.o.points },
+		req() { return (player[this.layer].unlockOrder>0&&!player.en.unlocked)?new Decimal("1e15825"):new Decimal("1e15000") },
+		requires() { return this.req() },
+		increaseUnlockOrder: ["ne"],
+		exp() { return Decimal.add(.8, tmp.en.clickables[11].eff) },
+		exponent() { return tmp[this.layer].exp },
+		gainMult() {
+			let mult = new Decimal(1);
+			if (hasMilestone("en", 0)) mult = mult.times(2);
+			if (hasMilestone("en", 2)) mult = mult.times(player.o.points.plus(1).log10().plus(1).log10().plus(1));
+			if (player.ne.unlocked && hasMilestone("ne", 5)) mult = mult.times(tmp.ne.thoughtEff3);
+			if (player.r.unlocked) mult = mult.times(tmp.r.producerEff);
+			if (hasMilestone("r", 0)) mult = mult.times(player.r.maxMinibots.max(1));
+			if (player.ai.unlocked && tmp.ai) mult = mult.times(tmp.ai.conscEff1);
+			return mult;
+		},
+		getResetGain() {
+			let gain = player.o.points.div(tmp.en.req).plus(1).log2().pow(tmp.en.exp);
+			return gain.times(tmp.en.gainMult).floor();
+		},
+		resetGain() { return this.getResetGain() },
+		getNextAt() {
+			let gain = tmp.en.getResetGain.div(tmp.en.gainMult).plus(1)
+			return Decimal.pow(2, gain.root(tmp.en.exp)).times(tmp.en.req);
+		},
+		passiveGeneration() { return hasMilestone("en", 0)?0.1:0 },
+		canReset() {
+			return player.o.points.gte(tmp.en.req) && tmp.en.getResetGain.gt(0) && (hasMilestone("en", 0)?player.en.points.lt(tmp.en.getResetGain):player.en.points.eq(0))
+		},
+		dispGainFormula() {
+			let start = tmp.en.req;
+			let exp = tmp.en.exp;
+			return "log2(x / "+format(start)+")^"+format(exp)
+		},
+		prestigeButtonText() {
+			if (tmp.nerdMode) return "Gain Formula: "+tmp.en.dispGainFormula;
+			else return `${ player.en.points.lt(1e3) ? (tmp.en.resetDescription !== undefined ? tmp.en.resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp.en.getResetGain)}</b> ${tmp.en.resource} ${tmp.en.resetGain.lt(100) && player.en.points.lt(1e3) ? `<br><br>Next at ${format(tmp.en.nextAt)}` : ""}`
+		},
+		prestigeNotify() {
+			if (!canReset("en")) return false;
+			if (tmp.en.getResetGain.gte(player.o.points.times(0.1).max(1)) && !tmp.en.passiveGeneration) return true;
+			else return false;
+		},
+		tooltip() { return formatWhole(player.en.points)+" Energy" },
+		tooltipLocked() { return "Reach "+formatWhole(tmp.en.req)+" Solarity to unlock (You have "+formatWhole(player.o.points)+" Solarity)" },
+        row: 4, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "y", description: "Press Y to Energy Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (resettingLayer==this.layer) player.en.target = player.en.target%(hasMilestone("en", 3)?4:3)+1;
+			if (layers[resettingLayer].row<7 && resettingLayer!="r" && resettingLayer!="ai" && resettingLayer!="c") {
+				keep.push("tw");
+				keep.push("sw");
+				keep.push("ow");
+				keep.push("mw");		
+				if (hasMilestone("en", 1)) keep.push("milestones");
+			}
+			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+		onPrestige(gain) { player.en.bestOnReset = player.en.bestOnReset.max(gain) },
+        layerShown(){return player.mc.unlocked },
+        branches: ["sb","o"],
+		update(diff) {
+			if (!player[this.layer].unlocked) return;
+			let subbed = new Decimal(0);
+			if (player.en.points.gt(0)) {
+				subbed = player.en.points.times(Decimal.sub(1, Decimal.pow(0.75, diff))).plus(diff);
+				player.en.points = player.en.points.times(Decimal.pow(0.75, diff)).sub(diff).max(0);
+				if (hasMilestone("en", 1)) player.en.stored = player.en.stored.plus(subbed.div(5));
+			}
+			let sw_mw_exp = hasUpgrade("ai", 34)?0.8:1
+			if (hasMilestone("r", 1)) {
+				subbed = subbed.times(player.r.total.max(1));
+				if (hasMilestone("r", 4) && tmp.r) subbed = subbed.times(tmp.r.producerEff.max(1));
+				player.en.tw = player.en.tw.pow(1.5).plus(subbed.div(player.en.target==1?1:3)).root(1.5);
+				player.en.ow = player.en.ow.pow(1.5).plus(subbed.div(player.en.target==2?1:3)).root(1.5);
+				player.en.sw = player.en.sw.pow(sw_mw_exp*(hasMilestone("en", 4)?2.5:4)).plus(subbed.div(player.en.target==3?1:3)).root(sw_mw_exp*(hasMilestone("en", 4)?2.5:4));
+				if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(sw_mw_exp*(hasMilestone("en", 4)?5.5:7)).plus(subbed.div(player.en.target==4?1:3)).root(sw_mw_exp*(hasMilestone("en", 4)?5.5:7));
+				
+			} else switch(player.en.target) {
+				case 1: 
+					player.en.tw = player.en.tw.pow(1.5).plus(subbed).root(1.5);
+					break;
+				case 2: 
+					player.en.ow = player.en.ow.pow(1.5).plus(subbed).root(1.5);
+					break;
+				case 3: 
+					player.en.sw = player.en.sw.pow(sw_mw_exp*(hasMilestone("en", 4)?2.5:4)).plus(subbed).root(sw_mw_exp*(hasMilestone("en", 4)?2.5:4));
+					break;
+				case 4: 
+					if (hasMilestone("en", 3)) player.en.mw = player.en.mw.pow(sw_mw_exp*(hasMilestone("en", 4)?5.5:7)).plus(subbed).root(sw_mw_exp*(hasMilestone("en", 4)?5.5:7));
+					break;
+			}
+		},
+		storageLimit() { return player.en.total.div(2) },
+		twEff() { return player.en.tw.plus(1).log10().plus(1).log10().times(10).plus(1).pow(4) },
+		owEff() { return player.en.ow.plus(1).log10().plus(1).log10().times(40).pow(1.8) },
+		swEff() { return player.en.sw.plus(1).log10().plus(1).log10().plus(1).log10().plus(1) },
+		mwEff() { return hasMilestone("en", 3)?player.en.mw.plus(1).log10().plus(1).log10().div(5).plus(1).pow(2):new Decimal(1) },
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank",
+			"milestones",
+			"blank", "blank", 
+			"clickables",
+			"blank", "blank",
+			["row", [
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==1?"#e1ffde;":"#8cfa82;")+"'>"+(player.en.target==1?"TIME WATTS":"Time Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #8cfa82;'>"+formatWhole(player.en.tw)+"</h4><br><br>Strengthens Non-Extra Time Capsules by <span style='color: #8cfa82; font-weight: bold; font-size: 20px;'>"+format(tmp.en.twEff.sub(1).times(100))+"</span>%" }]], {width: "100%"}],
+				]], "blank", "blank", ["row", [
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==2?"#fff0d9":"#ffd187;")+"'>"+(player.en.target==2?"SOLAR WATTS":"Solar Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #ffd187;'>"+formatWhole(player.en.ow)+"</h4><br><br>Adds <span style='color: #ffd187; font-weight: bold; font-size: 20px;'>"+format(tmp.en.owEff)+"</span> to Solarity gain exponent" }]], {width: "50%"}],
+				["column", [["display-text", function() { return "<h3 style='color: "+(player.en.target==3?"#dbfcff;":"#8cf5ff;")+"'>"+(player.en.target==3?"SUPER WATTS":"Super Watts")+"</h3>" }], ["display-text", function() { return "<h4 style='color: #8cf5ff;'>"+formatWhole(player.en.sw)+"</h4><br><br>Strengthens Super Boosters by <span style='color: #8cf5ff; font-weight: bold: font-size: 20px;'>"+format(tmp.en.swEff.sub(1).times(100))+"</span>%" }]], {width: "50%"}],
+				]], "blank", "blank", ["row", [
+				["column", [["display-text", function() { return hasMilestone("en", 3)?("<h3 style='color: "+(player.en.target==4?"#f4deff;":"#d182ff;")+"'>"+(player.en.target==4?"MIND WATTS":"Mind Watts")+"</h3>"):"" }], ["display-text", function() { return hasMilestone("en", 3)?("<h4 style='color: #d182ff;'>"+formatWhole(player.en.mw)+"</h4><br><br>Strengthens Thought effects by <span style='color: #d182ff; font-weight: bold; font-size: 20px;'>"+format(tmp.en.mwEff.sub(1).times(100))+"</span>%, and multiplies Signal gain by <span style='color: #d182ff; font-weight: bold; font-size: 20px;'>"+format(tmp.en.mwEff.pow(40))+"</span>x"):"" }]], {width: "75%"}],
+			], function() { return {display: hasMilestone("en", 3)?"none":""} }],
+			"blank", "blank", "blank",
+		],
+		milestones: {
+			0: {
+				requirementDescription: "8,750 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(8750) || hasAchievement("a", 151) },
+				effectDescription: "Gain 10% of Energy gain every second, you can always Energy reset when under 100% of Energy gain, and Energy gain is doubled.",
+			},
+			1: {
+				requirementDescription: "22,500 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(22500) || hasAchievement("a", 151) },
+				effectDescription: "20% of Energy that's lost over time becomes stored, Energy milestones are kept on all resets up to Row 7 (except ???), and when below 1, the Stored Energy effect is square rooted.",
+			},
+			2: {
+				requirementDescription: "335,000 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(335e3) || hasAchievement("a", 151) },
+				effectDescription() { return "Energy gain is multiplied by the double-log of your Solarity ("+format(player.o.points.plus(1).log10().plus(1).log10().plus(1))+"x)." },
+			},
+			3: {
+				unlocked() { return player.en.unlocked && player.ne.unlocked },
+				requirementDescription: "250,000,000 Total Energy & 26 Thoughts",
+				done() { return (player.en.total.gte(2.5e8) && player.ne.thoughts.gte(26)) || player.en.milestones.includes(3) },
+				effectDescription() { return "Unlock Mind Watts." },
+			},
+			4: {
+				unlocked() { return hasMilestone("en", 3) || hasAchievement("a", 151) },
+				requirementDescription: "10,000,000 Energy in one reset",
+				done() { return player.en.bestOnReset.gte(1e7) || hasAchievement("a", 151) },
+				effectDescription() { return "The Mind Watt & Super Watt gain roots are decreased by 1.5" },
+			},
+		},
+		clickables: {
+			rows: 1,
+			cols: 2,
+			11: {
+				title: "Store Energy",
+				display(){
+					return "Stored Energy: <span style='font-size: 20px; font-weight: bold;'>"+formatWhole(player.en.stored)+" / "+formatWhole(tmp.en.storageLimit)+"</span><br><br>"+(tmp.nerdMode?("Effect Formula: log(log(x+1)+1)/5"):("Increases Energy gain exponent by <span style='font-size: 20px; font-weight: bold;'>"+format(tmp.en.clickables[11].eff)+"</span>"))
+				},
+				eff() { 
+					let e = player.en.stored.plus(1).log10().plus(1).log10().div(5);
+					if (hasMilestone("en", 1) && e.lt(1)) e = e.sqrt();
+					return e;
+				},
+				unlocked() { return player.en.unlocked },
+				canClick() { return player.en.unlocked && player.en.points.gt(0) },
+				onClick() { 
+					player.en.stored = player.en.stored.plus(player.en.points).min(tmp.en.storageLimit);
+					player.en.points = new Decimal(0);
+				},
+				style: {width: "160px", height: "160px"},
+			},
+			12: {
+				title: "Release Energy",
+				display: "",
+				unlocked() { return player.en.unlocked },
+				canClick() { return player.en.unlocked && player.en.stored.gt(0) },
+				onClick() { 
+					player.en.points = player.en.points.plus(player.en.stored);
+					player.en.best = player.en.best.max(player.en.points);
+					player.en.stored = new Decimal(0);
+				},
+				style: {width: "80px", height: "80px"},
+			},
+		},
+})
+
+addLayer("ne", {
+		name: "neurons", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "NE", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 4, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			first: 0,
+			signals: new Decimal(0),
+			thoughts: new Decimal(0),
+			auto: false,
+			autoNN: false,
+        }},
+        color: "#ded9ff",
+        requires() { return (player[this.layer].unlockOrder>0&&!player.ne.unlocked)?new Decimal("1e1160000"):new Decimal("1e1000000") }, // Can be a function that takes requirement increases into account
+		increaseUnlockOrder: ["en"],
+        resource: "neurons", // Name of prestige currency
+        baseResource: "subspace", // Name of resource prestige is based on
+        baseAmount() {return player.ss.subspace}, // Get the current amount of baseResource
+        type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+        exponent: new Decimal(2.5), // Prestige currency exponent
+		base: new Decimal("1e10000"),
+        gainMult() { // Calculate the multiplier for main currency from bonuses
+            mult = new Decimal(1)
+            return mult
+        },
+		canBuyMax() { return false },
+        row: 4, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "u", description: "Press U to Neuron Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+		resetsNothing() { return player.ne.auto },
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (layers[resettingLayer].row<7&&resettingLayer!="id"&&resettingLayer!="ai"&&resettingLayer!="c") {
+				keep.push("thoughts")
+				keep.push("buyables")
+				if (hasMilestone("ne", 1)) keep.push("milestones");
+			}
+            if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+		effect() {
+			let eff = player[this.layer].points.div(2).plus(1).pow(0.75).sub(1);
+			if (hasMilestone("ne", 3)) eff = eff.times(Decimal.pow(1.5, player[this.layer].points.sqrt()).plus(player[this.layer].points));
+			if (hasMilestone("ne", 6)) eff = eff.pow(2);
+			if (hasMilestone("id", 1)) eff = eff.pow(2).times(player[this.layer].buyables[11].max(1));
+			return eff;
+		},
+		effectDescription() { return "which multiply Signal gain speed by <h2 style='color: #ded9ff; text-shadow: #ded9ff 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>." },
+		autoPrestige() { return player.ne.auto },
+        layerShown(){return player.mc.unlocked},
+        branches: ["ss", "sg"],
+		update(diff) {
+			if (player.ne.unlocked && (player.ne.activeChallenge==11||hasAchievement("a", 151))) {
+				player.ne.signals = player.ne.signals.plus(tmp.ne.challenges[11].amt.times(diff)).min((hasMilestone("ne", 4)||hasMilestone("id", 0))?(1/0):tmp.ne.signalLim);
+				if (player.ne.signals.gte(tmp.ne.signalLim.times(0.999))) {
+					if (hasMilestone("id", 0)) player.ne.thoughts = player.ne.thoughts.max(tmp.ne.thoughtTarg);
+					else {
+						if (!hasMilestone("ne", 4) && !hasUpgrade("ai", 14)) player.ne.signals = new Decimal(0);
+						player.ne.thoughts = player.ne.thoughts.plus(1);
+					}
+				}
+				if (player.ne.autoNN && hasMilestone("ne", 7)) layers.ne.buyables[11].buyMax();
+			}
+		},
+		signalLimThresholdInc() {
+			let inc = new Decimal(hasMilestone("ne", 4)?2:(hasMilestone("ne", 3)?2.5:(hasMilestone("ne", 2)?3:5)));
+			if (player.id.unlocked) inc = inc.sub(tmp.id.effect);
+			return inc;
+		},
+		signalLimThresholdDiv() {
+			let div = new Decimal(1);
+			if (player.c.unlocked && tmp.c) div = div.times(tmp.c.eff2);
+			return div;
+		},
+		signalLim() { return Decimal.pow(tmp[this.layer].signalLimThresholdInc, player.ne.thoughts).times(100).div(tmp[this.layer].signalLimThresholdDiv) },
+		thoughtTarg() { return player.ne.signals.times(tmp[this.layer].signalLimThresholdDiv).div(100).max(1).log(tmp[this.layer].signalLimThresholdInc).plus(1).floor() },
+		thoughtPower() {
+			let pow = new Decimal(1);
+			if (player.en.unlocked && hasMilestone("en", 3)) pow = pow.times(tmp.en.mwEff);
+			if (hasMilestone("id", 1)) pow = pow.times(1.2);
+			return pow;
+		},
+		thoughtEff1() { return player.ne.thoughts.times(tmp.ne.thoughtPower).plus(1).log10().plus(1).pow(hasMilestone("ne", 1)?2:1) },
+		thoughtEff2() { return Decimal.pow("1e800", player.ne.thoughts.times(tmp.ne.thoughtPower).pow(.75)).pow(hasMilestone("ne", 2)?2:1) },
+		thoughtEff3() { return Decimal.pow(1.2, player.ne.thoughts.times(hasMilestone("ne", 5)?tmp.ne.thoughtPower:0).sqrt()) },
+		challenges: {
+			rows: 1,
+			cols: 1,
+			11: {
+				name: "The Brain",
+				challengeDescription: "Prestige Upgrade 2, Boosters, & Generators are disabled.<br>",
+				unlocked() { return player.ne.unlocked && player.ne.points.gt(0) },
+				goal() { return new Decimal(1/0) },
+				currencyDisplayName: "",
+				currencyInternalName: "points",
+				gainMult() { 
+					let mult = tmp.ne.effect.times(player.ne.signals.plus(1).log10().plus(1));
+					if (hasMilestone("ne", 0)) mult = mult.times(player.ss.points.plus(1).sqrt());
+					if (hasMilestone("ne", 2)) mult = mult.times(player.ne.points.max(1));
+					if (player.en.unlocked && hasMilestone("en", 3)) mult = mult.times(tmp.en.mwEff.pow(40));
+					if (hasAchievement("a", 143)) mult = mult.times(3);
+					if (hasMilestone("r", 0)) mult = mult.times(player.r.maxMinibots.max(1));
+					if (hasMilestone("r", 4) && tmp.r) mult = mult.times(tmp.r.producerEff.max(1));
+					if (hasMilestone("id", 3) && tmp.mc) mult = mult.times(Decimal.pow(2, player.mc.buyables[11].max(1).log10()));
+					if (player.ai.unlocked && tmp.ai) mult = mult.times(tmp.ai.conscEff1);
+					if (player.c.unlocked && tmp.c) mult = mult.times(tmp.c.eff3);
+					if (hasUpgrade("ai", 42)) mult = mult.times(upgradeEffect("ai", 42));
+					return mult;
+				},
+				amt() { 
+					let a = Decimal.pow(10, player.points.plus(1).log10().plus(1).log10().div(player.ne.activeChallenge==11?11:14).pow(3)).pow(tmp.ne.buyables[11].effect).times(tmp.ne.challenges[11].gainMult).floor();
+					if (!a.eq(a)) return new Decimal(0);
+					return a;
+				},
+				next() { return Decimal.pow(10, Decimal.pow(10, new Decimal((player.ne.activeChallenge==11||hasAchievement("a", 151))?tmp.ne.challenges[11].amt:0).plus(1).div(tmp.ne.challenges[11].gainMult).root(tmp.ne.buyables[11].effect).log10().root(3).times(11)).sub(1)).sub(1) },
+				rewardDescription() { return "<br>Signals: <h3 style='color: #ded9ff'>"+formatWhole(player.ne.signals)+"/"+formatWhole(tmp.ne.signalLim)+"</h3> "+(tmp.nerdMode?("(Gain Formula: 10^((log(log(points+1)+1)/11)^3)*"+format(tmp.ne.challenges[11].gainMult)+")"):("(+"+formatWhole((player.ne.activeChallenge==11||hasAchievement("a", 151))?tmp.ne.challenges[11].amt:0)+"/s"+(tmp.ne.challenges[11].amt.lt(1e3)?(", next gain at "+format(tmp.ne.challenges[11].next)+" Points)"):")")))+"<br><br><br>Thoughts: <h3 style='color: #ffbafa'>"+formatWhole(player.ne.thoughts)+"</h3> (Next at "+formatWhole(tmp.ne.signalLim)+" Signals)<br><br>Effects"+(tmp.ne.thoughtPower.eq(1)?"":(" (Power: "+format(tmp.ne.thoughtPower.times(100))+"%)"))+"<br>Cheapen Subspace Energy by "+(tmp.nerdMode?" (Formula: (log(thoughts+1)+1)"+(hasMilestone("ne", 1)?"^2":"")+")":(format(tmp.ne.thoughtEff1)+"x"))+"<br>Multiply Subspace & SG bases by "+(tmp.nerdMode?" (Formula: (1e800^(thoughts^0.75))"+(hasMilestone("ne", 2)?"^2":"")+")":format(tmp.ne.thoughtEff2)+"x")+(hasMilestone("ne", 5)?("<br>Multiply Energy gain by "+(tmp.nerdMode?" (Formula: (1.2^sqrt(thoughts)))":(format(tmp.ne.thoughtEff3)+"x"))):"") },
+				style() { return {'background-color': "#484659", filter: "brightness("+(100+player.ne.signals.plus(1).log10().div(tmp.ne.signalLim.plus(1).log10()).times(50).toNumber())+"%)", color: "white", 'border-radius': "25px", height: "400px", width: "400px"}},
+				onStart(testInput=false) {
+					if (testInput && player.ne.auto) {
+						doReset("m", true);
+						player.ne.activeChallenge = 11;
+						updateTemp();
+					}
+				},
+			},
+		},
+		buyables: {
+			rows: 1,
+			cols: 1,
+			11: {
+				title: "The Neural Network",
+				ss() { return hasMilestone("id", 0)?12:10 },
+				cost(x=player[this.layer].buyables[this.id]) {
+					if (x.gte(tmp[this.layer].buyables[this.id].ss)) x = Decimal.pow(tmp[this.layer].buyables[this.id].ss, x.log(tmp[this.layer].buyables[this.id].ss).pow(hasMilestone("id", 0)?Math.sqrt(2):2));
+					return Decimal.pow(4, x.pow(1.2)).times(2e4);
+				},
+				bulk(r=player.ne.signals) {
+					let b = r.div(2e4).max(1).log(4).root(1.2);
+					if (b.gte(tmp[this.layer].buyables[this.id].ss)) b = Decimal.pow(tmp[this.layer].buyables[this.id].ss, b.log(tmp[this.layer].buyables[this.id].ss).root(hasMilestone("id", 0)?Math.sqrt(2):2));
+					return b.plus(1).floor();
+				},
+				power() {
+					let p = new Decimal(hasUpgrade("ai", 11)?1.5:1);
+					if (player.c.unlocked && tmp.c) p = p.times(tmp.c.eff5);
+					return p;
+				},
+				effect() { return player[this.layer].buyables[this.id].times(tmp.ne.buyables[11].power).div(3).plus(1) },
+				display() { // Everything else displayed in the buyable button after the title
+                    let data = tmp[this.layer].buyables[this.id];
+					let cost = data.cost;
+					let amt = player[this.layer].buyables[this.id];
+                    let display = "Cost: "+format(cost)+" Signals"+(tmp.nerdMode?(" (Cost Formula: 4^("+(amt.gte(data.ss)?(formatWhole(data.ss)+"^(log"+formatWhole(data.ss)+"(x)^"+format(hasMilestone("id", 0)?Math.sqrt(2):2)+")"):"x")+"^1.2)*2e4)"):"")+".<br><br>Level: "+formatWhole(amt)+"<br><br>Effect: Signal gain from Points is raised ^"+format(data.effect)+(tmp.nerdMode?" (Formula: x/3+1)":"");
+					return display;
+                },
+                unlocked() { return unl(this.layer) && hasMilestone("ne", 0) }, 
+                canAfford() {
+					if (!tmp[this.layer].buyables[this.id].unlocked) return false;
+                    return player[this.layer].unlocked && player.ne.signals.gte(layers[this.layer].buyables[this.id].cost());
+				},
+                buy() { 
+					player.ne.signals = player.ne.signals.sub(tmp[this.layer].buyables[this.id].cost).max(0)
+					player.ne.buyables[this.id] = player.ne.buyables[this.id].plus(1);
+                },
+				buyMax() { player.ne.buyables[this.id] = player.ne.buyables[this.id].max(tmp.ne.buyables[11].bulk) },
+                style: {'height':'250px', 'width':'250px', 'background-color'() { return tmp.ne.buyables[11].canAfford?'#a2cade':'#bf8f8f' }, "border-color": "#a2cade"},
+				autoed() { return hasMilestone("ne", 7)&&player.ne.autoNN },
+			},
+		},
+		milestones: {
+			0: {
+				requirementDescription: "2,750 Signals",
+				done() { return player.ne.signals.gte(2750) || player.ne.milestones.includes(0) },
+				effectDescription() { return "Subspace Energy multiplies Signal gain ("+format(player.ss.points.plus(1).sqrt())+"x), and unlock The Neural Network" },
+			},
+			1: {
+				requirementDescription: "50,000 Signals",
+				done() { return player.ne.signals.gte(5e4) || player.ne.milestones.includes(1) },
+				effectDescription() { return "The first Thought effect is squared, and Neuron milestones are kept on all resets up to Row 7 (except Ideas)" },
+			},
+			2: {
+				requirementDescription: "3,000,000 Signals",
+				done() { return player.ne.signals.gte(3e6) || player.ne.milestones.includes(2) },
+				effectDescription() { return "The Thought requirement increases slower (5x -> 3x), the second Thought effect is squared, and multiply Signal gain by your Neurons" },
+			},
+			3: {
+				requirementDescription: "150,000,000 Signals",
+				done() { return player.ne.signals.gte(1.5e8) || player.ne.milestones.includes(3) },
+				effectDescription() { return "The Thought requirement increases even slower (3x -> 2.5x), and the Neuron effect uses a better formula (becomes exponential instead of sub-linear)" },
+			},
+			4: {
+				requirementDescription: "2.5e9 Signals",
+				done() { return player.ne.signals.gte(2.5e9) || player.ne.milestones.includes(4) },
+				effectDescription() { return "The Thought requirement increases even slower (2.5x -> 2x), and getting a Thought does not reset Signals" },
+			},
+			5: {
+				unlocked() { return player.en.unlocked && player.ne.unlocked },
+				requirementDescription() { return "8 Neurons"+(player.id.unlocked?"":" & 2,500,000 Energy in one reset") },
+				done() { return (player.ne.best.gte(8) && (player.id.unlocked||player.en.bestOnReset.gte(2.5e6)))||hasAchievement("a", 161) },
+				effectDescription() { return "Neurons reset nothing, and unlock Auto-Neurons & a third Thought effect." },
+				toggles: [["ne", "auto"]],
+			},
+			6: {
+				unlocked() { return player.id.unlocked },
+				requirementDescription: "1e21 Signals",
+				done() { return player.ne.signals.gte(1e21) || player.ne.milestones.includes(6) },
+				effectDescription() { return "The Neuron effect is squared & multiplied by your Neural Network level" },
+			},
+			7: {
+				unlocked() { return hasUpgrade("ai", 11) },
+				requirementDescription: "9 Neurons",
+				done() { return hasUpgrade("ai", 11) && player.ne.best.gte(9) },
+				effectDescription: "Unlock Auto-Neural Networks.",
+				toggles: [["ne", "autoNN"]],
+			},
+		},
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank", 
+			"milestones", "blank", "blank",
+			"challenges", "blank",
+			"buyables",
+			"blank", "blank", "blank",
+		],
+})
+
+addLayer("id", {
+		name: "ideas", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "ID", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 5, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			first: 0,
+			auto: false,
+        }},
+        color: "#fad682",
+        requires() { 
+			let req = new Decimal(44);
+			if (player.ai.unlocked && tmp.ai) req = req.div(tmp.ai.conscEff2);
+			return req.max(2);
+		}, // Can be a function that takes requirement increases into account
+        resource: "ideas", // Name of prestige currency
+        baseResource: "thoughts", // Name of resource prestige is based on
+        baseAmount() {return player.ne.thoughts}, // Get the current amount of baseResource
+		roundUpCost: true,
+        type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+        exponent: new Decimal(1.4), // Prestige currency exponent
+		base: new Decimal(1.2),
+		effect() { return Decimal.sub((hasAchievement("a", 155)?0.005:0)+(hasUpgrade("ai", 32)?0.99:0.95), Decimal.div(0.95, player.id.points.plus(1).log10().times(hasMilestone("id", 4)?1.5:1).times(hasMilestone("id", 5)?1.75:1).plus(1))) },
+		effectDescription() { return "which reduce the Thought threshold's increase by <h2 style='color: #fad682; text-shadow: #fad682 0px 0px 10px;'>"+format(tmp[this.layer].effect)+"</h2>"+(tmp.nerdMode?" (0.95-0.95/(log(x+1)+1)).":".") },
+		rev() { return player.ne.signals.plus(1).log10().div(10).pow(.75).times(player.id.points).pow(hasMilestone("id", 0)?2:1).times(hasUpgrade("ai", 32)?1.5:1).times(hasUpgrade("ai", 14)?1.5:1).floor() },
+		revEff() { return Decimal.pow(1e25, tmp.id.rev.pow(.95)) },
+        gainMult() { // Calculate the multiplier for main currency from bonuses
+            mult = new Decimal(1)
+			if (hasMilestone("id", 2)) mult = mult.div(player.ne.points.plus(1).log10().plus(1));
+            return mult
+        },
+        gainExp() { // Calculate the exponent on main currency from bonuses
+            return new Decimal(1)
+        },
+		canBuyMax() { return hasMilestone("id", 4) && player.id.auto },
+        row: 5, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "I", description: "Press Shift+I to Idea Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+		resetsNothing() { return hasMilestone("id", 4) && player.id.auto },
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (layers[resettingLayer].row<7&&resettingLayer!="ai"&&resettingLayer!="c") {
+				keep.push("points");
+				keep.push("best");
+				keep.push("milestones");
+			}
+            if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+			if (hasUpgrade("ai", 22) && !(layers[resettingLayer].row<7&&resettingLayer!="ai"&&resettingLayer!="c")) addPoints("id", 4);
+        },
+		autoPrestige() { return hasMilestone("id", 4) && player.id.auto },
+        layerShown(){return player.en.unlocked&&player.ne.unlocked},
+        branches: ["ne"],
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank", 
+			"milestones", "blank", "blank",
+			["display-text", function() { return "Revelations: <h2>"+formatWhole(tmp.id.rev)+"</h2>"+(tmp.nerdMode?(hasMilestone("id", 0)?" ((ideas^2)*(log(signals+1)/10)^1.5)":" (ideas*(log(signals+1)/10)^0.75)"):" (based on Ideas & Signals)") }],
+			["display-text", function() { return "Effect: Multiply Mech-Energy by <h2>"+format(tmp.id.revEff)+"</h2>"+(tmp.nerdMode?" (1e25^(x^0.95))":".") } ], "blank",
+		],
+		milestones: {
+			0: {
+				requirementDescription: "2 Ideas & 2 Revelations",
+				done() { return (player.id.points.gte(2) && tmp.id.rev.gte(2))||hasAchievement("a", 161) },
+				effectDescription: "Neural Network cost scaling starts 2 purchases later & is 50% weaker, Thoughts can be gained in bulk, and Revelations are squared.",
+			},
+			1: {
+				unlocked() { return hasMilestone("id", 0) },
+				requirementDescription: "2 Ideas & 8 Revelations",
+				done() { return player.id.points.gte(2) && tmp.id.rev.gte(8) },
+				effectDescription: "The Neuron effect is squared, and Thought effects are all 20% stronger.",
+			},
+			2: {
+				unlocked() { return hasMilestone("id", 1) },
+				requirementDescription: "3 Ideas & 22 Revelations",
+				done() { return player.id.points.gte(3) && tmp.id.rev.gte(22) },
+				effectDescription() { return "The Idea cost is divided based on your Neurons (/"+format(player.ne.points.plus(1).log10().plus(1))+")" },
+			},
+			3: {
+				unlocked() { return hasMilestone("id", 2)||hasAchievement("a", 161) },
+				requirementDescription: "6 Ideas & 245 Revelations",
+				done() { return (player.id.points.gte(6) && tmp.id.rev.gte(245))||hasAchievement("a", 161) },
+				effectDescription() { return "Unlock Auto-Shell Expansion, which is much more efficient than normal purchasing, and each OoM of Shell Expansions double Signal gain ("+format(Decimal.pow(2, player.mc.buyables[11].max(1).log10()))+"x)." },
+				toggles: [["mc", "autoSE"]],
+			},
+			4: {
+				unlocked() { return hasUpgrade("ai", 22)||hasAchievement("a", 164) },
+				requirementDescription: "132 Revelations",
+				done() { return ((tmp.id.rev.gte(132)||hasMilestone("id", 4))&&hasUpgrade("ai", 22))||hasAchievement("a", 164) },
+				effectDescription: "Unlock Auto-Ideas, you can buy max Ideas, & the Idea effect is 50% more effective.",
+				toggles: [["id", "auto"]],
+			},
+			5: {
+				unlocked() { return hasUpgrade("ai", 22) },
+				requirementDescription: "1,800 Revelations",
+				done() { return (tmp.id.rev.gte(1800)||hasMilestone("id", 5))&&hasUpgrade("ai", 22) },
+				effectDescription: "The Idea effect is 75% more effective, and Revelations multiply Gear & Building gain.",
+			},
+		},
+})
+
+addLayer("r", {
+		name: "robots", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "R", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			total: new Decimal(0),
+			allotted: {
+				breeders: new Decimal((player && tmp.ma && hasUpgrade("ai", 12))?5:0),
+				farmers: new Decimal((player && tmp.ma && hasUpgrade("ai", 12))?5:0),
+				builders: new Decimal((player && tmp.ma && hasUpgrade("ai", 12))?5:0),
+				growers: new Decimal((player && tmp.ma && hasUpgrade("ai", 12))?5:0),
+				producers: new Decimal((player && tmp.ma && hasUpgrade("ai", 12))?5:0),
+			},
+			maxMinibots: new Decimal(0),
+			spentMinibots: new Decimal(0),
+			grownMinibots: new Decimal(0),
+			fuel: new Decimal(0),
+			buildings: new Decimal(1),
+			growTime: new Decimal(0),
+			deathTime: new Decimal(0),
+			first: 0,
+        }},
+        color: "#00ccff",
+		nodeStyle() { return {
+			background: (player.r.unlocked||canReset("r"))?((player.grad&&!player.oldStyle)?"radial-gradient(circle, #00ccff 0%, #b0b0b0 75%)":"#b0b0b0"):"#bf8f8f",
+		}},
+		componentStyles: {
+			background() { return (player.r.unlocked||canReset("r"))?((player.grad&&!player.oldStyle)?"radial-gradient(circle, #00ccff 0%, #b0b0b0 75%)":"#b0b0b0"):"#bf8f8f" },
+		},
+        resource: "robots", // Name of prestige currency
+        type: "custom", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+		baseResource: "total energy",
+		baseAmount() { return player.en.total },
+		req() { 
+			let req = Decimal.root(5e8, player[this.layer].total.plus(1).log10().plus(1).log10().plus(1).log10().plus(1))
+			if (player.ai.unlocked && tmp.ai) req = req.div(tmp.ai.conscEff2);
+			return req.max(2);
+		},
+		requires() { return this.req() },
+		exp: new Decimal(0.4),
+		exponent() { return tmp[this.layer].exp },
+		gainMult() {
+			let mult = new Decimal(1);
+			if (hasMilestone("r", 3)) mult = mult.times(2);
+			if (player.ai.unlocked && tmp.ai) mult = mult.times(tmp.ai.conscEff1);
+			if (hasUpgrade("ai", 33)) mult = mult.times(upgradeEffect("ai", 33));
+			return mult;
+		},
+		getResetGain() {
+			let gain = Decimal.pow(tmp.r.req, player.en.total.plus(1).log(tmp.r.req).pow(tmp.r.exp)).div(tmp.r.req);
+			return gain.times(tmp.r.gainMult).floor();
+		},
+		resetGain() { return this.getResetGain() },
+		getNextAt() {
+			let gain = tmp.r.getResetGain.div(tmp.r.gainMult).plus(1)
+			return Decimal.pow(tmp.r.req, gain.times(tmp.r.req).max(1).log(tmp.r.req).root(tmp.r.exp)).sub(1)
+		},
+		passiveGeneration() { return false },
+		canReset() {
+			return player.en.total.gte(tmp.r.req) && tmp.r.getResetGain.gt(0)
+		},
+		dispGainFormula() {
+			let start = tmp.r.req;
+			let exp = tmp.r.exp;
+			return "("+format(start)+" ^ (log(x+1) / log("+format(tmp.r.req)+") ^ "+format(exp)+")) / "+format(start)
+		},
+		prestigeButtonText() {
+			if (tmp.nerdMode) return "Gain Formula: "+tmp.r.dispGainFormula;
+			else return `${ player.r.points.lt(1e3) ? (tmp.r.resetDescription !== undefined ? tmp.r.resetDescription : "Reset for ") : ""}+<b>${formatWhole(tmp.r.getResetGain)}</b> ${tmp.r.resource} ${tmp.r.resetGain.lt(100) && player.r.points.lt(1e3) ? `<br><br>Next at ${format(tmp.r.nextAt)} Energy` : ""}`
+		},
+		prestigeNotify() {
+			if (!canReset("r")) return false;
+			if (tmp.r.getResetGain.gte(player.en.total.times(0.1).max(1)) && !tmp.r.passiveGeneration) return true;
+			else return false;
+		},
+		tooltip() { return formatWhole(player.r.points)+" Robots" },
+		tooltipLocked() { return "Reach "+formatWhole(tmp.r.req)+" Total Energy to unlock (You have "+formatWhole(player.en.total)+" Total Energy)" },
+        row: 5, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "r", description: "Press R to Robot Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (layers[resettingLayer].row==5||layers[resettingLayer].row==6) {
+				player.r.maxMinibots = new Decimal(0);
+				player.r.spentMinibots = new Decimal(0);
+				player.r.grownMinibots = new Decimal(0);
+				player.r.fuel = new Decimal(0);
+				player.r.buildings = new Decimal(1);
+				player.r.growTime = new Decimal(0);
+				player.r.deathTime = new Decimal(0);
+			}
+			
+			if (layers[resettingLayer].row > this.row+1 || resettingLayer=="ai") layerDataReset(this.layer, keep)
+        },
+        layerShown(){return player.id.unlocked },
+        branches: ["en"],
+		update(diff) {
+			if (!player[this.layer].unlocked) return;
+			player.r.maxMinibots = player.r.maxMinibots.max(tmp.r.totalMinibots);
+			player.r.fuel = player.r.fuel.pow(1.5).plus(player.r.allotted.farmers.div(4).times(diff)).root(1.5);
+			player.r.buildings = player.r.buildings.pow(2).plus(player.r.allotted.builders.times((hasMilestone("id", 5)&&tmp.id)?tmp.id.rev.max(1):1).div(3).times(diff)).sqrt();
+			if (tmp.r.minibots.gt(0)) {
+				player.r.deathTime = player.r.deathTime.plus(diff);
+				player.r.growTime = player.r.growTime.plus(diff);
+			}
+			if (Decimal.gte(player.r.deathTime, tmp.r.deathTime)) {
+				let bulk = player.r.growTime.div(tmp.r.growTime).min(tmp.r.minibots).floor();
+				player.r.deathTime = new Decimal(0);
+				if (tmp.r.minibots.gt(0)) {
+					player.r.spentMinibots = player.r.spentMinibots.plus(bulk);
+				}
+			}
+			if (Decimal.gte(player.r.growTime, tmp.r.growTime)) {
+				let bulk = player.r.growTime.div(tmp.r.growTime).min(tmp.r.minibots).floor();
+				player.r.growTime = new Decimal(0);
+				if (tmp.r.minibots.gt(0)) {
+					addPoints("r", hasUpgrade("ai", 12)?bulk.times(tmp.r.getResetGain.div(20)):bulk);
+					player.r.spentMinibots = player.r.spentMinibots.plus(bulk);
+					player.r.grownMinibots = player.r.grownMinibots.plus(bulk);
+				}
+			}
+			if (hasMilestone("r", 5)) {
+				player.r.allotted.breeders = player.r.allotted.breeders.plus(player.r.points.div(50).times(diff));
+				player.r.allotted.farmers = player.r.allotted.farmers.plus(player.r.points.div(50).times(diff));
+				player.r.allotted.builders = player.r.allotted.builders.plus(player.r.points.div(50).times(diff));
+				player.r.allotted.growers = player.r.allotted.growers.plus(player.r.points.div(50).times(diff));
+				player.r.allotted.producers = player.r.allotted.producers.plus(player.r.points.div(50).times(diff));
+			}
+		},
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank",
+			"milestones",
+			"blank", "blank", 
+			["clickable", 16], "blank",
+			["row", [
+				["column", [
+					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.breeders)+"<br>Breeders</h3><br><br><br>" }], "blank",
+					["row", [["clickable", 11], ["clickable", 21]]], "blank", "blank",
+					["display-text", function() { return "Next Minibot at "+format(tmp.r.nextMinibot)+" Total Energy"+(tmp.nerdMode?" (Formula: log(EN/1e5 * breeders^"+formatWhole(tmp.r.breederExp)+") ^ (2/3))":".") }],
+				], {width: "9em"}],
+				["tall-display-text", "<div class='vl2'></div>", {height: "223.667px"}],
+				["column", [
+					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.farmers)+"<br>Farmers</h3><br>(Req: 1 Breeder)<br><br>" }], "blank",
+					["row", [["clickable", 12], ["clickable", 22]]], "blank", "blank",
+					["display-text", function() { return "Fuel: "+format(player.r.fuel)+", which improves the next Minibot's lifespan to "+formatTime(tmp.r.deathTime.sub(player.r.deathTime))+"." }],
+				], {width: "9em"}],
+				["tall-display-text", "<div class='vl2'></div>", {height: "223.667px"}],
+				["column", [
+					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.builders)+"<br>Builders</h3><br>(Req: 1 Breeder)<br><br>" }], "blank",
+					["row", [["clickable", 13], ["clickable", 23]]], "blank", "blank",
+					["display-text", function() { return "Buildings: "+formatWhole(player.r.buildings.floor())+", which caps your Minibots at "+formatWhole(tmp.r.minibotCap)+(tmp.nerdMode?" (Formula: log2(x)+3)":"")+" and multiplies Gear gain by "+formatWhole(tmp.r.buildingEff)+(tmp.nerdMode?" (Formula: (x-1)^3*100+1)":".") }],
+				], {width: "9em"}],
+				["tall-display-text", "<div class='vl2'></div>", {height: "223.667px"}],
+				["column", [
+					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.growers)+"<br>Growth Experts</h3><br>(Req: 1 Breeder)<br>" }], "blank",
+					["row", [["clickable", 14], ["clickable", 24]]], "blank", "blank",
+					["display-text", function() { return "Next Minibot transforms into Robot in "+formatTime(tmp.r.growTime.sub(player.r.growTime))+"." }],
+				], {width: "9em"}],
+				["tall-display-text", "<div class='vl2'></div>", {height: "223.667px"}],
+				["column", [
+					["display-text", function() { return "<h3>"+formatWhole(player.r.allotted.producers)+"<br>Producers</h3><br><br><br>" }], "blank",
+					["row", [["clickable", 15], ["clickable", 25]]], "blank", "blank",
+					["display-text", function() { return "Multiply Energy gain by "+format(tmp.r.producerEff)+(tmp.nerdMode?" (Formula: ((x^1.5)/4+1))":"") }],
+				], {width: "9em"}],
+			], function() { return {display: player.r.unlocked?"":"none"} }], "blank", "blank",
+			["display-text", function() { return "You have <h2 style='color: #00ccff; text-shadow: 0px 0px 7px #00ccff;'>"+formatWhole(tmp.r.minibots)+" / "+formatWhole(tmp.r.minibotCap)+"</h2> Minibots" }],
+		],
+		breederExp() {
+			let exp = new Decimal(3);
+			if (hasMilestone("r", 2)) exp = exp.times(2);
+			return exp;
+		},
+		reduceMinibotReqMult() {
+			let mult = new Decimal(0);
+			if (hasMilestone("r", 3)) mult = mult.plus(.5);
+			if (hasUpgrade("ai", 23)) mult = mult.plus(.5);
+			return mult;
+		},
+		nextMinibot() { 
+			if (player.r.allotted.breeders.lt(1)||tmp.r.totalMinibots.gte(tmp.r.minibotCap.plus(player.r.spentMinibots))) return new Decimal(1/0);
+			else return Decimal.pow(10, tmp.r.totalMinibots.sub(player.r.grownMinibots.times(tmp.r.reduceMinibotReqMult)).plus(1).pow(1.5)).times(1e5).div(player.r.allotted.breeders.max(1).pow(tmp.r.breederExp));
+		},
+		totalMinibots() { 
+			if (player.r.allotted.breeders.lt(1)) return new Decimal(0);
+			else return player.en.total.times(player.r.allotted.breeders.pow(tmp.r.breederExp)).div(1e5).max(1).log10().root(1.5).plus(player.r.grownMinibots.times(tmp.r.reduceMinibotReqMult)).floor().min(tmp.r.minibotCap.plus(player.r.spentMinibots))
+		},
+		minibots() { return player.r.maxMinibots.sub(player.r.spentMinibots).max(0) },
+		deathTime() { return player.r.fuel.plus(1).log2().div(3).plus(1).times(20).div(hasUpgrade("ai", 21)?20:1) },
+		minibotCap() { return player.r.buildings.floor().max(1).log2().plus(3).floor() },
+		buildingEff() { return player.r.buildings.sub(1).max(0).floor().pow(3).times(100).plus(1) },
+		growTime() { return player.r.allotted.growers.lt(1)?new Decimal(1/0):Decimal.div(30, player.r.allotted.growers.log10().plus(1)).div(hasUpgrade("ai", 21)?5:1) },
+		producerEff() { 
+			let mult = hasMilestone("r", 3) ? player.r.grownMinibots.div(4).plus(1) : new Decimal(1);
+			if (hasUpgrade("ai", 23)) mult = mult.times(player.r.grownMinibots.times(.4).plus(1));
+			return player.r.allotted.producers.pow(1.5).div(4).plus(1).times(mult);
+		},
+		clickables: {
+			rows: 2,
+			cols: 6,
+			11: {
+				title: "+1",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gt(0) },
+				onClick() { 
+					player.r.allotted.breeders = player.r.allotted.breeders.plus(1);
+					player.r.points = player.r.points.sub(1).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			12: {
+				title: "+1",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gt(0) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					player.r.allotted.farmers = player.r.allotted.farmers.plus(1);
+					player.r.points = player.r.points.sub(1).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			13: {
+				title: "+1",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gt(0) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					player.r.allotted.builders = player.r.allotted.builders.plus(1);
+					player.r.points = player.r.points.sub(1).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			14: {
+				title: "+1",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gt(0) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					player.r.allotted.growers = player.r.allotted.growers.plus(1);
+					player.r.points = player.r.points.sub(1).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			15: {
+				title: "+1",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gt(0) },
+				onClick() { 
+					player.r.allotted.producers = player.r.allotted.producers.plus(1);
+					player.r.points = player.r.points.sub(1).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			16: {
+				title: "Distribute",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(5) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					let spendEach = player.r.points.div(5).floor()
+					player.r.allotted.breeders = player.r.allotted.breeders.plus(spendEach);
+					player.r.allotted.farmers = player.r.allotted.farmers.plus(spendEach);
+					player.r.allotted.builders = player.r.allotted.builders.plus(spendEach);
+					player.r.allotted.growers = player.r.allotted.growers.plus(spendEach);
+					player.r.allotted.producers = player.r.allotted.producers.plus(spendEach);
+					player.r.points = player.r.points.sub(spendEach.times(5)).max(0);
+				},
+				style: {width: "120px", height: "50px"},
+			},
+			21: {
+				title: "50%",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(2) },
+				onClick() { 
+					let spend = player.r.points.div(2).floor();
+					player.r.allotted.breeders = player.r.allotted.breeders.plus(spend);
+					player.r.points = player.r.points.sub(spend).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			22: {
+				title: "50%",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(2) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					let spend = player.r.points.div(2).floor();
+					player.r.allotted.farmers = player.r.allotted.farmers.plus(spend);
+					player.r.points = player.r.points.sub(spend).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			23: {
+				title: "50%",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(2) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					let spend = player.r.points.div(2).floor();
+					player.r.allotted.builders = player.r.allotted.builders.plus(spend);
+					player.r.points = player.r.points.sub(spend).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			24: {
+				title: "50%",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(2) && player.r.allotted.breeders.gte(1) },
+				onClick() { 
+					let spend = player.r.points.div(2).floor();
+					player.r.allotted.growers = player.r.allotted.growers.plus(spend);
+					player.r.points = player.r.points.sub(spend).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+			25: {
+				title: "50%",
+				unlocked() { return player.r.unlocked },
+				canClick() { return player.r.unlocked && player.r.points.gte(2) },
+				onClick() { 
+					let spend = player.r.points.div(2).floor();
+					player.r.allotted.producers = player.r.allotted.producers.plus(spend);
+					player.r.points = player.r.points.sub(spend).max(0);
+				},
+				style: {width: "50px", height: "50px"},
+			},
+		},
+		milestones: {
+			0: {
+				requirementDescription: "50 Total Robots",
+				done() { return player.r.total.gte(50) },
+				effectDescription: "Minibots multiply Energy & Signal gain",
+			},
+			1: {
+				requirementDescription: "100 Total Robots",
+				done() { return player.r.total.gte(100)||hasAchievement("a", 161) },
+				effectDescription: "Non-selected Watts are still generated (but 3x slower), and Total Robots multiply Watt generation speed",
+			},
+			2: {
+				requirementDescription: "360 Total Robots",
+				done() { return player.r.total.gte(360) },
+				effectDescription: "Effective Breeders are squared",
+			},
+			3: {
+				requirementDescription: "500 Total Robots",
+				done() { return player.r.total.gte(500) },
+				effectDescription: "Double Robot gain, and when a Minibot is transformed into a Robot, the requirement for the next Minibot is reduced by 0.5 levels & the Producer effect is 25% stronger (additive)",
+			},
+			4: {
+				unlocked() { return player.id.unlocked||hasAchievement("a", 161) },
+				requirementDescription: "2,000 Total Robots",
+				done() { return player.r.total.gte(2e3)||hasAchievement("a", 161) },
+				effectDescription: "Triple Robot gain, and the Producer effect also multiplies Watt generation speed & Signal gain",
+			},
+			5: {
+				unlocked() { return hasUpgrade("ai", 21) },
+				requirementDescription: "4,000,000 Total Robots",
+				done() { return player.r.total.gte(4e6) && hasUpgrade("ai", 21) },
+				effectDescription: "Automatically distribute 10% of your Robots every second without actually spending any Robots.",
+			},
+		},
+})
+
+addLayer("ai", {
+		name: "AI", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "AI", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			best: new Decimal(0),
+			total: new Decimal(0),
+			first: 0,
+			time: new Decimal(0),
+			consc: new Decimal(0),
+        }},
+        color: "#e6ffcc",
+		nodeStyle() { return {
+			background: (player.ai.unlocked||canReset("ai"))?((player.grad&&!player.oldStyle)?"radial-gradient(circle, #e6ffcc 0%, #566b65 100%)":"#e6ffcc"):"#bf8f8f",
+		}},
+		componentStyles: {
+			"prestige-button": {
+				background() { return (canReset("ai"))?((player.grad&&!player.oldStyle)?"radial-gradient(circle, #e6ffcc 0%, #566b65 100%)":"#e6ffcc"):"#bf8f8f" },
+			},
+		},
+        requires: new Decimal(408), // Can be a function that takes requirement increases into account
+        resource: "superintelligence", // Name of prestige currency 
+        baseResource: "revelations", // Name of resource prestige is based on
+        baseAmount() {return tmp.id.rev}, // Get the current amount of baseResource
+        type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+        exponent: new Decimal(2), // Prestige currency exponent
+		roundUpCost: true,
+        gainMult() { // Calculate the multiplier for main currency from bonuses
+            mult = new Decimal(1);
+			if (hasUpgrade("ai", 22)) mult = mult.times(3);
+			if (hasUpgrade("ai", 41)) mult = mult.times(upgradeEffect("ai", 41));
+			if (hasUpgrade("ai", 43)) mult = mult.times(upgradeEffect("ai", 43));
+			if (hasUpgrade("ai", 44)) mult = mult.times(player.ai.buyables[11].max(1));
+            return mult
+        },
+        gainExp() { // Calculate the exponent on main currency from bonuses
+            return new Decimal(1)
+        },
+        row: 6, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "R", description: "Press Shift+R to AI Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+		passiveGeneration() { return 0 },
+        doReset(resettingLayer){ 
+			let keep = [];
+			if (layers[resettingLayer].row == this.row) {
+				player.ai.time = new Decimal(0);
+				player.ai.consc = new Decimal(0);
+			}
+			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+        layerShown(){return player.r.unlocked && player.id.unlocked },
+        branches: ["r", ["id", 3]],
+		update(diff) {
+			if (!player[this.layer].unlocked) return;
+			player.ai.time = player.ai.time.plus(diff);
+			// player.ai.consc = player.ai.consc.plus(tmp.ai.buyables[11].effect.times(diff)).div(Decimal.pow(tmp.ai.divConsc, diff));
+			if (tmp.ai.divConsc.lte(1.00001)) player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(diff));
+			else player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(0.001).sub(player.ai.consc.mul(tmp.ai.divConsc.pow(0.001).sub(1))).mul(tmp.ai.divConsc.pow(0.001).sub(1).recip().mul(Decimal.sub(1, tmp.ai.divConsc.pow(0.001).recip().pow(diff*1000)))))
+		},
+		divConsc() { return player.ai.time.plus(1).log10().plus(1).sqrt() },
+		conscEff1() { return player.ai.consc.plus(1) },
+		conscEff2() { return player.ai.consc.plus(1).log(3).plus(1) },
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank",
+			["buyable", 11], "blank",
+			["display-text", function() { return "<h3>"+format(player.ai.consc)+"</h3> Artificial Consciousness (divided by "+format(tmp.ai.divConsc)+" each second, based on time in this Row 7 run)" }], 
+			["display-text", function() { return "Effect: Multiplies Energy, Signal, & Robot gain by "+format(tmp.ai.conscEff1)+(tmp.nerdMode?" (x+1)":"")+", and divides the Robot & Idea req by "+format(tmp.ai.conscEff2)+(tmp.nerdMode?" (log3(x+1)+1)":".") }],"blank", "blank",
+			["clickable", 11],
+			["display-text", function() { return "Nodes: "+formatWhole(player.ai.upgrades.length)+" / "+formatWhole(tmp.ai.nodeSlots) }], "blank",
+			"upgrades", "blank",
+		],
+		nodeSlots() { return player.ai.buyables[11].div(2).plus(player.ai.buyables[11].sub(6).div(2).max(0)).plus(player.ai.buyables[11].gte(1)?1:0).floor().min(16).toNumber() },
+		upgrades: {
+			rows: 4,
+			cols: 4,
+			11: {
+				title: "Node AA",
+				description: "Neural Networks are 50% stronger, and unlock a new Neuron milestone.",
+				multiRes: [
+					{
+						cost: new Decimal(2),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(5),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked },
+				style: {height: '150px', width: '150px'},
+			},
+			12: {
+				title: "Node AB",
+				description: "Each Minibot that transforms into a Robot grants you 5% of your Robot gain, and start with 5 of each Robot specialization.",
+				multiRes: [
+					{
+						cost: new Decimal(10),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(180),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) },
+				style: {height: '150px', width: '150px'},
+			},
+			13: {
+				title: "Node AC",
+				description: "Gear Evolution is 50% stronger, and unlock a new Gear milestone.",
+				multiRes: [
+					{
+						cost: new Decimal(300),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(48e3),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
+				style: {height: '150px', width: '150px'},
+			},
+			14: {
+				title: "Node AD",
+				description: "Improve Revelation gain by 50% & improve Gear Evolution power by 11.1%.",
+				multiRes: [
+					{
+						cost: new Decimal(5e3),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(5e8),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+			},
+			21: {
+				title: "Node BA",
+				description: "Minibot growth is 5x as fast, and unlock a new Robot milestone, but Miniboth death is 20x as fast.",
+				multiRes: [
+					{
+						cost: new Decimal(15),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(190),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) },
+				style: {height: '150px', width: '150px'},
+			},
+			22: {
+				title: "Node BB",
+				description: "Triple Superintelligence gain, start with 4 Ideas, and unlock two new Idea milestones.",
+				multiRes: [
+					{
+						cost: new Decimal(50),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(2e3),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && hasUpgrade("ai", 11) },
+				style: {height: '150px', width: '150px'},
+			},
+			23: {
+				title: "Node BC",
+				description: "When a Minibot grows up into a Robot, the requirement for the next Minibot is reduced by 0.5 more levels & the Producer effect is 40% stronger (additive).",
+				multiRes: [
+					{
+						cost: new Decimal(500),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(196000),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
+				style: {height: '150px', width: '150px'},
+			},
+			24: {
+				title: "Node BD",
+				description: "Gears boost Nebula Energy gain.",
+				multiRes: [
+					{
+						cost: new Decimal(2e4),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(2e9),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+				effect() { return player.ge.points.max(1).pow(5) },
+				effectDisplay() { return format(tmp.ai.upgrades[24].effect)+"x" },
+				formula: "x^5",
+			},
+			31: {
+				title: "Node CA",
+				description: "Mech-Energy loss is halved, and unlock a new Machine milestone.",
+				multiRes: [
+					{
+						cost: new Decimal(300),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(48e3),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
+				style: {height: '150px', width: '150px'},
+			},
+			32: {
+				title: "Node CB",
+				description: "The Idea effect is increased by 0.04, and gain 50% more Revelations.",
+				multiRes: [
+					{
+						cost: new Decimal(500),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(196000),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
+				style: {height: '150px', width: '150px'},
+			},
+			33: {
+				title: "Node CC",
+				description: "Superintelligence boosts Gear, Machine Part, & Robot gain, & Shell Expansion's boost to Mech-Energy gain is raised ^100.",
+				multiRes: [
+					{
+						cost: new Decimal(1500),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(790000),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=4 },
+				style: {height: '150px', width: '150px'},
+				effect() { return player.ai.points.plus(1).pow(1.5) },
+				effectDisplay() { return format(tmp.ai.upgrades[33].effect)+"x" },
+				formula: "(x+1)^1.5",
+			},
+			34: {
+				title: "Node CD",
+				description: "Super Watts, Mind Watts, & Gear gain are raised ^1.2.",
+				multiRes: [
+					{
+						cost: new Decimal(5e4),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(1e10),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+			},
+			41: {
+				title: "Node DA",
+				description: "Mastery boosts Superintelligence gain.",
+				multiRes: [
+					{
+						cost: new Decimal(5e3),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(5e8),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+				effect() { return Decimal.pow(1.05, player.ma.points) },
+				effectDisplay() { return format(tmp.ai.upgrades[41].effect)+"x" },
+				formula: "1.05^x",
+			},
+			42: {
+				title: "Node DB",
+				description: "Each Active AI Node multiplies Signal gain by 100x.",
+				multiRes: [
+					{
+						cost: new Decimal(2e4),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(2e9),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+				effect() { return Decimal.pow(100, player.ai.upgrades.length) },
+				effectDisplay() { return format(tmp.ai.upgrades[42].effect)+"x" },
+				formula: "100^x",
+			},
+			43: {
+				title: "Node DC",
+				description: "Ideas boosts Superintelligence gain.",
+				multiRes: [
+					{
+						cost: new Decimal(5e4),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(1e10),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+				effect() { return Decimal.pow(1.075, player.id.points) },
+				effectDisplay() { return format(tmp.ai.upgrades[43].effect)+"x" },
+				formula: "1.075^x",
+			},
+			44: {
+				title: "Node DD",
+				description: "Artificial Consciousness boosts Gear gain, and AI Networks multiply Superintelligence gain.",
+				multiRes: [
+					{
+						cost: new Decimal(1e6),
+					},
+					{
+						currencyDisplayName: "artificial consciousness",
+						currencyInternalName: "consc",
+						currencyLayer: "ai",
+						cost: new Decimal(5e11),
+					},
+				],
+				canAfford() {
+					let a = canAffordUpgrade(this.layer, this.id, true);
+					return a && (player.ai.upgrades.length<tmp.ai.nodeSlots)
+				},
+				unlocked() { return player.ai.unlocked && player.ai.upgrades.length>=9 },
+				style: {height: '150px', width: '150px'},
+				effect() { return player.ai.consc.plus(1).pow(5) },
+				effectDisplay() { return format(tmp.ai.upgrades[44].effect)+"x" },
+				formula: "x^5",
+			},
+		},
+		buyables: {
+			rows: 1,
+			cols: 1,
+			11: {
+				title: "AI Network",
+				cost(x=player[this.layer].buyables[this.id]) {
+					return {
+						ai: Decimal.pow(2, x),
+						ge: Decimal.pow(100, x.pow(1.8)).times(1e78),
+						mc: Decimal.pow('1e525', x.pow(2.5)).times('1e750'),
+					};
+				},
+				effect() { return Decimal.pow(4, player[this.layer].buyables[this.id]).sub(1).times(hasAchievement("a", 163)?player.id.points.max(1):1) },
+				display() { // Everything else displayed in the buyable button after the title
+                    let data = tmp[this.layer].buyables[this.id];
+					let cost = data.cost;
+					let amt = player[this.layer].buyables[this.id];
+                    let display = formatWhole(player.ai.points)+" / "+formatWhole(cost.ai)+" Superintelligence"+(tmp.nerdMode?(" (2^x)"):"")+"<br>"+formatWhole(player.ge.points)+" / "+formatWhole(cost.ge)+" Gears"+(tmp.nerdMode?(" (100^(x^1.8)*1e78)"):"")+"<br>"+formatWhole(player.mc.mechEn.times(tmp.mc.mechEnMult))+" / "+formatWhole(cost.mc)+" Mech-Energy"+(tmp.nerdMode?(" (1e525^(x^2.5)*1e750)"):"")+"<br><br>Level: "+formatWhole(amt)+"<br><br>Reward: Generates "+formatWhole(data.effect)+" Artificial Consciousness/sec"+(tmp.nerdMode?" (4^x-1)":".");
+					return display;
+                },
+                unlocked() { return unl(this.layer) }, 
+                canAfford() {
+					if (!tmp[this.layer].buyables[this.id].unlocked) return false;
+					let cost = layers[this.layer].buyables[this.id].cost();
+                    return player[this.layer].unlocked && player.ai.points.gte(cost.ai) && player.ge.points.gte(cost.ge) && player.mc.mechEn.times(tmp.mc.mechEnMult).gte(cost.mc) && player.ai.time>=1;
+				},
+                buy() { 
+					let cost = tmp[this.layer].buyables[this.id].cost;
+					player.ai.points = player.ai.points.sub(cost.ai);
+					player.ge.points = player.ge.points.sub(cost.ge);
+					player.mc.points = player.mc.points.sub(cost.mc);
+					player.ai.buyables[this.id] = player.ai.buyables[this.id].plus(1);
+                },
+                style: {'height':'200px', 'width':'200px'},
+				autoed() { return false },
+			},
+		},
+		clickables: {
+			rows: 1,
+			cols: 1,
+			11: {
+				title: "Delete all AI Nodes",
+				display: "",
+				unlocked() { return player.ai.unlocked },
+				canClick() { return player.ai.unlocked && player.ai.upgrades.length>0 },
+				onClick() { 
+					if (!confirm("Are you sure you want to delete all AI Nodes? This will force an AI reset!")) return;
+					player.ai.upgrades = [];
+					doReset("ai", true);
+				},
+				style: {width: "80px", height: "80px"},
+			},
+		},
+})
+
+addLayer("c", {
+		name: "civilizations", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "C", // This appears on the layer's node. Default is the id with the first letter capitalized
+        position: 4, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+        startData() { return {
+            unlocked: false,
+			points: new Decimal(0),
+			assigned: [new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0)],
+			gainedPower: [new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0)],
+			first: 0,
+        }},
+        color: "#edb3ff",
+        requires() { return Decimal.sub(108, hasAchievement("a", 164)?player.c.buyables[11].times(2):0).max(8) }, // Can be a function that takes requirement increases into account
+        resource: "civilization power", // Name of prestige currency
+        baseResource: "imperium bricks", // Name of resource prestige is based on
+        baseAmount() {return player.i.points}, // Get the current amount of baseResource
+		roundUpCost: true,
+        type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+        exponent: new Decimal(1.2), // Prestige currency exponent
+		base: new Decimal(1.025),
+        gainMult() { // Calculate the multiplier for main currency from bonuses
+            mult = new Decimal(1)
+            return mult
+        },
+        gainExp() { // Calculate the exponent on main currency from bonuses
+            return new Decimal(1)
+        },
+		canBuyMax() { return false },
+        row: 6, // Row the layer is in on the tree (0 is the first row)
+        hotkeys: [
+            {key: "C", description: "Press Shift+C to Civilization Reset", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        ],
+		resetsNothing() { return false },
+        doReset(resettingLayer){ 
+			let keep = [];
+            if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        },
+		autoPrestige() { return false },
+        layerShown(){return player.ai.unlocked},
+        branches: [["i", 2], "id"],
+		update(diff) {
+			if (!player.c.unlocked) return;
+			for (let i=0;i<5;i++) player.c.gainedPower[i] = Decimal.pow(2, player.c.gainedPower[i]).pow(3).plus(Decimal.pow(2, player.c.assigned[i]).sub(1).max(0).times(diff/100)).cbrt().log2();
+		},
+		power() {
+			let data = [];
+			for (let i=1;i<=5;i++) data[i] = player.c.points.sub(i).div(5).plus(1).floor().max(0).sqrt().plus(player.c.gainedPower[i-1]);
+			return data;
+		},
+		totalAssigned() { return player.c.assigned.reduce((a,c) => Decimal.add(a, c)) },
+		minAssigned() { return player.c.assigned.reduce((a,c) => Decimal.min(a, c)) },
+		eff1() { return tmp.c.power[1].times(50) },
+		eff2() { return Decimal.pow(1e20, tmp.c.power[2]) },
+		eff3() { return Decimal.pow(1e15, tmp.c.power[3]) },
+		eff4() { return Decimal.pow("1e1000", tmp.c.power[4]) },
+		eff5() { return tmp.c.power[5].plus(1).log(4).plus(1) },
+		tabFormat: ["main-display",
+			"prestige-button",
+			"resource-display", "blank",
+			["row", [
+				["column", [
+					["display-text", "<h3>Civ<sub>1</sub></h3>"],
+					["display-text", function() { return (player.c.assigned[0].gt(0)?("Population: "+formatWhole(player.c.assigned[0])+"<br>"):"")+"Power: "+format(tmp.c.power[1].times(100))+"%" }], "blank",
+					["display-text", function() { return "Effect: +"+format(tmp.c.eff1.times(100))+"% Hyper Building Power" }],
+					"blank", ["clickable", 11],
+				], function() { return {width: "9em", visibility: player.c.points.gte(1)?"visible":"hidden"}}],
+				["tall-display-text", "<div class='vl2'></div>", function() { return {height: "223.667px", visibility: player.c.points.gte(2)?"visible":"hidden"}}],
+				["column", [
+					["display-text", "<h3>Civ<sub>2</sub></h3>"],
+					["display-text", function() { return (player.c.assigned[1].gt(0)?("Population: "+formatWhole(player.c.assigned[1])+"<br>"):"")+"Power: "+format(tmp.c.power[2].times(100))+"%" }], "blank",
+					["display-text", function() { return "Effect: Divide Thought requirement by "+format(tmp.c.eff2) }],
+					"blank", ["clickable", 12],
+				], function() { return {width: "9em", visibility: player.c.points.gte(2)?"visible":"hidden"}}],
+				["tall-display-text", "<div class='vl2'></div>", function() { return {height: "223.667px", visibility: player.c.points.gte(3)?"visible":"hidden"}}],
+				["column", [
+					["display-text", "<h3>Civ<sub>3</sub></h3>"],
+					["display-text", function() { return (player.c.assigned[2].gt(0)?("Population: "+formatWhole(player.c.assigned[2])+"<br>"):"")+"Power: "+format(tmp.c.power[3].times(100))+"%" }], "blank",
+					["display-text", function() { return "Effect: Multiply Signal gain by "+format(tmp.c.eff3) }],
+					"blank", ["clickable", 13],
+				], function() { return {width: "9em", visibility: player.c.points.gte(3)?"visible":"hidden"}}],
+				["tall-display-text", "<div class='vl2'></div>", function() { return {height: "223.667px", visibility: player.c.points.gte(4)?"visible":"hidden"}}],
+				["column", [
+					["display-text", "<h3>Civ<sub>4</sub></h3>"],
+					["display-text", function() { return (player.c.assigned[3].gt(0)?("Population: "+formatWhole(player.c.assigned[3])+"<br>"):"")+"Power: "+format(tmp.c.power[4].times(100))+"%" }], "blank",
+					["display-text", function() { return "Effect: Multiply Damned Soul & Mech-Energy gain by "+format(tmp.c.eff4) }],
+					"blank", ["clickable", 14],
+				], function() { return {width: "9em", visibility: player.c.points.gte(4)?"visible":"hidden"}}],
+				["tall-display-text", "<div class='vl2'></div>", function() { return {height: "223.667px", visibility: player.c.points.gte(5)?"visible":"hidden"}}],
+				["column", [
+					["display-text", "<h3>Civ<sub>5</sub></h3>"],
+					["display-text", function() { return (player.c.assigned[4].gt(0)?("Population: "+formatWhole(player.c.assigned[4])+"<br>"):"")+"Power: "+format(tmp.c.power[5].times(100))+"%" }], "blank",
+					["display-text", function() { return "Effect: Super Boosters & Neural Networks are "+format(tmp.c.eff5.sub(1).times(100))+"% stronger" }],
+					"blank", ["clickable", 15],
+				], function() { return {width: "9em", visibility: player.c.points.gte(5)?"visible":"hidden"}}],
+			], function() { return {visibility: player.c.unlocked?"visible":"hidden"} }], "blank", "blank",
+			"buyables",
+		],
+		buyables: {
+			showRespec() { return player.c.points.gte(6) },
+            respec() {
+                player[this.layer].points = player[this.layer].points.add(player[this.layer].spentOnBuyables);
+				player.c.assigned = [new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0)];
+				player.c.gainedPower = [new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0), new Decimal(0)];
+                doReset(this.layer, true);
+            },
+			respecText: "Reset Populations",
+			rows: 1,
+			cols: 1,
+			11: {
+				title: "Population",
+				cost(x=player[this.layer].buyables[this.id]) {
+					return Decimal.pow(1.5, x.pow(1.1)).times(4e5).round();
+				},
+				cap() { 
+					let cap = player.c.points.sub(4).max(0);
+					cap = cap.plus(player.c.points.div(5).sub(1).max(0).floor().times(2));
+					cap = cap.plus(player.c.points.div(12).max(0).floor());
+					return cap;
+				},
+				display() { // Everything else displayed in the buyable button after the title
+                    let data = tmp[this.layer].buyables[this.id];
+					let cost = data.cost;
+					let amt = player[this.layer].buyables[this.id];
+                    let display = formatWhole(player.ai.points)+" / "+formatWhole(cost)+" Superintelligence"+(tmp.nerdMode?(" (1.5^(x^1.1))*400,000"):"")+"<br><br>Population: "+formatWhole(amt)+" / "+formatWhole(data.cap);
+					return display;
+                },
+                unlocked() { return unl(this.layer) && player.c.points.gte(6) }, 
+                canAfford() {
+					if (!tmp[this.layer].buyables[this.id].unlocked) return false;
+					let cost = layers[this.layer].buyables[this.id].cost();
+                    return player[this.layer].unlocked && player.ai.points.gte(cost) && player.c.buyables[this.id].lt(tmp[this.layer].buyables[this.id].cap);
+				},
+                buy() { 
+					let cost = tmp[this.layer].buyables[this.id].cost;
+					player.ai.points = player.ai.points.sub(cost);
+					player.c.buyables[this.id] = player.c.buyables[this.id].plus(1);
+                },
+                style: {'height':'140px', 'width':'140px'},
+				autoed() { return false },
+			},
+		},
+		clickables: {
+			rows: 1,
+			cols: 5,
+			11: {
+				title: "+1 Population",
+				display: "",
+				unlocked() { return player.c.unlocked && player.c.points.gte(6) },
+				canClick() { return player.c.unlocked && player.c.points.gte(6) && layers.c.totalAssigned().lt(player.c.buyables[11]) && layers.c.minAssigned().eq(player.c.assigned[0]) },
+				onClick() { 
+					player.c.assigned[0] = player.c.assigned[0].plus(1);
+				},
+				style: {width: "120px", height: "50px", "border-radius": "0px"},
+			},
+			12: {
+				title: "+1 Population",
+				display: "",
+				unlocked() { return player.c.unlocked && player.c.points.gte(6) },
+				canClick() { return player.c.unlocked && player.c.points.gte(6) && layers.c.totalAssigned().lt(player.c.buyables[11]) && layers.c.minAssigned().eq(player.c.assigned[1]) },
+				onClick() { 
+					player.c.assigned[1] = player.c.assigned[1].plus(1);
+				},
+				style: {width: "120px", height: "50px", "border-radius": "0px"},
+			},
+			13: {
+				title: "+1 Population",
+				display: "",
+				unlocked() { return player.c.unlocked && player.c.points.gte(6) },
+				canClick() { return player.c.unlocked && player.c.points.gte(6) && layers.c.totalAssigned().lt(player.c.buyables[11]) && layers.c.minAssigned().eq(player.c.assigned[2]) },
+				onClick() { 
+					player.c.assigned[2] = player.c.assigned[2].plus(1);
+				},
+				style: {width: "120px", height: "50px", "border-radius": "0px"},
+			},
+			14: {
+				title: "+1 Population",
+				display: "",
+				unlocked() { return player.c.unlocked && player.c.points.gte(6) },
+				canClick() { return player.c.unlocked && player.c.points.gte(6) && layers.c.totalAssigned().lt(player.c.buyables[11]) && layers.c.minAssigned().eq(player.c.assigned[3]) },
+				onClick() { 
+					player.c.assigned[3] = player.c.assigned[3].plus(1);
+				},
+				style: {width: "120px", height: "50px", "border-radius": "0px"},
+			},
+			15: {
+				title: "+1 Population",
+				display: "",
+				unlocked() { return player.c.unlocked && player.c.points.gte(6) },
+				canClick() { return player.c.unlocked && player.c.points.gte(6) && layers.c.totalAssigned().lt(player.c.buyables[11]) && layers.c.minAssigned().eq(player.c.assigned[4]) },
+				onClick() { 
+					player.c.assigned[4] = player.c.assigned[4].plus(1);
+				},
+				style: {width: "120px", height: "50px", "border-radius": "0px"},
+			},
+		},
+})
+
 addLayer("a", {
         startData() { return {
             unlocked: true,
@@ -7448,7 +9143,7 @@ addLayer("a", {
             return ("Achievements")
         },
         achievements: {
-            rows: 13,
+            rows: 16,
             cols: 5,
             11: {
                 name: "All that progress is gone!",
@@ -7632,7 +9327,7 @@ addLayer("a", {
 			65: {
 				name: "The Blood Moon",
 				unlocked() { return hasAchievement("a", 111) },
-				done() { return player.ma.mastered.includes("o")&&player.ma.mastered.includes("s") },
+				done() { return player.ma.mastered.includes("o")&&player.ma.mastered.includes("ss") },
 				tooltip: "Master Solarity & Subspace.",
 				image: "images/achs/65.png",
 			},
@@ -7818,8 +9513,8 @@ addLayer("a", {
 			125: {
 				name: "Baseless Property",
 				unlocked() { return hasAchievement("a", 111) },
-				done() { return player.points.gte("e2.5e13") && player.ss.best.eq(0) && player.q.buyables[11].eq(0) && player.sb.best.eq(0) && player.sg.best.eq(0) && player.t.best.eq(0) && player.s.best.eq(0) && player.e.buyables[11].eq(0) && player.t.buyables[11].eq(0) && player.b.best.eq(0) && player.g.best.eq(0) && inChallenge("h", 42) },
-				tooltip: 'Reach e2.5e13 Points while in the "Productionless" Hindrance and without Subspace Energy, Quirk Layers, any Row 3 currencies or buyables (except Enhance Points & Space Buildings), Boosters, or Generators.',
+				done() { return player.points.gte("e2.5e13") && inChallenge("h", 42) },
+				tooltip: 'Reach e2.5e13 Points while in the "Productionless" Hindrance.',
 				image: "images/achs/125.png",
 			},
 			131: {
@@ -7836,7 +9531,7 @@ addLayer("a", {
 			},
 			133: {
 				name: "Breaching the Barriers",
-				done() { return player.mc.mechEn.gte("1e375") },
+				done() { return player.mc.mechEn.times(tmp.mc.mechEnMult).gte("1e375") },
 				tooltip: "Reach 1e375 Mech-Energy. Reward: You can have 2 parts of The Motherboard active at once, Northbridge's effect is cubed, and there is a new Gear Upgrade.",
 				image: "images/achs/133.png",
 			},
@@ -7852,6 +9547,99 @@ addLayer("a", {
 				done() { return player.points.gte("ee15") },
 				tooltip: "Reach e1e15 Points.",
 				image: "images/achs/135.png",
+			},
+			141: {
+				name: "Powerful Mind",
+				done() { return player.en.unlocked || player.ne.unlocked },
+				tooltip: "Unlock Energy or Neurons. Reward: You can have all parts of The Motherboard active at once",
+				image: "images/achs/141.png",
+			},
+			142: {
+				name: "Failed Error",
+				done() { return player.en.sw.gte(104) },
+				tooltip: "Reach 104 Super Watts.",
+				image: "images/achs/142.png",
+			},
+			143: {
+				name: "Big Brain",
+				done() { return inChallenge("ne", 11) && player.points.gte("e5e11") },
+				tooltip: "Reach e5e11 Points while in The Brain. Reward: Triple Signal gain",
+				image: "images/achs/143.png",
+			},
+			144: {
+				name: "Scrappy Toes",
+				done() { return player.mc.points.gte(1e11) },
+				tooltip: "Reach 1e11 Machine Parts.",
+				image: "images/achs/144.png",
+			},
+			145: {
+				name: "Dizzy Whirl",
+				unlocked() { return hasAchievement("a", 111) },
+				done() { return player.ge.rotations.gte(2.5e19) && player.ge.boosted.eq(0) },
+				tooltip: "Reach 2.5e19 Gear Rotations without any Gear Upgrades.",
+				image: "images/achs/145.png",
+			},
+			151: {
+				name: "Planning for Success",
+				done() { return player.id.unlocked && player.r.unlocked },
+				tooltip: "Unlock Robots & Ideas. Reward: Permanently keep Energy milestones 1-3 & 5, and gain Signals while outside The Brain at a reduced rate.",
+				image: "images/achs/151.png",
+			},
+			152: {
+				name: "Slight Importance",
+				done() { return player.g.power.gte("ee12") },
+				tooltip: "Reach e1e12 Generator Power. Reward: The Generator Power effect is raised ^1.4.",
+				image: "images/achs/152.png",
+			},
+			153: {
+				name: "Crowned Royally",
+				done() { return player.hn.points.gte(Decimal.pow(10, 1e8)) },
+				tooltip: "Reach e100,000,000 Honour.",
+				image: "images/achs/153.png",
+			},
+			154: {
+				name: "Floating Prism",
+				done() { return player.ne.thoughts.gte(625) && player.ne.points.lt(player.id.points) },
+				tooltip: "Reach 625 Thoughts while having less Neurons than Ideas.",
+				image: "images/achs/154.png",
+			},
+			155: {
+				name: "Epic Big Brain",
+				unlocked() { return hasAchievement("a", 111) },
+				done() { return player.ne.thoughts.gte(1000) },
+				tooltip: "Reach 1,000 Thoughts. Reward: The Idea effect is increased by 0.005.",
+				image: "images/achs/155.png",
+			},
+			161: {
+				name: "The World is Ours!",
+				done() { return player.ai.unlocked },
+				tooltip: "Unlock AI. Reward: Permanently keep Neuron milestone 6, Robot milestones 2 & 5, & Idea milestone 4.",
+				image: "images/achs/161.png",
+			},
+			162: {
+				name: "What a useless feature!",
+				done() { return tmp.id.rev.gte(1650) && player.ai.upgrades.length==0 },
+				tooltip: "Reach 1,650 Revelations without any AI Nodes.",
+				image: "images/achs/162.png",
+			},
+			163: {
+				name: "I Own The World",
+				done() { return player.c.unlocked },
+				tooltip() { return "Unlock Civilizations. Reward: Ideas multiply Artificial Consciousness gain, and divide the Mastery requirement by 1.1 for each achievement in this row and below (/"+format(Decimal.pow(1.1, player.a.achievements.filter(x => x>160).length))+")." },
+				image: "images/achs/163.png",
+			},
+			164: {
+				name: "Existence was a Mistake",
+				done() { return player.c.buyables[11].gte(1) },
+				tooltip() { return "Get a Population of at least 1. Reward: Always have the first & fifth Idea milestones, and each Population decreases the Civilization requirement by 2 (-"+formatWhole(player.c.buyables[11].times(2).min(100))+", caps at -100)." },
+				image: "images/achs/164.png",
+			},
+			165: {
+				name: "Option F?",
+				unlocked() { return hasAchievement("a", 111) },
+				done() { return player.h.challenges[32]>=1e6 },
+				tooltip: "Complete Option D at least 1,000,000 times.",
+				image: "images/achs/165.png",
 			},
 		},
 		tabFormat: [
@@ -7889,15 +9677,15 @@ addLayer("sc", {
 	],
 }) 
 
-addLayer("at", {
+addLayer("ab", {
 	startData() { return {unlocked: true}},
 	color: "yellow",
-	symbol: "AT",
+	symbol: "AB",
 	row: "side",
 	layerShown() { return player.t.unlocked || player.s.unlocked },
 	tooltip: "Autobuyers",
 	clickables: {
-		rows: 5,
+		rows: 6,
 		cols: 4,
 		11: {
 			title: "Boosters",
@@ -7907,7 +9695,7 @@ addLayer("at", {
 			unlocked() { return player.t.unlocked },
 			canClick() { return hasMilestone("t", 3) },
 			onClick() { player.b.auto = !player.b.auto },
-			style: {"background-color" : "#6e64c4"},
+			style: {"background-color"() { return player.b.auto?"#6e64c4":"#666666" }},
 		},
 		12: {
 			title: "Generators",
@@ -7917,7 +9705,7 @@ addLayer("at", {
 			unlocked() { return player.s.unlocked },
 			canClick() { return hasMilestone("s", 3) },
 			onClick() { player.g.auto = !player.g.auto },
-			style: {"background-color" : "#a3d9a5"},
+			style: {"background-color"() { return player.g.auto?"#a3d9a5":"#666666" }},
 		},
 		13: {
 			title: "Enhancers",
@@ -7927,7 +9715,7 @@ addLayer("at", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 1) },
 			onClick() { player.e.auto = !player.e.auto },
-			style: {"background-color" : "#b82fbd"},
+			style: {"background-color"() { return player.e.auto?"#b82fbd":"#666666" }},
 		},
 		14: {
 			title: "Extra Time Capsules",
@@ -7937,7 +9725,7 @@ addLayer("at", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 1) },
 			onClick() { player.t.autoExt = !player.t.autoExt },
-			style: {"background-color" : "#006609"},
+			style: {"background-color"() { return player.t.autoExt?"#006609":"#666666" }},
 		},
 		21: {
 			title: "Time Capsules",
@@ -7947,7 +9735,7 @@ addLayer("at", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 3) },
 			onClick() { player.t.auto = !player.t.auto },
-			style: {"background-color" : "#006609"},
+			style: {"background-color"() { return player.t.auto?"#006609":"#666666" }},
 		},
 		22: {
 			title: "Space Energy",
@@ -7957,7 +9745,7 @@ addLayer("at", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 3) },
 			onClick() { player.s.auto = !player.s.auto },
-			style: {"background-color" : "#dfdfdf"},
+			style: {"background-color"() { return player.s.auto?"#dfdfdf":"#666666" }},
 		},
 		23: {
 			title: "Super Boosters",
@@ -7967,7 +9755,7 @@ addLayer("at", {
 			unlocked() { return player.q.unlocked },
 			canClick() { return hasMilestone("q", 4) },
 			onClick() { player.sb.auto = !player.sb.auto },
-			style: {"background-color" : "#504899"},
+			style: {"background-color"() { return player.sb.auto?"#504899":"#666666" }},
 		},
 		24: {
 			title: "Super Generators",
@@ -7977,7 +9765,7 @@ addLayer("at", {
 			unlocked() { return player.sg.unlocked },
 			canClick() { return hasMilestone("q", 6) },
 			onClick() { player.sg.auto = !player.sg.auto },
-			style: {"background-color" : "#248239"},
+			style: {"background-color"() { return player.sg.auto?"#248239":"#666666" }},
 		},
 		31: {
 			title: "Space Buildings",
@@ -7987,7 +9775,7 @@ addLayer("at", {
 			unlocked() { return player.sg.unlocked },
 			canClick() { return hasMilestone("q", 7) },
 			onClick() { player.s.autoBld = !player.s.autoBld },
-			style: {"background-color" : "#dfdfdf"},
+			style: {"background-color"() { return player.s.autoBld?"#dfdfdf":"#666666" }},
 		},
 		32: {
 			title: "Quirk Layers",
@@ -7997,7 +9785,7 @@ addLayer("at", {
 			unlocked() { return player.ba.unlocked },
 			canClick() { return hasMilestone("ba", 1) },
 			onClick() { player.q.auto = !player.q.auto },
-			style: {"background-color" : "#c20282"},
+			style: {"background-color"() { return player.q.auto?"#c20282":"#666666" }},
 		},
 		33: {
 			title: "Subspace Energy",
@@ -8007,7 +9795,7 @@ addLayer("at", {
 			unlocked() { return player.ba.unlocked },
 			canClick() { return hasMilestone("ba", 2) },
 			onClick() { player.ss.auto = !player.ss.auto },
-			style: {"background-color" : "#e8ffff"},
+			style: {"background-color"() { return player.ss.auto?"#e8ffff":"#666666" }},
 		},
 		34: {
 			title: "Spells",
@@ -8017,7 +9805,7 @@ addLayer("at", {
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 2) },
 			onClick() { player.m.auto = !player.m.auto },
-			style: {"background-color" : "#eb34c0"},
+			style: {"background-color"() { return player.m.auto?"#eb34c0":"#666666" }},
 		},
 		41: {
 			title: "Phantom Souls",
@@ -8027,7 +9815,7 @@ addLayer("at", {
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 4) },
 			onClick() { player.ps.auto = !player.ps.auto },
-			style: {"background-color" : "#b38fbf"},
+			style: {"background-color"() { return player.ps.auto?"#b38fbf":"#666666" }},
 		},
 		42: {
 			title: "Wraiths",
@@ -8037,7 +9825,7 @@ addLayer("at", {
 			unlocked() { return player.hn.unlocked },
 			canClick() { return hasMilestone("hn", 5) },
 			onClick() { player.ps.autoW = !player.ps.autoW },
-			style: {"background-color" : "#b38fbf"},
+			style: {"background-color"() { return player.ps.autoW?"#b38fbf":"#666666" }},
 		},
 		43: {
 			title: "Ghost Spirit",
@@ -8047,7 +9835,7 @@ addLayer("at", {
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 0) },
 			onClick() { player.ps.autoGhost = !player.ps.autoGhost },
-			style: {"background-color" : "#b38fbf"},
+			style: {"background-color"() { return player.ps.autoGhost?"#b38fbf":"#666666" }},
 		},
 		44: {
 			title: "Imperium Bricks",
@@ -8057,7 +9845,7 @@ addLayer("at", {
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 4) },
 			onClick() { player.i.auto = !player.i.auto },
-			style: {"background-color" : "#e5dab7"},
+			style: {"background-color"() { return player.i.auto?"#e5dab7":"#666666" }},
 		},
 		51: {
 			title: "Hyperspace",
@@ -8067,7 +9855,61 @@ addLayer("at", {
 			unlocked() { return player.ma.unlocked },
 			canClick() { return hasMilestone("ma", 5) },
 			onClick() { player.hs.auto = !player.hs.auto },
-			style: {"background-color" : "#dfdfff"},
+			style: {"background-color"() { return player.hs.auto?"#dfdfff":"#666666" }},
+		},
+		52: {
+			title: "Gear Upgrades",
+			display() { return hasMilestone("ge", 3)?(player.ge.auto?"On":"Off"):"Locked" },
+			unlocked() { return player.ai.unlocked && player.ge.unlocked },
+			canClick() { return hasMilestone("ge", 3) },
+			onClick() { player.ge.auto = !player.ge.auto },
+			style: {"background-color"() { return player.ge.auto?"#ababab":"#666666" }},
+		},
+		53: {
+			title: "Shell Expansion",
+			display() {
+				return hasMilestone("id", 3)?(player.mc.autoSE?"On":"Off"):"Locked"
+			},
+			unlocked() { return player.id.unlocked && player.mc.unlocked },
+			canClick() { return hasMilestone("id", 3) },
+			onClick() { player.mc.autoSE = !player.mc.autoSE },
+			style: {"background-color"() { return player.mc.autoSE?"#c99a6b":"#666666" }},
+		},
+		54: {
+			title: "Motherboard",
+			display() { return hasMilestone("mc", 1)?(player.mc.auto?"On":"Off"):"Locked" },
+			unlocked() { return player.ai.unlocked && player.mc.unlocked },
+			canClick() { return hasMilestone("mc", 1) },
+			onClick() { player.mc.auto = !player.mc.auto },
+			style: {"background-color"() { return player.mc.auto?"#c99a6b":"#666666" }},
+		},
+		61: {
+			title: "Neurons",
+			display() {
+				return hasMilestone("ne", 5)?(player.ne.auto?"On":"Off"):"Locked"
+			},
+			unlocked() { return player.ne.unlocked && player.en.unlocked },
+			canClick() { return hasMilestone("ne", 5) },
+			onClick() { player.ne.auto = !player.ne.auto },
+			style: {"background-color"() { return player.ne.auto?"#ded9ff":"#666666" }},
+		},
+		62: {
+			title: "Neural Networks",
+			display() {
+				return hasMilestone("ne", 7)?(player.ne.autoNN?"On":"Off"):"Locked"
+			},
+			unlocked() { return player.ne.unlocked && player.ai.unlocked },
+			canClick() { return hasMilestone("ne", 7) },
+			onClick() { player.ne.autoNN = !player.ne.autoNN },
+			style: {"background-color"() { return player.ne.autoNN?"#ded9ff":"#666666" }},
+		},
+		63: {
+			title: "Ideas",
+			display() { return hasMilestone("id", 4)?(player.id.auto?"On":"Off"):"Locked" },
+			unlocked() { return player.id.unlocked && player.ai.unlocked },
+			canClick() { return hasMilestone("id", 4) },
+			onClick() { player.id.auto = !player.id.auto },
+			style: {"background-color"() { return player.id.auto?"#fad682":"#666666" }},
 		},
 	},
 })

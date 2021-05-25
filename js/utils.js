@@ -66,11 +66,14 @@ function formatWhole(decimal, reallyWhole=false) {
 }
 
 function formatTime(s) {
-	if (s<60) return format(s)+"s"
-	else if (s<3600) return formatWhole(Math.floor(s/60))+"m "+format(s%60)+"s"
-	else if (s<86400) return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
-	else if (s<31536000) return formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
-	else return formatWhole(Math.floor(s/31536000))+"y "+formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	s = new Decimal(s);
+	if (s.gte(1/0)) return "Forever"
+	else if (s.lt(60)) return format(s)+"s"
+	else if (s.lt(3600)) return formatWhole(s.div(60).floor())+"m "+format(s.toNumber()%60)+"s"
+	else if (s.lt(86400)) return formatWhole(s.div(3600).floor())+"h "+format(s.div(60).floor().toNumber()%60)+"m"
+	else if (s.lt(31536000)) return formatWhole(s.div(84600).floor())+"d " + formatWhole(s.div(3600).floor().toNumber()%24)+"h"
+	else if (s.lt(31536000000)) return formatWhole(s.div(31536000).floor())+"y "+formatWhole(s.div(84600).floor().toNumber()%365)+"d"
+	else return formatWhole(s.div(31536000).floor())+"y"
 }
 
 function toPlaces(x, precision, maxAccepted) {
@@ -124,6 +127,7 @@ function startPlayerBase() {
 		spaceGlow: "normal",
 		solGlow: "normal",
 		majGlow: "uncasted",
+		shellGlow: true,
 		scShown: true,
 		oldStyle: false,
 		hideStars: false,
@@ -401,6 +405,7 @@ function NaNcheck(data) {
 			NaNcheck(data[item])
 		}
 		else if (data[item] !== data[item] || data[item] === decimalNaN){
+			console.log("DATA: "+JSON.stringify(data));
 			if (NaNalert === true || confirm ("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
 				NaNalert = true
 				data[item] = (data[item] !== data[item] ? 0 : decimalZero)
@@ -610,9 +615,10 @@ function respecBuyables(layer) {
 	updateBuyableTemp(layer)
 }
 
-function canAffordUpgrade(layer, id) {
+function canAffordUpgrade(layer, id, skipAfford=false) {
 	let upg = tmp[layer].upgrades[id]
-	if (upg.multiRes) {
+	if (layers[layer].upgrades[id].canAfford!==undefined && !skipAfford) return upg.canAfford;
+	else if (upg.multiRes) {
 		for (let i=0;i<upg.multiRes.length;i++) {
 			let cost = upg.multiRes[i].cost
 			if (!canAffordPurchase(layer, upg.multiRes[i], cost)) return false;
@@ -937,7 +943,7 @@ function updateMilestones(layer){
 		let done = layers[layer].milestones[id].done();
 		if (!player[layer].primeMiles.includes(id) && done) {
 			player[layer].primeMiles.push(id);
-			if (player.milNotify && !player[layer].milestones.includes(id)) addNotification("milestone", layers[layer].milestones[id].requirementDescription, "Milestone Gotten!");
+			if (player.milNotify && !player[layer].milestones.includes(id)) addNotification("milestone", tmp[layer].milestones[id].requirementDescription, "Milestone Gotten!");
 		}
 		if (!(player[layer].milestones.includes(id)) && done) {
 			player[layer].milestones.push(id)

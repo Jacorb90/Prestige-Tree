@@ -148,8 +148,11 @@
 							<td><button class="opt" onclick="adjustGlow('slight')">White Glow: {{ player.slightGlow.toUpperCase() }}</button></td>
 							<td><button class="opt" onclick="toggleOpt('redGlowActive')">Red Glow: {{ player.redGlowActive?"ON":"OFF" }}</button></td>
 							<td><button v-if="player.s.unlocked" class="opt" onclick="adjustGlow('space')">Red Glow - Space Buildings: {{ player.spaceGlow.toUpperCase() }}</button></td>
+						</tr>
+						<tr>
 							<td><button v-if="player.o.unlocked" class="opt" onclick="adjustGlow('sol')">Red Glow - Solarity Buyables: {{ player.solGlow.toUpperCase() }}</button></td>
 							<td><button v-if="player.m.unlocked" class="opt" onclick="adjustGlow('maj')">Red Glow - Spells: {{ player.majGlow.toUpperCase() }}</button></td>
+							<td><button v-if="player.mc.unlocked" class="opt" onclick="toggleOpt('shellGlow')">Red Glow - Shell Expansion: {{ player.shellGlow?"ON":"OFF" }}</button></td>
 						</tr>
 					</table>
 				</div><br><br>
@@ -199,7 +202,7 @@
 				<layer-tab :layer="player.navTab == 'none' ? player.tab : player.navTab"></layer-tab>
 
 			</div>
-			<div v-if="(player.navTab !== 'none' && player.tab !== 'tree' && LAYERS.includes(player.tab)) && !(gameEnded && !player.keepGoing)" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
+			<div v-if="(player.navTab !== 'none' && player.tab !== 'tree' && LAYERS.includes(player.tab)) && !(gameEnded && !player.keepGoing)" onscroll="resizeCanvas()" v-bind:class="{ fullWidth: player.navTab == 'none', col: player.navTab != 'none', right: player.navTab != 'none', fast: true, tab: true}">
 				<layer-tab :layer="player.tab" :back="'tree'" :spacing="'50px'"></layer-tab>
 			</div>
 		</div>
