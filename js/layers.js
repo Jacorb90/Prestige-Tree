@@ -7299,7 +7299,7 @@ addLayer("mc", {
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
 			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
-			if (hasMilestone("id", 3) && player.mc.autoSE) layers.mc.buyables[11].max();
+			if (hasMilestone("id", 3) && player.mc.autoSE) layers.mc.buyables[11].buyMax();
 			if (hasMilestone("mc", 1) && player.mc.auto) {
 				player.mc.clickables[11] = player.mc.clickables[11].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
 				player.mc.clickables[12] = player.mc.clickables[12].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
@@ -7490,7 +7490,7 @@ addLayer("mc", {
 					if (n.sub(b).eq(1)) player.mc.points = player.mc.points.sub(tmp[this.layer].buyables[this.id].cost);
 					else player.mc.points = player.mc.points.sub(n.sub(b).times(b.plus(n).plus(10)).times(0.05).max(n.sub(b)).div(tmp[this.layer].buyables[this.id].costDiv).floor()).max(0);
                 },
-				max() {
+				buyMax() {
 					let c = player.mc.points.times(tmp[this.layer].buyables[this.id].costDiv);
 					let n = c.sub(.5).times(10).plus(1).floor().max(0);
                     player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].max(n);
@@ -7699,7 +7699,7 @@ addLayer("en", {
 			1: {
 				requirementDescription: "22,500 Energy in one reset",
 				done() { return player.en.bestOnReset.gte(22500) || hasAchievement("a", 151) },
-				effectDescription: "20% of Energy that's lost over time becomes stored, Energy milestones are kept on all resets up to Row 7 (except ???), and when below 1, the Stored Energy effect is square rooted.",
+				effectDescription: "20% of Energy that's lost over time becomes stored, Energy milestones are kept on all resets up to Row 7 (except Robots & AI), and when below 1, the Stored Energy effect is square rooted.",
 			},
 			2: {
 				requirementDescription: "335,000 Energy in one reset",
