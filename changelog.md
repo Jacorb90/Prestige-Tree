@@ -1,7 +1,7 @@
 # The Prestige Tree: Rewritten changelog (major updates only):
 
 ### v1.3: The Expansion Update
-- Added "EN" layer
+- Added a bunch of new layers
 - Added the next section of achievements
 
 ### v1.2: Mechanical Mastery
