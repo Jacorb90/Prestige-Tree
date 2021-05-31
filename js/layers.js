@@ -7298,7 +7298,13 @@ addLayer("mc", {
         branches: ["hs", "i", "id"],
 		update(diff) {
 			if (!player[this.layer].unlocked) return;
-			player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
+			//player.mc.mechEn = player.mc.mechEn.plus(player.ge.rotations.times(tmp.mc.mechPer).times(diff)).times(tmp.mc.decayPower.pow(diff));
+			let decayPower = tmp.mc.decayPower.recip();
+			
+			if (tmp.mc.decayPower.lte(1.0001)) 
+				player.mc.mechEn = player.mc.mechEn.add(player.ge.rotations.times(tmp.mc.mechPer).mul(diff));
+			else
+				player.mc.mechEn = player.mc.mechEn.add(player.ge.rotations.times(tmp.mc.mechPer).mul(0.001).sub(player.mc.mechEn.mul(decayPower.pow(0.001).sub(1))).mul(decayPower.pow(0.001).sub(1).recip().mul(Decimal.sub(1, tmp.mc.decayPower.pow(diff)))))
 			if (hasMilestone("id", 3) && player.mc.autoSE) layers.mc.buyables[11].max();
 			if (hasMilestone("mc", 1) && player.mc.auto) {
 				player.mc.clickables[11] = player.mc.clickables[11].max(player.mc.mechEn.times(tmp.mc.mechEnMult));
@@ -7597,7 +7603,6 @@ addLayer("en", {
 			let gain = tmp.en.getResetGain.div(tmp.en.gainMult).plus(1)
 			return Decimal.pow(2, gain.root(tmp.en.exp)).times(tmp.en.req);
 		},
-		passiveGeneration() { return hasMilestone("en", 0)?0.1:0 },
 		canReset() {
 			return player.o.points.gte(tmp.en.req) && tmp.en.getResetGain.gt(0) && (hasMilestone("en", 0)?player.en.points.lt(tmp.en.getResetGain):player.en.points.eq(0))
 		},
@@ -7633,6 +7638,7 @@ addLayer("en", {
 			}
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         },
+    	passiveGeneration() { return hasMilestone("en", 0)?0.1:0},
 		onPrestige(gain) { player.en.bestOnReset = player.en.bestOnReset.max(gain) },
         layerShown(){return player.mc.unlocked },
         branches: ["sb","o"],
@@ -8508,7 +8514,7 @@ addLayer("ai", {
 			if (tmp.ai.divConsc.lte(1.00001)) player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(diff));
 			else player.ai.consc = player.ai.consc.add(tmp.ai.buyables[11].effect.mul(0.001).sub(player.ai.consc.mul(tmp.ai.divConsc.pow(0.001).sub(1))).mul(tmp.ai.divConsc.pow(0.001).sub(1).recip().mul(Decimal.sub(1, tmp.ai.divConsc.pow(0.001).recip().pow(diff*1000)))))
 		},
-		divConsc() { return player.ai.time.plus(1).log10().plus(1).sqrt() },
+		divConsc() { return player.ai.time.plus(1).log10().plus(1).sqrt()},
 		conscEff1() { return player.ai.consc.plus(1) },
 		conscEff2() { return player.ai.consc.plus(1).log(3).plus(1) },
 		tabFormat: ["main-display",
