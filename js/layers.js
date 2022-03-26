@@ -19,7 +19,9 @@ addLayer("p", {
 			if (hasUpgrade("b", 11)) mult = mult.times(upgradeEffect("b", 11));
 			if (hasUpgrade("g", 11)) mult = mult.times(upgradeEffect("g", 11));
 			if (player.t.unlocked) mult = mult.times(tmp.t.enEff);
-			if (player.e.unlocked) mult = mult.times(tmp.e.buyables[11].effect.first);
+			// At the start of the the game, effects may be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			if (player.e.unlocked) mult = mult.times(tmp.e.buyables[11].effect.first ?? Decimal.dOne);
 			if (player.s.unlocked) mult = mult.times(buyableEffect("s", 11));
 			if (hasUpgrade("e", 12)) mult = mult.times(upgradeEffect("e", 12));
 			if (hasUpgrade("b", 31)) mult = mult.times(upgradeEffect("b", 31));
@@ -310,7 +312,9 @@ addLayer("b", {
 			if (hasUpgrade("b", 12)) base = base.plus(upgradeEffect("b", 12));
 			if (hasUpgrade("b", 13)) base = base.plus(upgradeEffect("b", 13));
 			if (hasUpgrade("t", 11)) base = base.plus(upgradeEffect("t", 11));
-			if (hasUpgrade("e", 11)) base = base.plus(upgradeEffect("e", 11).b);
+			// At the start of the the game, upgradeEffects might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			if (hasUpgrade("e", 11)) base = base.plus(upgradeEffect("e", 11).b ?? Decimal.dZero);
 			if (player.e.unlocked) base = base.plus(layers.e.buyables[11].effect().second);
 			if (player.s.unlocked) base = base.plus(buyableEffect("s", 12));
 			if (hasUpgrade("t", 25)) base = base.plus(upgradeEffect("t", 25));
@@ -582,7 +586,9 @@ addLayer("g", {
 			// ADD
 			if (hasUpgrade("g", 12)) base = base.plus(upgradeEffect("g", 12));
 			if (hasUpgrade("g", 13)) base = base.plus(upgradeEffect("g", 13));
-			if (hasUpgrade("e", 11)) base = base.plus(upgradeEffect("e", 11).g);
+			// At the start of the the game, upgradeEffects might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			if (hasUpgrade("e", 11)) base = base.plus(upgradeEffect("e", 11).g ?? Decimal.dZero);
 			if (player.e.unlocked) base = base.plus(layers.e.buyables[11].effect().second);
 			if (player.s.unlocked) base = base.plus(buyableEffect("s", 12));
 			
@@ -909,7 +915,10 @@ addLayer("t", {
 			autoExt: false,
         }},
         color: "#006609",
-        requires() { return new Decimal(1e120).times(Decimal.pow("1e180", Decimal.pow(player[this.layer].unlockOrder, 1.415038))) }, // Can be a function that takes requirement increases into account
+        requires() {
+			// At the start of the game, unlockOrder might be undefined.
+			return new Decimal(1e120).times(Decimal.pow("1e180", Decimal.pow(player[this.layer].unlockOrder ?? 0, 1.415038)))
+		}, // Can be a function that takes requirement increases into account
         resource: "time capsules", // Name of prestige currency
         baseResource: "points", // Name of resource prestige is based on
         baseAmount() {return player.points}, // Get the current amount of baseResource
@@ -2485,7 +2494,9 @@ addLayer("sb", {
 			if (player.o.unlocked) base = base.times(buyableEffect("o", 12));
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes('b'):false) && hasUpgrade("b", 12)) base = base.times(upgradeEffect("b", 12).max(1));
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes('b'):false) && hasUpgrade("b", 13)) base = base.times(upgradeEffect("b", 13).max(1));
-			base = base.times(tmp.n.dustEffs.blue);
+			// At the start of the the game, dustEffs might not be initialized,
+			// returning Decimal.dOne instead of the expected object.
+			base = base.times(tmp.n.dustEffs.blue ?? Decimal.dOne);
 			if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false) && hasChallenge("h", 12)) base = base.times(player.hs.points.plus(1));
 			if (player.en.unlocked) base = base.pow(tmp.en.swEff);
 			if (player.c.unlocked && tmp.c) base = base.pow(tmp.c.eff5);
@@ -2632,7 +2643,9 @@ addLayer("h", {
         exponent() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?.2:.125) }, // Prestige currency exponent
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
-			if (hasUpgrade("q", 14)) mult = mult.times(upgradeEffect("q", 14).h);
+			// At the start of the the game, upgradeEffects might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			if (hasUpgrade("q", 14)) mult = mult.times(upgradeEffect("q", 14).h ?? Decimal.dOne);
 			if (player.m.unlocked) mult = mult.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("m"):false)?tmp.m.mainHexEff:tmp.m.hexEff);
 			if (hasUpgrade("ba", 22)) mult = mult.times(tmp.ba.negBuff);
             return mult
@@ -2808,7 +2821,9 @@ addLayer("h", {
 				currencyInternalName: "points",
 				rewardDescription() { return "<b>Timeless</b> completions boost Super Generator Power gain based on your time "+(hasUpgrade("ss", 33)?"playing this game.":"in this Row 4 reset.") },
 				rewardEffect() { 
-					let eff = Decimal.div(9, Decimal.add((hasUpgrade("ss", 33)?(player.timePlayed||0):player.q.time), 1).cbrt().pow(hasUpgrade("ss", 23)?(-1):1)).plus(1).pow(challengeCompletions("h", 31)).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1)).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?5:1);
+					// At the start of the the game, dustEffs might be uninitialised,
+					// returning Decimal.dOne instead of the expected object.
+					let eff = Decimal.div(9, Decimal.add((hasUpgrade("ss", 33)?(player.timePlayed||0):player.q.time), 1).cbrt().pow(hasUpgrade("ss", 23)?(-1):1)).plus(1).pow(challengeCompletions("h", 31)).times(tmp.n.realDustEffs2.blueOrange ?? Decimal.dOne).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?5:1);
 					if (!eff.eq(eff)) eff = new Decimal(1);
 					return eff;
 				},
@@ -2851,7 +2866,9 @@ addLayer("h", {
 				currencyInternalName: "points",
 				rewardDescription: "<b>Option D</b> completions multiply the Time Energy gain base.",
 				rewardEffect() { 
-					let eff = softcap("option_d", Decimal.pow(100, Decimal.pow(challengeCompletions("h", 32), 2))).times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.blueOrange:new Decimal(1));
+					// At the start of the the game, dustEffs might be uninitialised,
+					// returning Decimal.dOne instead of the expected object.
+					let eff = softcap("option_d", Decimal.pow(100, Decimal.pow(challengeCompletions("h", 32), 2))).times(tmp.n.realDustEffs2.blueOrange ?? Decimal.dOne);
 					if (!eff.eq(eff)) eff = new Decimal(1);
 					return eff;
 				},
@@ -2938,7 +2955,9 @@ addLayer("q", {
         exponent() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?.008:.0075) }, // Prestige currency exponent
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
-			if (hasUpgrade("q", 14)) mult = mult.times(upgradeEffect("q", 14).q);
+			// At the start of the the game, upgradeEffects might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			if (hasUpgrade("q", 14)) mult = mult.times(upgradeEffect("q", 14).q || Decimal.dOne);
 			mult = mult.times(improvementEffect("q", 33));
 			if (player.m.unlocked) mult = mult.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("m"):false)?tmp.m.mainHexEff:tmp.m.hexEff);
 			if (hasUpgrade("ba", 22)) mult = mult.times(tmp.ba.negBuff);
@@ -3650,7 +3669,8 @@ addLayer("o", {
 				title: "Solar Cores",
 				gain() { return player.o.points.div(2).root(1.5).pow(tmp.o.buyableGainExp).floor() },
 				effect() { 
-					let amt = player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables)
+					// At the start of the the game, multiplyBuyables might be undefined.
+					let amt = player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero)
 					amt = softcap("solCores2", softcap("solCores", amt));
 					return Decimal.pow(hasUpgrade("ss", 22)?(amt.plus(1).pow(tmp.o.solPow).cbrt()):(amt.plus(1).pow(tmp.o.solPow).log10().plus(1)), ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.1:1)
 				},
@@ -3678,7 +3698,10 @@ addLayer("o", {
 			12: {
 				title: "Tachoclinal Plasma",
 				gain() { return player.o.points.div(100).times(player.o.energy.div(2500)).root(3.5).pow(tmp.o.buyableGainExp).floor() },
-				effect() { return Decimal.pow(hasUpgrade("p", 24)?Decimal.pow(10, player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).log10().cbrt()):(player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().times(10).plus(1)), ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.1:1) },
+				effect() {
+					// At the start of the game, multiplyBuyables might be undefined.
+					return Decimal.pow(hasUpgrade("p", 24)?Decimal.pow(10, player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).log10().cbrt()):(player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().times(10).plus(1)), ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.1:1)
+				},
 				display() { // Everything else displayed in the buyable button after the title
                     let data = tmp[this.layer].buyables[this.id]
                     let display = ("Sacrifice all of your Solarity & Solar Energy for "+formatWhole(tmp[this.layer].buyables[this.id].gain)+" Tachoclinal Plasma\n"+
@@ -3703,7 +3726,10 @@ addLayer("o", {
 			13: {
 				title: "Convectional Energy",
 				gain() { return player.o.points.div(1e3).times(player.o.energy.div(2e5)).times(player.ss.subspace.div(10)).root(6.5).pow(tmp.o.buyableGainExp).floor() },
-				effect() { return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).pow(2.5).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?27.5:1) },
+				effect() {
+					// At the start of the game, multiplyBuyables might be undefined.
+					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().plus(1).pow(2.5).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?27.5:1)
+				},
 				display() { // Everything else displayed in the buyable button after the title
                     let data = tmp[this.layer].buyables[this.id]
                     let display = ("Sacrifice all of your Solarity, Solar Energy, & Subspace for "+formatWhole(tmp[this.layer].buyables[this.id].gain)+" Convectional Energy\n"+
@@ -3730,7 +3756,8 @@ addLayer("o", {
 				title: "Coronal Waves",
 				gain() { return player.o.points.div(1e5).root(5).times(player.o.energy.div(1e30).root(30)).times(player.ss.subspace.div(1e8).root(8)).times(player.q.energy.div("1e675").root(675)).pow(tmp.o.buyableGainExp).floor() },
 				effect() { 
-					let eff = player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10();
+					// At the start of the game, multiplyBuyables might be undefined.
+					let eff = player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().plus(1).log10();
 					eff = softcap("corona", eff);
 					if (hasUpgrade("hn", 24)) eff = eff.times(2);
 					if ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false) eff = eff.times(1.4);
@@ -3763,7 +3790,8 @@ addLayer("o", {
 				title: "Noval Remnants",
 				gain() { return player.o.buyables[11].div(1e150).pow(3).pow(tmp.o.buyableGainExp).floor() },
 				effect() {
-					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().root(10).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.4:1).plus(1)
+					// At the start of the game, multiplyBuyables might be undefined.
+					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().root(10).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.4:1).plus(1)
 				},
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
@@ -3788,7 +3816,8 @@ addLayer("o", {
 				title: "Nuclear Forges",
 				gain() { return player.o.buyables[11].div(1e175).times(player.o.energy.div("1e2500").root(10)).pow(tmp.o.buyableGainExp).floor() },
 				effect() {
-					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().root(2.5).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.4:1)
+					// At the start of the game, multiplyBuyables might be undefined.
+					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().root(2.5).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.4:1)
 				},
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
@@ -3814,7 +3843,8 @@ addLayer("o", {
 				title: "Blueshifted Flares",
 				gain() { return player.o.points.div("1e400").pow(10).pow(tmp.o.buyableGainExp).floor() },
 				effect() {
-					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().root(5).div(10).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.9:1)
+					// At the start of the game, multiplyBuyables might be undefined.
+					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().root(5).div(10).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.9:1)
 				},
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
@@ -3839,7 +3869,8 @@ addLayer("o", {
 				title: "Combustion Gas",
 				gain() { return player.o.energy.div("1e200000").root(100).pow(tmp.o.buyableGainExp).floor() },
 				effect() {
-					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().plus(1).log10().div(1.6).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.9:1).plus(1)
+					// At the start of the game, multiplyBuyables might be undefined.
+					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables ?? Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().plus(1).log10().div(1.6).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.9:1).plus(1)
 				},
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
@@ -3864,7 +3895,8 @@ addLayer("o", {
 				title: "Thermonuclear Reactants",
 				gain() { return player.o.points.div("1e500").pow(10).pow(tmp.o.buyableGainExp).floor() },
 				effect() {
-					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().plus(1).log10().div(3).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.9:1);
+					// At the start of the game, multiplyBuyables might be undefined.
+					return player[this.layer].buyables[this.id].times(tmp.o.multiplyBuyables || Decimal.dZero).plus(1).pow(tmp.o.solPow).log10().plus(1).log10().plus(1).log10().div(3).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.9:1);
 				},
 				display() {
 					let data = tmp[this.layer].buyables[this.id]
@@ -4161,7 +4193,9 @@ addLayer("m", {
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1);
 			if (hasAchievement("a", 74)) mult = mult.times(challengeEffect("h", 32));
-            return mult.times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.purpleBlue:new Decimal(1));
+			// At the start of the the game, dustEffs might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+            return mult.times(tmp.n.realDustEffs2.purpleBlue ?? Decimal.dOne);
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
             return new Decimal(1)
@@ -4560,7 +4594,9 @@ addLayer("ba", {
 		dirBase() { return player.ba.points.times(10) },
 		posGainMult() {
 			let mult = new Decimal(1);
-			if (hasUpgrade("ba", 24)) mult = mult.times(upgradeEffect("ba", 24).pos);
+			// At the start of the the game, upgradeEffects might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			if (hasUpgrade("ba", 24)) mult = mult.times(upgradeEffect("ba", 24).pos ?? Decimal.dOne);
 			return mult;
 		},
 		posGain() { return Decimal.pow(tmp.ba.dirBase, (hasMilestone("hn", 2)&&player.ma.current!="ba")?1:player.ba.allotted).times((hasMilestone("hn", 2)&&player.ma.current!="ba")?1:(player.ba.allotted)).times(tmp.ba.posGainMult) },
@@ -4575,7 +4611,15 @@ addLayer("ba", {
 		posNerf() { return tmp.ba.noNerfs?new Decimal(1):(player.ba.pos.plus(1).sqrt().pow(inChallenge("h", 41)?100:1)) },
 		negGainMult() {
 			let mult = new Decimal(1);
-			if (hasUpgrade("ba", 24)) mult = mult.times(upgradeEffect("ba", 24).neg);
+			// At the start of the the game, upgradeEffects might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			// That Decimal has a .neg method, which is easily confusable for the
+			// .neg property of the intended object! Only apply the effect if
+			// .neg _isn't_ a function.
+			if (hasUpgrade("ba", 24)) {
+				const effect = upgradeEffect("ba", 24).neg;
+				if (typeof effect !== "function") mult = mult.times(effect);
+			}
 			return mult;
 		},
 		negGain() { return Decimal.pow(tmp.ba.dirBase, (hasMilestone("hn", 2)&&player.ma.current!="ba")?1:(1-player.ba.allotted)).times((hasMilestone("hn", 2)&&player.ma.current!="ba")?1:(1-player.ba.allotted)).times(tmp.ba.negGainMult) },
@@ -4888,7 +4932,9 @@ addLayer("ps", {
 			if (tmp.ps.buyables[11].effects.damned) mult = mult.times(tmp.ps.buyables[11].effects.damned||1);
 			if (player.i.buyables[11].gte(1)) mult = mult.times(buyableEffect("s", 16));
 			if (player.c.unlocked) mult = mult.times(tmp.c.eff4);
-			return mult.times(tmp.n.dustEffs.purple);
+			// At the start of the the game, dustEffs might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			return mult.times(tmp.n.dustEffs.purple ?? Decimal.dOne);
 		},
 		soulGain() {
 			let gain = (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?Decimal.pow(tmp.ps.soulGainExp, player.ps.points):Decimal.pow(player.ps.points, tmp.ps.soulGainExp)).div(9.4).times(layers.ps.soulGainMult());
@@ -4912,7 +4958,11 @@ addLayer("ps", {
 			let eff = player.ps.souls.plus(1).pow(layers.ps.soulEffExp());
 			return eff;
 		},
-		powerGain() { return player.ps.souls.plus(1).times(tmp.ps.buyables[21].effect).times(tmp.n.dustEffs.purple) },
+		powerGain() {
+			// At the start of the the game, dustEffs might be uninitialised,
+			// returning Decimal.dOne instead of the expected object.
+			return player.ps.souls.plus(1).times(tmp.ps.buyables[21].effect).times(tmp.n.dustEffs.purple ?? Decimal.dOne)
+		},
 		powerExp() { return player.ps.points.sqrt().times(tmp.ps.buyables[21].effect) },
 		tabFormat: {
 			"Main Tab": {
